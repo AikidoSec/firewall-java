@@ -1,13 +1,15 @@
 package dev.aikido.AikidoAgent.context;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.HashMap;
 
-public class SpringContextObject implements ContextObject{
-    public void ContextObject() {
-        // Initialize context object : Extract headers, cookies, etc.
-    }
-    @Override
-    public HashMap<String, String> getHeaders() {
-        return null;
+public class SpringContextObject extends ContextObject{
+    private final String source = "SpringFramework";
+    public SpringContextObject(HttpServletRequest request) {
+        this.method = request.getMethod();
+        this.url = request.getRequestURL().toString();
+        this.remoteAddress = request.getRemoteAddr();
+        this.headers = null;
     }
 }
