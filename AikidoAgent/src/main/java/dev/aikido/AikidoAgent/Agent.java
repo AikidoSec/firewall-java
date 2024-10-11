@@ -1,5 +1,6 @@
 package dev.aikido.AikidoAgent;
 
+import dev.aikido.AikidoAgent.wrappers.PostgresWrapper;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
@@ -19,7 +20,7 @@ public class Agent {
     public static void premain(String agentArgs, Instrumentation inst) {
         System.out.println("Aikido Java Agent loaded.");
         new AgentBuilder.Default()
-            .type(ElementMatchers.any())
+            .type(ElementMatchers.nameContainsIgnoreCase("postgres"))
             .transform(new AikidoTransformer())
             .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
             .installOn(inst);
@@ -32,29 +33,10 @@ public class Agent {
                 ClassLoader classLoader,
                 JavaModule javaModule,
                 ProtectionDomain protectionDomain) {
+            // Builder type : https://javadoc.io/static/net.bytebuddy/byte-buddy/1.15.4/net/bytebuddy/dynamic/DynamicType.Builder.html
             System.out.println(typeDescription);
-            return builder.visit(Advice.to(LoggingAdvice.class).on(named("*")));
-        }
-
-        private static class LoggingAdvice {
-            @Advice.OnMethodEnter
-            public static void intercept(@Advice.AllArguments Object[] allArguments,
-                                         @Advice.Origin Method method) {
-                //Logger logger = LogManager.getLogger();
-                String pkgName = method.getDeclaringClass().getPackageName();
-                if(pkgName.startsWith("org.postgresql")) {
-                    System.out.println("Package : " + pkgName);
-                    System.out.println("Method "+ method.getName() + " of class " + method.getDeclaringClass().getSimpleName() + " called.");
-                }
-
-                /*
-                for (Object argument : allArguments) {
-                    logger.info("Method {}, parameter type {}, value={}",
-                            method.getName(), argument.getClass().getSimpleName(),
-                            argument.toString());
-                }
-                */
-            }
+            return builder
+                    .visit(PostgresWrapper.get());
         }
     }
 }
