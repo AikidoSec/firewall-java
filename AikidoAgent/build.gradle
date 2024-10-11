@@ -18,8 +18,8 @@ repositories {
 
 dependencies {
     implementation 'net.bytebuddy:byte-buddy:1.15.4'
-    implementation 'org.apache.logging.log4j:log4j-api:2.24.1'
     implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 jar {
@@ -45,6 +45,7 @@ task fatJar(type: Jar) {
         exclude "META-INF/LICENSE"
         exclude "META-INF/NOTICE"
         exclude "module-info.class"
+        exclude "META-INF/versions/9/module-info.class"
     }
     with jar
 }

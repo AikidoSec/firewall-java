@@ -11,7 +11,7 @@ public abstract class ContextObject {
     String route;
     String remoteAddress;
     HashMap<String, String> headers;
-    HashMap<String, ArrayList<String>> query;
+    HashMap<String, String[]> query;
     HashMap<String, String> cookies;
 
     public String getMethod() {
@@ -34,7 +34,7 @@ public abstract class ContextObject {
         return headers;
     }
 
-    public HashMap<String, ArrayList<String>> getQuery() {
+    public HashMap<String, String[]> getQuery() {
         return query;
     }
 
