@@ -19,17 +19,10 @@ public class SpringFrameworkWrapper extends Wrapper {
     private static class SpringFrameworkAdvice {
         @Advice.OnMethodEnter
         public static void intercept(@Advice.Argument(0) HttpServletRequest request) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
             ContextObject contextObject = new SpringContextObject(request);
 
-            String method = contextObject.getMethod();
-            String url = contextObject.getUrl();
-            System.out.printf("Url: %s with Method: %s \n", url, method);
-
-            String json = gson.toJson(contextObject);
-            System.out.println("Serialized JSON:");
-            System.out.println(json);
+            System.out.printf("Url: %s with Method: %s \n", contextObject.getUrl(), contextObject.getMethod());
+            System.out.println(contextObject.toJson());
 
         }
     }
