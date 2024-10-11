@@ -1,5 +1,6 @@
 package dev.aikido.AikidoAgent.context;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class SpringContextObject extends ContextObject{
         this.remoteAddress = request.getRemoteAddr();
         this.headers = extractHeaders(request);
         this.query = extractQueryParameters(request);
+        this.cookies = extractCookies(request);
     }
     private static HashMap<String, String> extractHeaders(HttpServletRequest request) {
         HashMap<String, String> headersMap = new HashMap<>();
@@ -29,7 +31,19 @@ public class SpringContextObject extends ContextObject{
         return headersMap;
     }
     private static HashMap<String, String[]> extractQueryParameters(HttpServletRequest request) {
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        return new HashMap<>(parameterMap);
+        return new HashMap<>(request.getParameterMap());
+    }
+    private static HashMap<String, String> extractCookies(HttpServletRequest request) {
+        HashMap<String, String> cookiesMap = new HashMap<>();
+        Cookie[] cookies = request.getCookies();
+        System.out.println(cookies);
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                cookiesMap.put(cookie.getName(), cookie.getValue());
+            }
+        }
+
+        return cookiesMap;
     }
 }
