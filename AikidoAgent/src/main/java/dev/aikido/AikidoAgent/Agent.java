@@ -1,6 +1,7 @@
 package dev.aikido.AikidoAgent;
 
 import dev.aikido.AikidoAgent.wrappers.PostgresWrapper;
+import dev.aikido.AikidoAgent.wrappers.RuntimeExecWrapper;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
@@ -24,7 +25,7 @@ public class Agent {
             .ignore(ElementMatchers.none())
             .type(
                 ElementMatchers.nameContainsIgnoreCase("org.postgresql.core")
-                .or(ElementMatchers.nameContainsIgnoreCase("springboot"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java"))
             )
             .transform(new AikidoTransformer())
             .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
@@ -39,13 +40,11 @@ public class Agent {
                 JavaModule javaModule,
                 ProtectionDomain protectionDomain) {
             // Builder type : https://javadoc.io/static/net.bytebuddy/byte-buddy/1.15.4/net/bytebuddy/dynamic/DynamicType.Builder.html
-            System.out.println(typeDescription.toString());
             if (Objects.equals(typeDescription.toString(), "class org.postgresql.core.NativeQuery")) {
-                System.out.println("NativeQuery");
-                return builder
-                    .visit(PostgresWrapper.get());
+                return builder.visit(PostgresWrapper.get());
             }
-            return builder;
+
+            return builder.visit(RuntimeExecWrapper.get());
         }
     }
 }
