@@ -27,12 +27,16 @@ public class Agent {
             .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
             .installOn(inst);
     }
-    private static class AikidoTransformer implements Transformer {
+    private static class AikidoTransformer implements AgentBuilder.Transformer {
         @Override
-        public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder, TypeDescription typeDescription, ClassLoader classLoader, JavaModule javaModule, ProtectionDomain protectionDomain) {
-            return builder
-                    .method(ElementMatchers.any())
-                    .intercept(Advice.to(LoggingAdvice.class))
+        public DynamicType.Builder<?> transform(
+                DynamicType.Builder<?> builder,
+                TypeDescription typeDescription,
+                ClassLoader classLoader,
+                JavaModule javaModule,
+                ProtectionDomain protectionDomain) {
+            System.out.println(typeDescription);
+            return builder.visit(Advice.to(LoggingAdvice.class).on(named("*")));
         }
 
         private static class LoggingAdvice {
