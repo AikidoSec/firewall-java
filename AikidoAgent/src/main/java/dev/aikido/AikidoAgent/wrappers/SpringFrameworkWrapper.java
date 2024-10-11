@@ -12,6 +12,10 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public class SpringFrameworkWrapper extends Wrapper {
     public static AsmVisitorWrapper get() {
+        // We wrap the function processRequest which gets called with
+        // HttpServletRequest request, HttpServletResponse response
+        // And is part of org.springframework.web.servlet.FrameworkServlet
+        // See : https://github.com/spring-projects/spring-framework/blob/eb4bf1c0a65db32a161abd6fc89c69623dd80418/spring-webmvc/src/main/java/org/springframework/web/servlet/FrameworkServlet.java#L996
         return Advice.to(SpringFrameworkAdvice.class)
                 .on(ElementMatchers.named("processRequest"));
     }
