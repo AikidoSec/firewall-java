@@ -2,6 +2,9 @@ package helpers;
 
 import org.junit.jupiter.api.Test;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import static dev.aikido.AikidoAgent.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -93,5 +96,35 @@ public class BuildRouteFromUrlTest {
         assertEquals("/block/:ip", buildRouteFromUrl("/block/100::"));
         assertEquals("/block/:ip", buildRouteFromUrl("/block/fec0::"));
         assertEquals("/block/:ip", buildRouteFromUrl("/block/227.202.96.196"));
+    }
+
+    private String generateHash(String algorithm) {
+        String data = "test";
+        try {
+            MessageDigest digest = MessageDigest.getInstance(algorithm);
+            byte[] hash = digest.digest(data.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+    }
+
+    @Test
+    public void testReplaceHashes() {
+        assertEquals("/files/:hash", buildRouteFromUrl("/files/" + generateHash("MD5")));
+        assertEquals("/files/:hash", buildRouteFromUrl("/files/" + generateHash("SHA-1")));
+        assertEquals("/files/:hash", buildRouteFromUrl("/files/" + generateHash("SHA-256")));
+        assertEquals("/files/:hash", buildRouteFromUrl("/files/" + generateHash("SHA-512")));
+    }
+
+    @Test
+    public void testReplaceSecrets() {
+        assertEquals("/confirm/:secret", buildRouteFromUrl("/confirm/CnJ4DunhYfv2db6T1FRfciRBHtlNKOYrjoz"));
     }
 }
