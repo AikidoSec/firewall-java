@@ -26,26 +26,10 @@ public class SpringFrameworkBodyWrapper extends Wrapper {
 
     private static class SpringFrameworkAdvice {
         @Advice.OnMethodExit
-        public static void interceptOnExit(@Advice.Return Object obj) {
-            Map<String, Object> properties = new HashMap<>();
-            Class<?> personClass = obj.getClass();
-            Field[] fields = personClass.getDeclaredFields();
-
-            // Iterate through the fields and extract their values
-            for (Field field : fields) {
-                // Make the field accessible if it's private
-                field.setAccessible(true);
-
-                // Get the value of the field from the person object
-                Object value = null;
-                try {
-                    value = field.get(obj);
-                    properties.put(field.getName(), value);
-                } catch (IllegalAccessException ignored) {
-                }
-            }
-
-            System.out.println(properties);
+        public static void interceptOnExit(@Advice.Return Object body) {
+            ContextObject contextObj = Context.get();
+            contextObj.setBody(body);
+            Context.set(contextObj);
         }
     }
 }
