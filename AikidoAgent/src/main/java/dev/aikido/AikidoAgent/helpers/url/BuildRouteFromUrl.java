@@ -1,11 +1,9 @@
 package dev.aikido.AikidoAgent.helpers.url;
 
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import static dev.aikido.AikidoAgent.helpers.patterns.LooksLikeASecret.looksLikeASecret;
+import static dev.aikido.AikidoAgent.helpers.patterns.LooksLikeValidIpAddress.isValidIpAddress;
 import static dev.aikido.AikidoAgent.helpers.url.UrlParser.tryParseUrlPath;
 
 public class BuildRouteFromUrl {
@@ -83,15 +81,6 @@ public class BuildRouteFromUrl {
         }
 
         return segment;
-    }
-
-    private static boolean isValidIpAddress(String segment) {
-        try {
-            InetAddress.getByName(segment);
-            return true;
-        } catch (UnknownHostException e) {
-            return false;
-        }
     }
 
     private static boolean isHash(String segment) {
