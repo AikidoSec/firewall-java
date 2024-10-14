@@ -2,6 +2,7 @@ package dev.aikido.AikidoAgent.wrappers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
 import dev.aikido.AikidoAgent.context.SpringContextObject;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,6 +11,8 @@ import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import static dev.aikido.AikidoAgent.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public class SpringFrameworkWrapper extends Wrapper {
     public static AsmVisitorWrapper get() {
@@ -26,9 +29,10 @@ public class SpringFrameworkWrapper extends Wrapper {
         public static HttpServletResponse interceptOnEnter(
                 @Advice.Argument(0) HttpServletRequest request,
                 @Advice.Argument(1) HttpServletResponse response) {
+            Context.reset();
             ContextObject contextObject = new SpringContextObject(request);
+            Context.set(contextObject);
 
-            System.out.printf("Url: %s with Method: %s \n", contextObject.getUrl(), contextObject.getMethod());
             System.out.println(contextObject.toJson());
             return response;
         }
@@ -36,7 +40,12 @@ public class SpringFrameworkWrapper extends Wrapper {
         @Advice.OnMethodExit
         public static void interceptOnExit(@Advice.Enter HttpServletResponse response) {
             int statusCode = response.getStatus();
-            System.out.println("HTTP Status Code: " + statusCode);
+            ContextObject context = Context.get();
+            boolean currentRouteUseful = isUsefulRoute(statusCode, context.getRoute(), context.getMethod());
+            if (!currentRouteUseful) {
+                return;
+            }
+            System.out.println("HTTP Status Code: " + statusCode + " Method:" + context.getMethod() + ", Route: "+ context.getRoute());
         }
     }
 }
