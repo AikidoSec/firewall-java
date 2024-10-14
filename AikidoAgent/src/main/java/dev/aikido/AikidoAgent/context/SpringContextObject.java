@@ -8,6 +8,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static dev.aikido.AikidoAgent.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
+
 public class SpringContextObject extends ContextObject{
     private final String source = "SpringFramework";
     public SpringContextObject(HttpServletRequest request) {
@@ -17,6 +19,7 @@ public class SpringContextObject extends ContextObject{
         this.headers = extractHeaders(request);
         this.query = extractQueryParameters(request);
         this.cookies = extractCookies(request);
+        this.route = buildRouteFromUrl(this.url);
     }
     private static HashMap<String, String> extractHeaders(HttpServletRequest request) {
         HashMap<String, String> headersMap = new HashMap<>();
@@ -36,7 +39,6 @@ public class SpringContextObject extends ContextObject{
     private static HashMap<String, String> extractCookies(HttpServletRequest request) {
         HashMap<String, String> cookiesMap = new HashMap<>();
         Cookie[] cookies = request.getCookies();
-        System.out.println(cookies);
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
