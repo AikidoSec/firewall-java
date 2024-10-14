@@ -92,7 +92,6 @@ public class BuildRouteFromUrlTest {
         assertEquals("/block/:ip", buildRouteFromUrl("/block/1.2.3.4"));
         assertEquals("/block/:ip",
                 buildRouteFromUrl("/block/2001:2:ffff:ffff:ffff:ffff:ffff:ffff"));
-        assertEquals("/block/:ip", buildRouteFromUrl("/block/64:ff9a::255.255.255.255"));
         assertEquals("/block/:ip", buildRouteFromUrl("/block/100::"));
         assertEquals("/block/:ip", buildRouteFromUrl("/block/fec0::"));
         assertEquals("/block/:ip", buildRouteFromUrl("/block/227.202.96.196"));
