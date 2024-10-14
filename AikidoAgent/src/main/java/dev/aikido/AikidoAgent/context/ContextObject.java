@@ -15,7 +15,14 @@ public abstract class ContextObject {
     HashMap<String, String> headers;
     HashMap<String, String[]> query;
     HashMap<String, String> cookies;
+    Object body;
 
+    public Object getBody() {
+        return body;
+    }
+    public void setBody(Object newBody) {
+        body = newBody;
+    }
     public String getMethod() {
         return method;
     }
