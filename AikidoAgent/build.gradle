@@ -1,0 +1,48 @@
+
+plugins {
+    id 'java'
+}
+
+java {
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
+}
+
+group = 'dev.aikido'
+version = '1.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    implementation 'net.bytebuddy:byte-buddy:1.15.4'
+    implementation 'org.apache.logging.log4j:log4j-api:2.24.1'
+}
+
+jar {
+    manifest {
+        attributes(
+            'Premain-Class': 'dev.aikido.AikidoAgent.Agent',
+            'Agent-Class': 'dev.aikido.AikidoAgent.Agent',
+            'Can-Redefine-Classes': 'false',
+            'Can-Retransform-Classes': 'false',
+            'Can-Set-Native-Method-Prefix': 'false'
+        )
+    }
+}
+
+task fatJar(type: Jar) {
+    manifest.from jar.manifest
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+        exclude "META-INF/LICENSE"
+        exclude "META-INF/NOTICE"
+    }
+    with jar
+}
