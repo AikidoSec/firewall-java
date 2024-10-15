@@ -3,6 +3,14 @@ package dev.aikido.AikidoAgent.vulnerabilities.sql_injection;
 import java.util.regex.Pattern;
 import java.util.regex.Pattern;
 public class SqlInjection {
+    public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
+        String queryLower = query.toLowerCase();
+        String userInputLower = userInput.toLowerCase();
+        if (shouldReturnEarly(queryLower, userInputLower)) {
+            return false;
+        }
+        return RustSQLInterface.detectSqlInjection(queryLower, userInputLower, dialect);
+    }
     /**
      *     Input : Lowercased query and user_input.
      *     Returns true if the detect_sql_injection algo should return early :
