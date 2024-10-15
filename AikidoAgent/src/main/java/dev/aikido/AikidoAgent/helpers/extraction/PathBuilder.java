@@ -38,6 +38,11 @@ public class PathBuilder {
             this.index = index;
         }
 
+        // Constructor for JWT type
+        public PathPart(String type) {
+            this.type = type;
+        }
+
         public String getType() {
             return type;
         }

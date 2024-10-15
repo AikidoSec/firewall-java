@@ -1,5 +1,7 @@
 package dev.aikido.AikidoAgent.helpers.extraction;
 
+import dev.aikido.AikidoAgent.helpers.patterns.LooksLikeJWT;
+
 import java.lang.constant.Constable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -18,7 +20,24 @@ public class StringExtractor {
         }
         if (obj instanceof String) {
             result.put((String) obj, PathBuilder.buildPathToPayload(pathToPayload));
-            // Check for JWT HERE
+
+            // Extract JWT Tokens :
+            LooksLikeJWT.Result jwtResult = LooksLikeJWT.tryDecodeAsJwt((String) obj);
+            if (jwtResult.isSuccess()) {
+                ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                newPathToPayload.add(new PathBuilder.PathPart("jwt"));
+                Map<String, String> resultsFromJWT = extractStringsRecursive(jwtResult.getPayload(), newPathToPayload);
+                for (Map.Entry<String, String> entry : resultsFromJWT.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    if (key.equals("iss") || value.endsWith("<jwt>.iss")) {
+                        // Do not add the issuer of the JWT as a string because it can contain a
+                        // domain / url and produce false positives
+                        continue;
+                    }
+                    result.put(key, value);
+                }
+            }
         }
         // We don't stringify arrays right now, it seems uncommon as an injection.
         else if (obj instanceof Collection<?>) {
