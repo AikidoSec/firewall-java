@@ -12,10 +12,12 @@ import java.util.Optional;
 
 public class IPCServer {
     private final ServerSocketChannel serverChannel;
-    public IPCServer(Path socketPath) throws IOException, InterruptedException {
+    private final BackgroundProcess process;
+    public IPCServer(Path socketPath, BackgroundProcess process) throws IOException, InterruptedException {
         // Delete previous socket file :
         Files.deleteIfExists(socketPath); // Make sure this is alright with multiple agents
 
+        this.process = process;
         // Create a new server socket channel :
         UnixDomainSocketAddress socketAddress = UnixDomainSocketAddress.of(socketPath);
         this.serverChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX);
