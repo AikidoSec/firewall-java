@@ -1,5 +1,7 @@
 package dev.aikido.AikidoAgent.background;
 
+import dev.aikido.AikidoAgent.background.utilities.UDSPath;
+
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -15,14 +17,11 @@ public class BackgroundProcess extends Thread {
             return; // Can only run if thread is daemon
         }
         System.out.println("Background thread here!");
-        Path socketPath = Path
-            .of(System.getProperty("user.home"))
-            .resolve("aikido2342.socket");
+        Path socketPath = UDSPath.getUDSPath();
         try {
             IPCServer server = new IPCServer(socketPath);
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            this.start(); // Restart thread
+        } catch (IOException | InterruptedException ignored) {
         }
+        System.out.println("Background thread closing.");
     }
 }
