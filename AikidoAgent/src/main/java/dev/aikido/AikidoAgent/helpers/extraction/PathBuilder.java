@@ -13,7 +13,7 @@ public class PathBuilder {
             if ("object".equals(part.getType())) {
                 result.append(".").append(part.getKey());
             } else if ("array".equals(part.getType())) {
-                result.append("[").append(part.getIndex()).append("]");
+                result.append(".[").append(part.getIndex()).append("]");
             } else if ("jwt".equals(part.getType())) {
                 result.append("<jwt>");
             }
