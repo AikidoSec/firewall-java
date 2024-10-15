@@ -24,6 +24,7 @@ public class BackgroundProcess extends Thread {
         this.connectionManager = new CloudConnectionManager(
                 true, Token.fromEnv(), null
         );
+        this.connectionManager.onStart();
         try {
             IPCServer server = new IPCServer(socketPath, this);
         } catch (IOException | InterruptedException ignored) {
