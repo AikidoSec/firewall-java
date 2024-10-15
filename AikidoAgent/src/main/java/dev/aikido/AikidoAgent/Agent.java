@@ -2,6 +2,7 @@ package dev.aikido.AikidoAgent;
 
 import dev.aikido.AikidoAgent.wrappers.PostgresWrapper;
 import dev.aikido.AikidoAgent.wrappers.RuntimeExecWrapper;
+import dev.aikido.AikidoAgent.wrappers.SpringFrameworkWrapper;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
@@ -25,7 +26,7 @@ public class Agent {
             .ignore(ElementMatchers.none())
             .type(
                 ElementMatchers.nameContainsIgnoreCase("org.postgresql.core")
-                .or(ElementMatchers.nameContainsIgnoreCase("java"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet"))
             )
             .transform(new AikidoTransformer())
             .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
@@ -43,7 +44,9 @@ public class Agent {
             if (Objects.equals(typeDescription.toString(), "class org.postgresql.core.NativeQuery")) {
                 return builder.visit(PostgresWrapper.get());
             }
-
+            else if (Objects.equals(typeDescription.toString(), "class org.springframework.web.servlet.FrameworkServlet")) {
+                return builder.visit(SpringFrameworkWrapper.get());
+            }
             return builder.visit(RuntimeExecWrapper.get());
         }
     }

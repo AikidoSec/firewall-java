@@ -7,7 +7,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 
 import java.util.Optional;
 
-public class RuntimeExecWrapper {
+public class RuntimeExecWrapper extends Wrapper {
     public static AsmVisitorWrapper get() {
         // Wrap Runtime.exec
         return Advice.to(RuntimeExecAdvice.class)

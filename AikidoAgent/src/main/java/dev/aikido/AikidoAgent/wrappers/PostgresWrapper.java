@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
-public class PostgresWrapper {
+public class PostgresWrapper extends Wrapper {
 
     public static AsmVisitorWrapper get() {
         // Wrap NativeQuery constructor.
@@ -22,7 +22,6 @@ public class PostgresWrapper {
     private static class PostgresAdvice {
         @Advice.OnMethodEnter
         public static void intercept(@Advice.Argument(0) String sql) {
-            //System.out.println(method);
             SQLCollector.report(sql, "postgresql");
         }
     }
