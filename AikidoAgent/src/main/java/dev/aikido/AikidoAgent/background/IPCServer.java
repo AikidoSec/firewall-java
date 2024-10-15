@@ -25,12 +25,18 @@ public class IPCServer {
     }
     private void listen() throws IOException, InterruptedException {
         while (true) {
-            System.out.println("Waiting for connection..");
             SocketChannel channel = serverChannel.accept();
             while (true) {
-                readSocketMessage(channel)
-                        .ifPresent(message -> System.out.printf("[Client message] %s", message));
-                Thread.sleep(100);
+                if (!serverChannel.isOpen()) {
+                    break;
+                }
+                Optional<String> message = readSocketMessage(channel);
+                if (message.isEmpty()) {
+                    channel.close();
+                    break;
+                }
+                System.out.printf("[Client message] %s \n", message.get());
+                Thread.sleep(10);
             }
         }
     }
