@@ -2,6 +2,7 @@ package dev.aikido.AikidoAgent;
 
 import dev.aikido.AikidoAgent.wrappers.PostgresWrapper;
 import dev.aikido.AikidoAgent.wrappers.RuntimeExecWrapper;
+import dev.aikido.AikidoAgent.wrappers.SpringFrameworkBodyWrapper;
 import dev.aikido.AikidoAgent.wrappers.SpringFrameworkWrapper;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
@@ -46,6 +47,9 @@ public class Agent {
             }
             else if (Objects.equals(typeDescription.toString(), "class org.springframework.web.servlet.FrameworkServlet")) {
                 return builder.visit(SpringFrameworkWrapper.get());
+            }
+            else if (Objects.equals(typeDescription.toString(), "class org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver")) {
+                return builder.visit(SpringFrameworkBodyWrapper.get());
             }
             return builder.visit(RuntimeExecWrapper.get());
         }
