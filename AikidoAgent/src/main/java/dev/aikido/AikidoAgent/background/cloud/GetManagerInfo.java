@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Class to give you the "agent" info, which is the CloudConnectionManager in Java.
+ */
 public class GetManagerInfo {
     public record ManagerInfo(
             boolean dryMode,

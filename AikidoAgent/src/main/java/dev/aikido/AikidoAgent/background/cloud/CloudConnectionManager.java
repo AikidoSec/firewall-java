@@ -5,6 +5,9 @@ import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.AikidoAgent.background.cloud.api.events.Started;
 import dev.aikido.AikidoAgent.helpers.env.Token;
 
+/**
+ * Class contains logic for communication with Aikido Cloud : managing config, routes, calls to API, heartbeats
+ */
 public class CloudConnectionManager {
     private final int timeout = 10;
     private boolean blockingEnabled;
