@@ -5,57 +5,69 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static dev.aikido.AikidoAgent.helpers.patterns.PrimitiveType.isPrimitiveType;
+
 public class StringExtractor {
     public static Map<String, String> extractStringsFromObject(Object obj) {
-        HashMap<String, String> result = new HashMap<>();
-        extractStringsRecursive(obj, result, ".");
-        return result;
+        return extractStringsRecursive(obj, new ArrayList<>());
     }
-    private static void extractStringsRecursive(Object obj, Map<String, String> result, String fieldName) {
+    private static Map<String, String> extractStringsRecursive(Object obj, ArrayList<PathBuilder.PathPart> pathToPayload) {
+        Map<String, String> result = new HashMap<>();
         if (obj == null) {
-            return;
+            return Map.of();
         }
-
-        if (obj.getClass().isArray()) {
-            int length = Array.getLength(obj);
-            for (int i = 0; i < length; i++) {
-                Object arrayElement = Array.get(obj, i);
-                extractStringsRecursive(arrayElement, result, "array");
-            }
-            return;
-        }
-
-        // If the object is a string, add it to the result
-        switch (obj) {
-            case String s -> {
-                result.put(fieldName, s);
-                return;
-            }
-            case Collection<?> objects -> {
-                int index = 0;
-                for (Object element : objects) {
-                    extractStringsRecursive(element, result, fieldName + "." + index);
+        if (obj instanceof String) {
+            result.put((String) obj, PathBuilder.buildPathToPayload(pathToPayload));
+            // Check for JWT HERE
+        } else if (obj instanceof Collection<?> || obj.getClass().isArray()) {
+            /* Add the stringified array as well to the results, there might
+            be accidental concatenation if the client expects a string but gets the array
+            E.g. HTTP Parameter pollution */
+            result.put(obj.toString(), PathBuilder.buildPathToPayload(pathToPayload));
+            int index = 0;
+            if (obj instanceof Collection<?>) {
+                for (Object element : (Collection<?>) obj) {
+                    ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                    newPathToPayload.add(new PathBuilder.PathPart("array", index));
+                    result.putAll(extractStringsRecursive(element, newPathToPayload));
                     index++;
                 }
-                return;
+            } else {
+                int len = Array.getLength(obj);
+                for (int i = 0; i < len; i++) {
+                    ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                    newPathToPayload.add(new PathBuilder.PathPart("array", i));
+                    result.putAll(extractStringsRecursive(Array.get(obj, i), newPathToPayload));
+                }
             }
+        } else if (obj instanceof Map<?, ?> map) {
+            for (Object key : map.keySet()) {
+                if (!isPrimitiveType(key)) {
+                    continue; // Key needs to be a primitive in order to create the path
 
-            // Otherwise, inspect the fields of the object
-            case Constable constable -> {
-                return;
+                }
+                if (key instanceof String) {
+                    result.put((String) key, PathBuilder.buildPathToPayload(pathToPayload));
+                }
+                ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                newPathToPayload.add(new PathBuilder.PathPart("object", key.toString()));
+                result.putAll(extractStringsRecursive(map.get(key), newPathToPayload));
             }
-            default -> {
+        } else if (isPrimitiveType(obj)) {
+            // Do nothing, not a string, so don't check anymore.
+        } else {
+            Field[] fields = obj.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                try {
+                    field.setAccessible(true); // Allow access to private fields
+                    Object fieldValue = field.get(obj);
+                    ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                    newPathToPayload.add(new PathBuilder.PathPart("object", field.toString()));
+                    result.putAll(extractStringsRecursive(fieldValue, newPathToPayload));
+                } catch (IllegalAccessException | RuntimeException ignored) {
+                }
             }
         }
-
-        Field[] fields = obj.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true); // Allow access to private fields
-                Object fieldValue = field.get(obj);
-                extractStringsRecursive(fieldValue, result, field.getName());
-            } catch (IllegalAccessException | RuntimeException ignored) {
-            }
-        }
+        return result;
     }
 }
