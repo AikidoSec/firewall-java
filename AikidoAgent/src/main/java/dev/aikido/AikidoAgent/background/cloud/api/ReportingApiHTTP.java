@@ -34,19 +34,29 @@ public class ReportingApiHTTP extends ReportingApi {
                 .build();
             URI uri = URI.create(reportingUrl + "api/runtime/events");
             HttpRequest request = createHttpRequest(event, token, uri);
-
             // Send the request and get the response
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            APIResponse apiResponse = toApiResponse(httpResponse);
 
-            // Print the response status and body
-            System.out.println(response.statusCode());
-            System.out.println(response.body());
-
+            System.out.println(apiResponse.configUpdatedAt());
+            System.out.println(apiResponse.error());
         } catch (Exception e) {
-            System.out.print("Error: " + e.getMessage() + "\n");
-            System.out.print("Error type: " + e.getClass().getSimpleName() + "\n");
-            // Handle specific exceptions if needed
+            System.out.print("Error while communicating with cloud: " + e.getMessage() + "\n");
         }
+    }
+    @Override
+    public APIResponse toApiResponse(HttpResponse<String> res) {
+        int status = res.statusCode();
+        if (status == 429) {
+            return new APIResponse(false, "rate_limited", 0, null, null, null, false);
+        } else if (status == 401) {
+            return new APIResponse(false, "invalid_token", 0, null, null, null, false);
+        } else if (status == 200) {
+            Gson gson = new Gson();
+            return gson.fromJson(res.body(), APIResponse.class);
+        }
+        return new APIResponse(false, "unknown_error", 0, null, null, null, false);
+
     }
     private static HttpRequest createHttpRequest(APIEvent event, String token, URI uri) {
         Gson gson = new Gson();
