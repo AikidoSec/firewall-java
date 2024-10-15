@@ -19,26 +19,22 @@ public class StringExtractor {
         if (obj instanceof String) {
             result.put((String) obj, PathBuilder.buildPathToPayload(pathToPayload));
             // Check for JWT HERE
-        } else if (obj instanceof Collection<?> || obj.getClass().isArray()) {
-            /* Add the stringified array as well to the results, there might
-            be accidental concatenation if the client expects a string but gets the array
-            E.g. HTTP Parameter pollution */
-            result.put(obj.toString(), PathBuilder.buildPathToPayload(pathToPayload));
+        }
+        // We don't stringify arrays right now, it seems uncommon as an injection.
+        else if (obj instanceof Collection<?>) {
             int index = 0;
-            if (obj instanceof Collection<?>) {
-                for (Object element : (Collection<?>) obj) {
-                    ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
-                    newPathToPayload.add(new PathBuilder.PathPart("array", index));
-                    result.putAll(extractStringsRecursive(element, newPathToPayload));
-                    index++;
-                }
-            } else {
-                int len = Array.getLength(obj);
-                for (int i = 0; i < len; i++) {
-                    ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
-                    newPathToPayload.add(new PathBuilder.PathPart("array", i));
-                    result.putAll(extractStringsRecursive(Array.get(obj, i), newPathToPayload));
-                }
+            for (Object element : (Collection<?>) obj) {
+                ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                newPathToPayload.add(new PathBuilder.PathPart("array", index));
+                result.putAll(extractStringsRecursive(element, newPathToPayload));
+                index++;
+            }
+        } else if (obj.getClass().isArray()) {
+            int len = Array.getLength(obj);
+            for (int i = 0; i < len; i++) {
+                ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                newPathToPayload.add(new PathBuilder.PathPart("array", i));
+                result.putAll(extractStringsRecursive(Array.get(obj, i), newPathToPayload));
             }
         } else if (obj instanceof Map<?, ?> map) {
             for (Object key : map.keySet()) {
