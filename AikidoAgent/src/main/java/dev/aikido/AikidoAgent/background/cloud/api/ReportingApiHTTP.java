@@ -2,6 +2,7 @@ package dev.aikido.AikidoAgent.background.cloud.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -26,7 +27,7 @@ public class ReportingApiHTTP extends ReportingApi {
     }
 
     @Override
-    public void report(String token, String event, int timeoutInSec) {
+    public void report(String token, APIEvent event, int timeoutInSec) {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(timeoutInSec))
@@ -47,7 +48,7 @@ public class ReportingApiHTTP extends ReportingApi {
             // Handle specific exceptions if needed
         }
     }
-    private static HttpRequest createHttpRequest(Object event, String token, URI uri) {
+    private static HttpRequest createHttpRequest(APIEvent event, String token, URI uri) {
         Gson gson = new Gson();
         String requestPayload = gson.toJson(event);
         return HttpRequest.newBuilder()

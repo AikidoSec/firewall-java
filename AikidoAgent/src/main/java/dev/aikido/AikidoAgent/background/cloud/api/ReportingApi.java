@@ -1,6 +1,7 @@
 package dev.aikido.AikidoAgent.background.cloud.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public abstract class ReportingApi {
      * @param res The response object containing status code and body.
      * @return A map representing the API response.
      */
+    /*
     public Map<String, Object> toApiResponse(ApiResponse res) {
         Map<String, Object> response = new HashMap<>();
         int status = res.getStatusCode();
@@ -38,6 +40,7 @@ public abstract class ReportingApi {
         response.put("error", "unknown_error");
         return response;
     }
+    */
 
     /**
      * Report event to the Aikido server.
@@ -46,5 +49,5 @@ public abstract class ReportingApi {
      * @param event           The event to report.
      * @param timeoutInSec    The timeout in seconds.
      */
-    public abstract void report(String token, String event, int timeoutInSec);
+    public abstract void report(String token, APIEvent event, int timeoutInSec);
 }
