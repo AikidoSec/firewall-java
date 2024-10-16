@@ -49,8 +49,8 @@ public class IPCServer {
     }
     private Optional<String> readSocketMessage(SocketChannel channel) throws IOException {
         StringBuilder message  = new StringBuilder();
-        // Create 1024 bytes long buffer :
-        ByteBuffer buffer = ByteBuffer.allocate(3);
+        // Create 1024 bytes long buffer (This will get re-assigned and read in the while loop)
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
 
 
         // Read channel until it's empty :
