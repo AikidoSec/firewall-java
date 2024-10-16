@@ -9,7 +9,7 @@ import jnr.ffi.annotations.In;
 import java.util.Map;
 
 public class Scanner {
-    public static void run(Attacks.Attack attack, String operation, String[] arguments) {
+    public static void scanForGivenVulnerability(Attacks.Attack attack, String operation, String[] arguments) {
         ContextObject ctx = Context.get();
         if (ctx == null) { // Client is never null
             return;
