@@ -11,7 +11,9 @@ import static dev.aikido.AikidoAgent.helpers.url.BuildRouteFromUrl.buildRouteFro
 public class SpringContextObject extends ContextObject{
     public SpringContextObject(HttpServletRequest request) {
         this.method = request.getMethod();
-        this.url = request.getRequestURL().toString();
+        if (request.getRequestURL() != null) {
+            this.url = request.getRequestURL().toString();
+        }
         this.remoteAddress = request.getRemoteAddr();
         this.headers = extractHeaders(request);
         this.query = extractQueryParameters(request);
@@ -22,8 +24,7 @@ public class SpringContextObject extends ContextObject{
     private static HashMap<String, String> extractHeaders(HttpServletRequest request) {
         HashMap<String, String> headersMap = new HashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
-
-        while (headerNames.hasMoreElements()) {
+        while (headerNames != null && headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
             String headerValue = request.getHeader(headerName);
             headersMap.put(headerName, headerValue);
