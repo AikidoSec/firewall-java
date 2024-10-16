@@ -3,12 +3,14 @@ package dev.aikido.AikidoAgent.background;
 import dev.aikido.AikidoAgent.background.cloud.CloudConnectionManager;
 import dev.aikido.AikidoAgent.background.utilities.UDSPath;
 import dev.aikido.AikidoAgent.helpers.env.Token;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-
 public class BackgroundProcess extends Thread {
+    private static final Logger logger = LogManager.getLogger(BackgroundProcess.class);
     private CloudConnectionManager connectionManager;
     private final Token token;
     public BackgroundProcess(String name, Token token) {
@@ -20,16 +22,15 @@ public class BackgroundProcess extends Thread {
         if (!Thread.currentThread().isDaemon() && token == null) {
             return; // Can only run if thread is daemon and token needs to be defined.
         }
-        System.out.println("Background thread here!");
         Path socketPath = UDSPath.getUDSPath(token);
-        System.out.println("Listening on : " + socketPath);
+        logger.debug("Background Process started, Listening on : {}", socketPath);
         this.connectionManager = new CloudConnectionManager(true, token, null);
         this.connectionManager.onStart();
         try {
             IPCServer server = new IPCServer(socketPath, this);
         } catch (IOException | InterruptedException ignored) {
         }
-        System.out.println("Background thread closing.");
+        logger.debug("Background thread closing.");
     }
     public CloudConnectionManager getCloudConnectionManager() {
         return connectionManager;

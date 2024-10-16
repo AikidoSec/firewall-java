@@ -16,11 +16,13 @@ import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.Objects;
 
-import static net.bytebuddy.matcher.ElementMatchers.named;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Agent {
+    private static final Logger logger = LogManager.getLogger(Agent.class);
     public static void premain(String agentArgs, Instrumentation inst) {
-        System.out.println("Aikido Java Agent loaded.");
+        logger.info("Aikido Java Agent loaded.");
         // Bytecode instrumentation :
         new AgentBuilder.Default()
             .ignore(ElementMatchers.none())

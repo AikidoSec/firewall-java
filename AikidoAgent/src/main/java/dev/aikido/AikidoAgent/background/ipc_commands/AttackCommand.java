@@ -5,8 +5,11 @@ import dev.aikido.AikidoAgent.background.cloud.CloudConnectionManager;
 import dev.aikido.AikidoAgent.background.cloud.api.events.DetectedAttack;
 import dev.aikido.AikidoAgent.context.ContextObject;
 import dev.aikido.AikidoAgent.vulnerabilities.Attack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AttackCommand implements Command {
+    private static final Logger logger = LogManager.getLogger(AttackCommand.class);
     private record AttackCommandData(Attack attack, ContextObject context) {}
 
     @Override
@@ -24,7 +27,7 @@ public class AttackCommand implements Command {
         Gson gson = new Gson();
         AttackCommandData attackCommandData = gson.fromJson(data, AttackCommandData.class);
         if (attackCommandData.attack == null || attackCommandData.context == null) {
-            System.out.println("Attack or context not defined correctly, returning.");
+            logger.debug("Attack or context not defined correctly, returning.");
             return;
         }
         // Generate an attack event :

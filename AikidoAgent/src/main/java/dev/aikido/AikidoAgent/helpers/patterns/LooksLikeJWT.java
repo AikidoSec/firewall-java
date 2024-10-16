@@ -26,7 +26,7 @@ public class LooksLikeJWT {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> jwtPayload = objectMapper.readValue(payload, Map.class);
             return new Result(true, jwtPayload);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return new Result(false, null);
         }
     }
