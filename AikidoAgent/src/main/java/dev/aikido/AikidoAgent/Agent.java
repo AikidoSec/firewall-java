@@ -1,5 +1,7 @@
 package dev.aikido.AikidoAgent;
 
+import dev.aikido.AikidoAgent.background.BackgroundProcess;
+import dev.aikido.AikidoAgent.helpers.env.Token;
 import dev.aikido.AikidoAgent.wrappers.PostgresWrapper;
 import dev.aikido.AikidoAgent.wrappers.RuntimeExecWrapper;
 import dev.aikido.AikidoAgent.wrappers.SpringFrameworkBodyWrapper;
@@ -23,6 +25,7 @@ import static net.bytebuddy.matcher.ElementMatchers.named;
 public class Agent {
     public static void premain(String agentArgs, Instrumentation inst) {
         System.out.println("Aikido Java Agent loaded.");
+        // Bytecode instrumentation :
         new AgentBuilder.Default()
             .ignore(ElementMatchers.none())
             .type(
@@ -32,6 +35,11 @@ public class Agent {
             .transform(new AikidoTransformer())
             .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
             .installOn(inst);
+
+        // Background process :
+        BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
+        backgroundProcess.setDaemon(true);
+        backgroundProcess.start();
     }
     private static class AikidoTransformer implements AgentBuilder.Transformer {
         @Override
