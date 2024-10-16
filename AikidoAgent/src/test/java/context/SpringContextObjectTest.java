@@ -1,5 +1,6 @@
 package context;
 
+import dev.aikido.AikidoAgent.context.ContextObject;
 import dev.aikido.AikidoAgent.context.SpringContextObject;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -108,5 +109,33 @@ class SpringContextObjectTest {
         assertEquals(2, cookiesMap.size());
         assertEquals("abc123", cookiesMap.get("sessionId"));
         assertEquals("user1", cookiesMap.get("userId"));
+    }
+    @Test
+    void testGetRouteWithSlashTest() {
+        // Arrange
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/test"));
+        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
+
+        // Act
+        springContextObject = new SpringContextObject(request);
+
+        // Assert
+        assertEquals("http://localhost/test", springContextObject.getUrl());
+        assertEquals("/test", springContextObject.getRoute());
+    }
+    @Test
+    void testGetRouteWithNumbers() {
+        // Arrange
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/api/dog/28632"));
+        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
+
+        // Act
+        springContextObject = new SpringContextObject(request);
+
+        // Assert
+        assertEquals("http://localhost/api/dog/28632", springContextObject.getUrl());
+        assertEquals("/api/dog/:number", springContextObject.getRoute());
     }
 }
