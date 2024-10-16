@@ -1,11 +1,8 @@
 package dev.aikido.AikidoAgent.wrappers;
 
-import dev.aikido.AikidoAgent.collectors.SQLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import java.util.Optional;
 
 public class RuntimeExecWrapper extends Wrapper {
     public static AsmVisitorWrapper get() {
@@ -17,8 +14,7 @@ public class RuntimeExecWrapper extends Wrapper {
     private static class RuntimeExecAdvice {
         @Advice.OnMethodEnter
         public static void intercept() {
-            System.out.println("INTERCEPT INTERCEPT INTERCEPT INTERCEPT");
-            //SQLCollector.report(sql, "postgresql");
+            // NOP
         }
     }
 }
