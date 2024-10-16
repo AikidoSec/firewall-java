@@ -4,7 +4,7 @@ import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
 
 public class Scanner {
-    public static void run(Attacks.Attack attack, String operation, String[] arguments) {
+    public static void scanForGivenVulnerability(Attacks.Attack attack, String operation, String[] arguments) {
         ContextObject ctx = Context.get();
         String[] userInputs = {}; // Update in later PR
         boolean isInjection = false;

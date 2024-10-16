@@ -22,7 +22,7 @@ public class PostgresWrapper extends Wrapper {
     private static class PostgresAdvice {
         @Advice.OnMethodEnter
         public static void intercept(@Advice.Argument(0) String sql) {
-            SQLCollector.report(sql, "postgresql");
+            SQLCollector.report(sql, "postgresql", "postgresql.core.NativeQuery");
         }
     }
 }
