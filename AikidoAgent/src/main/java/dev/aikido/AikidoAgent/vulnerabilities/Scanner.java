@@ -1,29 +1,46 @@
 package dev.aikido.AikidoAgent.vulnerabilities;
 
+import dev.aikido.AikidoAgent.background.utilities.IPCClient;
+import dev.aikido.AikidoAgent.background.utilities.IPCDefaultClient;
 import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
+import jnr.ffi.annotations.In;
+
+import java.util.Map;
 
 public class Scanner {
     public static void run(Attacks.Attack attack, String operation, String[] arguments) {
         ContextObject ctx = Context.get();
-        String[] userInputs = {}; // Update in later PR
-        boolean isInjection = false;
+        if (ctx == null) { // Client is never null
+            return;
+        }
+        Injection injection = null;
         try {
-            for (String userInput : userInputs) {
-                if (attack.getDetector().run(userInput, arguments)) {
-                    // Attack detected, set injection and break for loop.
-                    isInjection = true;
-                    break;
+            Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(ctx).getAll();
+            for (Map.Entry<String, Map<String, String>> sourceEntry : stringsFromContext.entrySet()) {
+                String source = sourceEntry.getKey();
+                for (Map.Entry<String, String> entry : sourceEntry.getValue().entrySet()) {
+                    // Extract values :
+                    String userInput = entry.getKey();
+                    String path = entry.getValue();
+                    // Run Injection code :
+                    boolean isInjection = attack.getDetector().run(userInput, arguments);
+                    if (isInjection) {
+                        System.out.println("Detected an injection: user input : " + userInput + ", Path " + path);
+                        injection = new Injection(operation, attack, source, path);
+                        break;
+                    }
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace(); // Temporary logging measure
         }
-        if (isInjection) {
+        if (injection != null) {
             // Report to background :
-
+            IPCClient client = new IPCDefaultClient();
+            injection.reportOverIPC(client);
             // Throw error :
-            throw new RuntimeException("SQL Injection");
+            throw new RuntimeException(injection.kind);
         }
     }
 }
