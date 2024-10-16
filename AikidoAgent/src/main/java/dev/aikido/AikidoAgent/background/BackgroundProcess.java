@@ -24,9 +24,7 @@ public class BackgroundProcess extends Thread {
         System.out.println("Background thread here!");
         Path socketPath = UDSPath.getUDSPath(token);
         System.out.println("Listening on : " + socketPath);
-        this.connectionManager = new CloudConnectionManager(
-                true, Token.fromEnv(), null
-        );
+        this.connectionManager = new CloudConnectionManager(true, token, null);
         this.connectionManager.onStart();
         try {
             IPCServer server = new IPCServer(socketPath, this);
