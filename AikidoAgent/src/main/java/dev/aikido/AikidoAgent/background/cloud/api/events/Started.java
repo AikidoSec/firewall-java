@@ -5,6 +5,8 @@ import dev.aikido.AikidoAgent.background.cloud.GetManagerInfo;
 
 import java.time.Instant;
 
+import static dev.aikido.AikidoAgent.helpers.UnixTimeMS.getUnixTimeMS;
+
 public class Started {
     public record StartedEvent(
             String type,
@@ -13,7 +15,6 @@ public class Started {
     ) implements APIEvent {};
     public static StartedEvent get(CloudConnectionManager connectionManager) {
         // Get current time :
-        long time = Instant.now().getEpochSecond() * 1000;
-        return new StartedEvent("started", connectionManager.getManagerInfo(), time);
+        return new StartedEvent("started", connectionManager.getManagerInfo(), getUnixTimeMS());
     }
 }
