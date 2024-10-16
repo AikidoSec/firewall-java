@@ -1,8 +1,24 @@
 package dev.aikido.AikidoAgent.vulnerabilities.sql_injection;
 
+import dev.aikido.AikidoAgent.vulnerabilities.Detector;
+
 import java.util.regex.Pattern;
-import java.util.regex.Pattern;
-public class SqlInjection {
+
+public class SqlDetector implements Detector {
+    /**
+     * @param userInput contains the user input which we want to scan
+     * @param arguments contains: [query, dialect]
+     * @return True if it detected an injection
+     */
+    public boolean run(String userInput, String[] arguments) {
+        if (arguments.length != 2) {
+            System.out.println("Error: Arguments mismatch for SqlDetector");
+            return false;
+        }
+        String query = arguments[0];
+        Dialect dialect = new Dialect(arguments[1]);
+        return detectSqlInjection(query, userInput, dialect);
+    }
     public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
         String queryLower = query.toLowerCase();
         String userInputLower = userInput.toLowerCase();
