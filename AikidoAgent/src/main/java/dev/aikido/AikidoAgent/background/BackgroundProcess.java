@@ -32,4 +32,7 @@ public class BackgroundProcess extends Thread {
         }
         System.out.println("Background thread closing.");
     }
+    public CloudConnectionManager getCloudConnectionManager() {
+        return connectionManager;
+    }
 }

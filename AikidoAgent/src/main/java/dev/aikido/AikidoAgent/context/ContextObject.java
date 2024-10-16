@@ -7,8 +7,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class ContextObject {
+public class ContextObject {
     String method;
+    String source;
     String url;
     String route;
     String remoteAddress;
@@ -25,6 +26,9 @@ public abstract class ContextObject {
     }
     public String getMethod() {
         return method;
+    }
+    public String getSource() {
+        return source;
     }
 
     public String getUrl() {
@@ -53,5 +57,10 @@ public abstract class ContextObject {
     public String toJson() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(this);
+    }
+
+    public String getJSONBody() {
+        Gson gson = new Gson();
+        return gson.toJson(this.body);
     }
 }

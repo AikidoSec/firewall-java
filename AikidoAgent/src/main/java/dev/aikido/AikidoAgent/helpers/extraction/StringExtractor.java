@@ -77,7 +77,7 @@ public class StringExtractor {
                     field.setAccessible(true); // Allow access to private fields
                     Object fieldValue = field.get(obj);
                     ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
-                    newPathToPayload.add(new PathBuilder.PathPart("object", field.toString()));
+                    newPathToPayload.add(new PathBuilder.PathPart("object", field.getName()));
                     result.putAll(extractStringsRecursive(fieldValue, newPathToPayload));
                 } catch (IllegalAccessException | RuntimeException ignored) {
                 }
