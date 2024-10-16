@@ -5,13 +5,12 @@ import dev.aikido.AikidoAgent.background.utilities.IPCClient;
 import dev.aikido.AikidoAgent.background.utilities.IPCDefaultClient;
 import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
-import jnr.ffi.annotations.In;
 
 import java.util.Map;
 
 public class Scanner {
     private record AttackCommandData(Attack attack, ContextObject context) {}
-    public static void scanForGivenVulnerability(Attacks.Attack vulnerability, String operation, String[] arguments) {
+    public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
         ContextObject ctx = Context.get();
         if (ctx == null) { // Client is never null
             return;
