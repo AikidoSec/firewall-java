@@ -29,8 +29,10 @@ public class AttackCommand implements Command {
             return;
         }
         // Generate an attack event :
-        APIEvent detectedAttack = DetectedAttack.createAPIEvent(
+        DetectedAttack.DetectedAttackEvent detectedAttack = DetectedAttack.createAPIEvent(
                 attackCommandData.attack, attackCommandData.context, connectionManager
         );
+        // Send to cloud :
+        connectionManager.onDetectedAttack(detectedAttack);
     }
 }

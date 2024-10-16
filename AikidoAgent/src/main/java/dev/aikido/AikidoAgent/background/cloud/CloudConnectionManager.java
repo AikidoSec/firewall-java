@@ -2,6 +2,7 @@ package dev.aikido.AikidoAgent.background.cloud;
 
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApi;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
+import dev.aikido.AikidoAgent.background.cloud.api.events.DetectedAttack;
 import dev.aikido.AikidoAgent.background.cloud.api.events.Started;
 import dev.aikido.AikidoAgent.helpers.env.Token;
 
@@ -26,6 +27,9 @@ public class CloudConnectionManager {
     }
     public void onStart() {
         this.api.report(this.token, Started.get(this), this.timeout);
+    }
+    public void onDetectedAttack(DetectedAttack.DetectedAttackEvent event) {
+        this.api.report(this.token, event, this.timeout);
     }
     public boolean shouldBlock() {
         return this.blockingEnabled;
