@@ -4,6 +4,7 @@ package dev.aikido.AikidoAgent.background.ipc_commands;
  * Routes the string command input to the correct class
  */
 public class CommandRouter {
+    private static final Command[] commands = {new AttackCommand()};
     public CommandRouter() {
         // Do some funky business
     }
@@ -22,6 +23,15 @@ public class CommandRouter {
         }
         String command = input.substring(0, indexOfCommandSeparator);
         String data = input.substring(indexOfCommandSeparator + 1);
-        System.out.println("Command: " + command + "; Data: " + data);
+        switchCommands(command, data);
+    }
+
+    public void switchCommands(String commandName, String data) {
+        for (Command command: commands) {
+            if (command.matchesName(commandName)) {
+                command.execute(data);
+                break;
+            }
+        }
     }
 }
