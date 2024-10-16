@@ -21,14 +21,11 @@ jobs:
         with:
           java-version: '21'
           distribution: 'adopt'
-      - name: Enter Aikido Agent directory
-        run: cd AikidoAgent
-
-      - name: Grant execute permission for Gradle wrapper
-        run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        working-directory: ./AikidoAgent
+        run: chmod +x gradlew && ./gradlew build
 
       - name: Run tests with Gradle
-        run: ./gradlew test
+        working-directory: ./AikidoAgent
+        run: chmod +x gradlew && ./gradlew test
