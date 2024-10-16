@@ -9,6 +9,7 @@ import dev.aikido.AikidoAgent.helpers.env.Token;
  * Class contains logic for communication with Aikido Cloud : managing config, routes, calls to API, heartbeats
  */
 public class CloudConnectionManager {
+    // Timeout for HTTP requests to server :
     private final int timeout = 10;
     private boolean blockingEnabled;
     private String serverless;
