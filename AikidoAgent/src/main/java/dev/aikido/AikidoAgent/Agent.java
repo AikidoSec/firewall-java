@@ -1,6 +1,7 @@
 package dev.aikido.AikidoAgent;
 
 import dev.aikido.AikidoAgent.background.BackgroundProcess;
+import dev.aikido.AikidoAgent.helpers.env.Token;
 import dev.aikido.AikidoAgent.wrappers.PostgresWrapper;
 import dev.aikido.AikidoAgent.wrappers.RuntimeExecWrapper;
 import dev.aikido.AikidoAgent.wrappers.SpringFrameworkBodyWrapper;
@@ -36,7 +37,7 @@ public class Agent {
             .installOn(inst);
 
         // Background process :
-        BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process");
+        BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
         backgroundProcess.setDaemon(true);
         backgroundProcess.start();
     }

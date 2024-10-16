@@ -5,6 +5,7 @@ import java.net.StandardProtocolFamily;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 public class IPCClient {
@@ -30,9 +31,9 @@ public class IPCClient {
         }
     }
     private static ByteBuffer stringToBytes(String str) {
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-        buffer.clear();
-        buffer.put(str.getBytes());
+        byte[] stringBytes = str.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer buffer = ByteBuffer.allocate(stringBytes.length);
+        buffer.put(stringBytes);
         buffer.flip();
         return buffer;
     }
