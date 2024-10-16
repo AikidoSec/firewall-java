@@ -7,7 +7,6 @@ import dev.aikido.AikidoAgent.helpers.env.Token;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static java.lang.Thread.sleep;
 
 public class BackgroundProcess extends Thread {
     private CloudConnectionManager connectionManager;

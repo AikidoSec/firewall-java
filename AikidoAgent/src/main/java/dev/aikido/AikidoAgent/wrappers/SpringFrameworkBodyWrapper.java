@@ -2,18 +2,9 @@ package dev.aikido.AikidoAgent.wrappers;
 
 import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
-import dev.aikido.AikidoAgent.context.SpringContextObject;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
-import static dev.aikido.AikidoAgent.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public class SpringFrameworkBodyWrapper extends Wrapper {
     public static AsmVisitorWrapper get() {

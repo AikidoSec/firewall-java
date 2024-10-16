@@ -2,7 +2,6 @@ package dev.aikido.AikidoAgent.background.ipc_commands;
 
 import com.google.gson.Gson;
 import dev.aikido.AikidoAgent.background.cloud.CloudConnectionManager;
-import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
 import dev.aikido.AikidoAgent.background.cloud.api.events.DetectedAttack;
 import dev.aikido.AikidoAgent.context.ContextObject;
 import dev.aikido.AikidoAgent.vulnerabilities.Attack;

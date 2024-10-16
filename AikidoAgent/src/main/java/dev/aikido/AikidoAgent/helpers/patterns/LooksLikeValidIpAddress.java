@@ -1,7 +1,5 @@
 package dev.aikido.AikidoAgent.helpers.patterns;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 
 public class LooksLikeValidIpAddress {

@@ -1,13 +1,11 @@
 package helpers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aikido.AikidoAgent.helpers.patterns.LooksLikeJWT;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class LooksLikeJWTTest {

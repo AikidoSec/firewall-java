@@ -4,18 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ReportingApiHTTP extends ReportingApi {
     private final String reportingUrl;

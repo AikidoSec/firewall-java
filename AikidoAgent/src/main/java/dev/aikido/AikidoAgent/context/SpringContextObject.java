@@ -3,10 +3,8 @@ package dev.aikido.AikidoAgent.context;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 
 import static dev.aikido.AikidoAgent.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
