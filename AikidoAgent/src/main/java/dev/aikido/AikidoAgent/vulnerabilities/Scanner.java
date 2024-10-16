@@ -1,5 +1,6 @@
 package dev.aikido.AikidoAgent.vulnerabilities;
 
+import com.google.gson.Gson;
 import dev.aikido.AikidoAgent.background.utilities.IPCClient;
 import dev.aikido.AikidoAgent.background.utilities.IPCDefaultClient;
 import dev.aikido.AikidoAgent.context.Context;
@@ -9,12 +10,13 @@ import jnr.ffi.annotations.In;
 import java.util.Map;
 
 public class Scanner {
-    public static void scanForGivenVulnerability(Attacks.Attack attack, String operation, String[] arguments) {
+    private record AttackCommandData(Attack attack, ContextObject context) {}
+    public static void scanForGivenVulnerability(Attacks.Attack vulnerability, String operation, String[] arguments) {
         ContextObject ctx = Context.get();
         if (ctx == null) { // Client is never null
             return;
         }
-        Injection injection = null;
+        Attack attack = null;
         try {
             Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(ctx).getAll();
             for (Map.Entry<String, Map<String, String>> sourceEntry : stringsFromContext.entrySet()) {
@@ -23,12 +25,12 @@ public class Scanner {
                     // Extract values :
                     String userInput = entry.getKey();
                     String path = entry.getValue();
-                    // Run Injection code :
-                    boolean isInjection = attack.getDetector().run(userInput, arguments);
-                    if (isInjection) {
+                    // Run attack code :
+                    boolean isAttack = vulnerability.getDetector().run(userInput, arguments);
+                    if (isAttack) {
                         System.out.println("Detected an injection: user input : " + userInput + ", Path " + path);
                         Map<String, String> metadata = Map.of("sql", arguments[0]); // Fix
-                        injection = new Injection(operation, attack, source, path, metadata, userInput);
+                        attack = new Attack(operation, vulnerability, source, path, metadata, userInput);
                         break;
                     }
                 }
@@ -36,12 +38,16 @@ public class Scanner {
         } catch (Throwable e) {
             e.printStackTrace(); // Temporary logging measure
         }
-        if (injection != null) {
+        if (attack != null) {
             // Report to background :
             IPCClient client = new IPCDefaultClient();
-            injection.reportOverIPC(client);
+            Gson gson = new Gson();
+
+            String json = gson.toJson(new AttackCommandData(attack, ctx));
+            client.sendData("ATTACK$" + json);
             // Throw error :
-            throw new RuntimeException(injection.kind);
+            throw new RuntimeException(attack.kind);
         }
     }
+
 }
