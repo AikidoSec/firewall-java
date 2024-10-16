@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static dev.aikido.AikidoAgent.helpers.UnixTimeMS.getUnixTimeMS;
+import static dev.aikido.AikidoAgent.helpers.extraction.UserAgentFromContext.getUserAgent;
 
 public class DetectedAttack {
     public record DetectedAttackEvent (
@@ -47,7 +48,7 @@ public class DetectedAttack {
             context.getMethod(), // Method
             context.getHeaders(), // headers
             context.getRemoteAddress(), // ipAddress
-            "UserAgentHere", // userAgent
+            getUserAgent(context), // userAgent
             context.getUrl(), // url
             context.getJSONBody(), // body
             context.getSource(), // source
