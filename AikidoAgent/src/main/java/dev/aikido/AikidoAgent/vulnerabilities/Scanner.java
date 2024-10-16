@@ -48,5 +48,4 @@ public class Scanner {
             throw new RuntimeException(attack.kind);
         }
     }
-
 }
