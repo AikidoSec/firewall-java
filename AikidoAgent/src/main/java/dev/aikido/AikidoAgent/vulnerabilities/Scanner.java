@@ -27,7 +27,8 @@ public class Scanner {
                     boolean isInjection = attack.getDetector().run(userInput, arguments);
                     if (isInjection) {
                         System.out.println("Detected an injection: user input : " + userInput + ", Path " + path);
-                        injection = new Injection(operation, attack, source, path);
+                        Map<String, String> metadata = Map.of("sql", arguments[0]); // Fix
+                        injection = new Injection(operation, attack, source, path, metadata, userInput);
                         break;
                     }
                 }
