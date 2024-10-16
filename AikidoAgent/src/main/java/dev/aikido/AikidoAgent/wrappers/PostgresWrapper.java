@@ -1,14 +1,9 @@
 package dev.aikido.AikidoAgent.wrappers;
 
-import dev.aikido.AikidoAgent.Agent;
 import dev.aikido.AikidoAgent.collectors.SQLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import java.lang.reflect.Method;
-
-import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class PostgresWrapper extends Wrapper {
 

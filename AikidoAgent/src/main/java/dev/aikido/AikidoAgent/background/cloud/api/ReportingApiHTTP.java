@@ -3,21 +3,17 @@ package dev.aikido.AikidoAgent.background.cloud.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ReportingApiHTTP extends ReportingApi {
+    private static final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
     private final String reportingUrl;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -37,11 +33,8 @@ public class ReportingApiHTTP extends ReportingApi {
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             APIResponse apiResponse = toApiResponse(httpResponse);
-
-            System.out.println(apiResponse.configUpdatedAt());
-            System.out.println(apiResponse.error());
         } catch (Exception e) {
-            System.out.print("Error while communicating with cloud: " + e.getMessage() + "\n");
+            logger.debug("Error while communicating with cloud: {}", e.getMessage());
         }
     }
     @Override

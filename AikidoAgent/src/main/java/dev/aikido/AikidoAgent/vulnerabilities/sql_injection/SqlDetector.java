@@ -1,10 +1,13 @@
 package dev.aikido.AikidoAgent.vulnerabilities.sql_injection;
 
 import dev.aikido.AikidoAgent.vulnerabilities.Detector;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.regex.Pattern;
 
 public class SqlDetector implements Detector {
+    private static final Logger logger = LogManager.getLogger(SqlDetector.class);
     /**
      * @param userInput contains the user input which we want to scan
      * @param arguments contains: [query, dialect]
@@ -12,7 +15,7 @@ public class SqlDetector implements Detector {
      */
     public boolean run(String userInput, String[] arguments) {
         if (arguments.length != 2) {
-            System.out.println("Error: Arguments mismatch for SqlDetector");
+            logger.debug("Arguments mismatch for SqlDetector");
             return false;
         }
         String query = arguments[0];

@@ -5,7 +5,6 @@ import dev.aikido.AikidoAgent.background.cloud.GetManagerInfo;
 import dev.aikido.AikidoAgent.context.ContextObject;
 import dev.aikido.AikidoAgent.vulnerabilities.Attack;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static dev.aikido.AikidoAgent.helpers.UnixTimeMS.getUnixTimeMS;

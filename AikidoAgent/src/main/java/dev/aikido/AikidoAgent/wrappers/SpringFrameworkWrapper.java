@@ -1,7 +1,5 @@
 package dev.aikido.AikidoAgent.wrappers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
 import dev.aikido.AikidoAgent.context.SpringContextObject;
@@ -11,10 +9,13 @@ import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.AikidoAgent.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public class SpringFrameworkWrapper extends Wrapper {
+    private static final Logger logger = LogManager.getLogger(SpringFrameworkWrapper.class);
     public static AsmVisitorWrapper get() {
         // We wrap the function processRequest which gets called with
         // HttpServletRequest request, HttpServletResponse response
@@ -32,8 +33,6 @@ public class SpringFrameworkWrapper extends Wrapper {
             Context.reset();
             ContextObject contextObject = new SpringContextObject(request);
             Context.set(contextObject);
-
-            System.out.println(contextObject.toJson());
             return response;
         }
 
@@ -45,7 +44,7 @@ public class SpringFrameworkWrapper extends Wrapper {
             if (!currentRouteUseful) {
                 return;
             }
-            System.out.println("HTTP Status Code: " + statusCode + " Method:" + context.getMethod() + ", Route: "+ context.getRoute());
+            logger.debug("{} {} On Route: {}", statusCode, context.getMethod(), context.getRoute());
         }
     }
 }

@@ -2,9 +2,7 @@ package dev.aikido.AikidoAgent.context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ContextObject {

@@ -2,6 +2,8 @@ package dev.aikido.AikidoAgent.vulnerabilities.sql_injection;
 
 import jnr.ffi.LibraryLoader;
 import jnr.ffi.LibraryOption;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -11,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RustSQLInterface {
+    private static final Logger logger = LogManager.getLogger(RustSQLInterface.class);
     public interface SqlLib {
         int detect_sql_injection(String query, String userinput, int dialect);
     }
@@ -20,7 +23,7 @@ public class RustSQLInterface {
             SqlLib lib = loadLibrary();
             return lib.detect_sql_injection(query, userInput, dialectInteger) != 0;
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            logger.trace(e);
             return false;
         }
     }

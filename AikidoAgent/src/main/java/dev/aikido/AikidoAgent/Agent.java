@@ -7,24 +7,22 @@ import dev.aikido.AikidoAgent.wrappers.RuntimeExecWrapper;
 import dev.aikido.AikidoAgent.wrappers.SpringFrameworkBodyWrapper;
 import dev.aikido.AikidoAgent.wrappers.SpringFrameworkWrapper;
 import net.bytebuddy.agent.builder.AgentBuilder;
-import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.utility.JavaModule;
-import net.bytebuddy.agent.builder.AgentBuilder.Transformer;
 
 import java.lang.instrument.Instrumentation;
-import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
 import java.util.Objects;
 
-import static net.bytebuddy.matcher.ElementMatchers.named;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Agent {
+    private static final Logger logger = LogManager.getLogger(Agent.class);
     public static void premain(String agentArgs, Instrumentation inst) {
-        System.out.println("Aikido Java Agent loaded.");
+        logger.info("Aikido Java Agent loaded.");
         // Bytecode instrumentation :
         new AgentBuilder.Default()
             .ignore(ElementMatchers.none())

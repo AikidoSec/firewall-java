@@ -1,8 +1,6 @@
 package dev.aikido.AikidoAgent.helpers.extraction;
 
 import dev.aikido.AikidoAgent.helpers.patterns.LooksLikeJWT;
-
-import java.lang.constant.Constable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;

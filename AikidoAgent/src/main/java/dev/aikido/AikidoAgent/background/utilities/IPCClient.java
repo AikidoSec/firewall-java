@@ -1,5 +1,8 @@
 package dev.aikido.AikidoAgent.background.utilities;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.net.StandardProtocolFamily;
 import java.net.UnixDomainSocketAddress;
@@ -9,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 public class IPCClient {
+    private static final Logger logger = LogManager.getLogger(IPCClient.class);
     private final UnixDomainSocketAddress socketAddress;
     public IPCClient(Path socketPath) {
         this.socketAddress = UnixDomainSocketAddress.of(socketPath);
@@ -26,8 +30,9 @@ public class IPCClient {
                 channel.write(buffer);
             }
             channel.close();
-        } catch (IOException ignored) {
-            System.out.println("Something went wrong whilst sending data.");
+        } catch (IOException e) {
+            logger.debug("Something went wrong whilst sending data.");
+            logger.trace(e);
         }
     }
     private static ByteBuffer stringToBytes(String str) {

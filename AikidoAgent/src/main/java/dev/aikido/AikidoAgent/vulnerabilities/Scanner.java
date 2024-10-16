@@ -7,8 +7,11 @@ import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
 
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Scanner {
+    private static final Logger logger = LogManager.getLogger(Scanner.class);
     private record AttackCommandData(Attack attack, ContextObject context) {}
     public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
         ContextObject ctx = Context.get();
@@ -27,15 +30,15 @@ public class Scanner {
                     // Run attack code :
                     boolean isAttack = vulnerability.getDetector().run(userInput, arguments);
                     if (isAttack) {
-                        System.out.println("Detected an injection: user input : " + userInput + ", Path " + path);
                         Map<String, String> metadata = Map.of("sql", arguments[0]); // Fix
                         attack = new Attack(operation, vulnerability, source, path, metadata, userInput);
+                        logger.info("Detected {} attack due to input: {}", vulnerability.getKind(), userInput);
                         break;
                     }
                 }
             }
         } catch (Throwable e) {
-            e.printStackTrace(); // Temporary logging measure
+            logger.debug(e);
         }
         if (attack != null) {
             // Report to background :

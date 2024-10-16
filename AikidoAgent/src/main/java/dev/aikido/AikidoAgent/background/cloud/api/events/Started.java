@@ -3,8 +3,6 @@ package dev.aikido.AikidoAgent.background.cloud.api.events;
 import dev.aikido.AikidoAgent.background.cloud.CloudConnectionManager;
 import dev.aikido.AikidoAgent.background.cloud.GetManagerInfo;
 
-import java.time.Instant;
-
 import static dev.aikido.AikidoAgent.helpers.UnixTimeMS.getUnixTimeMS;
 
 public class Started {

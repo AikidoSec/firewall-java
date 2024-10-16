@@ -1,6 +1,5 @@
 package helpers;
 
-import dev.aikido.AikidoAgent.helpers.extraction.StringExtractor;
 import org.junit.jupiter.api.Test;
 
 import static dev.aikido.AikidoAgent.helpers.extraction.StringExtractor.extractStringsFromObject;

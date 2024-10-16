@@ -14,6 +14,9 @@ public class UrlParser {
     }
 
     public static String tryParseUrlPath(String url) {
+        if (url == null) {
+            return null;
+        }
         URI parsed = tryParseUrl(url.startsWith("/") ? "http://localhost" + url : url);
         if (parsed == null || parsed.getScheme() == null) {
             return null;

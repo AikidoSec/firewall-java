@@ -3,10 +3,7 @@ package dev.aikido.AikidoAgent.background.cloud.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
 
-import java.io.IOException;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class ReportingApi {
     private static final ObjectMapper objectMapper = new ObjectMapper();
