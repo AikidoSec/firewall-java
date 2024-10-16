@@ -22,7 +22,7 @@ public class IPCServer {
         Files.deleteIfExists(socketPath); // Make sure this is alright with multiple agents
 
         this.process = process;
-        commandRouter = new CommandRouter();
+        commandRouter = new CommandRouter(process.getCloudConnectionManager());
         // Create a new server socket channel :
         UnixDomainSocketAddress socketAddress = UnixDomainSocketAddress.of(socketPath);
         this.serverChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX);

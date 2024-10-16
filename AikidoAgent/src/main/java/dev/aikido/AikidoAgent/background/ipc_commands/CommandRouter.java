@@ -1,12 +1,15 @@
 package dev.aikido.AikidoAgent.background.ipc_commands;
 
+import dev.aikido.AikidoAgent.background.cloud.CloudConnectionManager;
+
 /**
  * Routes the string command input to the correct class
  */
 public class CommandRouter {
     private static final Command[] commands = {new AttackCommand()};
-    public CommandRouter() {
-        // Do some funky business
+    private final CloudConnectionManager connectionManager;
+    public CommandRouter(CloudConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
     }
 
     /**
@@ -29,7 +32,7 @@ public class CommandRouter {
     public void switchCommands(String commandName, String data) {
         for (Command command: commands) {
             if (command.matchesName(commandName)) {
-                command.execute(data);
+                command.execute(data, this.connectionManager);
                 break;
             }
         }
