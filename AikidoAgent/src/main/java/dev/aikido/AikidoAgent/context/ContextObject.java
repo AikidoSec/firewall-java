@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class ContextObject {
+public class ContextObject {
     String method;
     String source;
     String url;

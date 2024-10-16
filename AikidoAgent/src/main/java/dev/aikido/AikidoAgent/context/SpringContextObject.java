@@ -11,7 +11,6 @@ import java.util.Map;
 import static dev.aikido.AikidoAgent.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
 public class SpringContextObject extends ContextObject{
-    private final String source = "SpringFramework";
     public SpringContextObject(HttpServletRequest request) {
         this.method = request.getMethod();
         this.url = request.getRequestURL().toString();
@@ -20,6 +19,7 @@ public class SpringContextObject extends ContextObject{
         this.query = extractQueryParameters(request);
         this.cookies = extractCookies(request);
         this.route = buildRouteFromUrl(this.url);
+        this.source = "SpringFramework";
     }
     private static HashMap<String, String> extractHeaders(HttpServletRequest request) {
         HashMap<String, String> headersMap = new HashMap<>();
