@@ -10,7 +10,7 @@ public class Dialect {
         } else if (Objects.equals(dialect, "mysql")) {
             rustDialectInt = 8;
         } else {
-            rustDialectInt = -1;
+            rustDialectInt = 0; // Default option
         }
     }
 
