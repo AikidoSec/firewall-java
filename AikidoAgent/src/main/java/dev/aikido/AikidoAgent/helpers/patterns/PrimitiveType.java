@@ -18,7 +18,6 @@ public class PrimitiveType {
         WRAPPER_TYPE_MAP.put(String.class, String.class); // Yes also see Strings as primitive.
     }
     public static boolean isPrimitiveType(Object source) {
-        System.out.println(source.getClass());
         return WRAPPER_TYPE_MAP.containsKey(source.getClass());
     }
 }
