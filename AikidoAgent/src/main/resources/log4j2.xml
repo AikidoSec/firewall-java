@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="INFO">
-    <!-- Define the appenders -->
     <Appenders>
-        <!-- Console Appender -->
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
         </Console>
     </Appenders>
-    <!-- Define the loggers -->
     <Loggers>
-        <!-- Root Logger -->
         <Root level="debug">
             <AppenderRef ref="ConsoleAppender" />
-            <AppenderRef ref="FileAppender" />
         </Root>
     </Loggers>
 </Configuration>
