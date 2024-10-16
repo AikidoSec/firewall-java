@@ -3,6 +3,7 @@ package dev.aikido.AikidoAgent.helpers.env;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class Token {
     private final String token;
@@ -25,7 +26,8 @@ public class Token {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(token.getBytes());
-            return Arrays.toString(hashBytes);
+            String base64String = Base64.getEncoder().encodeToString(hashBytes);
+            return base64String.replaceAll("=+$", "");
         } catch (NoSuchAlgorithmException ignored) {
         }
         return "default";
