@@ -1,5 +1,9 @@
 package dev.aikido.AikidoAgent.helpers.env;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+
 public class Token {
     private final String token;
     public Token(String token) {
@@ -16,5 +20,14 @@ public class Token {
     }
     public static Token fromEnv() {
         return new Token(System.getenv("AIKIDO_TOKEN"));
+    }
+    public String hash() {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(token.getBytes());
+            return Arrays.toString(hashBytes);
+        } catch (NoSuchAlgorithmException ignored) {
+        }
+        return "default";
     }
 }

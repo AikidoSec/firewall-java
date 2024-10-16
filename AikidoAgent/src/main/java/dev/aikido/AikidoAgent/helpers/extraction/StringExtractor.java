@@ -1,61 +1,88 @@
 package dev.aikido.AikidoAgent.helpers.extraction;
 
+import dev.aikido.AikidoAgent.helpers.patterns.LooksLikeJWT;
+
 import java.lang.constant.Constable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static dev.aikido.AikidoAgent.helpers.patterns.PrimitiveType.isPrimitiveType;
+
 public class StringExtractor {
     public static Map<String, String> extractStringsFromObject(Object obj) {
-        HashMap<String, String> result = new HashMap<>();
-        extractStringsRecursive(obj, result, ".");
-        return result;
+        return extractStringsRecursive(obj, new ArrayList<>());
     }
-    private static void extractStringsRecursive(Object obj, Map<String, String> result, String fieldName) {
+    private static Map<String, String> extractStringsRecursive(Object obj, ArrayList<PathBuilder.PathPart> pathToPayload) {
+        Map<String, String> result = new HashMap<>();
         if (obj == null) {
-            return;
+            return Map.of();
         }
+        if (obj instanceof String) {
+            result.put((String) obj, PathBuilder.buildPathToPayload(pathToPayload));
 
-        if (obj.getClass().isArray()) {
-            int length = Array.getLength(obj);
-            for (int i = 0; i < length; i++) {
-                Object arrayElement = Array.get(obj, i);
-                extractStringsRecursive(arrayElement, result, "array");
-            }
-            return;
-        }
-
-        // If the object is a string, add it to the result
-        switch (obj) {
-            case String s -> {
-                result.put(fieldName, s);
-                return;
-            }
-            case Collection<?> objects -> {
-                int index = 0;
-                for (Object element : objects) {
-                    extractStringsRecursive(element, result, fieldName + "." + index);
-                    index++;
+            // Extract JWT Tokens :
+            LooksLikeJWT.Result jwtResult = LooksLikeJWT.tryDecodeAsJwt((String) obj);
+            if (jwtResult.isSuccess()) {
+                ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                newPathToPayload.add(new PathBuilder.PathPart("jwt"));
+                Map<String, String> resultsFromJWT = extractStringsRecursive(jwtResult.getPayload(), newPathToPayload);
+                for (Map.Entry<String, String> entry : resultsFromJWT.entrySet()) {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    if (key.equals("iss") || value.endsWith("<jwt>.iss")) {
+                        // Do not add the issuer of the JWT as a string because it can contain a
+                        // domain / url and produce false positives
+                        continue;
+                    }
+                    result.put(key, value);
                 }
-                return;
-            }
-
-            // Otherwise, inspect the fields of the object
-            case Constable constable -> {
-                return;
-            }
-            default -> {
             }
         }
+        // We don't stringify arrays right now, it seems uncommon as an injection.
+        else if (obj instanceof Collection<?>) {
+            int index = 0;
+            for (Object element : (Collection<?>) obj) {
+                ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                newPathToPayload.add(new PathBuilder.PathPart("array", index));
+                result.putAll(extractStringsRecursive(element, newPathToPayload));
+                index++;
+            }
+        } else if (obj.getClass().isArray()) {
+            int len = Array.getLength(obj);
+            for (int i = 0; i < len; i++) {
+                ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                newPathToPayload.add(new PathBuilder.PathPart("array", i));
+                result.putAll(extractStringsRecursive(Array.get(obj, i), newPathToPayload));
+            }
+        } else if (obj instanceof Map<?, ?> map) {
+            for (Object key : map.keySet()) {
+                if (!isPrimitiveType(key)) {
+                    continue; // Key needs to be a primitive in order to create the path
 
-        Field[] fields = obj.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true); // Allow access to private fields
-                Object fieldValue = field.get(obj);
-                extractStringsRecursive(fieldValue, result, field.getName());
-            } catch (IllegalAccessException | RuntimeException ignored) {
+                }
+                if (key instanceof String) {
+                    result.put((String) key, PathBuilder.buildPathToPayload(pathToPayload));
+                }
+                ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                newPathToPayload.add(new PathBuilder.PathPart("object", key.toString()));
+                result.putAll(extractStringsRecursive(map.get(key), newPathToPayload));
+            }
+        } else if (isPrimitiveType(obj)) {
+            // Do nothing, not a string, so don't check anymore.
+        } else {
+            Field[] fields = obj.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                try {
+                    field.setAccessible(true); // Allow access to private fields
+                    Object fieldValue = field.get(obj);
+                    ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
+                    newPathToPayload.add(new PathBuilder.PathPart("object", field.toString()));
+                    result.putAll(extractStringsRecursive(fieldValue, newPathToPayload));
+                } catch (IllegalAccessException | RuntimeException ignored) {
+                }
             }
         }
+        return result;
     }
 }
