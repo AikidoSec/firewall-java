@@ -22,19 +22,16 @@ public class CommandRouter {
      * @param input raw IPC command.
      * -> E.g. input = "ATTACK${'this': 'that'}"
      */
-    public void parseIPCInput(String input) {
+    public Optional<String> parseIPCInput(String input) {
         // P
         int indexOfCommandSeparator = input.indexOf('$');
         if (indexOfCommandSeparator == -1) {
             logger.debug("Separator not found for malformed IPC command: {}", input);
-            return;
+            return Optional.empty();
         }
         String command = input.substring(0, indexOfCommandSeparator);
         String data = input.substring(indexOfCommandSeparator + 1);
-        Optional<String> commandResult = switchCommands(command, data);
-        if(commandResult.isPresent()) {
-            // Send back :
-        }
+        return switchCommands(command, data);
     }
 
     public Optional<String> switchCommands(String commandName, String data) {

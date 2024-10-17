@@ -17,7 +17,7 @@ public class IPCClient {
     public IPCClient(Path socketPath) {
         this.socketAddress = UnixDomainSocketAddress.of(socketPath);
     }
-    public void sendData(String data) {
+    public void sendData(String data, boolean receive) {
         try {
             // Start a channel :
             SocketChannel channel = SocketChannel
