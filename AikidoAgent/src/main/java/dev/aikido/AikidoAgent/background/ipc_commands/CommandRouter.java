@@ -11,7 +11,7 @@ import java.util.Optional;
  */
 public class CommandRouter {
     private static final Logger logger = LogManager.getLogger(CommandRouter.class);
-    private static final Command[] commands = {new AttackCommand()};
+    private static final Command[] commands = {new AttackCommand(), new BlockingEnabledCommand()};
     private final CloudConnectionManager connectionManager;
     public CommandRouter(CloudConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
@@ -23,7 +23,6 @@ public class CommandRouter {
      * -> E.g. input = "ATTACK${'this': 'that'}"
      */
     public Optional<String> parseIPCInput(String input) {
-        // P
         int indexOfCommandSeparator = input.indexOf('$');
         if (indexOfCommandSeparator == -1) {
             logger.debug("Separator not found for malformed IPC command: {}", input);
