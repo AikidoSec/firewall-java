@@ -4,6 +4,8 @@ import dev.aikido.AikidoAgent.background.cloud.CloudConnectionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Optional;
+
 /**
  * Routes the string command input to the correct class
  */
@@ -29,15 +31,22 @@ public class CommandRouter {
         }
         String command = input.substring(0, indexOfCommandSeparator);
         String data = input.substring(indexOfCommandSeparator + 1);
-        switchCommands(command, data);
+        Optional<String> commandResult = switchCommands(command, data);
+        if(commandResult.isPresent()) {
+            // Send back :
+        }
     }
 
-    public void switchCommands(String commandName, String data) {
+    public Optional<String> switchCommands(String commandName, String data) {
         for (Command command: commands) {
             if (command.matchesName(commandName)) {
-                command.execute(data, this.connectionManager);
+                Optional<String> commandResult = command.execute(data, this.connectionManager);
+                if (command.returnsData()) {
+                    return commandResult;
+                }
                 break;
             }
         }
+        return Optional.empty();
     }
 }
