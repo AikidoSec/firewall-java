@@ -8,7 +8,7 @@ import dev.aikido.AikidoAgent.vulnerabilities.Attack;
 import java.util.Optional;
 
 public class BlockingEnabledCommand implements  Command {
-    private record BlockingEnabledResult(boolean isBlockingEnabled) {}
+    public record BlockingEnabledResult(boolean isBlockingEnabled) {}
 
     @Override
     public boolean returnsData() {
