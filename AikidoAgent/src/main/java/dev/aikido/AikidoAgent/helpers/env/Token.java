@@ -21,12 +21,25 @@ public class Token {
     public static Token fromEnv() {
         return new Token(System.getenv("AIKIDO_TOKEN"));
     }
+
+    /**
+     * Hashes the token with SHA-256 and returns the hashed bytes in a hex representation (alphanum)
+     */
     public String hash() {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(token.getBytes());
-            String base64String = Base64.getEncoder().encodeToString(hashBytes);
-            return base64String.replaceAll("=+$", "");
+
+            // Convert hashed bytes to hexadecimal string :
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0'); // Append leading zero for single digit
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
         } catch (NoSuchAlgorithmException ignored) {
         }
         return "default";
