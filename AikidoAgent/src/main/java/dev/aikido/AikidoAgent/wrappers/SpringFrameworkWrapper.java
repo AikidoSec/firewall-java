@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 import static dev.aikido.AikidoAgent.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public class SpringFrameworkWrapper extends Wrapper {
-    private static final Logger logger = LogManager.getLogger(SpringFrameworkWrapper.class);
+    public static final Logger logger = LogManager.getLogger(SpringFrameworkWrapper.class);
     public static AsmVisitorWrapper get() {
         // We wrap the function processRequest which gets called with
         // HttpServletRequest request, HttpServletResponse response
