@@ -10,6 +10,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Optional;
+
+import static dev.aikido.AikidoAgent.background.utilities.IPCFacilitator.readSocketMessage;
+import static dev.aikido.AikidoAgent.background.utilities.IPCFacilitator.stringToBytes;
 
 public class IPCClient {
     private static final Logger logger = LogManager.getLogger(IPCClient.class);
@@ -29,17 +33,16 @@ public class IPCClient {
             while (buffer.hasRemaining()) {
                 channel.write(buffer);
             }
+            System.out.println("Wrote data to channel.");
+            if (receive) {
+                System.out.println("Receiving data..");
+                Optional<String> response = readSocketMessage(channel);
+                System.out.println(response);
+            }
             channel.close();
         } catch (IOException e) {
             logger.debug("Something went wrong whilst sending data.");
             logger.trace(e);
         }
-    }
-    private static ByteBuffer stringToBytes(String str) {
-        byte[] stringBytes = str.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer buffer = ByteBuffer.allocate(stringBytes.length);
-        buffer.put(stringBytes);
-        buffer.flip();
-        return buffer;
     }
 }

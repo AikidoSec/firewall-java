@@ -13,6 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import static dev.aikido.AikidoAgent.background.utilities.IPCFacilitator.readSocketMessage;
+import static dev.aikido.AikidoAgent.background.utilities.IPCFacilitator.stringToBytes;
+
 public class IPCServer {
     private final ServerSocketChannel serverChannel;
     private final CommandRouter commandRouter;
@@ -42,30 +45,13 @@ public class IPCServer {
                     channel.close();
                     break;
                 }
-                commandRouter.parseIPCInput(message.get());
+                Optional<String> response = commandRouter.parseIPCInput(message.get());
+                if (response.isPresent()) {
+                    // Send response :
+                    channel.write(stringToBytes(response.get()));
+                }
                 Thread.sleep(10);
             }
         }
-    }
-    private Optional<String> readSocketMessage(SocketChannel channel) throws IOException {
-        StringBuilder message  = new StringBuilder();
-        // Create 1024 bytes long buffer (This will get re-assigned and read in the while loop)
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-
-
-        // Read channel until it's empty :
-        while (channel.read(buffer) > 0) {
-            buffer.flip();
-            byte[] byteArray = new byte[buffer.remaining()];
-            buffer.get(byteArray);
-            String resultString = new String(byteArray, StandardCharsets.UTF_8);
-            message.append(resultString);
-
-            buffer.clear(); // Clear buffer so we can receive new data.
-        }
-        if (message.toString().isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(message.toString());
     }
 }
