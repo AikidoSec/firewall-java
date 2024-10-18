@@ -1,10 +1,13 @@
 package dev.aikido.AikidoAgent.background.cloud;
 
+import dev.aikido.AikidoAgent.background.cloud.api.APIResponse;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApi;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.AikidoAgent.background.cloud.api.events.DetectedAttack;
 import dev.aikido.AikidoAgent.background.cloud.api.events.Started;
 import dev.aikido.AikidoAgent.helpers.env.Token;
+
+import java.util.Optional;
 
 /**
  * Class contains logic for communication with Aikido Cloud : managing config, routes, calls to API, heartbeats
@@ -26,7 +29,8 @@ public class CloudConnectionManager {
         this.token = token.get();
     }
     public void onStart() {
-        this.api.report(this.token, Started.get(this), this.timeout);
+        Optional< APIResponse> res = this.api.report(this.token, Started.get(this), this.timeout);
+        res.ifPresent(this::updateConfig);
     }
     public void onDetectedAttack(DetectedAttack.DetectedAttackEvent event) {
         this.api.report(this.token, event, this.timeout);
@@ -40,5 +44,11 @@ public class CloudConnectionManager {
     }
     public GetManagerInfo.ManagerInfo getManagerInfo() {
         return GetManagerInfo.getManagerInfo(this);
+    }
+    public void updateConfig(APIResponse apiResponse) {
+        if (!apiResponse.success()) {
+            return;
+        }
+        this.blockingEnabled = apiResponse.block();
     }
 }
