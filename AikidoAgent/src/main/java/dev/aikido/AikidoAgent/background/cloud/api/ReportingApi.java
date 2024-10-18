@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
 
 import java.net.http.HttpResponse;
+import java.util.Optional;
 
 public abstract class ReportingApi {
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -19,9 +20,10 @@ public abstract class ReportingApi {
     /**
      * Report event to the Aikido server.
      *
-     * @param token           The authentication token.
-     * @param event           The event to report.
-     * @param timeoutInSec    The timeout in seconds.
+     * @param token        The authentication token.
+     * @param event        The event to report.
+     * @param timeoutInSec The timeout in seconds.
+     * @return
      */
-    public abstract void report(String token, APIEvent event, int timeoutInSec);
+    public abstract Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec);
 }
