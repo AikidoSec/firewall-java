@@ -15,13 +15,13 @@ public class Heartbeat {
             long time,
             Object stats,
             String[] hostnames,
-            Collection<RouteEntry> routes,
+            RouteEntry[] routes,
             String[] users
     ) implements APIEvent {};
     
     public static HeartbeatEvent get(
             CloudConnectionManager connectionManager,
-            Object stats, String[] hostnames, Collection<RouteEntry> routes, String[] users
+            Object stats, String[] hostnames, RouteEntry[] routes, String[] users
     ) {
         long time = getUnixTimeMS(); // Get current time
         GetManagerInfo.ManagerInfo agent = connectionManager.getManagerInfo();

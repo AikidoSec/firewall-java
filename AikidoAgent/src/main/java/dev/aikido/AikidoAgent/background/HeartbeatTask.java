@@ -26,7 +26,7 @@ public class HeartbeatTask extends TimerTask {
         // Get data :
         Object stats = null;
         String[] hostnames = null;
-        Collection<RouteEntry> routes = connectionManager.getRoutes().asList();
+        RouteEntry[] routes = connectionManager.getRoutes().asList();
         String[] users = null;
         // Clear data :
         connectionManager.getRoutes().clear();
