@@ -11,6 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Optional;
 
 public class ReportingApiHTTP extends ReportingApi {
     private static final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
@@ -23,7 +24,7 @@ public class ReportingApiHTTP extends ReportingApi {
     }
 
     @Override
-    public void report(String token, APIEvent event, int timeoutInSec) {
+    public Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec) {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(timeoutInSec))
@@ -32,24 +33,24 @@ public class ReportingApiHTTP extends ReportingApi {
             HttpRequest request = createHttpRequest(event, token, uri);
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            APIResponse apiResponse = toApiResponse(httpResponse);
+            return Optional.of(toApiResponse(httpResponse));
         } catch (Exception e) {
             logger.debug("Error while communicating with cloud: {}", e.getMessage());
         }
+        return Optional.empty();
     }
     @Override
     public APIResponse toApiResponse(HttpResponse<String> res) {
         int status = res.statusCode();
         if (status == 429) {
-            return new APIResponse(false, "rate_limited", 0, null, null, null, false);
+            return getUnsuccessfulAPIResponse("rate_limited");
         } else if (status == 401) {
-            return new APIResponse(false, "invalid_token", 0, null, null, null, false);
+            return getUnsuccessfulAPIResponse("invalid_token");
         } else if (status == 200) {
             Gson gson = new Gson();
             return gson.fromJson(res.body(), APIResponse.class);
         }
-        return new APIResponse(false, "unknown_error", 0, null, null, null, false);
-
+        return getUnsuccessfulAPIResponse("unknown_error");
     }
     private static HttpRequest createHttpRequest(APIEvent event, String token, URI uri) {
         Gson gson = new Gson();
@@ -60,5 +61,12 @@ public class ReportingApiHTTP extends ReportingApi {
             .header("Authorization", token) // Set Authorization header
             .POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
             .build();
+    }
+    private static APIResponse getUnsuccessfulAPIResponse(String error) {
+        return new APIResponse(
+                false, // Success
+                error,
+                0, null, null, null, false, false // Unimportant values.
+        );
     }
 }

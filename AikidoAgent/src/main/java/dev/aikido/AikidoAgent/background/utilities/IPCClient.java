@@ -2,44 +2,55 @@ package dev.aikido.AikidoAgent.background.utilities;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.newsclub.net.unix.AFUNIXSocket;
+import org.newsclub.net.unix.AFUNIXSocketAddress;
 
 import java.io.IOException;
-import java.net.StandardProtocolFamily;
-import java.net.UnixDomainSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
+import java.net.SocketException;
 import java.nio.file.Path;
+import java.util.Optional;
+
+import static dev.aikido.AikidoAgent.background.utilities.IPCFacilitator.*;
 
 public class IPCClient {
     private static final Logger logger = LogManager.getLogger(IPCClient.class);
-    private final UnixDomainSocketAddress socketAddress;
+    private final AFUNIXSocketAddress socketAddress;
     public IPCClient(Path socketPath) {
-        this.socketAddress = UnixDomainSocketAddress.of(socketPath);
-    }
-    public void sendData(String data) {
         try {
-            // Start a channel :
-            SocketChannel channel = SocketChannel
-                    .open(StandardProtocolFamily.UNIX);
-            channel.connect(socketAddress);
+            this.socketAddress = AFUNIXSocketAddress.of(socketPath.toFile());
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public Optional<String> sendData(String data, boolean receive) {
+        AFUNIXSocket socket = null;
+        try {
+            // Start socket
+            socket = AFUNIXSocket.newInstance();
+            socket.connect(socketAddress);
 
             // Write a message :
-            ByteBuffer buffer = stringToBytes(data);
-            while (buffer.hasRemaining()) {
-                channel.write(buffer);
+            if (socket.isConnected()) {
+                writeToSocket(socket, data);
             }
-            channel.close();
+            if (receive && socket.isConnected()) {
+                Optional<String> response = readFromSocket(socket);
+                socket.close();
+                return response;
+            }
         } catch (IOException e) {
             logger.debug("Something went wrong whilst sending data.");
             logger.trace(e);
+        } finally {
+            // Make sure the socket is also closed in event of a crash :
+            if (socket != null && !socket.isClosed()) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    System.err.println("Error closing socket: " + e.getMessage());
+                }
+            }
         }
-    }
-    private static ByteBuffer stringToBytes(String str) {
-        byte[] stringBytes = str.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer buffer = ByteBuffer.allocate(stringBytes.length);
-        buffer.put(stringBytes);
-        buffer.flip();
-        return buffer;
+        return Optional.empty();
     }
 }

@@ -1,5 +1,7 @@
 package dev.aikido.AikidoAgent.wrappers;
 
+import com.google.gson.Gson;
+import dev.aikido.AikidoAgent.background.utilities.IPCDefaultClient;
 import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
 import dev.aikido.AikidoAgent.context.SpringContextObject;
@@ -15,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 import static dev.aikido.AikidoAgent.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public class SpringFrameworkWrapper extends Wrapper {
-    private static final Logger logger = LogManager.getLogger(SpringFrameworkWrapper.class);
+    public static final Logger logger = LogManager.getLogger(SpringFrameworkWrapper.class);
     public static AsmVisitorWrapper get() {
         // We wrap the function processRequest which gets called with
         // HttpServletRequest request, HttpServletResponse response
@@ -41,10 +43,11 @@ public class SpringFrameworkWrapper extends Wrapper {
             int statusCode = response.getStatus();
             ContextObject context = Context.get();
             boolean currentRouteUseful = isUsefulRoute(statusCode, context.getRoute(), context.getMethod());
-            if (!currentRouteUseful) {
-                return;
+            if (currentRouteUseful) {
+                Gson gson = new Gson();
+                String data = "INIT_ROUTE$" + gson.toJson(context.getRouteMetadata());
+                new IPCDefaultClient().sendData(data, false /* does not receive a response*/);
             }
-            logger.debug("{} {} On Route: {}", statusCode, context.getMethod(), context.getRoute());
         }
     }
 }
