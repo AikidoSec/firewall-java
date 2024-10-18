@@ -11,7 +11,11 @@ import java.util.Optional;
  */
 public class CommandRouter {
     private static final Logger logger = LogManager.getLogger(CommandRouter.class);
-    private static final Command[] commands = {new AttackCommand(), new BlockingEnabledCommand()};
+    private static final Command[] commands = {
+            new AttackCommand(),
+            new BlockingEnabledCommand(),
+            new InitRouteCommand()
+    };
     private final CloudConnectionManager connectionManager;
     public CommandRouter(CloudConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
@@ -40,9 +44,10 @@ public class CommandRouter {
                 if (command.returnsData()) {
                     return commandResult;
                 }
-                break;
+                return Optional.empty();
             }
         }
+        logger.debug("Command not found: {} (With data: {})", commandName, data);
         return Optional.empty();
     }
 }
