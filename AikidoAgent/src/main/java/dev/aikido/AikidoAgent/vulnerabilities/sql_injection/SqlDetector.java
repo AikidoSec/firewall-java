@@ -24,7 +24,7 @@ public class SqlDetector implements Detector {
         boolean detectedAttack = detectSqlInjection(query, userInput, dialect);
         if (detectedAttack) {
             Map<String, String> metadata = Map.of("sql", query);
-            return new DetectorResult(/* detectedAttack*/ true, metadata);
+            return new DetectorResult(/* detectedAttack*/ true, metadata, SQLInjectionException.get(dialect));
         }
         return new DetectorResult();
     }

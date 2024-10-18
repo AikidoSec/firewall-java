@@ -7,6 +7,7 @@ import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
 
 import java.util.Map;
+import java.util.Optional;
 
 import dev.aikido.AikidoAgent.helpers.ShouldBlockHelper;
 import org.apache.logging.log4j.LogManager;
@@ -22,7 +23,7 @@ public class Scanner {
         if (ctx == null) { // Client is never null
             return;
         }
-        boolean detectedAttack = false;
+        Optional<AikidoException> exception = Optional.empty();
         try {
             Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(ctx).getAll();
             for (Map.Entry<String, Map<String, String>> sourceEntry : stringsFromContext.entrySet()) {
@@ -36,7 +37,7 @@ public class Scanner {
                     if (!detectorResult.isDetectedAttack()) {
                         continue;
                     }
-                    detectedAttack = true;
+                    exception = Optional.of(detectorResult.getException());
                     // Report attack :
                     Attack attack = new Attack(operation, vulnerability, source, path, detectorResult.getMetadata(), userInput);
                     Gson gson = new Gson();
@@ -54,8 +55,8 @@ public class Scanner {
             logger.debug(e);
         }
         // Run throw code here so it does not get caught :
-        if (detectedAttack && shouldBlock()) {
-            throw new RuntimeException(vulnerability.getKind());
+        if (exception.isPresent() && shouldBlock()) {
+            throw exception.get();
         }
     }
 }
