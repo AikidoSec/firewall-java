@@ -1,8 +1,8 @@
 package dev.aikido.AikidoAgent.background.routes;
 import dev.aikido.AikidoAgent.context.RouteMetadata;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import static dev.aikido.AikidoAgent.background.routes.RouteToKeyHelper.routeToKey;
@@ -64,8 +64,8 @@ public class Routes {
         }
     }
 
-    public Iterator<RouteEntry> iterator() {
-        return routes.values().iterator();
+    public Collection<RouteEntry> asList() {
+        return routes.values();
     }
 
     public int size() {
