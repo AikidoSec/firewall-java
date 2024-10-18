@@ -9,12 +9,14 @@ public class Attack {
     public final String pathToPayload;
     public final Map<String, String> metadata;
     public final String payload;
-    Attack(String op, Vulnerabilities.Vulnerability vulnerability, String source, String pathToPayload, Map<String, String> metadata, String payload) {
+    public final String stack;
+    Attack(String op, Vulnerabilities.Vulnerability vulnerability, String source, String pathToPayload, Map<String, String> metadata, String payload, String stack) {
         this.operation = op;
         this.kind = vulnerability.getKind();
         this.source = source;
         this.pathToPayload = pathToPayload;
         this.metadata = metadata;
         this.payload = payload;
+        this.stack = stack;
     }
 }
