@@ -26,6 +26,7 @@ public class InitRouteCommand implements Command {
     public Optional<String> execute(String data, CloudConnectionManager connectionManager) {
         Gson gson = new Gson();
         RouteMetadata routeMetadata = gson.fromJson(data, RouteMetadata.class);
+        connectionManager.getRoutes().initializeRoute(routeMetadata);
         return Optional.empty();
     }
 }

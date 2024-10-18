@@ -32,10 +32,9 @@ public class Routes {
     public void incrementRoute(RouteMetadata routeMetadata) {
         String key = routeToKey(routeMetadata);
         RouteEntry route = routes.get(key);
-        if (route == null) {
-            return;
+        if (route != null) {
+            route.incrementHits();
         }
-        route.incrementHits();
     }
 
     public RouteEntry get(RouteMetadata routeMetadata) {
