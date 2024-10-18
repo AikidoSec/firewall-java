@@ -5,6 +5,7 @@ import dev.aikido.AikidoAgent.background.cloud.api.ReportingApi;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.AikidoAgent.background.cloud.api.events.DetectedAttack;
 import dev.aikido.AikidoAgent.background.cloud.api.events.Started;
+import dev.aikido.AikidoAgent.background.routes.Routes;
 import dev.aikido.AikidoAgent.helpers.env.Token;
 
 import java.util.Optional;
@@ -16,9 +17,10 @@ public class CloudConnectionManager {
     // Timeout for HTTP requests to server :
     private final int timeout = 10;
     private boolean blockingEnabled;
-    private String serverless;
-    private ReportingApi api;
+    private final String serverless;
+    private final ReportingApi api;
     private final String token;
+    private final Routes routes;
     public CloudConnectionManager(boolean block, Token token, String serverless) {
         if (serverless != null && serverless.isEmpty()) {
             throw new IllegalArgumentException("Serverless cannot be an empty string");
@@ -27,6 +29,7 @@ public class CloudConnectionManager {
         this.serverless = serverless;
         this.api = new ReportingApiHTTP("https://guard.aikido.dev/");
         this.token = token.get();
+        this.routes = new Routes(200); // Max size is 200 routes.
     }
     public void onStart() {
         Optional< APIResponse> res = this.api.report(this.token, Started.get(this), this.timeout);
@@ -50,5 +53,8 @@ public class CloudConnectionManager {
             return;
         }
         this.blockingEnabled = apiResponse.block();
+    }
+    public Routes getRoutes() {
+        return routes;
     }
 }

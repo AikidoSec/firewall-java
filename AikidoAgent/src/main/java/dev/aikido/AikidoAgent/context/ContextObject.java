@@ -61,4 +61,8 @@ public class ContextObject {
         Gson gson = new Gson();
         return gson.toJson(this.body);
     }
+
+    public RouteMetadata getRouteMetadata() {
+        return new RouteMetadata(route, url, method);
+    }
 }

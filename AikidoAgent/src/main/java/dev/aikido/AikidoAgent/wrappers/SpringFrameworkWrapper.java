@@ -1,5 +1,7 @@
 package dev.aikido.AikidoAgent.wrappers;
 
+import com.google.gson.Gson;
+import dev.aikido.AikidoAgent.background.utilities.IPCDefaultClient;
 import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
 import dev.aikido.AikidoAgent.context.SpringContextObject;
@@ -41,10 +43,11 @@ public class SpringFrameworkWrapper extends Wrapper {
             int statusCode = response.getStatus();
             ContextObject context = Context.get();
             boolean currentRouteUseful = isUsefulRoute(statusCode, context.getRoute(), context.getMethod());
-            if (!currentRouteUseful) {
-                return;
+            if (currentRouteUseful) {
+                Gson gson = new Gson();
+                String data = "INIT_ROUTE$" + gson.toJson(context.getRouteMetadata());
+                new IPCDefaultClient().sendData(data, false /* does not receive a response*/);
             }
-            logger.debug("{} {} On Route: {}", statusCode, context.getMethod(), context.getRoute());
         }
     }
 }
