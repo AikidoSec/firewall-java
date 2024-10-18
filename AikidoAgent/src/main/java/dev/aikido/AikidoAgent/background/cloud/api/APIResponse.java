@@ -9,6 +9,7 @@ public record APIResponse(
         List<Object> endpoints,
         List<String> blockedUserIds,
         List<String> allowedIPAddresses,
-        boolean receivedAnyStats
+        boolean receivedAnyStats,
+        boolean block
 ) {
 }

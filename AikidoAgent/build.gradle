@@ -22,6 +22,9 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
     implementation 'com.github.jnr:jnr-ffi:2.2.17'
+    // Junixsocket imports :
+    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
+    implementation 'com.kohlschutter.junixsocket:junixsocket-server:2.10.1'
     // Log4j 2 :
     implementation 'org.apache.logging.log4j:log4j-core:2.21.1'
     implementation 'org.apache.logging.log4j:log4j-api:2.21.1'

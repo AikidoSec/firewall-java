@@ -46,7 +46,10 @@ public class Scanner {
             Gson gson = new Gson();
 
             String json = gson.toJson(new AttackCommandData(attack, ctx));
-            client.sendData("ATTACK$" + json);
+            client.sendData(
+                    "ATTACK$" + json, // data
+                    false // receive
+            );
             // Throw error :
             throw new RuntimeException(attack.kind);
         }
