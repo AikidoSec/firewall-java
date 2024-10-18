@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.AikidoAgent.helpers.ShouldBlockHelper.shouldBlock;
+import static dev.aikido.AikidoAgent.helpers.StackTrace.getCurrentStackTrace;
 
 public class Scanner {
     private static final Logger logger = LogManager.getLogger(Scanner.class);
@@ -39,7 +40,7 @@ public class Scanner {
                     }
                     exception = Optional.of(detectorResult.getException());
                     // Report attack :
-                    Attack attack = new Attack(operation, vulnerability, source, path, detectorResult.getMetadata(), userInput);
+                    Attack attack = new Attack(operation, vulnerability, source, path, detectorResult.getMetadata(), userInput, getCurrentStackTrace());
                     Gson gson = new Gson();
                     String json = gson.toJson(new AttackCommandData(attack, ctx));
 
