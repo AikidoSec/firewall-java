@@ -2,6 +2,7 @@ package dev.aikido.AikidoAgent.background;
 
 import dev.aikido.AikidoAgent.background.cloud.CloudConnectionManager;
 import dev.aikido.AikidoAgent.background.utilities.UDSPath;
+import dev.aikido.AikidoAgent.helpers.env.BlockingEnv;
 import dev.aikido.AikidoAgent.helpers.env.Token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +25,7 @@ public class BackgroundProcess extends Thread {
         }
         Path socketPath = UDSPath.getUDSPath(token);
         logger.debug("Background Process started, Listening on : {}", socketPath);
-        this.connectionManager = new CloudConnectionManager(true, token, null);
+        this.connectionManager = new CloudConnectionManager(new BlockingEnv().getValue(), token, null);
         this.connectionManager.onStart();
         try {
             IPCServer server = new IPCServer(socketPath, this);
