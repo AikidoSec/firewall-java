@@ -4,6 +4,7 @@ import dev.aikido.AikidoAgent.background.HeartbeatTask;
 import dev.aikido.AikidoAgent.background.cloud.api.APIResponse;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApi;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
+import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
 import dev.aikido.AikidoAgent.background.cloud.api.events.DetectedAttack;
 import dev.aikido.AikidoAgent.background.cloud.api.events.Started;
 import dev.aikido.AikidoAgent.background.routes.Routes;
@@ -46,7 +47,7 @@ public class CloudConnectionManager {
                 heartbeatEveryXSeconds * 1000 // Interval in milliseconds
         );
     }
-    public void onDetectedAttack(DetectedAttack.DetectedAttackEvent event) {
+    public void reportEvent(APIEvent event) {
         this.api.report(this.token, event, timeout);
     }
     public boolean shouldBlock() {

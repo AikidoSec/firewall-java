@@ -37,7 +37,7 @@ public class AttackCommand implements Command {
                 attackCommandData.attack, attackCommandData.context, connectionManager
         );
         // Send to cloud :
-        connectionManager.onDetectedAttack(detectedAttack);
+        connectionManager.reportEvent(detectedAttack);
         return Optional.empty();
     }
 }
