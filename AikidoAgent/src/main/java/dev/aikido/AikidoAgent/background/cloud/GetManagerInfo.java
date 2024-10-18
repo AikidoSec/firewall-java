@@ -2,10 +2,12 @@ package dev.aikido.AikidoAgent.background.cloud;
 
 import dev.aikido.AikidoAgent.Config;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Class to give you the "agent" info, which is the CloudConnectionManager in Java.
@@ -47,11 +49,15 @@ public class GetManagerInfo {
     }
 
     private static String getHostname() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            return "unknown";
+        // getHostName function seem unreliable, so using "hostname" command which works for both UNIX(-like) systems and Windows
+        // See https://stackoverflow.com/a/7800008 for more info.
+        try (Scanner s = new Scanner(Runtime.getRuntime().exec("hostname").getInputStream()).useDelimiter("\\A")) {
+            if (s.hasNext()) {
+                return s.next().trim();
+            }
+        } catch (IOException ignored) {
         }
+        return "unknown";
     }
 
     private static String getIpAddress() {
