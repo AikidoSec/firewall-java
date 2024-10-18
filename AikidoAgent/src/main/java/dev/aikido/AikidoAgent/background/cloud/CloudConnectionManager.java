@@ -1,5 +1,6 @@
 package dev.aikido.AikidoAgent.background.cloud;
 
+import dev.aikido.AikidoAgent.background.HeartbeatTask;
 import dev.aikido.AikidoAgent.background.cloud.api.APIResponse;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApi;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
@@ -9,13 +10,16 @@ import dev.aikido.AikidoAgent.background.routes.Routes;
 import dev.aikido.AikidoAgent.helpers.env.Token;
 
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Class contains logic for communication with Aikido Cloud : managing config, routes, calls to API, heartbeats
  */
 public class CloudConnectionManager {
     // Timeout for HTTP requests to server :
-    private final int timeout = 10;
+    private static final int timeout = 10;
+    private static final int heartbeatEveryXSeconds = 600; // 10 minutes
     private boolean blockingEnabled;
     private final String serverless;
     private final ReportingApi api;
@@ -32,11 +36,18 @@ public class CloudConnectionManager {
         this.routes = new Routes(200); // Max size is 200 routes.
     }
     public void onStart() {
-        Optional< APIResponse> res = this.api.report(this.token, Started.get(this), this.timeout);
+        Optional< APIResponse> res = this.api.report(this.token, Started.get(this), timeout);
         res.ifPresent(this::updateConfig);
+        // Start heartbeat :
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(
+                new HeartbeatTask(this), // Create a heartbeat task with this context (CloudConnectionManager)
+                heartbeatEveryXSeconds * 1000, // Delay before first execution in milliseconds
+                heartbeatEveryXSeconds * 1000 // Interval in milliseconds
+        );
     }
     public void onDetectedAttack(DetectedAttack.DetectedAttackEvent event) {
-        this.api.report(this.token, event, this.timeout);
+        this.api.report(this.token, event, timeout);
     }
     public boolean shouldBlock() {
         return this.blockingEnabled;
