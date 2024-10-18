@@ -7,8 +7,12 @@ import dev.aikido.AikidoAgent.context.Context;
 import dev.aikido.AikidoAgent.context.ContextObject;
 
 import java.util.Map;
+
+import dev.aikido.AikidoAgent.helpers.ShouldBlockHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static dev.aikido.AikidoAgent.helpers.ShouldBlockHelper.shouldBlock;
 
 public class Scanner {
     private static final Logger logger = LogManager.getLogger(Scanner.class);
@@ -18,7 +22,7 @@ public class Scanner {
         if (ctx == null) { // Client is never null
             return;
         }
-        Attack attack = null;
+        boolean detectedAttack = false;
         try {
             Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(ctx).getAll();
             for (Map.Entry<String, Map<String, String>> sourceEntry : stringsFromContext.entrySet()) {
@@ -28,30 +32,30 @@ public class Scanner {
                     String userInput = entry.getKey();
                     String path = entry.getValue();
                     // Run attack code :
-                    boolean isAttack = vulnerability.getDetector().run(userInput, arguments);
-                    if (isAttack) {
-                        Map<String, String> metadata = Map.of("sql", arguments[0]); // Fix
-                        attack = new Attack(operation, vulnerability, source, path, metadata, userInput);
-                        logger.info("Detected {} attack due to input: {}", vulnerability.getKind(), userInput);
-                        break;
+                    Detector.DetectorResult detectorResult = vulnerability.getDetector().run(userInput, arguments);
+                    if (!detectorResult.isDetectedAttack()) {
+                        continue;
                     }
+                    detectedAttack = true;
+                    // Report attack :
+                    Attack attack = new Attack(operation, vulnerability, source, path, detectorResult.getMetadata(), userInput);
+                    Gson gson = new Gson();
+                    String json = gson.toJson(new AttackCommandData(attack, ctx));
+
+                    IPCClient client = new IPCDefaultClient();
+                    client.sendData(
+                            "ATTACK$" + json, // data
+                            false // receive
+                    );
+                    break;
                 }
             }
         } catch (Throwable e) {
             logger.debug(e);
         }
-        if (attack != null) {
-            // Report to background :
-            IPCClient client = new IPCDefaultClient();
-            Gson gson = new Gson();
-
-            String json = gson.toJson(new AttackCommandData(attack, ctx));
-            client.sendData(
-                    "ATTACK$" + json, // data
-                    false // receive
-            );
-            // Throw error :
-            throw new RuntimeException(attack.kind);
+        // Run throw code here so it does not get caught :
+        if (detectedAttack && shouldBlock()) {
+            throw new RuntimeException(vulnerability.getKind());
         }
     }
 }
