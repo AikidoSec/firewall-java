@@ -33,6 +33,6 @@ public class HeartbeatTask extends TimerTask {
 
         // Create and send event :
         Heartbeat.HeartbeatEvent event = Heartbeat.get(connectionManager, stats, hostnames, routes, users);
-        connectionManager.reportEvent(event);
+        connectionManager.reportEvent(event, true /* Update config */);
     }
 }

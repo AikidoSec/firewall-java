@@ -47,9 +47,9 @@ public class CloudConnectionManager {
                 heartbeatEveryXSeconds * 1000 // Interval in milliseconds
         );
     }
-    public void reportEvent(APIEvent event) {
+    public void reportEvent(APIEvent event, boolean updateConfig) {
         Optional<APIResponse> res = this.api.report(this.token, event, timeout);
-        if (res.isPresent()) {
+        if (res.isPresent() && updateConfig) {
             updateConfig(res.get());
         }
     }
