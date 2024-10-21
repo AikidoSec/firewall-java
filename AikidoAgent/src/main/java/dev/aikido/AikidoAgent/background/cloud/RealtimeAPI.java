@@ -1,10 +1,6 @@
 package dev.aikido.AikidoAgent.background.cloud;
 
 import com.google.gson.Gson;
-import dev.aikido.AikidoAgent.background.cloud.api.APIResponse;
-import dev.aikido.AikidoAgent.background.cloud.api.ReportingApi;
-import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
-import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,12 +13,12 @@ import java.util.Optional;
 
 import static dev.aikido.AikidoAgent.helpers.env.Endpoints.getAikidoRealtimeEndpoint;
 
-public class Realtime {
-    private static final Logger logger = LogManager.getLogger(Realtime.class);
-    private static final int timeoutInSec = 3; // 3 seconds timeout
+public class RealtimeAPI {
+    private static final Logger logger = LogManager.getLogger(RealtimeAPI.class);
+    private static final int timeoutInSec = 3; // 3 sec timeout for requests to the realtime endpoint
     private final String endpoint;
 
-    public Realtime() {
+    public RealtimeAPI() {
         // Create API :
         endpoint = getAikidoRealtimeEndpoint();
     }
