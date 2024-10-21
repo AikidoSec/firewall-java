@@ -1,6 +1,7 @@
 package dev.aikido.AikidoAgent.background.cloud;
 
 import dev.aikido.AikidoAgent.background.HeartbeatTask;
+import dev.aikido.AikidoAgent.background.RealtimeTask;
 import dev.aikido.AikidoAgent.background.cloud.api.APIResponse;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApi;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
@@ -23,6 +24,7 @@ public class CloudConnectionManager {
     // Timeout for HTTP requests to server :
     private static final int timeout = 10;
     private static final int heartbeatEveryXSeconds = 600; // 10 minutes
+    private static final int pollingEveryXSeconds = 60; // Check for realtime config changes every 1 minute
     private boolean blockingEnabled;
     private final String serverless;
     private final ReportingApi api;
@@ -46,6 +48,11 @@ public class CloudConnectionManager {
                 new HeartbeatTask(this), // Create a heartbeat task with this context (CloudConnectionManager)
                 heartbeatEveryXSeconds * 1000, // Delay before first execution in milliseconds
                 heartbeatEveryXSeconds * 1000 // Interval in milliseconds
+        );
+        timer.scheduleAtFixedRate(
+                new RealtimeTask(this), // Create a realtime task with this context (CloudConnectionManager)
+                pollingEveryXSeconds * 1000, // Delay before first execution in milliseconds
+                pollingEveryXSeconds * 1000 // Interval in milliseconds
         );
     }
     public void reportEvent(APIEvent event, boolean updateConfig) {
@@ -72,5 +79,8 @@ public class CloudConnectionManager {
     }
     public Routes getRoutes() {
         return routes;
+    }
+    public String getToken() {
+        return token;
     }
 }
