@@ -38,7 +38,7 @@ public class RealtimeTask extends TimerTask {
                 // Config was updated
                 configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt); // Store new time of last update
                 Optional<APIResponse> newConfig = connectionManager.getApi().fetchNewConfig(connectionManager.getToken(), /* Timeout in seconds: */ 3);
-                newConfig.ifPresent(connectionManager::updateConfig);
+                newConfig.ifPresent(connectionManager.getConfig()::updateConfig);
                 logger.debug("Config updated");
             }
         }

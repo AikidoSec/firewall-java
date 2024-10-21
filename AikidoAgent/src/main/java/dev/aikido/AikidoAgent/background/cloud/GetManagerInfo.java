@@ -1,6 +1,7 @@
 package dev.aikido.AikidoAgent.background.cloud;
 
 import dev.aikido.AikidoAgent.Config;
+import dev.aikido.AikidoAgent.background.ServiceConfiguration;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -38,6 +39,7 @@ public class GetManagerInfo {
     public record Platform(String name, String version) {}
 
     public static ManagerInfo getManagerInfo(CloudConnectionManager connectionManager) {
+        ServiceConfiguration serviceConfig = connectionManager.getConfig();
         return new ManagerInfo(
             !connectionManager.shouldBlock(), // dryMode
             getHostname(), // hostname
@@ -45,7 +47,7 @@ public class GetManagerInfo {
             "firewall-java", // library
             getIpAddress(), // ipAddress
             Map.of(), // packages (FIX LATER)
-            connectionManager.getServerless(), // serverless
+            serviceConfig.getServerless(), // serverless
             List.of(), // stack
             getOSInfo(), // os
             false, // preventedPrototypePollution, should be removed from API
