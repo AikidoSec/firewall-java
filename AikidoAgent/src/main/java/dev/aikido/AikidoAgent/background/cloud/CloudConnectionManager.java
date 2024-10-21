@@ -48,7 +48,10 @@ public class CloudConnectionManager {
         );
     }
     public void reportEvent(APIEvent event) {
-        this.api.report(this.token, event, timeout);
+        Optional<APIResponse> res = this.api.report(this.token, event, timeout);
+        if (res.isPresent()) {
+            updateConfig(res.get());
+        }
     }
     public boolean shouldBlock() {
         return this.blockingEnabled;
