@@ -83,4 +83,7 @@ public class CloudConnectionManager {
     public String getToken() {
         return token;
     }
+    public ReportingApiHTTP getApi() {
+        return (ReportingApiHTTP) api;
+    }
 }

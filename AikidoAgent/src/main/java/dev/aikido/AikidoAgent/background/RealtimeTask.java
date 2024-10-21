@@ -2,6 +2,7 @@ package dev.aikido.AikidoAgent.background;
 
 import dev.aikido.AikidoAgent.background.cloud.CloudConnectionManager;
 import dev.aikido.AikidoAgent.background.cloud.Realtime;
+import dev.aikido.AikidoAgent.background.cloud.api.APIResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,15 +23,19 @@ public class RealtimeTask extends TimerTask {
     public void run() {
         logger.debug("Running realtime task, config last updated at: {}", configLastUpdatedAt);
         Optional<Realtime.ConfigResponse> res = new Realtime().getConfig(connectionManager.getToken());
+
         if(res.isPresent()) {
             long configAccordingToCloudUpdatedAt = res.get().configUpdatedAt();
+
             if (configLastUpdatedAt.isEmpty()) {
                 configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt);
             }
             if(configLastUpdatedAt.get() < configAccordingToCloudUpdatedAt) {
                 // Config was updated
-                logger.debug("Config updated");
                 configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt); // Store new time of last update
+                Optional<APIResponse> newConfig = connectionManager.getApi().fetchNewConfig(connectionManager.getToken(), /* Timeout in seconds: */ 3);
+                newConfig.ifPresent(connectionManager::updateConfig);
+                logger.debug("Config updated");
             }
         }
     }
