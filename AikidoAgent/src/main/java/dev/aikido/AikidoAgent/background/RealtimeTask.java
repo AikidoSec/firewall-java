@@ -9,6 +9,12 @@ import org.apache.logging.log4j.Logger;
 import java.util.Optional;
 import java.util.TimerTask;
 
+/**
+ * This tasks runs every x seconds to poll for config changes at the realtime endpoint,
+ * normally runtime.aikido.dev but can be specified with AIKIDO_REALTIME_ENDPOINT.
+ * If it notices that the config was updated (i.e. time of last change is more recent) it will
+ * fetch the new config from the Zen API (guard.aikido.dev).
+ */
 public class RealtimeTask extends TimerTask {
     private static final Logger logger = LogManager.getLogger(RealtimeTask.class);
     private final CloudConnectionManager connectionManager;
