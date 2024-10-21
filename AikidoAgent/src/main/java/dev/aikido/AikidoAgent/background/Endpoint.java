@@ -3,7 +3,7 @@ package dev.aikido.AikidoAgent.background;
 import java.util.List;
 
 public class Endpoint {
-    public record RateLimitingConfig(long maxRequests, long windowSizeInMS) {}
+    public record RateLimitingConfig(long maxRequests, long windowSizeInMS, boolean enabled) {}
     private final String method;
     private final String route;
     private final RateLimitingConfig rateLimiting;
@@ -13,10 +13,10 @@ public class Endpoint {
     public Endpoint(
             String method, String route, long maxRequests,
             long windowSizeMS, List<String> allowedIPAddresses, boolean graphql,
-            boolean forceProtectionOff) {
+            boolean forceProtectionOff, boolean rateLimitingEnabled) {
         this.method = method;
         this.route = route;
-        this.rateLimiting = new RateLimitingConfig(maxRequests, windowSizeMS);
+        this.rateLimiting = new RateLimitingConfig(maxRequests, windowSizeMS, rateLimitingEnabled);
         this.allowedIPAddresses = allowedIPAddresses;
         this.graphql = graphql;
         this.forceProtectionOff = forceProtectionOff;
