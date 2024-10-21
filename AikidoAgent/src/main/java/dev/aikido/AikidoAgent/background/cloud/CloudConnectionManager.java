@@ -37,8 +37,7 @@ public class CloudConnectionManager {
         this.routes = new Routes(200); // Max size is 200 routes.
     }
     public void onStart() {
-        Optional< APIResponse> res = this.api.report(this.token, Started.get(this), timeout);
-        res.ifPresent(this::updateConfig);
+        reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
         // Start heartbeat :
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(
