@@ -8,11 +8,13 @@ public class Endpoint {
     private final String route;
     private final RateLimitingConfig rateLimiting;
     private final List<String> allowedIPAddresses;
-    public Endpoint(String method, String route, long maxRequests, long windowSizeMS, List<String> allowedIPAddresses) {
+    private final boolean graphql;
+    public Endpoint(String method, String route, long maxRequests, long windowSizeMS, List<String> allowedIPAddresses, boolean graphql) {
         this.method = method;
         this.route = route;
         this.rateLimiting = new RateLimitingConfig(maxRequests, windowSizeMS);
         this.allowedIPAddresses = allowedIPAddresses;
+        this.graphql = graphql;
     }
 
     // Getters :
@@ -27,5 +29,8 @@ public class Endpoint {
     }
     public List<String> getAllowedIPAddresses() {
         return allowedIPAddresses;
+    }
+    public boolean isGraphql() {
+        return graphql;
     }
 }
