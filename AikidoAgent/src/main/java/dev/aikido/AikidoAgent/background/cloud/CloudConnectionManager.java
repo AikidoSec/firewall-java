@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static dev.aikido.AikidoAgent.helpers.env.Endpoints.getAikidoAPIEndpoint;
+
 /**
  * Class contains logic for communication with Aikido Cloud : managing config, routes, calls to API, heartbeats
  */
@@ -32,7 +34,7 @@ public class CloudConnectionManager {
         }
         this.blockingEnabled = block;
         this.serverless = serverless;
-        this.api = new ReportingApiHTTP("https://guard.aikido.dev/");
+        this.api = new ReportingApiHTTP(getAikidoAPIEndpoint());
         this.token = token.get();
         this.routes = new Routes(200); // Max size is 200 routes.
     }
