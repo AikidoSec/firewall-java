@@ -1,12 +1,14 @@
 package dev.aikido.AikidoAgent.background.cloud.api;
 
+import dev.aikido.AikidoAgent.background.Endpoint;
+
 import java.util.List;
 
 public record APIResponse(
         boolean success,
         String error,
         long configUpdatedAt,
-        List<Object> endpoints,
+        List<Endpoint> endpoints,
         List<String> blockedUserIds,
         List<String> allowedIPAddresses,
         boolean receivedAnyStats,
