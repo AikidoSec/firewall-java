@@ -1,6 +1,7 @@
 package dev.aikido.AikidoAgent.background.cloud;
 
 import dev.aikido.AikidoAgent.background.HeartbeatTask;
+import dev.aikido.AikidoAgent.background.RealtimeTask;
 import dev.aikido.AikidoAgent.background.cloud.api.APIResponse;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApi;
 import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
@@ -14,6 +15,8 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static dev.aikido.AikidoAgent.helpers.env.Endpoints.getAikidoAPIEndpoint;
+
 /**
  * Class contains logic for communication with Aikido Cloud : managing config, routes, calls to API, heartbeats
  */
@@ -21,6 +24,7 @@ public class CloudConnectionManager {
     // Timeout for HTTP requests to server :
     private static final int timeout = 10;
     private static final int heartbeatEveryXSeconds = 600; // 10 minutes
+    private static final int pollingEveryXSeconds = 60; // Check for realtime config changes every 1 minute
     private boolean blockingEnabled;
     private final String serverless;
     private final ReportingApi api;
@@ -32,13 +36,12 @@ public class CloudConnectionManager {
         }
         this.blockingEnabled = block;
         this.serverless = serverless;
-        this.api = new ReportingApiHTTP("https://guard.aikido.dev/");
+        this.api = new ReportingApiHTTP(getAikidoAPIEndpoint());
         this.token = token.get();
         this.routes = new Routes(200); // Max size is 200 routes.
     }
     public void onStart() {
-        Optional< APIResponse> res = this.api.report(this.token, Started.get(this), timeout);
-        res.ifPresent(this::updateConfig);
+        reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
         // Start heartbeat :
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(
@@ -46,9 +49,17 @@ public class CloudConnectionManager {
                 heartbeatEveryXSeconds * 1000, // Delay before first execution in milliseconds
                 heartbeatEveryXSeconds * 1000 // Interval in milliseconds
         );
+        timer.scheduleAtFixedRate(
+                new RealtimeTask(this), // Create a realtime task with this context (CloudConnectionManager)
+                pollingEveryXSeconds * 1000, // Delay before first execution in milliseconds
+                pollingEveryXSeconds * 1000 // Interval in milliseconds
+        );
     }
-    public void reportEvent(APIEvent event) {
-        this.api.report(this.token, event, timeout);
+    public void reportEvent(APIEvent event, boolean updateConfig) {
+        Optional<APIResponse> res = this.api.report(this.token, event, timeout);
+        if (res.isPresent() && updateConfig) {
+            updateConfig(res.get());
+        }
     }
     public boolean shouldBlock() {
         return this.blockingEnabled;
@@ -68,5 +79,11 @@ public class CloudConnectionManager {
     }
     public Routes getRoutes() {
         return routes;
+    }
+    public String getToken() {
+        return token;
+    }
+    public ReportingApiHTTP getApi() {
+        return (ReportingApiHTTP) api;
     }
 }

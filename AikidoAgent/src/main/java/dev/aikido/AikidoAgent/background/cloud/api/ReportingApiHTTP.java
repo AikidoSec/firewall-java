@@ -22,7 +22,21 @@ public class ReportingApiHTTP extends ReportingApi {
         // Reporting URL should end with trailing slash for now.
         this.reportingUrl = reportingUrl;
     }
-
+    public Optional<APIResponse> fetchNewConfig(String token, int timeoutInSec) {
+        try {
+            HttpClient httpClient = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                    .build();
+            URI uri = URI.create(reportingUrl + "api/runtime/config");
+            HttpRequest request = createHttpRequest(Optional.empty(), token, uri);
+            // Send the request and get the response
+            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return Optional.of(toApiResponse(httpResponse));
+        } catch (Exception e) {
+            logger.debug("Error while fetching new config from cloud: {}", e.getMessage());
+        }
+        return Optional.empty();
+    }
     @Override
     public Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec) {
         try {
@@ -30,7 +44,7 @@ public class ReportingApiHTTP extends ReportingApi {
                 .connectTimeout(Duration.ofSeconds(timeoutInSec))
                 .build();
             URI uri = URI.create(reportingUrl + "api/runtime/events");
-            HttpRequest request = createHttpRequest(event, token, uri);
+            HttpRequest request = createHttpRequest(Optional.of(event), token, uri);
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return Optional.of(toApiResponse(httpResponse));
@@ -52,15 +66,18 @@ public class ReportingApiHTTP extends ReportingApi {
         }
         return getUnsuccessfulAPIResponse("unknown_error");
     }
-    private static HttpRequest createHttpRequest(APIEvent event, String token, URI uri) {
-        Gson gson = new Gson();
-        String requestPayload = gson.toJson(event);
-        return HttpRequest.newBuilder()
+    private static HttpRequest createHttpRequest(Optional<APIEvent> event, String token, URI uri) {
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(uri) // Change to your target URL
             .header("Content-Type", "application/json") // Set Content-Type header
-            .header("Authorization", token) // Set Authorization header
-            .POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
-            .build();
+            .header("Authorization", token); // Set Authorization header
+        if (event.isPresent()) {
+            Gson gson = new Gson();
+            String requestPayload = gson.toJson(event.get());
+            return requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
+                .build();
+        }
+        return requestBuilder.build();
     }
     private static APIResponse getUnsuccessfulAPIResponse(String error) {
         return new APIResponse(
