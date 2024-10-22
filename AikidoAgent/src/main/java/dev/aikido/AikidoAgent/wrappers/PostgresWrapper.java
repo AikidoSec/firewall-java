@@ -1,6 +1,7 @@
 package dev.aikido.AikidoAgent.wrappers;
 
 import dev.aikido.AikidoAgent.collectors.SQLCollector;
+import dev.aikido.AikidoAgent.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -17,7 +18,13 @@ public class PostgresWrapper extends Wrapper {
     private static class PostgresAdvice {
         @Advice.OnMethodEnter
         public static void intercept(@Advice.Argument(0) String sql) {
-            SQLCollector.report(sql, "postgresql", "postgresql.core.NativeQuery");
+            try {
+                SQLCollector.report(sql, "postgres", "postgresql.core.NativeQuery");
+            } catch (AikidoException e) {
+                throw e;
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         }
     }
 }

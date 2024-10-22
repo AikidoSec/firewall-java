@@ -2,10 +2,18 @@ package dev.aikido.AikidoAgent.background.cloud;
 
 import dev.aikido.AikidoAgent.Config;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+
+import static dev.aikido.AikidoAgent.helpers.net.Hostname.getHostname;
+import static dev.aikido.AikidoAgent.helpers.net.IPAddress.getIpAddress;
 
 /**
  * Class to give you the "agent" info, which is the CloudConnectionManager in Java.
@@ -44,19 +52,6 @@ public class GetManagerInfo {
             "", // nodeEnv
             getPlatformInfo() // platform info
         );
-    }
-
-    private static String getHostname() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            return "unknown";
-        }
-    }
-
-    private static String getIpAddress() {
-        // Fix later :
-        return "0.0.0.0";
     }
 
     private static OS getOSInfo() {

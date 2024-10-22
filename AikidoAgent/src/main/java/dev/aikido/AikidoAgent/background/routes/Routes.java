@@ -1,7 +1,6 @@
 package dev.aikido.AikidoAgent.background.routes;
 import dev.aikido.AikidoAgent.context.RouteMetadata;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,8 +63,8 @@ public class Routes {
         }
     }
 
-    public Collection<RouteEntry> asList() {
-        return routes.values();
+    public RouteEntry[] asList() {
+        return routes.values().toArray(new RouteEntry[0]);
     }
 
     public int size() {

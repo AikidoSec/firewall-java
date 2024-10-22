@@ -55,7 +55,7 @@ public class DetectedAttack {
         );
         AttackData attackData = new AttackData(
             attack.kind, attack.operation, attack.source, attack.pathToPayload, attack.payload, attack.metadata,
-            "MODULE?", connectionManager.shouldBlock(), "stack?"
+            "MODULE?", connectionManager.shouldBlock(), attack.stack
         );
         return new DetectedAttackEvent(
         "detected_attack", // type
