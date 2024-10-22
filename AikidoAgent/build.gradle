@@ -46,8 +46,8 @@ jar {
             'Premain-Class': 'dev.aikido.AikidoAgent.Agent',
             'Agent-Class': 'dev.aikido.AikidoAgent.Agent',
             'Can-Redefine-Classes': 'false',
-            'Can-Retransform-Classes': 'false',
-            'Can-Set-Native-Method-Prefix': 'false'
+            'Can-Retransform-Classes': 'true',
+            'Can-Set-Native-Method-Prefix': 'false',
         )
     }
 }
