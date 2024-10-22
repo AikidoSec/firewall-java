@@ -2,13 +2,20 @@ package dev.aikido.AikidoAgent.wrappers;
 
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.asm.AsmVisitorWrapper;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-public class RuntimeExecWrapper extends Wrapper {
-    public static AsmVisitorWrapper get() {
+public class RuntimeExecWrapper implements Wrapper {
+    @Override
+    public String getName() {
         // Wrap Runtime.exec
-        return Advice.to(RuntimeExecAdvice.class)
-            .on(ElementMatchers.named("exec"));
+        return RuntimeExecAdvice.class.getName();
+    }
+
+    @Override
+    public ElementMatcher<? super MethodDescription> getMatcher() {
+        return ElementMatchers.any();
     }
 
     private static class RuntimeExecAdvice {

@@ -2,22 +2,26 @@ package dev.aikido.AikidoAgent;
 
 import dev.aikido.AikidoAgent.background.BackgroundProcess;
 import dev.aikido.AikidoAgent.helpers.env.Token;
-import dev.aikido.AikidoAgent.wrappers.PostgresWrapper;
-import dev.aikido.AikidoAgent.wrappers.RuntimeExecWrapper;
-import dev.aikido.AikidoAgent.wrappers.SpringFrameworkBodyWrapper;
-import dev.aikido.AikidoAgent.wrappers.SpringFrameworkWrapper;
+import dev.aikido.AikidoAgent.wrappers.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.matcher.ElementMatchers;
+import net.bytebuddy.matcher.LatentMatcher;
 import net.bytebuddy.utility.JavaModule;
 
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
@@ -25,13 +29,18 @@ public class Agent {
         logger.info("Aikido Java Agent loaded.");
         // Bytecode instrumentation :
         new AgentBuilder.Default()
+            //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
+            .disableClassFormatChanges()
+            // Applies a retransformation to all classes that are already loaded and that would have been transformed if the
+            // built agent was registered before they were loaded.
+            .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
             .ignore(ElementMatchers.none())
             .type(
                 ElementMatchers.nameContainsIgnoreCase("org.postgresql.core")
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet"))
             )
-            .transform(new AikidoTransformer())
-            .with(AgentBuilder.TypeStrategy.Default.REDEFINE)
+            .transform(AikidoTransformer.get())
+            .with(AgentBuilder.TypeStrategy.Default.DECORATE)
             .installOn(inst);
 
         // Background process :
@@ -39,25 +48,20 @@ public class Agent {
         backgroundProcess.setDaemon(true);
         backgroundProcess.start();
     }
-    private static class AikidoTransformer implements AgentBuilder.Transformer {
-        @Override
-        public DynamicType.Builder<?> transform(
-                DynamicType.Builder<?> builder,
-                TypeDescription typeDescription,
-                ClassLoader classLoader,
-                JavaModule javaModule,
-                ProtectionDomain protectionDomain) {
-            // Builder type : https://javadoc.io/static/net.bytebuddy/byte-buddy/1.15.4/net/bytebuddy/dynamic/DynamicType.Builder.html
-            if (Objects.equals(typeDescription.toString(), "class org.postgresql.core.NativeQuery")) {
-                return builder.visit(PostgresWrapper.get());
+    private static final List<Wrapper> wrappers = Arrays.asList(
+            new PostgresWrapper(),
+            new SpringFrameworkWrapper(),
+            new SpringFrameworkBodyWrapper()
+    );
+    private static class AikidoTransformer {
+        public static AgentBuilder.Transformer get() {
+            var adviceAgentBuilder = new AgentBuilder.Transformer.ForAdvice()
+                    .include(Agent.class.getClassLoader());
+            for(Wrapper wrapper: wrappers) {
+                // Add wrapper as advice :
+                adviceAgentBuilder = adviceAgentBuilder.advice(wrapper.getMatcher(), wrapper.getName());
             }
-            else if (Objects.equals(typeDescription.toString(), "class org.springframework.web.servlet.FrameworkServlet")) {
-                return builder.visit(SpringFrameworkWrapper.get());
-            }
-            else if (Objects.equals(typeDescription.toString(), "class org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver")) {
-                return builder.visit(SpringFrameworkBodyWrapper.get());
-            }
-            return builder.visit(RuntimeExecWrapper.get());
+            return adviceAgentBuilder;
         }
     }
 }

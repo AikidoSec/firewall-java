@@ -1,9 +1,9 @@
 package dev.aikido.AikidoAgent.wrappers;
 
-import net.bytebuddy.asm.AsmVisitorWrapper;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.matcher.ElementMatcher;
 
-public abstract class Wrapper {
-    public static AsmVisitorWrapper get() {
-        return null;
-    }
+public interface Wrapper {
+    String getName();
+    ElementMatcher<? super MethodDescription> getMatcher();
 }
