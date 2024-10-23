@@ -1,0 +1,17 @@
+allprojects {
+    group = 'dev.aikido'
+    version = '1.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java' // Apply the Java plugin to all subprojects
+
+    // Define common configurations for all subprojects
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}
