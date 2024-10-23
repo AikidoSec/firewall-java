@@ -1,6 +1,7 @@
 
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 java {
@@ -40,24 +41,16 @@ test {
     useJUnitPlatform()
 }
 
-jar {
+shadowJar {
+    mergeServiceFiles()
     manifest {
         attributes(
-            'Premain-Class': 'dev.aikido.AikidoAgent.Agent',
-            'Agent-Class': 'dev.aikido.AikidoAgent.Agent',
-            'Can-Redefine-Classes': 'false',
-            'Can-Retransform-Classes': 'true',
-            'Can-Set-Native-Method-Prefix': 'false',
+                'Premain-Class': 'dev.aikido.AikidoAgent.Agent',
+                'Agent-Class': 'dev.aikido.AikidoAgent.Agent',
+                'Can-Redefine-Classes': 'true',
+                'Can-Retransform-Classes': 'true',
+                'Can-Set-Native-Method-Prefix': 'false',
+                'Implementation-Version': rootProject.version
         )
     }
-}
-
-task fatJar(type: Jar) {
-    manifest.from jar.manifest
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    } {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
-    with jar
 }
