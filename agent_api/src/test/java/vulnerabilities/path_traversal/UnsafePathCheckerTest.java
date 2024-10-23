@@ -1,6 +1,6 @@
 package vulnerabilities.path_traversal;
 
-import dev.aikido.AikidoAgent.vulnerabilities.path_traversal.UnsafePathChecker;
+import dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathChecker;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

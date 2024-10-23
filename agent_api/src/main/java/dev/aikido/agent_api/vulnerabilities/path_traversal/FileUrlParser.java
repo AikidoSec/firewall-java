@@ -1,8 +1,6 @@
-package dev.aikido.AikidoAgent.vulnerabilities.path_traversal;
+package dev.aikido.agent_api.vulnerabilities.path_traversal;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 

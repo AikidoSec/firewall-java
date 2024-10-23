@@ -1,12 +1,12 @@
-package dev.aikido.AikidoAgent.vulnerabilities.path_traversal;
+package dev.aikido.agent_api.vulnerabilities.path_traversal;
 
-import dev.aikido.AikidoAgent.vulnerabilities.Detector;
+import dev.aikido.agent_api.vulnerabilities.Detector;
 
 import java.util.HashMap;
 
-import static dev.aikido.AikidoAgent.vulnerabilities.path_traversal.FileUrlParser.parseAsFileUrl;
-import static dev.aikido.AikidoAgent.vulnerabilities.path_traversal.UnsafePathChecker.startsWithUnsafePath;
-import static dev.aikido.AikidoAgent.vulnerabilities.path_traversal.UnsafePathPartsChecker.containsUnsafePathParts;
+import static dev.aikido.agent_api.vulnerabilities.path_traversal.FileUrlParser.parseAsFileUrl;
+import static dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathChecker.startsWithUnsafePath;
+import static dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathPartsChecker.containsUnsafePathParts;
 
 public class PathTraversalDetector implements Detector {
     /**

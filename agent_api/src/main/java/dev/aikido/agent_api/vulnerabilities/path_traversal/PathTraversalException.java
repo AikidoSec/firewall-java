@@ -1,7 +1,6 @@
-package dev.aikido.AikidoAgent.vulnerabilities.path_traversal;
+package dev.aikido.agent_api.vulnerabilities.path_traversal;
 
-import dev.aikido.AikidoAgent.vulnerabilities.AikidoException;
-import dev.aikido.AikidoAgent.vulnerabilities.sql_injection.Dialect;
+import dev.aikido.agent_api.vulnerabilities.AikidoException;
 
 public class PathTraversalException extends AikidoException {
     public PathTraversalException(String msg) {

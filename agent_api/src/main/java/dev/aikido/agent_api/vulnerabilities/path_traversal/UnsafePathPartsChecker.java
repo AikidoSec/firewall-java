@@ -1,4 +1,4 @@
-package dev.aikido.AikidoAgent.vulnerabilities.path_traversal;
+package dev.aikido.agent_api.vulnerabilities.path_traversal;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,6 +1,6 @@
 package vulnerabilities.path_traversal;
 
-import dev.aikido.AikidoAgent.vulnerabilities.path_traversal.FileUrlParser;
+import dev.aikido.agent_api.vulnerabilities.path_traversal.FileUrlParser;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
