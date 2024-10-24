@@ -1,16 +1,16 @@
 package dev.aikido.agent_api.background.cloud;
 
-import dev.aikido.AikidoAgent.background.HeartbeatTask;
-import dev.aikido.AikidoAgent.background.RealtimeTask;
-import dev.aikido.AikidoAgent.background.ServiceConfiguration;
-import dev.aikido.AikidoAgent.background.cloud.api.APIResponse;
-import dev.aikido.AikidoAgent.background.cloud.api.ReportingApi;
-import dev.aikido.AikidoAgent.background.cloud.api.ReportingApiHTTP;
-import dev.aikido.AikidoAgent.background.cloud.api.events.APIEvent;
-import dev.aikido.AikidoAgent.background.cloud.api.events.DetectedAttack;
-import dev.aikido.AikidoAgent.background.cloud.api.events.Started;
-import dev.aikido.AikidoAgent.background.routes.Routes;
-import dev.aikido.AikidoAgent.helpers.env.Token;
+import dev.aikido.agent_api.background.HeartbeatTask;
+import dev.aikido.agent_api.background.RealtimeTask;
+import dev.aikido.agent_api.background.ServiceConfiguration;
+import dev.aikido.agent_api.background.cloud.api.APIResponse;
+import dev.aikido.agent_api.background.cloud.api.ReportingApi;
+import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
+import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
+import dev.aikido.agent_api.background.cloud.api.events.DetectedAttack;
+import dev.aikido.agent_api.background.cloud.api.events.Started;
+import dev.aikido.agent_api.background.routes.Routes;
+import dev.aikido.agent_api.helpers.env.Token;
 
 import java.util.Optional;
 import java.util.Timer;

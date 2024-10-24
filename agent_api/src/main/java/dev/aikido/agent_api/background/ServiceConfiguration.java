@@ -1,6 +1,6 @@
-package dev.aikido.AikidoAgent.background;
+package dev.aikido.agent_api.background;
 
-import dev.aikido.AikidoAgent.background.cloud.api.APIResponse;
+import dev.aikido.agent_api.background.cloud.api.APIResponse;
 
 import java.util.ArrayList;
 import java.util.HashSet;

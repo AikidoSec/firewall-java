@@ -1,6 +1,6 @@
 package dev.aikido.agent_api.background.cloud.api;
 
-import dev.aikido.AikidoAgent.background.Endpoint;
+import dev.aikido.agent_api.background.Endpoint;
 
 import java.util.List;
 

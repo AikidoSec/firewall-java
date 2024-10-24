@@ -1,7 +1,7 @@
 package dev.aikido.agent_api.background.cloud;
 
-import dev.aikido.AikidoAgent.Config;
-import dev.aikido.AikidoAgent.background.ServiceConfiguration;
+import dev.aikido.agent_api.Config;
+import dev.aikido.agent_api.background.ServiceConfiguration;
 
 import java.util.List;
 import java.util.Map;
