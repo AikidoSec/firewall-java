@@ -22,13 +22,17 @@ public class FileWrapper implements Wrapper {
         return ElementMatchers.isDeclaredBy(ElementMatchers.named("java.io.File")).and(ElementMatchers.isConstructor());
     }
     public static class FileAdvice {
+        // Since we have to wrap a native Java Class stuff gets more complicated
+        // The classpath is not the same anymore, and we can't import our modules directly.
+        // To bypass this issue we load collectors from a .jar file, specified with the AIKIDO_DIRECTORY env variable
         @Advice.OnMethodEnter
         public static void before(
                 @Advice.This(typing = DYNAMIC, optional = true) Object target,
                 @Advice.Origin Executable method,
                 @Advice.Argument(0) Object argument
         ) throws Throwable {
-            String jarFilePath = "file:?";
+            String pathToAikidoFolder = System.getenv("AIKIDO_DIRECTORY");
+            String jarFilePath = "file:" + pathToAikidoFolder + "agent_api.jar";
             URLClassLoader classLoader = null;
             try {
                 URL[] urls = { new URL(jarFilePath) };
