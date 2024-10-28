@@ -4,23 +4,14 @@ import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent.wrappers.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.matcher.ElementMatchers;
-import net.bytebuddy.matcher.LatentMatcher;
-import net.bytebuddy.utility.JavaModule;
 
-import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.Arrays;
 import java.util.List;
-import java.util.jar.JarFile;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
@@ -53,7 +44,7 @@ public class Agent {
             new PostgresWrapper(),
             new SpringFrameworkWrapper(),
             new SpringFrameworkBodyWrapper(),
-            new FileInputStreamWrapper()
+            new FileWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {

@@ -19,6 +19,10 @@ public class HtmlController {
     public String create(Model model) {
         return "create"; // This will resolve to src/main/resources/templates/create.html
     }
+    @GetMapping("/read_file")
+    public String read_file(Model model) {
+        return "read"; // This will resolve to src/main/resources/templates/read.html
+    }
 
     @GetMapping("/pet_page/{id}")
     public String pet_page(@PathVariable("id") Integer id) {
