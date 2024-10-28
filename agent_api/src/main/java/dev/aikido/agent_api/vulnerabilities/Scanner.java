@@ -44,6 +44,7 @@ public class Scanner {
                     String json = gson.toJson(new AttackCommandData(attack, ctx));
 
                     IPCClient client = new IPCDefaultClient();
+                    logger.info("Attack detected: {}", json);
                     client.sendData(
                             "ATTACK$" + json, // data
                             false // receive
