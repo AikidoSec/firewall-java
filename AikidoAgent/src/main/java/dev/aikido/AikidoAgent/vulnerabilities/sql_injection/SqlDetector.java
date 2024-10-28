@@ -4,6 +4,7 @@ import dev.aikido.AikidoAgent.vulnerabilities.Detector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class SqlDetector implements Detector {
@@ -13,14 +14,19 @@ public class SqlDetector implements Detector {
      * @param arguments contains: [query, dialect]
      * @return True if it detected an injection
      */
-    public boolean run(String userInput, String[] arguments) {
+    public DetectorResult run(String userInput, String[] arguments) {
         if (arguments.length != 2) {
             logger.debug("Arguments mismatch for SqlDetector");
-            return false;
+            return new DetectorResult();
         }
         String query = arguments[0];
         Dialect dialect = new Dialect(arguments[1]);
-        return detectSqlInjection(query, userInput, dialect);
+        boolean detectedAttack = detectSqlInjection(query, userInput, dialect);
+        if (detectedAttack) {
+            Map<String, String> metadata = Map.of("sql", query);
+            return new DetectorResult(/* detectedAttack*/ true, metadata, SQLInjectionException.get(dialect));
+        }
+        return new DetectorResult();
     }
     public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
         String queryLower = query.toLowerCase();
