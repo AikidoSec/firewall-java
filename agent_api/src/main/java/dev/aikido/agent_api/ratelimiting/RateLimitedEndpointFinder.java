@@ -32,7 +32,7 @@ public class RateLimitedEndpointFinder {
             return Double.compare(rateA, rateB);
         });
 
-        return matches.getFirst();
+        return matches.get(0);
     }
 
     public static double getEndpointRateLimitingRate(Endpoint endpoint) {

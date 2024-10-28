@@ -34,13 +34,13 @@ public class RateLimitedEndpointFinderTest {
     public void testReturnsNoneIfMatchingButNotEnabled() {
         List<Endpoint> endpoints = createEndpoints();
         Endpoint endpoint = new Endpoint(
-                endpoints.getFirst().getMethod(),
-                endpoints.getFirst().getRoute(),
-                endpoints.getFirst().getRateLimiting().maxRequests(),
-                endpoints.getFirst().getRateLimiting().windowSizeInMS(),
-                endpoints.getFirst().getAllowedIPAddresses(),
-                endpoints.getFirst().isGraphql(),
-                endpoints.getFirst().protectionForcedOff(),
+                endpoints.get(0).getMethod(),
+                endpoints.get(0).getRoute(),
+                endpoints.get(0).getRateLimiting().maxRequests(),
+                endpoints.get(0).getRateLimiting().windowSizeInMS(),
+                endpoints.get(0).getAllowedIPAddresses(),
+                endpoints.get(0).isGraphql(),
+                endpoints.get(0).protectionForcedOff(),
                 false // Rate limiting disabled
                 );
         assertNull(RateLimitedEndpointFinder.getRateLimitedEndpoint(List.of(endpoint), "/api/login"));
@@ -50,7 +50,7 @@ public class RateLimitedEndpointFinderTest {
     public void testReturnsEndpointIfMatchingAndEnabled() {
         List<Endpoint> endpoints = createEndpoints();
         Endpoint result = RateLimitedEndpointFinder.getRateLimitedEndpoint(endpoints, "/api/login");
-        assertEquals(endpoints.getFirst(), result);
+        assertEquals(endpoints.get(0), result);
     }
 
     @Test
@@ -72,6 +72,6 @@ public class RateLimitedEndpointFinderTest {
     public void testAlwaysReturnsExactMatchesFirst() {
         List<Endpoint> endpoints = createEndpoints();
         Endpoint result = RateLimitedEndpointFinder.getRateLimitedEndpoint(endpoints, "/api/login");
-        assertEquals(endpoints.getFirst(), result); // Exact match should be returned first
+        assertEquals(endpoints.get(0), result); // Exact match should be returned first
     }
 }
