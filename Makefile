@@ -14,6 +14,9 @@ build: clean
 	./gradlew agent_api:shadowJar
 	cp agent_api/build/libs/agent*-all.jar dist/agent_api.jar
 
+test:
+	AIKIDO_DIRECTORY="$(shell pwd)/dist" ./gradlew test
+
 
 BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.26
 FILES = \
@@ -28,9 +31,10 @@ FILES = \
     libzen_internals_x86_64-unknown-linux-gnu.so \
     libzen_internals_x86_64-unknown-linux-gnu.so.sha256sum
 
-binaries: binaries_make_dir $(FILES)
+binaries: binaries_make_dir $(addprefix .cache/binaries/, $(FILES))
 binaries_make_dir:
+	rm -rf .cache/binaries
 	mkdir -p .cache/binaries/
-%:
-	@echo "Downloading $@..."
-	curl -L -o .cache/binaries/$@ $(BASE_URL)/$@
+.cache/binaries/%:
+	@echo "Downloading $*..."
+	curl -L -o $@ $(BASE_URL)/$*
