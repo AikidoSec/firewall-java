@@ -12,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import static dev.aikido.agent_api.vulnerabilities.sql_injection.GetBinaryPath.getPathForBinary;
+
 public class RustSQLInterface {
     private static final Logger logger = LogManager.getLogger(RustSQLInterface.class);
     public interface SqlLib {
@@ -28,18 +30,10 @@ public class RustSQLInterface {
         }
     }
     private static SqlLib loadLibrary() throws URISyntaxException {
-        String path = getBinaryPath();
+        String path = getPathForBinary();
         Map<LibraryOption, Object> libraryOptions = new HashMap<>();
         libraryOptions.put(LibraryOption.LoadNow, true); // load immediately instead of lazily (ie on first use)
         libraryOptions.put(LibraryOption.IgnoreError, true); // calls shouldn't save last errno after call
         return LibraryLoader.loadLibrary(SqlLib.class, libraryOptions, path);
-    }
-    private static String getBinaryPath() throws URISyntaxException {
-        URL res = RustSQLInterface.class.getClassLoader().getResource("libzen_internals_x86_64-unknown-linux-gnu.so");
-        if (res != null) {
-            File file = Paths.get(res.toURI()).toFile();
-            return file.getAbsolutePath();
-        }
-        return "";
     }
 }
