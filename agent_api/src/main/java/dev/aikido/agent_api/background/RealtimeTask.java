@@ -30,11 +30,7 @@ public class RealtimeTask extends TimerTask {
 
         if(res.isPresent()) {
             long configAccordingToCloudUpdatedAt = res.get().configUpdatedAt();
-
-            if (configLastUpdatedAt.isEmpty()) {
-                configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt);
-            }
-            if(configLastUpdatedAt.get() < configAccordingToCloudUpdatedAt) {
+            if(configLastUpdatedAt.isEmpty() || configLastUpdatedAt.get() < configAccordingToCloudUpdatedAt) {
                 // Config was updated
                 configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt); // Store new time of last update
                 Optional<APIResponse> newConfig = connectionManager.getApi().fetchNewConfig(connectionManager.getToken(), /* Timeout in seconds: */ 3);

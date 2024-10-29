@@ -14,7 +14,8 @@ public class CommandRouter {
     private static final Command[] commands = {
             new AttackCommand(),
             new BlockingEnabledCommand(),
-            new InitRouteCommand()
+            new InitRouteCommand(),
+            new SyncDataCommand()
     };
     private final CloudConnectionManager connectionManager;
     public CommandRouter(CloudConnectionManager connectionManager) {
