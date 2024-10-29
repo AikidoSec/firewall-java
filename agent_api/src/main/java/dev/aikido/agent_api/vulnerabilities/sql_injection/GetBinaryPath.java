@@ -5,10 +5,7 @@ import static dev.aikido.agent_api.helpers.env.AikidoDir.getAikidoDir;
 public class GetBinaryPath {
     public static String getPathForBinary() {
       String fileName = getFileName();
-      if (fileName == null) {
-          return null;
-      }
-      String aikidoDirectory = getAikidoDir();
+        String aikidoDirectory = getAikidoDir();
       if (aikidoDirectory == null) {
           return null;
       }
@@ -17,27 +14,23 @@ public class GetBinaryPath {
     private static String getFileName() {
         String os = System.getProperty("os.name").toLowerCase();
         String architecture = System.getProperty("os.arch").toLowerCase();
+        StringBuilder fileName = new StringBuilder();
+
+        fileName.append("libzen_internals_"); // Start of file
+
+        if (architecture.contains("aarch64")) {
+            fileName.append("aarch64-"); // Add architecture to file name
+        } else if (architecture.contains("64")) {
+            fileName.append("x86_64-"); // Add architecture to file name
+        }
 
         if (os.contains("win")) {
-            // Windows
-            if (architecture.contains("64")) {
-                return "libzen_internals_x86_64-pc-windows-gnu.dll";
-            }
+            fileName.append("pc-windows-gnu.dll"); // Windows
         } else if (os.contains("mac")) {
-            // macOS
-            if (architecture.contains("aarch64")) {
-                return "libzen_internals_aarch64-apple-darwin.dylib";
-            } else if (architecture.contains("x86_64")) {
-                return "libzen_internals_x86_64-apple-darwin.dylib";
-            }
+            fileName.append("apple-darwin.dylib"); // macOS
         } else if (os.contains("nix") || os.contains("nux")) {
-            // Linux
-            if (architecture.contains("aarch64")) {
-                return "libzen_internals_aarch64-unknown-linux-gnu.so";
-            } else if (architecture.contains("x86_64")) {
-                return "libzen_internals_x86_64-unknown-linux-gnu.so";
-            }
+            fileName.append("unknown-linux-gnu.so"); // Linux
         }
-        return null;
+        return fileName.toString();
     }
 }
