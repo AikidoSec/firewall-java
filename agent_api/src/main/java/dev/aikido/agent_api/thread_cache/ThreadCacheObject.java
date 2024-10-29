@@ -11,27 +11,23 @@ public class ThreadCacheObject {
     private final List<Endpoint> endpoints;
     private final Set<String> blockedUserIds;
     private final long lastRenewedAtMS;
-    public ThreadCacheObject(Endpoint[] endpoints, String[] blockedUserIDs) {
+    public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs) {
         this.lastRenewedAtMS = getUnixTimeMS();
         // Set endpoints :
-        if (endpoints != null) {
-            this.endpoints = List.of(endpoints);
-        } else {
-            this.endpoints = List.of();
-        }
-
-        // Set blocked user IDs :
-        if (blockedUserIDs != null) {
-            this.blockedUserIds = Set.of(blockedUserIDs);
-        } else {
-            this.blockedUserIds = Set.of();
-        }
+        this.endpoints = endpoints;
+        this.blockedUserIds = blockedUserIDs;
     }
 
     public List<Endpoint> getEndpoints() {
+        if (endpoints == null) {
+            return List.of();
+        }
         return endpoints;
     }
     public boolean isBlockedUserID(String userID) {
+        if (blockedUserIds == null) {
+            return false;
+        }
         return blockedUserIds.contains(userID);
     }
 
