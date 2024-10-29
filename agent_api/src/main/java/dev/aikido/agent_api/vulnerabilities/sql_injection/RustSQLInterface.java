@@ -8,6 +8,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,14 +25,20 @@ public class RustSQLInterface {
         int dialectInteger = dialect.getDialectInteger();
         try {
             SqlLib lib = loadLibrary();
-            return lib.detect_sql_injection(query, userInput, dialectInteger) != 0;
-        } catch (URISyntaxException e) {
+            if (lib != null) {
+                return lib.detect_sql_injection(query, userInput, dialectInteger) != 0;
+            }
+        } catch (Exception e) {
             logger.trace(e);
-            return false;
         }
+        return false;
     }
-    private static SqlLib loadLibrary() throws URISyntaxException {
+    private static SqlLib loadLibrary() {
         String path = getPathForBinary();
+        if (path == null || !Files.exists(Path.of(path))) {
+            logger.info("Could not load binaries for SQL Injection algorithm. Path: {}", path);
+            return null;
+        }
         Map<LibraryOption, Object> libraryOptions = new HashMap<>();
         libraryOptions.put(LibraryOption.LoadNow, true); // load immediately instead of lazily (ie on first use)
         libraryOptions.put(LibraryOption.IgnoreError, true); // calls shouldn't save last errno after call
