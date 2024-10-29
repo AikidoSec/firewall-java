@@ -24,8 +24,8 @@ jobs:
 
       - name: Build with Gradle
         working-directory: ./
-        run: chmod +x gradlew && ./gradlew agent:shadowJar && ./gradlew agent_api:shadowJar
+        run: chmod +x gradlew && make binaries && make build
 
       - name: Run tests with Gradle
         working-directory: ./
-        run: chmod +x gradlew && ./gradlew agent_api:test
+        run: chmod +x gradlew && make test
