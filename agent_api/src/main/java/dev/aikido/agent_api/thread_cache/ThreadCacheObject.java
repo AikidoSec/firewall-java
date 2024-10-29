@@ -5,10 +5,14 @@ import dev.aikido.agent_api.background.Endpoint;
 import java.util.List;
 import java.util.Set;
 
+import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
+
 public class ThreadCacheObject {
     private final List<Endpoint> endpoints;
     private final Set<String> blockedUserIds;
+    private final long lastRenewedAtMS;
     public ThreadCacheObject(Endpoint[] endpoints, String[] blockedUserIDs) {
+        this.lastRenewedAtMS = getUnixTimeMS();
         // Set endpoints :
         if (endpoints != null) {
             this.endpoints = List.of(endpoints);
@@ -29,5 +33,9 @@ public class ThreadCacheObject {
     }
     public boolean isBlockedUserID(String userID) {
         return blockedUserIds.contains(userID);
+    }
+
+    public long getLastRenewedAtMS() {
+        return lastRenewedAtMS;
     }
 }
