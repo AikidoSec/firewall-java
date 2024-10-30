@@ -30,7 +30,7 @@ public class ShouldRateLimit {
         long maxRequests = rateLimitedEndpoint.getRateLimiting().maxRequests();
         if (user != null) {
             String key = rateLimitedEndpoint.getMethod() + ":" + rateLimitedEndpoint.getRoute() + ":user:" + user.id();
-            boolean allowed =  .getRateLimiter().isAllowed(key, windowSizeInMS, maxRequests);
+            boolean allowed = connectionManager.getRateLimiter().isAllowed(key, windowSizeInMS, maxRequests);
             if (allowed) {
                 // Do not continue to check based on IP if user is present:
                 return new RateLimitDecision(/*block*/false, null);
