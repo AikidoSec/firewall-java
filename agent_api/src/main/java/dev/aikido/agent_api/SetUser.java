@@ -1,10 +1,14 @@
 package dev.aikido.agent_api;
 
+import com.google.gson.Gson;
+import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public class SetUser {
     private static final Logger logger = LogManager.getLogger(SetUser.class);
@@ -24,8 +28,14 @@ public class SetUser {
                 "setUser(...) must be called before the Zen middleware is executed."
             );
         }
-        User validatedUser = new User(user.id(), user.name(), currentContext.getRemoteAddress());
+        long time = getUnixTimeMS();
+        User validatedUser = new User(user.id(), user.name(), currentContext.getRemoteAddress(), time);
+        // Update context:
         currentContext.setUser(validatedUser);
         Context.set(currentContext);
+
+        // Register user (Send to cloud)
+        String jsonDataPacket = new Gson().toJson(validatedUser);
+        new IPCDefaultClient().sendData("REGISTER_USER$" + jsonDataPacket, false);
     }
 }
