@@ -42,9 +42,13 @@ public class CommandRouter {
     public Optional<String> switchCommands(String commandName, String data) {
         for (Command command: commands) {
             if (command.matchesName(commandName)) {
-                Optional<String> commandResult = command.execute(data, this.connectionManager);
-                if (command.returnsData()) {
-                    return commandResult;
+                try {
+                    Optional<String> commandResult = command.execute(data, this.connectionManager);
+                    if (command.returnsData()) {
+                        return commandResult;
+                    }
+                } catch (Throwable e) {
+                    logger.trace(e);
                 }
                 return Optional.empty();
             }
