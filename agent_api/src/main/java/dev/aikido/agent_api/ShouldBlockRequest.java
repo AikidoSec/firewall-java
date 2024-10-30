@@ -28,8 +28,13 @@ public class ShouldBlockRequest {
         }
         context.setExecutedMiddleware(true); // Mark middleware as executed.
         Context.set(context);
-
-        // Check for blocked users after that PR here.
+        if (context.getUser() != null) {
+            if (threadCache.isBlockedUserID(context.getUser().id())) {
+                return new ShouldBlockRequestResult(/*block*/ true, new BlockedRequestResult(
+                        /*type*/ "blocked",/*trigger*/ "user", context.getRemoteAddress()
+                ));
+            }
+        }
 
         // Get matched endpoints:
         List<Endpoint> matches = matchEndpoints(context.getRouteMetadata(), threadCache.getEndpoints());
