@@ -9,7 +9,7 @@ public class RateLimiter {
         this.rateLimitedItems = new LRUCache<String, RequestInfo>(maxItems, timeToLiveInMs);
     }
 
-    public boolean isAllowed(String key, long windowSizeInMs, int maxRequests) {
+    public boolean isAllowed(String key, long windowSizeInMs, long maxRequests) {
         long currentTime = getUnixTimeMS();
         RequestInfo requestInfo = rateLimitedItems.get(key);
 
