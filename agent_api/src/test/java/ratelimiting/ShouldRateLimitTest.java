@@ -92,7 +92,7 @@ public class ShouldRateLimitTest {
         connectionManager = createConnectionManager(endpoints, new HashSet<>());
 
         RouteMetadata routeMetadata = createRouteMetadata("POST", "/login");
-        User user = new User("user123", "John Doe", "1.1.1.1");
+        User user = new User("user123", "John Doe", "1.1.1.1", 0);
 
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
                 ShouldRateLimit.shouldRateLimit(routeMetadata, user, "1.2.3.4", connectionManager));
@@ -140,7 +140,7 @@ public class ShouldRateLimitTest {
         connectionManager = createConnectionManager(endpoints, new HashSet<>());
 
         RouteMetadata routeMetadata = createRouteMetadata("POST", "/login");
-        User user = new User("user123", "John Doe", "1.2.3.4");
+        User user = new User("user123", "John Doe", "1.2.3.4", 0);
 
         // First three requests should not be blocked
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
@@ -195,19 +195,19 @@ public class ShouldRateLimitTest {
         // First request from first IP
         RouteMetadata metadata = createRouteMetadata("POST", "/login");
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
 
         // First request from second IP
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "4.3.2.1"), "4.3.2.1", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "4.3.2.1", 0), "4.3.2.1", connectionManager));
 
         // Second request from first IP
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
 
         // This request from second IP should trigger the rate limit
         assertEquals(new ShouldRateLimit.RateLimitDecision(true, "user"),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "4.3.2.1"), "4.3.2.1", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "4.3.2.1", 0), "4.3.2.1", connectionManager));
     }
 
     @Test
@@ -222,19 +222,19 @@ public class ShouldRateLimitTest {
         // First request from user 1
         RouteMetadata metadata = createRouteMetadata("POST", "/login");
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
 
         // First request from user 2
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123456", "User 456", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123456", "User 456", "1.2.3.4", 0), "1.2.3.4", connectionManager));
 
         // Second request from user 1
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
 
         // Second request from user 2
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123456", "User 456", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123456", "User 456", "1.2.3.4", 0), "1.2.3.4", connectionManager));
     }
 
     @Test
@@ -249,12 +249,12 @@ public class ShouldRateLimitTest {
         // All requests from the bypassed IP should not be blocked
         RouteMetadata metadata = createRouteMetadata("POST", "/login");
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4"), "1.2.3.4", connectionManager));
+                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
         }
     }
