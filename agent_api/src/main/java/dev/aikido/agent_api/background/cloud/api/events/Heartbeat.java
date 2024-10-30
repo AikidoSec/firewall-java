@@ -3,6 +3,9 @@ package dev.aikido.agent_api.background.cloud.api.events;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.background.routes.RouteEntry;
+import dev.aikido.agent_api.context.User;
+
+import java.util.List;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
@@ -14,12 +17,12 @@ public class Heartbeat {
             Object stats,
             String[] hostnames,
             RouteEntry[] routes,
-            String[] users
+            List<User> users
     ) implements APIEvent {};
     
     public static HeartbeatEvent get(
             CloudConnectionManager connectionManager,
-            Object stats, String[] hostnames, RouteEntry[] routes, String[] users
+            Object stats, String[] hostnames, RouteEntry[] routes, List<User> users
     ) {
         long time = getUnixTimeMS(); // Get current time
         GetManagerInfo.ManagerInfo agent = connectionManager.getManagerInfo();

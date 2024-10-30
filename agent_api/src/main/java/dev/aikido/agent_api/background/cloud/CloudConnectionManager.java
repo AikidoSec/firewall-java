@@ -10,6 +10,7 @@ import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.DetectedAttack;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.background.routes.Routes;
+import dev.aikido.agent_api.background.users.Users;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.ratelimiting.RateLimiter;
 
@@ -32,6 +33,7 @@ public class CloudConnectionManager {
     private final String token;
     private final Routes routes;
     private final RateLimiter rateLimiter;
+    private final Users users;
     public CloudConnectionManager(boolean block, Token token, String serverless) {
         this.config = new ServiceConfiguration(block, serverless);
         this.api = new ReportingApiHTTP(getAikidoAPIEndpoint());
@@ -40,6 +42,7 @@ public class CloudConnectionManager {
         this.rateLimiter = new RateLimiter(
                 /*maxItems:*/ 5000, /*TTL in ms:*/ 120 * 60 * 1000 // 120 minutes
         );
+        this.users = new Users();
     }
     public void onStart() {
         reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
@@ -84,5 +87,9 @@ public class CloudConnectionManager {
 
     public RateLimiter getRateLimiter() {
         return rateLimiter;
+    }
+
+    public Users getUsers() {
+        return users;
     }
 }
