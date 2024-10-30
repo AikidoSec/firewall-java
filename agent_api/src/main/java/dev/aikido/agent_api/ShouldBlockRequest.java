@@ -1,10 +1,13 @@
 package dev.aikido.agent_api;
 
+import com.google.gson.Gson;
 import dev.aikido.agent_api.background.Endpoint;
+import dev.aikido.agent_api.background.ipc_commands.ShouldRateLimitCommand;
 import dev.aikido.agent_api.background.utilities.IPCClient;
 import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 
@@ -23,6 +26,8 @@ public class ShouldBlockRequest {
         if (context == null || threadCache == null) {
             return new ShouldBlockRequestResult(false, null); // Blocking false
         }
+        context.setExecutedMiddleware(true); // Mark middleware as executed.
+        Context.set(context);
 
         // Check for blocked users after that PR here.
 
@@ -33,8 +38,21 @@ public class ShouldBlockRequest {
         if (matches != null && getRateLimitedEndpoint(matches, context.getRoute()) != null) {
             // As an optimization check if the route is rate limited before sending over IPC
             IPCClient ipcClient = new IPCDefaultClient();
-            String jsonDataPacket = "";
-            Optional<String> res = ipcClient.sendData("SHOULD_RATELIMIT$" + jsonDataPacket, true);
+            Gson gson = new Gson();
+            ShouldRateLimitCommand.Req shouldRateLimitReq = new ShouldRateLimitCommand.Req(
+                    context.getRouteMetadata(), context.getUser(), context.getRemoteAddress()
+            );
+            String jsonDataPacket = gson.toJson(shouldRateLimitReq);
+            Optional<String> res = ipcClient.sendData("SHOULD_RATE_LIMIT$" + jsonDataPacket, true);
+            if (res.isPresent() && !res.get().isEmpty()) {
+                ShouldRateLimit.RateLimitDecision rateLimitDecision = gson.fromJson(res.get(), ShouldRateLimit.RateLimitDecision.class);
+                if(rateLimitDecision.block()) {
+                    BlockedRequestResult blockedRequestResult = new BlockedRequestResult(
+                            "ratelimited", rateLimitDecision.trigger(), context.getRemoteAddress()
+                    );
+                    return new ShouldBlockRequestResult(/*block:*/ true, blockedRequestResult);
+                }
+            }
         }
 
         return new ShouldBlockRequestResult(false, null); // Blocking false

@@ -26,5 +26,6 @@ public class SetUser {
         }
         User validatedUser = new User(user.id(), user.name(), currentContext.getRemoteAddress());
         currentContext.setUser(validatedUser);
+        Context.set(currentContext);
     }
 }
