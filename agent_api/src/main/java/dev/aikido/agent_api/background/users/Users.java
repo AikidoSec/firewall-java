@@ -25,11 +25,10 @@ public class Users {
     }
 
     public void addUser(User user) {
-        long currentTime = getUnixTimeMS();
-
         User existing = users.get(user.id());
         if (existing != null) {
-            users.put(user.id(), new User(existing, currentTime));
+            // Update last seen at:
+            users.put(user.id(), new User(existing, user.lastSeenAt()));
             return;
         }
         if (users.size() >= maxEntries) {
