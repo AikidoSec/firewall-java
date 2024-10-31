@@ -10,7 +10,7 @@ public class Attack {
     public final Map<String, String> metadata;
     public final String payload;
     public final String stack;
-    Attack(String op, Vulnerabilities.Vulnerability vulnerability, String source, String pathToPayload, Map<String, String> metadata, String payload, String stack) {
+    public Attack(String op, Vulnerabilities.Vulnerability vulnerability, String source, String pathToPayload, Map<String, String> metadata, String payload, String stack) {
         this.operation = op;
         this.kind = vulnerability.getKind();
         this.source = source;
