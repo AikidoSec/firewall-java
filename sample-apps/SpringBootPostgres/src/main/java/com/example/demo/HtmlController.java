@@ -23,6 +23,10 @@ public class HtmlController {
     public String read_file(Model model) {
         return "read"; // This will resolve to src/main/resources/templates/read.html
     }
+    @GetMapping("/request")
+    public String request(Model model) {
+        return "request"; // This will resolve to src/main/resources/templates/request.html
+    }
 
     @GetMapping("/pet_page/{id}")
     public String pet_page(@PathVariable("id") Integer id) {
