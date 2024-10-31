@@ -30,8 +30,8 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.filter.RequestContextFilter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
-
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
@@ -47,7 +47,8 @@ public class Agent {
             new SpringFrameworkWrapper(),
             new SpringFrameworkBodyWrapper(),
             new FileWrapper(),
-            new HttpURLConnectionWrapper()
+            new HttpURLConnectionWrapper(),
+            new InetAddressWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
