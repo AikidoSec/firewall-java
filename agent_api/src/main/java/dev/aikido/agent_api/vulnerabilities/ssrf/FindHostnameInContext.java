@@ -11,7 +11,8 @@ import java.util.Optional;
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrl;
 
 public class FindHostnameInContext {
-    public static boolean findHostnameInContext(String hostname, ContextObject context, int port) {
+    public record Res(String source, String pathToPayload, String payload) {}
+    public static Res findHostnameInContext(String hostname, ContextObject context, int port) {
         Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(context).getAll();
         for (Map.Entry<String, Map<String, String>> sourceEntry : stringsFromContext.entrySet()) {
             String source = sourceEntry.getKey();
@@ -20,13 +21,13 @@ public class FindHostnameInContext {
                 String userInput = entry.getKey();
                 String path = entry.getValue();
                 if (hostnameInUserInput(userInput, hostname, port)) {
-                    return true; // fix
+                    return new Res(source, path, userInput);
                 }
             }
         }
-        return false;
+        return null;
     }
-    private static boolean hostnameInUserInput(String userInput, String hostname, int port) {
+    public static boolean hostnameInUserInput(String userInput, String hostname, int port) {
         if(userInput.length() <= 1) {
             return false;
         }
@@ -37,7 +38,13 @@ public class FindHostnameInContext {
         List<String> variants = List.of(userInput, "http://" + userInput, "https://" + userInput);
         for(String variant: variants) {
             URI userInputUrl = tryParseUrl(variant);
-            if (userInputUrl != null && userInputUrl.getHost().equals(hostnameUrl.getHost())) {
+            if (userInputUrl == null || userInputUrl.getHost() == null) {
+                continue;
+            }
+            if (userInputUrl.getHost().equals(hostnameUrl.getHost())) {
+                if (userInputUrl.getPort() == -1 || port == -1) {
+                    return true;
+                }
                 if (userInputUrl.getPort() == port) {
                     return true;
                 }
