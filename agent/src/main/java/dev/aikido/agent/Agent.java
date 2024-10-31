@@ -31,6 +31,7 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
 
+                .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
@@ -45,7 +46,8 @@ public class Agent {
             new PostgresWrapper(),
             new SpringFrameworkWrapper(),
             new SpringFrameworkBodyWrapper(),
-            new FileWrapper()
+            new FileWrapper(),
+            new HttpURLConnectionWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
