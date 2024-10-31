@@ -8,7 +8,7 @@ public class SSRFException extends AikidoException {
         super(msg);
     }
 
-    public static dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException get(Dialect dialect) {
+    public static dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException get() {
         String defaultMsg = generateDefaultMessage("a server-side request forgery");
         return new dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException(defaultMsg);
     }
