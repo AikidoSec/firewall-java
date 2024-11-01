@@ -24,15 +24,15 @@ public class SpringFrameworkWrapper implements Wrapper {
 
     @Override
     public String getName() {
-        // We wrap the function processRequest which gets called with
+        // We wrap the function doFilterInternal which gets called with
         // HttpServletRequest request, HttpServletResponse response
-        // And is part of org.springframework.web.servlet.FrameworkServlet
-        // See : https://github.com/spring-projects/spring-framework/blob/eb4bf1c0a65db32a161abd6fc89c69623dd80418/spring-webmvc/src/main/java/org/springframework/web/servlet/FrameworkServlet.java#L996
+        // And is part of org.springframework.web.filter.RequestContextFilter
+        // See: https://github.com/spring-projects/spring-framework/blob/4749d810db0261ce16ae5f32da6d375bb8087430/spring-web/src/main/java/org/springframework/web/filter/RequestContextFilter.java#L92
         return SpringFrameworkAdvice.class.getName();
     }
     @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.nameContainsIgnoreCase("processRequest");
+        return ElementMatchers.nameContainsIgnoreCase("doFilterInternal");
     }
 
     private static class SpringFrameworkAdvice {

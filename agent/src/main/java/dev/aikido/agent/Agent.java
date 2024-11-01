@@ -27,7 +27,8 @@ public class Agent {
             .ignore(ElementMatchers.none())
             .type(
                 ElementMatchers.nameContainsIgnoreCase("org.postgresql.core")
-                .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.filter.RequestContextFilter"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
 
             )
