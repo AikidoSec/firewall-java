@@ -23,9 +23,9 @@ jobs:
           distribution: 'adopt'
 
       - name: Build with Gradle
-        working-directory: ./AikidoAgent
-        run: chmod +x gradlew && ./gradlew build
+        working-directory: ./
+        run: chmod +x gradlew && ./gradlew agent:shadowJar && ./gradlew agent_api:shadowJar
 
       - name: Run tests with Gradle
-        working-directory: ./AikidoAgent
-        run: chmod +x gradlew && ./gradlew test
+        working-directory: ./
+        run: chmod +x gradlew && ./gradlew agent_api:test
