@@ -5,7 +5,7 @@ public class StackTrace {
         StringBuilder stringBuilder = new StringBuilder();
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
         for (StackTraceElement ste : trace) {
-            if(ste.getModuleName() != null && ste.getModuleName().startsWith("dev.aikido")) {
+            if(ste.getClassName().startsWith("dev.aikido")) {
                 continue; // Ignore Aikido internal stacktrace
             }
             stringBuilder.append(stackTraceElementToString(ste));

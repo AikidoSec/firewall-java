@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class AttackCommand implements Command {
     private static final Logger logger = LogManager.getLogger(AttackCommand.class);
-    private record AttackCommandData(Attack attack, ContextObject context) {}
+    public record AttackCommandData(Attack attack, ContextObject context) {}
 
     @Override
     public boolean returnsData() {
