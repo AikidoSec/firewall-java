@@ -15,7 +15,13 @@ public class ContextObject {
     HashMap<String, String[]> query;
     HashMap<String, String> cookies;
     Object body;
-
+    // Auxiliary :
+    User user;
+    boolean executedMiddleware;
+    public boolean middlewareExecuted() {return executedMiddleware; }
+    public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
     public Object getBody() {
         return body;
     }

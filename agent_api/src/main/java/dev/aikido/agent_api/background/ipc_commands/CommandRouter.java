@@ -15,7 +15,9 @@ public class CommandRouter {
             new AttackCommand(),
             new BlockingEnabledCommand(),
             new InitRouteCommand(),
-            new SyncDataCommand()
+            new SyncDataCommand(),
+            new ShouldRateLimitCommand(),
+            new RegisterUserCommand()
     };
     private final CloudConnectionManager connectionManager;
     public CommandRouter(CloudConnectionManager connectionManager) {
@@ -41,9 +43,13 @@ public class CommandRouter {
     public Optional<String> switchCommands(String commandName, String data) {
         for (Command command: commands) {
             if (command.matchesName(commandName)) {
-                Optional<String> commandResult = command.execute(data, this.connectionManager);
-                if (command.returnsData()) {
-                    return commandResult;
+                try {
+                    Optional<String> commandResult = command.execute(data, this.connectionManager);
+                    if (command.returnsData()) {
+                        return commandResult;
+                    }
+                } catch (Throwable e) {
+                    logger.trace(e);
                 }
                 return Optional.empty();
             }
