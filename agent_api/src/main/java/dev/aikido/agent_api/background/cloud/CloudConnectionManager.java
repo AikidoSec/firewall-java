@@ -25,8 +25,6 @@ import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoAPIEndpoint;
 public class CloudConnectionManager {
     // Constants:
     private static final int timeout = 10; // Timeout for HTTP requests to cloud
-    private static final int heartbeatEveryXSeconds = 600; // 10 minutes
-    private static final int pollingEveryXSeconds = 60; // Check for realtime config changes every 1 minute
 
     private final ServiceConfiguration config;
     private final ReportingApi api;
@@ -46,18 +44,6 @@ public class CloudConnectionManager {
     }
     public void onStart() {
         reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
-        // Start heartbeat :
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(
-                new HeartbeatTask(this), // Create a heartbeat task with this context (CloudConnectionManager)
-                heartbeatEveryXSeconds * 1000, // Delay before first execution in milliseconds
-                heartbeatEveryXSeconds * 1000 // Interval in milliseconds
-        );
-        timer.scheduleAtFixedRate(
-                new RealtimeTask(this), // Create a realtime task with this context (CloudConnectionManager)
-                pollingEveryXSeconds * 1000, // Delay before first execution in milliseconds
-                pollingEveryXSeconds * 1000 // Interval in milliseconds
-        );
     }
     public void reportEvent(APIEvent event, boolean updateConfig) {
         Optional<APIResponse> res = this.api.report(this.token, event, timeout);
