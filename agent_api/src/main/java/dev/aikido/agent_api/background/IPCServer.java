@@ -20,7 +20,10 @@ public class IPCServer {
         // Delete previous socket file :
         Files.deleteIfExists(socketPath); // Make sure this is alright with multiple agents
 
-        commandRouter = new CommandRouter(process.getCloudConnectionManager());
+        commandRouter = new CommandRouter(
+            /* connection manager: */ process.getCloudConnectionManager(),
+            /* attack queue: */ process.getAttackQueue()
+        );
 
         // Create a new server socket :
         serverSocket = AFUNIXServerSocket.newInstance();
