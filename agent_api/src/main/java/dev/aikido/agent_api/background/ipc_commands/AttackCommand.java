@@ -2,6 +2,7 @@ package dev.aikido.agent_api.background.ipc_commands;
 
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
+import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.DetectedAttack;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.vulnerabilities.Attack;
@@ -9,11 +10,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 
 public class AttackCommand implements Command {
     private static final Logger logger = LogManager.getLogger(AttackCommand.class);
+    private final BlockingQueue<APIEvent> queue;
     public record AttackCommandData(Attack attack, ContextObject context) {}
-
+    public AttackCommand(BlockingQueue<APIEvent> queue) {
+        this.queue = queue;
+    }
     @Override
     public boolean returnsData() {
         return false;
@@ -36,8 +41,7 @@ public class AttackCommand implements Command {
         DetectedAttack.DetectedAttackEvent detectedAttack = DetectedAttack.createAPIEvent(
                 attackCommandData.attack, attackCommandData.context, connectionManager
         );
-        // Send to cloud :
-        connectionManager.reportEvent(detectedAttack, false /* Update config */);
+        queue.add(detectedAttack); // Add to attack queue, so attack is reported in background
         return Optional.empty();
     }
 }
