@@ -29,10 +29,14 @@ public class GetApiInfo {
     private static Map<String, Object> getBodyInfo(ContextObject context) {
         Object body = context.getBody();
         if (body != null) {
-            return Map.of(
-                "type", getBodyDataType(context.getHeaders()),
-                "schema", getDataSchema(body)
-            );
+            DataSchemaItem dataSchema = getDataSchema(body);
+            String dataType = getBodyDataType(context.getHeaders());
+            if(dataType != null && dataSchema != null) {
+                return Map.of(
+                        "type", getBodyDataType(context.getHeaders()),
+                        "schema", getDataSchema(body)
+                );
+            }
         }
         return Map.of();
     }
