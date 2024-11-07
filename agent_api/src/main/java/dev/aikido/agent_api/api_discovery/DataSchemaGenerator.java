@@ -6,6 +6,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
 import static dev.aikido.agent_api.helpers.patterns.PrimitiveType.isPrimitiveOrString;
 
 public class DataSchemaGenerator {
@@ -33,16 +34,7 @@ public class DataSchemaGenerator {
 
         // Collection is a catch-all for lists, sets, ...
         if (data instanceof Collection<?> dataList) {
-            DataSchemaItem items = null;
-            for (int i = 0; i < Math.min(MAX_ARRAY_DEPTH, dataList.size()); i++) {
-                DataSchemaItem childDataSchemaItem = getDataSchema(data);
-                if (items == null) {
-                    items = childDataSchemaItem;
-                } else {
-                    // Merge here
-                }
-            }
-            return new DataSchemaItem(DataSchemaType.ARRAY, items);
+            return getDataSchema(dataList.toArray());
         }
         // Arrays are still another thing :
         if (data.getClass().isArray()) {
@@ -52,7 +44,7 @@ public class DataSchemaGenerator {
                 if (items == null) {
                     items = childDataSchemaItem;
                 } else {
-                    // Merge here
+                    items = mergeDataSchemas(items, childDataSchemaItem); // Merge schemas
                 }
             }
             return new DataSchemaItem(DataSchemaType.ARRAY, items);
@@ -67,14 +59,14 @@ public class DataSchemaGenerator {
                         // We cannot allow more properties than MAX_PROPS, breaking for loop.
                         break;
                     }
-                    props.put((String) key, getDataSchema(map.get(key)));
+                    props.put((String) key, getDataSchema(map.get(key), depth + 1));
                 }
             } else {
                 Field[] fields = data.getClass().getDeclaredFields();
                 for (Field field : fields) {
                     try {
                         field.setAccessible(true); // Allow access to private fields
-                        props.put(field.getName(), getDataSchema(field.get(data)));
+                        props.put(field.getName(), getDataSchema(field.get(data), depth + 1));
                     } catch (IllegalAccessException | RuntimeException ignored) {
                     }
                 }
