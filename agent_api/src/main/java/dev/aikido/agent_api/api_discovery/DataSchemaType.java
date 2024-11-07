@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public enum DataSchemaType {
     @SerializedName("string")
     STRING,
-    
+
     @SerializedName("number")
     NUMBER,
 

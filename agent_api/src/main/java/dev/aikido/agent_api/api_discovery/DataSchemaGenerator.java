@@ -52,7 +52,7 @@ public class DataSchemaGenerator {
 
         // If the depth is less than the maximum depth, get the schema for each property
         Map<String, DataSchemaItem> props = new HashMap<>();
-        if (depth < MAX_TRAVERSAL_DEPTH) {
+        if (depth <= MAX_TRAVERSAL_DEPTH) {
             if (data instanceof Map<?, ?> map) {
                 for (Object key : map.keySet()) {
                     if (props.size() >= MAX_PROPS) {
