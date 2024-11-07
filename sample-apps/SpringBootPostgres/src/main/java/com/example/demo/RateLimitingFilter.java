@@ -19,7 +19,6 @@ public class RateLimitingFilter implements Filter {
             FilterChain chain) throws IOException, ServletException {
         ShouldBlockRequest.ShouldBlockRequestResult shouldBlockRequestResult = ShouldBlockRequest.shouldBlockRequest();
         if (shouldBlockRequestResult.block()) {
-            System.out.println("Blcoekd");
             if (shouldBlockRequestResult.data().type().equals("ratelimited")) {
                 String message = "You are rate limited by Zen.";
                 if (shouldBlockRequestResult.data().trigger().equals("ip")) {
