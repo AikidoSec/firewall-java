@@ -1,6 +1,8 @@
 package dev.aikido.agent_api.vulnerabilities.shell_injection;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -18,9 +20,11 @@ public class ShellCommandsRegex {
     private static final List<String> PATH_PREFIXES = Arrays.asList(
             "/bin/", "/sbin/", "/usr/bin/", "/usr/sbin/", "/usr/local/bin/", "/usr/local/sbin/"
     );
-
-    public static final Pattern COMMANDS_REGEX = Pattern.compile(
-            "([/.]*(" + String.join("|", PATH_PREFIXES) + ")?(" +
-                    String.join("|", COMMANDS) + "))", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
-    );
+    public static Pattern getCommandsRegex() {
+        COMMANDS.sort(Collections.reverseOrder());
+        return Pattern.compile(
+                "([/.]*(" + String.join("|", PATH_PREFIXES) + ")?(" +
+                        String.join("|", COMMANDS) + "))", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+        );
+    }
 }

@@ -1,29 +1,43 @@
 package dev.aikido.agent_api.vulnerabilities.shell_injection;
 
+import dev.aikido.agent_api.SetUser;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.DangerousShellChars.containDangerousCharacter;
-import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellCommandsRegex.COMMANDS_REGEX;
+import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellCommandsRegex.getCommandsRegex;
 
 public class ShellSyntaxChecker {
     private static final List<String> SEPARATORS = Arrays.asList(
             " ", "\t", "\n", ";", "&", "|", "(", ")", "<", ">"
     );
 
-    public static boolean containsShellSyntax(String userInput, String command) {
+    public static boolean containsShellSyntax(String command, String userInput) {
+        if(userInput.isBlank()) {
+            return false; // The entire user input is just whitespace, ignore
+        }
         if (containDangerousCharacter(userInput)) {
             return true;
         }
 
+        // Check if the command is the same as the user input
+        // Rare case, but it's possible
+        // e.g. command is `shutdown` and user input is `shutdown`
+        // (`shutdown -h now` will be caught by the dangerous chars as it contains a space)
         if (command.equals(userInput)) {
-            Matcher match = COMMANDS_REGEX.matcher(command);
-            // Check if there is a match on the command regex that spans full command:
-            return match.find() && match.start() == 0 && match.end() == command.length();
+            Matcher matcher = getCommandsRegex().matcher(command);
+            while (matcher.find()) {
+                if (matcher.group().equals(command)) {
+                    return true;
+                }
+            }
+            return false;
         }
+
         // Check if the command contains a commonly used command
-        Matcher matcher = COMMANDS_REGEX.matcher(command);
+        Matcher matcher = getCommandsRegex().matcher(command);
         while (matcher.find()) {
             // We found a command like `rm` or `/sbin/shutdown` in the command
             // Check if the command is the same as the user input
