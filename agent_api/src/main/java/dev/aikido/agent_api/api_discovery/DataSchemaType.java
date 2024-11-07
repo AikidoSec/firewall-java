@@ -1,20 +1,23 @@
 package dev.aikido.agent_api.api_discovery;
 
+import com.google.gson.annotations.SerializedName;
+
 public enum DataSchemaType {
-    STRING("string"),
-    NUMBER("number"),
-    BOOL("boolean"),
-    ARRAY("array"),
-    OBJECT("object"),
-    EMPTY("null");
+    @SerializedName("string")
+    STRING,
+    
+    @SerializedName("number")
+    NUMBER,
 
-    private final String type;
-    DataSchemaType(String type) {
-        this.type = type;
-    }
+    @SerializedName("boolean")
+    BOOL,
 
-    @Override
-    public String toString() {
-        return this.type;
-    }
+    @SerializedName("array")
+    ARRAY,
+
+    @SerializedName("object")
+    OBJECT,
+
+    @SerializedName("null")
+    EMPTY;
 }
