@@ -1,10 +1,10 @@
-package dev.aikido.agent_api.background.routes;
+package dev.aikido.agent_api.storage.routes;
 import dev.aikido.agent_api.context.RouteMetadata;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static dev.aikido.agent_api.background.routes.RouteToKeyHelper.routeToKey;
+import static dev.aikido.agent_api.storage.routes.RouteToKeyHelper.routeToKey;
 
 public class Routes {
     private final int maxSize;

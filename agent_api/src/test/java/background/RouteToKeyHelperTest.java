@@ -2,7 +2,7 @@ package background;
 import dev.aikido.agent_api.context.RouteMetadata;
 import org.junit.jupiter.api.Test;
 
-import static dev.aikido.agent_api.background.routes.RouteToKeyHelper.routeToKey;
+import static dev.aikido.agent_api.storage.routes.RouteToKeyHelper.routeToKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 public class RouteToKeyHelperTest {
     @Test
