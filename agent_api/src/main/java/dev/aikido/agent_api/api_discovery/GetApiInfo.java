@@ -26,19 +26,19 @@ public class GetApiInfo {
         return null;
     }
 
-    private static Map<String, Object> getBodyInfo(ContextObject context) {
+    private static APISpec.Body getBodyInfo(ContextObject context) {
         Object body = context.getBody();
         if (body != null) {
             DataSchemaItem dataSchema = getDataSchema(body);
             String dataType = getBodyDataType(context.getHeaders());
             if(dataType != null && dataSchema != null) {
-                return Map.of(
-                        "type", getBodyDataType(context.getHeaders()),
-                        "schema", getDataSchema(body)
+                return new APISpec.Body(
+                        /* schema: */ getDataSchema(body),
+                        /* type: */ getBodyDataType(context.getHeaders())
                 );
             }
         }
-        return Map.of();
+        return null;
     }
     private static DataSchemaItem getQueryInfo(ContextObject context) {
         Map<String, String[]> query =  context.getQuery();
