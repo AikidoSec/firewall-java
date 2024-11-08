@@ -3,6 +3,8 @@ package dev.aikido.agent_api.storage.routes;
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.context.RouteMetadata;
 
+import static dev.aikido.agent_api.api_discovery.APISpecMerger.mergeAPISpecs;
+
 public class RouteEntry {
     private final String method;
     private final String path;
@@ -35,8 +37,9 @@ public class RouteEntry {
         return path;
     }
 
-    public APISpec updateApiSpec(APISpec newApiSpec) {
-        this.apispec = newApiSpec;
+    public void updateApiSpec(APISpec newApiSpec) {
+        APISpec mergedAPISpec = mergeAPISpecs(newApiSpec, this.apispec);
+        this.apispec = mergedAPISpec;
     }
     public APISpec getApispec() {
         return apispec;
