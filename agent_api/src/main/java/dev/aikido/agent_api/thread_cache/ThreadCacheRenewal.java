@@ -16,7 +16,7 @@ public class ThreadCacheRenewal {
             Gson gson = new Gson();
             SyncDataCommand.SyncDataResult res = gson.fromJson(result.get(), SyncDataCommand.SyncDataResult.class);
             if (res != null) {
-                return new ThreadCacheObject(res.endpoints(), res.blockedUserIDs(), res.routes());
+                return new ThreadCacheObject(res.endpoints(), res.blockedUserIDs(), res.bypassedIPs(), res.routes());
             }
         }
         return null;
