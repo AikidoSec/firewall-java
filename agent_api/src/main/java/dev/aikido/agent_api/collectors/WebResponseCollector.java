@@ -1,6 +1,8 @@
 package dev.aikido.agent_api.collectors;
 
 import com.google.gson.Gson;
+import dev.aikido.agent_api.api_discovery.APISpec;
+import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
 import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
@@ -9,6 +11,7 @@ import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 
+import static dev.aikido.agent_api.api_discovery.GetApiInfo.getApiInfo;
 import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public class WebResponseCollector {
@@ -40,7 +43,9 @@ public class WebResponseCollector {
             RouteEntry route = threadCache.getRoutes().get(routeMetadata);
             route.incrementHits(); // Increment hits so we can limit with constant:
             if (route.getHits() <= ANALYSIS_ON_FIRST_X_REQUESTS) {
-                String apiDiscoveryStr = "API_DISCOVERY$" + gson.toJson(routeMetadata);
+                APISpec apiSpec = getApiInfo(context);
+                ApiDiscoveryCommand.Req req = new ApiDiscoveryCommand.Req(apiSpec, routeMetadata);
+                String apiDiscoveryStr = "API_DISCOVERY$" + gson.toJson(req);
                 new IPCDefaultClient().sendData(apiDiscoveryStr, false /* does not receive a response*/);
             }
         }
