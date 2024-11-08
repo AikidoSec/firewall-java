@@ -1,7 +1,7 @@
 package background;
 
-import dev.aikido.agent_api.background.routes.RouteEntry;
-import dev.aikido.agent_api.background.routes.Routes;
+import dev.aikido.agent_api.storage.routes.RouteEntry;
+import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.context.RouteMetadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

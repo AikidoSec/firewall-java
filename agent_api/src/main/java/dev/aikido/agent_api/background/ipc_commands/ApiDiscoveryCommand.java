@@ -1,12 +1,13 @@
 package dev.aikido.agent_api.background.ipc_commands;
 
 import com.google.gson.Gson;
+import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 
 import java.util.Optional;
 
-public class InitRouteCommand implements Command {
+public class ApiDiscoveryCommand implements Command {
     @Override
     public boolean returnsData() {
         return false;
@@ -14,22 +15,18 @@ public class InitRouteCommand implements Command {
 
     @Override
     public boolean matchesName(String command) {
-        return command.equalsIgnoreCase("INIT_ROUTE");
+        return command.equalsIgnoreCase("API_DISCOVERY");
     }
 
-    /**
-     *
-     * @param data is JSON String for {@code RouteMetadata}
-     * @return Nothing (Empty optional)
-     */
+    public record Req(APISpec apiSpec, RouteMetadata routeMetadata) {}
     @Override
     public Optional<String> execute(String data, CloudConnectionManager connectionManager) {
         Gson gson = new Gson();
-        RouteMetadata routeMetadata = gson.fromJson(data, RouteMetadata.class);
-        if (connectionManager.getRoutes().get(routeMetadata) == null) {
-            connectionManager.getRoutes().initializeRoute(routeMetadata);
+        Req request = gson.fromJson(data, Req.class);
+        if (request != null) {
+            connectionManager.getRoutes().get(request.routeMetadata())
+                    .updateApiSpec(request.apiSpec());
         }
-        connectionManager.getRoutes().get(routeMetadata).incrementHits();
         return Optional.empty();
     }
 }

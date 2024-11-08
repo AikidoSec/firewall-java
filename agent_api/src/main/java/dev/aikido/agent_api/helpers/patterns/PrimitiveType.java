@@ -20,4 +20,10 @@ public class PrimitiveType {
     public static boolean isPrimitiveType(Object source) {
         return WRAPPER_TYPE_MAP.containsKey(source.getClass());
     }
+    public static boolean isPrimitiveOrString(Object source) {
+        if (WRAPPER_TYPE_MAP.containsKey(source.getClass())) {
+            return true;
+        }
+        return source instanceof String;
+    }
 }

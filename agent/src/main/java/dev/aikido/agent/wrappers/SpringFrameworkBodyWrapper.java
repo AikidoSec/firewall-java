@@ -1,5 +1,6 @@
 package dev.aikido.agent.wrappers;
 
+import dev.aikido.agent_api.collectors.RequestBodyCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import net.bytebuddy.asm.Advice;
@@ -24,9 +25,7 @@ public class SpringFrameworkBodyWrapper implements Wrapper {
     private static class SpringFrameworkBodyWrapperAdvice {
         @Advice.OnMethodExit
         public static void interceptOnExit(@Advice.Return Object body) {
-            ContextObject contextObj = Context.get();
-            contextObj.setBody(body);
-            Context.set(contextObj);
+            RequestBodyCollector.report(body);
         }
     }
 }

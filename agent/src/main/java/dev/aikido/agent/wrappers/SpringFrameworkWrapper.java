@@ -2,6 +2,8 @@ package dev.aikido.agent.wrappers;
 
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
+import dev.aikido.agent_api.collectors.WebRequestCollector;
+import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.SpringContextObject;
@@ -42,9 +44,8 @@ public class SpringFrameworkWrapper implements Wrapper {
                 @Advice.Argument(0) Object request,
                 @Advice.Argument(1) Object response) {
             try {
-                Context.reset();
                 ContextObject contextObject = new SpringContextObject((HttpServletRequest) request);
-                Context.set(contextObject);
+                WebRequestCollector.report(contextObject);
                 return (HttpServletResponse) response;
             } catch (Throwable e) {
                 logger.debug(e);
@@ -57,14 +58,7 @@ public class SpringFrameworkWrapper implements Wrapper {
             if (response == null) {
                 return;
             }
-            int statusCode = response.getStatus();
-            ContextObject context = Context.get();
-            boolean currentRouteUseful = isUsefulRoute(statusCode, context.getRoute(), context.getMethod());
-            if (currentRouteUseful) {
-                Gson gson = new Gson();
-                String data = "INIT_ROUTE$" + gson.toJson(context.getRouteMetadata());
-                new IPCDefaultClient().sendData(data, false /* does not receive a response*/);
-            }
+            WebResponseCollector.report(response.getStatus()); // Report status code.
         }
     }
 }
