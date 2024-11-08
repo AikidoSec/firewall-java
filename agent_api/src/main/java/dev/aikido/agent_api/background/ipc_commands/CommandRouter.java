@@ -1,27 +1,31 @@
 package dev.aikido.agent_api.background.ipc_commands;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
+import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Routes the string command input to the correct class
  */
 public class CommandRouter {
     private static final Logger logger = LogManager.getLogger(CommandRouter.class);
-    private static final Command[] commands = {
-            new AttackCommand(),
-            new BlockingEnabledCommand(),
-            new InitRouteCommand(),
-            new SyncDataCommand(),
-            new ShouldRateLimitCommand(),
-            new RegisterUserCommand()
-    };
+    private final List<Command> commands = new ArrayList<>();
+
     private final CloudConnectionManager connectionManager;
-    public CommandRouter(CloudConnectionManager connectionManager) {
+    public CommandRouter(CloudConnectionManager connectionManager, BlockingQueue<APIEvent> queue) {
         this.connectionManager = connectionManager;
+        commands.add(new BlockingEnabledCommand());
+        commands.add(new InitRouteCommand());
+        commands.add(new SyncDataCommand());
+        commands.add(new ShouldRateLimitCommand());
+        commands.add(new RegisterUserCommand());
+        commands.add(new AttackCommand(queue));
     }
 
     /**
