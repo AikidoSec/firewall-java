@@ -49,8 +49,8 @@ public class GetApiInfoTest {
         Gson gson = new Gson();
         assertEquals(
                 "{\"type\":\"object\",\"properties\":{\"data1\":{\"type\":\"object\",\"properties\":{\"identifier\":{\"type\":\"string\",\"optional\":false},\"data2\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"location\":{\"type\":\"string\",\"optional\":true},\"Help\":{\"type\":\"boolean\",\"optional\":false}},\"optional\":false},\"optional\":false},\"active\":{\"type\":\"boolean\",\"optional\":false}},\"optional\":false},\"user\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"optional\":false},\"email\":{\"type\":\"string\",\"optional\":false}},\"optional\":false}},\"optional\":false}",
-                gson.toJson(apiInfo.body().get("schema")));
-        assertEquals("form-urlencoded", apiInfo.body().get("type"));
+                gson.toJson(apiInfo.body().schema()));
+        assertEquals("form-urlencoded", apiInfo.body().type());
     }
 
     @Test
@@ -75,8 +75,8 @@ public class GetApiInfoTest {
         assertNotNull(apiInfo.body());
         assertNotNull(apiInfo.query());
         Gson gson = new Gson();
-        assertEquals("json", apiInfo.body().get("type"));
-        assertEquals("{\"type\":\"object\",\"properties\":{\"user\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"optional\":false},\"email\":{\"type\":\"string\",\"optional\":false}},\"optional\":false}},\"optional\":false}", gson.toJson(apiInfo.body().get("schema")));
+        assertEquals("json", apiInfo.body().type());
+        assertEquals("{\"type\":\"object\",\"properties\":{\"user\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"optional\":false},\"email\":{\"type\":\"string\",\"optional\":false}},\"optional\":false}},\"optional\":false}", gson.toJson(apiInfo.body().schema()));
         assertEquals("{\"type\":\"object\",\"properties\":{\"user2\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"optional\":false},\"optional\":false}},\"optional\":false}", gson.toJson(apiInfo.query()));
         assertNull(apiInfo.auth());
     }
