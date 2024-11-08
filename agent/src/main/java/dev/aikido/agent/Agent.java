@@ -32,6 +32,7 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.lang"))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
@@ -48,7 +49,8 @@ public class Agent {
             new SpringFrameworkBodyWrapper(),
             new FileWrapper(),
             new HttpURLConnectionWrapper(),
-            new InetAddressWrapper()
+            new InetAddressWrapper(),
+            new RuntimeExecWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {

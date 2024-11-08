@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.vulnerabilities;
 
 import dev.aikido.agent_api.vulnerabilities.path_traversal.PathTraversalDetector;
+import dev.aikido.agent_api.vulnerabilities.shell_injection.ShellInjectionDetector;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 
@@ -35,6 +36,14 @@ public class Vulnerabilities {
         @Override
         public String getKind() {
             return "ssrf";
+        }
+    }
+    public static final class ShellInjectionVulnerability implements Vulnerability {
+        @Override
+        public Detector getDetector() { return new ShellInjectionDetector(); }
+        @Override
+        public String getKind() {
+            return "shell_injection";
         }
     }
 }
