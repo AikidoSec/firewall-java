@@ -27,6 +27,10 @@ public class HtmlController {
     public String request(Model model) {
         return "request"; // This will resolve to src/main/resources/templates/request.html
     }
+    @GetMapping("/exec")
+    public String exec(Model model) {
+        return "execute"; // This will resolve to src/main/resources/templates/execute.html
+    }
 
     @GetMapping("/pet_page/{id}")
     public String pet_page(@PathVariable("id") Integer id) {
