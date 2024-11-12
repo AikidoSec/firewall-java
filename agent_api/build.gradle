@@ -26,10 +26,13 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.mockito:mockito-core:5.0.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.0.0'
+    testImplementation 'org.junit-pioneer:junit-pioneer:2.2.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
 
 test {
+    jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
+    jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
     useJUnitPlatform()
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
