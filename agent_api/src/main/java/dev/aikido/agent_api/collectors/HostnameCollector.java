@@ -29,6 +29,9 @@ public final class HostnameCollector {
             ipAddresses.add(inetAddress.getHostAddress());
         }
         // Currently using hostnames from thread cache, might not be as accurate as using Context-dependant hostnames.
+        if (ThreadCache.get() == null || ThreadCache.get().getHostnames() == null) {
+            return;
+        }
         for (Hostnames.HostnameEntry hostnameEntry: ThreadCache.get().getHostnames().asArray()) {
             if(!hostnameEntry.getHostname().equals(hostname)) {
                 continue;
