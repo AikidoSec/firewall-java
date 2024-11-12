@@ -1,6 +1,8 @@
 package dev.aikido.agent_api.context;
 
-public class Context {
+public final class Context {
+    private Context() {}
+    
     static final ThreadLocal<ContextObject> threadLocalContext = new ThreadLocal<>();
     public static ContextObject get() {
         return threadLocalContext.get();
