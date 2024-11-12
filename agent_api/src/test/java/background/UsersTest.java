@@ -98,4 +98,22 @@ class UsersTest {
         List<User> userList = users.asList();
         assertTrue(userList.isEmpty()); // Should be empty after clearing
     }
+
+    @Test
+    void testEmptyConstructor() {
+        users = new Users(); // Set max entries to default (1000)
+        User user1 = new User("2000", "User One", "192.168.1.1", System.currentTimeMillis(), System.currentTimeMillis());
+        User user2 = new User("2200", "User Two", "192.168.1.2", System.currentTimeMillis(), System.currentTimeMillis());
+        users.addUser(user1);
+        users.addUser(user2);
+        for (int i = 0; i < (1000 - 1); i++) {
+            User userI = new User(String.valueOf(i), "User", "192.168.1.2", System.currentTimeMillis(), System.currentTimeMillis());
+            users.addUser(userI);
+        }
+
+        List<User> userList = users.asList();
+        assertEquals(1000, userList.size());
+        assertFalse(userList.contains(user1)); // user1 should be removed
+        assertTrue(userList.contains(user2));
+    }
 }
