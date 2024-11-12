@@ -55,29 +55,17 @@ public final class BuildRouteFromUrl {
 
         if (startsWithNumber && NUMBER_REGEX.matcher(segment).matches()) {
             return ":number";
-        }
-
-        if (segment.length() == 36 && UUID_REGEX.matcher(segment).matches()) {
+        } else if (segment.length() == 36 && UUID_REGEX.matcher(segment).matches()) {
             return ":uuid";
-        }
-
-        if (startsWithNumber && DATE_REGEX.matcher(segment).matches()) {
+        } else if (startsWithNumber && DATE_REGEX.matcher(segment).matches()) {
             return ":date";
-        }
-
-        if (segment.contains("@") && EMAIL_REGEX.matcher(segment).matches()) {
+        } else if (segment.contains("@") && EMAIL_REGEX.matcher(segment).matches()) {
             return ":email";
-        }
-
-        if (isValidIpAddress(segment)) {
+        } else if (isValidIpAddress(segment)) {
             return ":ip";
-        }
-
-        if (isHash(segment)) {
+        } else if (isHash(segment)) {
             return ":hash";
-        }
-
-        if (looksLikeASecret(segment)) {
+        } else if (looksLikeASecret(segment)) {
             return ":secret";
         }
 

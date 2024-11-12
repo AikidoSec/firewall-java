@@ -22,10 +22,10 @@ public final class StringExtractor {
 
             // Extract JWT Tokens :
             LooksLikeJWT.Result jwtResult = LooksLikeJWT.tryDecodeAsJwt((String) obj);
-            if (jwtResult.isSuccess()) {
+            if (jwtResult.success()) {
                 ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
                 newPathToPayload.add(new PathBuilder.PathPart("jwt"));
-                Map<String, String> resultsFromJWT = extractStringsRecursive(jwtResult.getPayload(), newPathToPayload);
+                Map<String, String> resultsFromJWT = extractStringsRecursive(jwtResult.payload(), newPathToPayload);
                 for (Map.Entry<String, String> entry : resultsFromJWT.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
