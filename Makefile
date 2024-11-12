@@ -17,6 +17,8 @@ build: clean
 test:
 	AIKIDO_DIRECTORY="$(shell pwd)/dist" ./gradlew test
 
+cov:
+	AIKIDO_DIRECTORY="$(shell pwd)/dist" ./gradlew test jacocoTestReport
 
 BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.26
 FILES = \
