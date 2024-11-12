@@ -129,8 +129,8 @@ public class HostnameCollectorTest {
         assertEquals("Aikido Zen has blocked a server-side request forgery", exception.getMessage());
     }
 
-    @AfterAll
-    public static void cleanupBackgroundProcess() {
+    @AfterEach
+    public void cleanup() {
         ThreadCache.set(null);
         Context.set(null);
     }
