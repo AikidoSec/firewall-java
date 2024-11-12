@@ -9,8 +9,11 @@ import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import dev.aikido.agent_api.vulnerabilities.Detector;
 import dev.aikido.agent_api.vulnerabilities.Scanner;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
+import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -23,40 +26,58 @@ import static org.mockito.Mockito.*;
 
 class ScannerTest {
 
-    private ContextObject mockContext;
-    private Vulnerabilities.Vulnerability mockVulnerability;
-    private Detector mockDetector;
-    private IPCClient mockIPCClient;
+    public static class SampleContextObject extends ContextObject {
+        public SampleContextObject() {
+            this.method = "GET";
+            this.source = "web";
+            this.url = "https://example.com/api/resource";
+            this.route = "/api/resource";
+            this.remoteAddress = "192.168.1.1";
+            this.headers = new HashMap<>();
 
+            this.query = new HashMap<>();
+            this.query.put("search", new String[]{"example", "dev.aikido:80"});
+            this.query.put("sql1", new String[]{"SELECT * FRO"});
+
+            this.cookies = new HashMap<>();
+            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
+        }
+    }
     @BeforeEach
     void setUp() {
-        mockContext = mock(ContextObject.class);
-        mockVulnerability = mock(Vulnerabilities.Vulnerability.class);
-        mockDetector = mock(Detector.class);
-        mockIPCClient = mock(IPCClient.class);
-
-        // Set up the context to return the mock context object
-        Context.set(mockContext);
-        // Set up the vulnerability to return the mock detector
-        when(mockVulnerability.getDetector()).thenReturn(mockDetector);
+        Context.set(new SampleContextObject());
+    }
+    @AfterEach
+    void cleanup() {
+        Context.set(null);
     }
 
     @Test
     void testScanForGivenVulnerability_ContextIsNull() {
+        Vulnerabilities.Vulnerability mockVulnerability = mock(Vulnerabilities.Vulnerability.class);
+        Detector mockDetector = mock(Detector.class);
+        when(mockVulnerability.getDetector()).thenReturn(mockDetector);
         Context.set(null);
         Scanner.scanForGivenVulnerability(mockVulnerability, "operation", new String[]{"arg1"});
 
         // Verify that no interactions occur when context is null
-        verifyNoInteractions(mockDetector, mockIPCClient);
+        verifyNoInteractions(mockDetector);
     }
 
+    // Disable IPC :
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
-    void testScanForGivenVulnerability_NoAttackDetected() {
-        when(mockDetector.run(anyString(), any())).thenReturn(new Detector.DetectorResult(false, null, null));
+    void testScanSafeSQLCode() {
+        // Safe :
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgres"});
+        // Argument-mismatch, safe :
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM"});
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
 
-        Scanner.scanForGivenVulnerability(mockVulnerability, "operation", new String[]{"arg1"});
-
-        // Verify that no interactions occur with IPCClient
-        verify(mockIPCClient, never()).sendData(anyString(), anyBoolean());
+        // Unsafe :
+        assertThrows(SQLInjectionException.class, () -> {
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+        });
     }
 }
