@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class UnsafePathChecker {
+public final class UnsafePathChecker {
+    private UnsafePathChecker() {}
     private static final List<String> LINUX_ROOT_FOLDERS = Arrays.asList(
             "/bin/",
             "/boot/",

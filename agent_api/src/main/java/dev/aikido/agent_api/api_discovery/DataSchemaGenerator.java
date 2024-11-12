@@ -9,8 +9,8 @@ import java.util.*;
 import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
 import static dev.aikido.agent_api.helpers.patterns.PrimitiveType.isPrimitiveOrString;
 
-public class DataSchemaGenerator {
-
+public final class DataSchemaGenerator {
+    private DataSchemaGenerator() {}
     // Maximum depth to traverse the data structure to get the schema for improved performance
     private static final int MAX_TRAVERSAL_DEPTH = 20;
     // Maximum amount of array members to merge into one

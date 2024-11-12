@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.helpers.env;
 
-public class AikidoDir {
+public final class AikidoDir {
+    private AikidoDir() {}
     public static String getAikidoDir() {
         // Read out environment variable :
         String aikidoDirectoryEnv = System.getenv("AIKIDO_DIRECTORY");

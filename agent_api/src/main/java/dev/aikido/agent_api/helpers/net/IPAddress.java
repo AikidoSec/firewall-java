@@ -5,7 +5,8 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
-public class IPAddress {
+public final class IPAddress {
+    private IPAddress() {}
 
     public static String getIpAddress() {
         try {

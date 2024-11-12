@@ -10,7 +10,8 @@ import java.util.List;
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
 import static dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder.getRateLimitedEndpoint;
 
-public class ShouldRateLimit {
+public final class ShouldRateLimit {
+    private ShouldRateLimit() {}
     public record RateLimitDecision(boolean block, String trigger) {}
     public static RateLimitDecision shouldRateLimit(
             RouteMetadata routeMetadata, User user, String remoteAddress, CloudConnectionManager connectionManager

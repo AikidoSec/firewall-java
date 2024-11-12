@@ -3,7 +3,8 @@ package dev.aikido.agent_api.helpers.url;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class UrlParser {
+public final class UrlParser {
+    private UrlParser() {}
 
     public static URI tryParseUrl(String url) {
         try {

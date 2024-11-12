@@ -7,7 +7,8 @@ import dev.aikido.agent_api.helpers.env.BlockingEnv;
 
 import java.util.Optional;
 
-public class ShouldBlockHelper {
+public final class ShouldBlockHelper {
+    private ShouldBlockHelper() {}
 
     /**
      * Tries to fetch config over IPC, if that fails, uses environment variable

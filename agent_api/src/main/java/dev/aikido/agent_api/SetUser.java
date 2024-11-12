@@ -10,7 +10,8 @@ import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
-public class SetUser {
+public final class SetUser {
+    private SetUser() {}
     private static final Logger logger = LogManager.getLogger(SetUser.class);
 
     public record UserObject(String id, String name) {}

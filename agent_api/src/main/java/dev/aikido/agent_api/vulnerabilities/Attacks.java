@@ -2,7 +2,8 @@ package dev.aikido.agent_api.vulnerabilities;
 
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector;
 
-public class Attacks {
+public final class Attacks {
+    private Attacks() {}
     public interface Attack {
         Detector getDetector();
     }

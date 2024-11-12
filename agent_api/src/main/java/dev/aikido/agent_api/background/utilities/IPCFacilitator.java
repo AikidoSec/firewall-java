@@ -8,7 +8,8 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-public class IPCFacilitator {
+public final class IPCFacilitator {
+    private IPCFacilitator() {}
     private static final int BufferSize = 1024;
     public static Optional<String> readFromSocket(AFUNIXSocket socket) {
         try {

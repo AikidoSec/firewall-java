@@ -3,7 +3,8 @@ package dev.aikido.agent_api.helpers.patterns;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LooksLikeASecret {
+public final class LooksLikeASecret {
+    private LooksLikeASecret() {}
 
     private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPERCASE = LOWERCASE.toUpperCase();

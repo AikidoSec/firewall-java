@@ -5,7 +5,8 @@ import dev.aikido.agent_api.vulnerabilities.shell_injection.ShellInjectionDetect
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 
-public class Vulnerabilities {
+public final class Vulnerabilities {
+    private Vulnerabilities() {}
     public interface Vulnerability {
         Detector getDetector();
         String getKind();

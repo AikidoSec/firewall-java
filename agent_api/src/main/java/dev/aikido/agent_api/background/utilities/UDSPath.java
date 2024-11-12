@@ -5,7 +5,8 @@ import dev.aikido.agent_api.helpers.env.Token;
 
 import java.nio.file.Path;
 
-public class UDSPath {
+public final class UDSPath {
+    private UDSPath() {}
     private static final String prefix = "aikido_java";
     public static Path getUDSPath(Token token) {
         String temporaryDir = TemporaryDir.getTemporaryDir();

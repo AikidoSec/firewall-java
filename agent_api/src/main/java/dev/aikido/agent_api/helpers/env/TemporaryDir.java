@@ -2,7 +2,8 @@ package dev.aikido.agent_api.helpers.env;
 
 import java.nio.file.Path;
 
-public class TemporaryDir {
+public final class TemporaryDir {
+    private TemporaryDir() {}
     public static String getTemporaryDir() {
         // Read out environment variable :
         String tempDirEnv = System.getenv("AIKIDO_TMP_DIR");

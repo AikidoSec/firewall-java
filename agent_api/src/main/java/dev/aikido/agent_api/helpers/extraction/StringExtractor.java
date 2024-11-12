@@ -7,7 +7,8 @@ import java.util.*;
 
 import static dev.aikido.agent_api.helpers.patterns.PrimitiveType.isPrimitiveType;
 
-public class StringExtractor {
+public final class StringExtractor {
+    private StringExtractor() {}
     public static Map<String, String> extractStringsFromObject(Object obj) {
         return extractStringsRecursive(obj, new ArrayList<>());
     }

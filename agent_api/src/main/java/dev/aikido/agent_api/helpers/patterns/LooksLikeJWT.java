@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import java.util.Objects;
 
-public class LooksLikeJWT {
+public final class LooksLikeJWT {
+    private LooksLikeJWT() {}
 
     public static Result tryDecodeAsJwt(String jwt) {
         // Check if the JWT contains the required parts

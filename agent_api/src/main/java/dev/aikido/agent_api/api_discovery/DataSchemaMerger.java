@@ -3,7 +3,8 @@ package dev.aikido.agent_api.api_discovery;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DataSchemaMerger {
+public final class DataSchemaMerger {
+    private DataSchemaMerger() {}
 
     public static DataSchemaItem mergeDataSchemas(DataSchemaItem first, DataSchemaItem second) {
         // Cannot merge different types

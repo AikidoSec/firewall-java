@@ -11,7 +11,8 @@ import static dev.aikido.agent_api.api_discovery.DataSchemaGenerator.getDataSche
 import static dev.aikido.agent_api.api_discovery.GetAuthTypes.getAuthTypes;
 import static dev.aikido.agent_api.api_discovery.GetBodyDataType.getBodyDataType;
 
-public class GetApiInfo {
+public final class GetApiInfo {
+    private GetApiInfo() {}
     private static final Logger logger = LogManager.getLogger(GetApiInfo.class);
     public static APISpec getApiInfo(ContextObject context) {
         try {

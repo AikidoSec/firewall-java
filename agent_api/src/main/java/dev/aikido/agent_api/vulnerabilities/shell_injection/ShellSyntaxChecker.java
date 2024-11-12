@@ -1,7 +1,5 @@
 package dev.aikido.agent_api.vulnerabilities.shell_injection;
 
-import dev.aikido.agent_api.SetUser;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -9,7 +7,8 @@ import java.util.regex.Matcher;
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.DangerousShellChars.containDangerousCharacter;
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellCommandsRegex.getCommandsRegex;
 
-public class ShellSyntaxChecker {
+public final class ShellSyntaxChecker {
+    private ShellSyntaxChecker() {}
     private static final List<String> SEPARATORS = Arrays.asList(
             " ", "\t", "\n", ";", "&", "|", "(", ")", "<", ">"
     );

@@ -1,6 +1,7 @@
 package dev.aikido.agent_api;
 
-public abstract class Config {
+public final class Config {
+    private Config() {}
     public static final String pkgVersion = "0.1.0";
 
     public static final int heartbeatEveryXSeconds = 600; // 10 minutes

@@ -9,7 +9,8 @@ import java.util.List;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
-public class Heartbeat {
+public final class Heartbeat {
+    private Heartbeat() {}
     public record HeartbeatEvent(
             String type,
             GetManagerInfo.ManagerInfo agent,

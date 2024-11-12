@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.helpers;
 
-public class StackTrace {
+public final class StackTrace {
+    private StackTrace() {}
     public static String getCurrentStackTrace() {
         StringBuilder stringBuilder = new StringBuilder();
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();

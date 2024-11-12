@@ -3,7 +3,8 @@ package dev.aikido.agent_api.helpers.patterns;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PrimitiveType {
+public final class PrimitiveType {
+    private PrimitiveType() {}
     private static final Map<Class<?>, Class<?>> WRAPPER_TYPE_MAP;
     static {
         WRAPPER_TYPE_MAP = new HashMap<Class<?>, Class<?>>(16);
