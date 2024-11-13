@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class AuthTypeMerger {
+public final class AuthTypeMerger {
+    private AuthTypeMerger() {}
 
     public static List<Map<String, String>> mergeAuthTypes(List<Map<String, String>> existing, List<Map<String, String>> newAuth) {
         // Check if newAuth is null or empty

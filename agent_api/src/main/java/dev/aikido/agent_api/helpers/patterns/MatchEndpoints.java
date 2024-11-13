@@ -10,7 +10,8 @@ import java.util.regex.Pattern;
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrl;
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrlPath;
 
-public class MatchEndpoints {
+public final class MatchEndpoints {
+    private MatchEndpoints() {}
     public static List<Endpoint> matchEndpoints(RouteMetadata routeMetadata, List<Endpoint> endpoints) {
         if (routeMetadata == null || routeMetadata.method() == null || routeMetadata.url() == null || routeMetadata.route() == null) {
             return null;

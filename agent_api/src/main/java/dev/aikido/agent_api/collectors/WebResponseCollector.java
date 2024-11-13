@@ -14,7 +14,8 @@ import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import static dev.aikido.agent_api.api_discovery.GetApiInfo.getApiInfo;
 import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
 
-public class WebResponseCollector {
+public final class WebResponseCollector {
+    private WebResponseCollector() {}
     // Only do API Discovery on first 20 requests:
     private static final int ANALYSIS_ON_FIRST_X_REQUESTS = 20;
     /**

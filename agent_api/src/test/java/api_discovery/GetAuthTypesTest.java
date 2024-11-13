@@ -32,6 +32,15 @@ class GetAuthTypesTest {
     }
 
     @Test
+    void testGetAuthTypesWithEmptyAuthHeader() {
+        ContextObject context = mock(ContextObject.class);
+        when(context.getHeaders()).thenReturn(new HashMap<>(Map.of("authorization", "")));
+
+        List<Map<String, String>> result = GetAuthTypes.getAuthTypes(context);
+        assertNull(result);
+    }
+
+    @Test
     void testGetAuthTypesWithAuthorizationHeader() {
         ContextObject context = mock(ContextObject.class);
         HashMap<String, String> headers = new HashMap<>();
@@ -61,6 +70,36 @@ class GetAuthTypesTest {
     }
 
     @Test
+    void testGetAuthTypesWithInvalidAuthorizationHeader2() {
+        ContextObject context = mock(ContextObject.class);
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("authorization", "InvalidScheme");
+        when(context.getHeaders()).thenReturn(headers);
+
+        List<Map<String, String>> result = GetAuthTypes.getAuthTypes(context);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("apiKey", result.get(0).get("type"));
+        assertEquals("header", result.get(0).get("in"));
+        assertEquals("Authorization", result.get(0).get("name"));
+    }
+
+    @Test
+    void testGetAuthTypesWithInvalidAuthorizationHeader3() {
+        ContextObject context = mock(ContextObject.class);
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("authorization", "InvalidScheme some_token test2");
+        when(context.getHeaders()).thenReturn(headers);
+
+        List<Map<String, String>> result = GetAuthTypes.getAuthTypes(context);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("apiKey", result.get(0).get("type"));
+        assertEquals("header", result.get(0).get("in"));
+        assertEquals("Authorization", result.get(0).get("name"));
+    }
+
+    @Test
     void testGetAuthTypesWithApiKeyInHeaders() {
         ContextObject context = mock(ContextObject.class);
         HashMap<String, String> headers = new HashMap<>();
@@ -73,6 +112,16 @@ class GetAuthTypesTest {
         assertEquals("apiKey", result.get(0).get("type"));
         assertEquals("header", result.get(0).get("in"));
         assertEquals("x-api-key", result.get(0).get("name"));
+    }
+
+    @Test
+    void testCookiesAreNull() {
+        ContextObject context = mock(ContextObject.class);
+        when(context.getHeaders()).thenReturn(new HashMap<>());
+        when(context.getCookies()).thenReturn(null);
+
+        List<Map<String, String>> result = GetAuthTypes.getAuthTypes(context);
+        assertNull(result);
     }
 
     @Test

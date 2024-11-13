@@ -6,7 +6,8 @@ import java.util.Map;
 import static dev.aikido.agent_api.api_discovery.AuthTypeMerger.mergeAuthTypes;
 import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
 
-public class APISpecMerger {
+public final class APISpecMerger {
+    private APISpecMerger() {}
     public static APISpec mergeAPISpecs(APISpec updatedApiSpec, APISpec oldApiSpec) {
         if (updatedApiSpec == null) {
             return oldApiSpec;

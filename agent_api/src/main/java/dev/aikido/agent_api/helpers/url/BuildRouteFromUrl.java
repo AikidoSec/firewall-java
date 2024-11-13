@@ -6,7 +6,8 @@ import static dev.aikido.agent_api.helpers.patterns.LooksLikeASecret.looksLikeAS
 import static dev.aikido.agent_api.helpers.patterns.LooksLikeValidIpAddress.isValidIpAddress;
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrlPath;
 
-public class BuildRouteFromUrl {
+public final class BuildRouteFromUrl {
+    private BuildRouteFromUrl() {}
 
     private static final Pattern UUID_REGEX = Pattern.compile(
             "[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff",
@@ -54,29 +55,17 @@ public class BuildRouteFromUrl {
 
         if (startsWithNumber && NUMBER_REGEX.matcher(segment).matches()) {
             return ":number";
-        }
-
-        if (segment.length() == 36 && UUID_REGEX.matcher(segment).matches()) {
+        } else if (segment.length() == 36 && UUID_REGEX.matcher(segment).matches()) {
             return ":uuid";
-        }
-
-        if (startsWithNumber && DATE_REGEX.matcher(segment).matches()) {
+        } else if (startsWithNumber && DATE_REGEX.matcher(segment).matches()) {
             return ":date";
-        }
-
-        if (segment.contains("@") && EMAIL_REGEX.matcher(segment).matches()) {
+        } else if (segment.contains("@") && EMAIL_REGEX.matcher(segment).matches()) {
             return ":email";
-        }
-
-        if (isValidIpAddress(segment)) {
+        } else if (isValidIpAddress(segment)) {
             return ":ip";
-        }
-
-        if (isHash(segment)) {
+        } else if (isHash(segment)) {
             return ":hash";
-        }
-
-        if (looksLikeASecret(segment)) {
+        } else if (looksLikeASecret(segment)) {
             return ":secret";
         }
 

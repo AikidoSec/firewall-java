@@ -81,4 +81,82 @@ public class GetApiInfoTest {
         assertNull(apiInfo.auth());
     }
 
+
+    @Test
+    public void testGetApiInfoWithEmptyBody() {
+        HashMap<String, String[]> query = new HashMap<>();
+        query.put("user2", List.of("a", "b").toArray(new String[0]));
+
+        Mockito.when(context.getMethod()).thenReturn("GET");
+        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
+        Mockito.when(context.getBody()).thenReturn(null);
+        Mockito.when(context.getQuery()).thenReturn(query);
+        Mockito.when(context.getHeaders()).thenReturn(new HashMap<>(Map.of("content-type", "application/json")));
+
+        APISpec apiInfo = GetApiInfo.getApiInfo(context);
+        assertNotNull(apiInfo);
+        assertNull(apiInfo.body());
+        assertNotNull(apiInfo.query());
+        Gson gson = new Gson();
+        assertEquals("{\"type\":\"object\",\"properties\":{\"user2\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"optional\":false},\"optional\":false}},\"optional\":false}", gson.toJson(apiInfo.query()));
+        assertNull(apiInfo.auth());
+    }
+
+    @Test
+    public void testGetApiInfoWithEmptyQueryAndBody() {
+        HashMap<String, String[]> query = new HashMap<>();
+
+        Mockito.when(context.getMethod()).thenReturn("GET");
+        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
+        Mockito.when(context.getBody()).thenReturn(null);
+        Mockito.when(context.getQuery()).thenReturn(query);
+        Mockito.when(context.getHeaders()).thenReturn(new HashMap<>(Map.of("content-type", "application/json")));
+
+        APISpec apiInfo = GetApiInfo.getApiInfo(context);
+        assertNotNull(apiInfo);
+        assertNull(apiInfo.body());
+        assertNull(apiInfo.query());
+        assertNull(apiInfo.auth());
+    }
+    @Test
+    public void testGetApiInfoWithNullQueryAndBody() {
+        Mockito.when(context.getMethod()).thenReturn("GET");
+        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
+        Mockito.when(context.getBody()).thenReturn(null);
+        Mockito.when(context.getQuery()).thenReturn(null);
+        Mockito.when(context.getHeaders()).thenReturn(new HashMap<>(Map.of("content-type", "application/json")));
+
+        APISpec apiInfo = GetApiInfo.getApiInfo(context);
+        assertNotNull(apiInfo);
+        assertNull(apiInfo.body());
+        assertNull(apiInfo.query());
+        assertNull(apiInfo.auth());
+    }
+
+    @Test
+    public void testGetApiInfoWithInvalidHeader() {
+        Map<String, Object> body = new HashMap<>();
+        body.put("data1", Map.of(
+                "data2", List.of(Map.of("Help", true), Map.of("Help", true, "location", "Sea")),
+                "identifier", "hsfkjewhfwehgkjwehgkj",
+                "active", true
+        ));
+        body.put("user", Map.of(
+                "name", "John Doe",
+                "email", "john.doe@example.com"
+        ));
+
+        Mockito.when(context.getMethod()).thenReturn("GET");
+        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
+        Mockito.when(context.getBody()).thenReturn(body);
+        HashMap<String, String> headers = new HashMap<>(Map.of("content-type", "application/invalid-form-type"));
+        Mockito.when(context.getHeaders()).thenReturn(headers);
+
+        APISpec apiInfo = GetApiInfo.getApiInfo(context);
+        assertNotNull(apiInfo);
+        assertNull(apiInfo.body());
+        assertNull(apiInfo.query());
+        assertNull(apiInfo.auth());
+    }
+
 }

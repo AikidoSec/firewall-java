@@ -14,9 +14,20 @@ build: clean
 	./gradlew agent_api:shadowJar
 	cp agent_api/build/libs/agent*-all.jar dist/agent_api.jar
 
+mock_init:
+	docker kill mock_core && docker rm mock_core
+	cd end2end/server && docker build -t mock_core .
+	docker run --name mock_core -d -p 5000:5000 mock_core
+mock_restart:
+	docker restart mock_core
+mock_stop:
+	docker kill mock_core && docker rm mock_core
+
 test:
 	AIKIDO_DIRECTORY="$(shell pwd)/dist" ./gradlew test
 
+cov:
+	AIKIDO_DIRECTORY="$(shell pwd)/dist" ./gradlew test jacocoTestReport
 
 BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.26
 FILES = \

@@ -5,7 +5,8 @@ import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
-public class Started {
+public final class Started {
+    private Started() {}
     public record StartedEvent(
             String type,
             GetManagerInfo.ManagerInfo agent,

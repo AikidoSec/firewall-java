@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf.imds;
 
-public class IMDSAddresses {
+public final class IMDSAddresses {
+    private IMDSAddresses() {}
     private static final BlockList imdsAddresses = new BlockList();
 
     static {

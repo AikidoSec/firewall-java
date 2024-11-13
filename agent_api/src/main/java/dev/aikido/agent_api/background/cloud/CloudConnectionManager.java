@@ -28,9 +28,13 @@ public class CloudConnectionManager {
     private final Routes routes;
     private final RateLimiter rateLimiter;
     private final Users users;
+
     public CloudConnectionManager(boolean block, Token token, String serverless) {
+        this(block, token, serverless, new ReportingApiHTTP(getAikidoAPIEndpoint()));
+    }
+    public CloudConnectionManager(boolean block, Token token, String serverless, ReportingApi api) {
         this.config = new ServiceConfiguration(block, serverless);
-        this.api = new ReportingApiHTTP(getAikidoAPIEndpoint());
+        this.api = api;
         this.token = token.get();
         this.routes = new Routes(200); // Max size is 200 routes.
         this.rateLimiter = new RateLimiter(

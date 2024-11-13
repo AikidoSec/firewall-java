@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.helpers.patterns;
 
-public class HttpAuthScheme {
+public final class HttpAuthScheme {
+    private HttpAuthScheme() {}
     private static final String[] AUTH_SCHEMES = {
         "basic",  "bearer",  "digest",
         "dpop", "gnap", "hoba",

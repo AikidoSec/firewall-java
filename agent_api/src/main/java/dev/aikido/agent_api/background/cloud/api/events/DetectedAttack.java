@@ -10,7 +10,8 @@ import java.util.Map;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static dev.aikido.agent_api.helpers.extraction.UserAgentFromContext.getUserAgent;
 
-public class DetectedAttack {
+public final class DetectedAttack {
+    private DetectedAttack() {}
     public record DetectedAttackEvent (
         String type,
         RequestData request,

@@ -10,7 +10,8 @@ import java.util.Optional;
 
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrl;
 
-public class FindHostnameInContext {
+public final class FindHostnameInContext {
+    private FindHostnameInContext() {}
     public record Res(String source, String pathToPayload, String payload) {}
     public static Res findHostnameInContext(String hostname, ContextObject context, int port) {
         Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(context).getAll();

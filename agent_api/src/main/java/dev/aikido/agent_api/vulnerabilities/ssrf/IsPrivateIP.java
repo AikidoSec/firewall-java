@@ -8,7 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class IsPrivateIP {
+public final class IsPrivateIP {
+    private IsPrivateIP() {}
     public static boolean containsPrivateIP(List<String> ipAddresses) {
         for (String ip : ipAddresses) {
             if (isPrivateIp(ip)) {
@@ -37,8 +38,6 @@ public class IsPrivateIP {
         }
     }
 
-
-
     // Define private IP ranges
     private static final String[] PRIVATE_IP_RANGES = {
             "0.0.0.0/8",
@@ -61,7 +60,6 @@ public class IsPrivateIP {
             "224.0.0.0/4",
             "255.255.255.255/32"
     };
-
     private static final String[] PRIVATE_IPV6_RANGES = {
             "::/128",  // Unspecified address
             "::1/128",  // Loopback address

@@ -12,7 +12,8 @@ import static dev.aikido.agent_api.helpers.net.IPAddress.getIpAddress;
 /**
  * Class to give you the "agent" info, which is the CloudConnectionManager in Java.
  */
-public class GetManagerInfo {
+public final class GetManagerInfo {
+    private GetManagerInfo() {}
     public record ManagerInfo(
             boolean dryMode,
             String hostname,

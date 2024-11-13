@@ -2,7 +2,8 @@ package dev.aikido.agent_api.helpers.extraction;
 
 import java.util.List;
 
-public class PathBuilder {
+public final class PathBuilder {
+    private PathBuilder() {}
     public static String buildPathToPayload(List<PathPart> pathToPayload) {
         if (pathToPayload.isEmpty()) {
             return ".";

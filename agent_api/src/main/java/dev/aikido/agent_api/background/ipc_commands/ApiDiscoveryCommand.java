@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
+import dev.aikido.agent_api.storage.routes.RouteEntry;
 
 import java.util.Optional;
 
@@ -24,8 +25,10 @@ public class ApiDiscoveryCommand implements Command {
         Gson gson = new Gson();
         Req request = gson.fromJson(data, Req.class);
         if (request != null) {
-            connectionManager.getRoutes().get(request.routeMetadata())
-                    .updateApiSpec(request.apiSpec());
+            RouteEntry route = connectionManager.getRoutes().get(request.routeMetadata());
+            if (route != null) {
+                route.updateApiSpec(request.apiSpec());
+            }
         }
         return Optional.empty();
     }

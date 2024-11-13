@@ -2,6 +2,7 @@ package dev.aikido.agent_api.storage.routes;
 import dev.aikido.agent_api.context.RouteMetadata;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static dev.aikido.agent_api.storage.routes.RouteToKeyHelper.routeToKey;
@@ -12,7 +13,7 @@ public class Routes {
 
     public Routes(int maxSize) {
         this.maxSize = maxSize;
-        this.routes = new HashMap<>();
+        this.routes = new LinkedHashMap<>();
     }
 
     public Routes() {

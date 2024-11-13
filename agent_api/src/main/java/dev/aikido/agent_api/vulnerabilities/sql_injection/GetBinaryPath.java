@@ -2,7 +2,8 @@ package dev.aikido.agent_api.vulnerabilities.sql_injection;
 
 import static dev.aikido.agent_api.helpers.env.AikidoDir.getAikidoDir;
 
-public class GetBinaryPath {
+public final class GetBinaryPath {
+    private GetBinaryPath() {}
     public static String getPathForBinary() {
       String fileName = getFileName();
         String aikidoDirectory = getAikidoDir();

@@ -6,7 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ShellCommandsRegex {
+public final class ShellCommandsRegex {
+    private ShellCommandsRegex() {}
     private static final List<String> COMMANDS = Arrays.asList(
             "sleep", "shutdown", "reboot", "poweroff", "halt", "ifconfig", "chmod",
             "chown", "ping", "ssh", "scp", "curl", "wget", "telnet", "kill", "killall",
