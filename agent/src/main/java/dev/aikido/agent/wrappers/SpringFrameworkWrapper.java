@@ -18,6 +18,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Executable;
+import java.util.Map;
+import java.util.Optional;
 
 import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
 
@@ -38,15 +40,31 @@ public class SpringFrameworkWrapper implements Wrapper {
     }
 
     private static class SpringFrameworkAdvice {
-        @Advice.OnMethodEnter
-        public static HttpServletResponse interceptOnEnter(
+        // Wrapper to skip if it's inside this wrapper (i.e. our own response : )
+        public record SkipOnWrapper(HttpServletResponse response) {};
+        /**
+         * @return the first value of Object is used as a boolean, if it's true code will
+         * not execute (skip execution). The second value is the servlet request.
+         */
+        @Advice.OnMethodEnter(skipOn = SkipOnWrapper.class)
+        public static Object interceptOnEnter(
                 @Advice.Origin Executable method,
                 @Advice.Argument(0) Object request,
                 @Advice.Argument(1) Object response) {
             try {
                 ContextObject contextObject = new SpringContextObject((HttpServletRequest) request);
-                WebRequestCollector.report(contextObject);
-                return (HttpServletResponse) response;
+
+                // Write a new response:
+                WebRequestCollector.Res res = WebRequestCollector.report(contextObject);
+                if (res != null) {
+                    logger.debug("Writing a new response");
+                    HttpServletResponse newResponse = (HttpServletResponse) response;
+                    newResponse.setStatus(res.status());
+                    newResponse.setContentType("text/plain");
+                    newResponse.getWriter().write(res.msg());
+                    return new SkipOnWrapper(newResponse);
+                }
+                return response;
             } catch (Throwable e) {
                 logger.debug(e);
             }
@@ -54,11 +72,13 @@ public class SpringFrameworkWrapper implements Wrapper {
         }
 
         @Advice.OnMethodExit
-        public static void interceptOnExit(@Advice.Enter HttpServletResponse response) {
+        public static void interceptOnExit(@Advice.Enter Object response) {
             if (response == null) {
                 return;
             }
-            WebResponseCollector.report(response.getStatus()); // Report status code.
+            if (response instanceof HttpServletResponse httpServletResponse) {
+                WebResponseCollector.report(httpServletResponse.getStatus()); // Report status code.
+            }
         }
     }
 }
