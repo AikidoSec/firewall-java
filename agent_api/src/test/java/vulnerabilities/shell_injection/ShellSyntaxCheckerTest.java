@@ -69,8 +69,17 @@ public class ShellSyntaxCheckerTest {
 
     @Test
     public void testDetectsCommandsWithSeparators() {
+        assertTrue(containsShellSyntax("rm>echo", "echo"));
         assertTrue(containsShellSyntax("rm>arg", "rm"));
         assertTrue(containsShellSyntax("rm<arg", "rm"));
+    }
+
+    @Test
+    public void testDoesNotDetectsCommandsWithSeparators() {
+        // Check that if there is no \0 we don't flag it
+        assertFalse(containsShellSyntax("rm>echo+", "echo"));
+        assertFalse(containsShellSyntax("+rm>arg", "rm"));
+        assertFalse(containsShellSyntax("+rm<arg", "rm"));
     }
 
     @Test

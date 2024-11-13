@@ -4,6 +4,7 @@ import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
+import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.background.users.Users;
@@ -27,7 +28,7 @@ class CloudConnectionManagerTest {
 
     @BeforeEach
     void setUp() {
-        mockApi = mock(ReportingApi.class);
+        mockApi = mock(ReportingApiHTTP.class);
         cloudConnectionManager = new CloudConnectionManager(true, new Token("token"), "serverless", mockApi);
     }
 
@@ -113,5 +114,14 @@ class CloudConnectionManagerTest {
 
         // Assert
         assertNotNull(users);
+    }
+
+    @Test
+    void testGetApi() {
+        // Act
+        ReportingApiHTTP api = cloudConnectionManager.getApi();
+
+        // Assert
+        assertEquals(mockApi, api);
     }
 }
