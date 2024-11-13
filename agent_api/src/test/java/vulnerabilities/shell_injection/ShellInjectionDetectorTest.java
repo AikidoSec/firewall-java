@@ -34,6 +34,14 @@ public class ShellInjectionDetectorTest {
     }
 
     @Test
+    void testUswrInputButWrongArgs() {
+        assertFalse(new ShellInjectionDetector().run("123", null).isDetectedAttack());
+        assertFalse(new ShellInjectionDetector().run("123", new String[]{}).isDetectedAttack());
+        assertFalse(new ShellInjectionDetector().run("123", new String[]{null}).isDetectedAttack());
+
+    }
+
+    @Test
     void testUserInputNotInCommand() {
         assertIsNotShellInjection("ls", "$(echo)");
     }
@@ -380,7 +388,10 @@ public class ShellInjectionDetectorTest {
 
     @Test
     void testNoShellInjectionWithTilde() {
+        assertIsNotShellInjection("~", "~ test");
         assertIsNotShellInjection("~", "~");
+        assertIsNotShellInjection("", "~");
+        assertIsNotShellInjection("echo ", "~");
         assertIsNotShellInjection("ls ~/path", "path");
     }
 
