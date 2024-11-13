@@ -39,6 +39,21 @@ public class AuthTypeMergerTest {
         assertEquals(newSingleAuth, mergeAuthTypes(null, newSingleAuth));
     }
 
+    @Test
+    public void testMergeApiAuthTypesWhereExistingNull() {
+        List<Map<String, String>> newAuth = new ArrayList<>();
+        newAuth.add(createAuthType("http", "bearer", null, null));
+        newAuth.add(createAuthType("http", "basic", null, null));
+
+        List<Map<String, String>> expected = new ArrayList<>(newAuth);
+
+        List<Map<String, String>> result = mergeAuthTypes(null, newAuth);
+        assertEquals(expected, result);
+
+        result = mergeAuthTypes(new ArrayList<>(), newAuth);
+        assertEquals(expected, result);
+    }
+
     private Map<String, String> createAuthType(String type, String scheme, String name, String in) {
         Map<String, String> authType = new HashMap<>();
         authType.put("type", type);
