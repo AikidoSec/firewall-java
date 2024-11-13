@@ -3,7 +3,9 @@ package dev.aikido.agent_api.thread_cache;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static dev.aikido.agent_api.thread_cache.ThreadCacheRenewal.renewThreadCache;
 
-public class ThreadCache {
+public final class ThreadCache {
+    private ThreadCache() {}
+    
     static final long timeToLiveMS = 60 * 1000; // 60 seconds
     static final ThreadLocal<ThreadCacheObject> threadCache = new ThreadLocal<>();
     public static ThreadCacheObject get() {

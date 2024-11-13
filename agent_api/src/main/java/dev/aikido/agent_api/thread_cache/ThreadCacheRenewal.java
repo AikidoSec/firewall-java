@@ -7,7 +7,8 @@ import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 
 import java.util.Optional;
 
-public class ThreadCacheRenewal {
+public final class ThreadCacheRenewal {
+    private ThreadCacheRenewal() {}
     public static ThreadCacheObject renewThreadCache() {
         // Fetch thread cache over IPC:
         IPCClient client = new IPCDefaultClient();
