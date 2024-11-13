@@ -5,7 +5,7 @@ import static dev.aikido.agent_api.thread_cache.ThreadCacheRenewal.renewThreadCa
 
 public final class ThreadCache {
     private ThreadCache() {}
-    
+
     static final long timeToLiveMS = 60 * 1000; // 60 seconds
     static final ThreadLocal<ThreadCacheObject> threadCache = new ThreadLocal<>();
     public static ThreadCacheObject get() {
