@@ -9,7 +9,7 @@ public class RouteEntry {
     final String method;
     final String path;
     private int hits;
-    private APISpec apispec;
+    public APISpec apispec;
 
     public RouteEntry(String method, String path) {
         this.method = method;
