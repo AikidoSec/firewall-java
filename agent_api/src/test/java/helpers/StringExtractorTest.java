@@ -336,4 +336,12 @@ public class StringExtractorTest {
 
         assertEquals(expectedOutput, extractStringsFromObject(input));
     }
+
+    @Test
+    public void testExtractString() {
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("my_string", ".");
+        assertEquals(expectedOutput, extractStringsFromObject("my_string"));
+    }
 }
