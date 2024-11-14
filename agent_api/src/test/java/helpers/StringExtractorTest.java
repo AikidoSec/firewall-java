@@ -1,12 +1,16 @@
 package helpers;
 
+import api_discovery.DataSchemaGeneratorTest;
+import dev.aikido.agent_api.api_discovery.DataSchemaGenerator;
+import dev.aikido.agent_api.api_discovery.DataSchemaItem;
+import dev.aikido.agent_api.api_discovery.DataSchemaType;
 import org.junit.jupiter.api.Test;
 
 import static dev.aikido.agent_api.helpers.extraction.StringExtractor.extractStringsFromObject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class StringExtractorTest {
     private static Map<String, String> fromObj(Map<String, Object> obj) {
@@ -151,6 +155,184 @@ public class StringExtractorTest {
             put("test123", ".arr.[4].test.[0]");
             put("test345", ".arr.[4].test.[1]");
         }});
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    @Test
+    public void testExtractStringsFromArray() {
+        Object input = List.of("test1", List.of("Test 2", "Test 3"));
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("Test 2", ".[1].[0]");
+        expectedOutput.put("test1", ".[0]");
+        expectedOutput.put("Test 3", ".[1].[1]");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    @Test
+    public void testExtractStringsFromHashMap() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("test", "abc");
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("abc", ".test");
+        expectedOutput.put("test", ".");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    @Test
+    public void testExtractStringsFromComplexObject() {
+        Map<String, Object> input = new LinkedHashMap<>();
+        input.put("test", 123);
+        input.put("arr", Arrays.asList("Hello", 2, "World"));
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("arr", ".");
+        expectedOutput.put("test", ".");
+        expectedOutput.put("Hello", ".arr.[0]");
+        expectedOutput.put("World", ".arr.[2]");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    @Test
+    public void testExtractStringsFromNestedObject() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("test", 123);
+        input.put("arr", Arrays.asList(Collections.singletonMap("sub", true)));
+        input.put("x", null);
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("arr", ".");
+        expectedOutput.put("sub", ".arr.[0]");
+        expectedOutput.put("test", ".");
+        expectedOutput.put("x", ".");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+    private record MyRecord(String a, Number abc, List<String> stringslist) {}
+    @Test
+    public void testExtractsFromClasses() {
+        MyRecord myRecord = new MyRecord("Hello World", null, List.of("Abc", "def", "ghi"));
+        Map<String, Object> input = new HashMap<>();
+        input.put("important_record", myRecord);
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("Hello World", ".important_record.a");
+        expectedOutput.put("Abc", ".important_record.stringslist.[0]");
+        expectedOutput.put("def", ".important_record.stringslist.[1]");
+        expectedOutput.put("important_record", ".");
+        expectedOutput.put("ghi", ".important_record.stringslist.[2]");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    @Test
+    void testUndefinedPrimitives() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("character", 'a');
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("character", ".");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    @Test
+    public void testExtractsFromMapWithNumericKeys() {
+        Map<Object, Object> input = new HashMap<>();
+        input.put(1, "one");
+        input.put(2, "two");
+        input.put(3, Arrays.asList("three", "four"));
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("one", ".1");
+        expectedOutput.put("two", ".2");
+        expectedOutput.put("three", ".3.[0]");
+        expectedOutput.put("four", ".3.[1]");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    // Test with keys as instances of other classes
+    private static class CustomKey {
+        private final String key;
+
+        public CustomKey(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
+
+    @Test
+    public void testExtractsFromMapWithCustomKeyObjects() {
+        Map<CustomKey, Object> input = new HashMap<>();
+        input.put(new CustomKey("key1"), "value1");
+        input.put(new CustomKey("key2"), Arrays.asList("value2a", "value2b"));
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("value1", ".?");
+        expectedOutput.put("value2a", ".?.[0]");
+        expectedOutput.put("value2b", ".?.[1]");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    // Test with nested maps containing numeric keys
+    @Test
+    public void testExtractsFromNestedMapWithNumericKeys() {
+        Map<Object, Object> input = new HashMap<>();
+        Map<Object, Object> nestedMap = new HashMap<>();
+        nestedMap.put(1, "nestedValue1");
+        nestedMap.put(2, "nestedValue2");
+        input.put(0, nestedMap);
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("nestedValue1", ".0.1");
+        expectedOutput.put("nestedValue2", ".0.2");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    // Test with mixed types in a map
+    @Test
+    public void testExtractsFromMapWithMixedTypes() {
+        Map<Object, Object> input = new HashMap<>();
+        input.put("stringKey", "stringValue");
+        input.put(100, 200);
+        input.put("listKey", Arrays.asList("item1", 2, true));
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("stringValue", ".stringKey");
+        expectedOutput.put("item1", ".listKey.[0]");
+        expectedOutput.put("stringKey", ".");
+        expectedOutput.put("listKey", ".");
+
+        assertEquals(expectedOutput, extractStringsFromObject(input));
+    }
+
+    // Test with a map containing other maps as values
+    @Test
+    public void testExtractsFromMapWithMapValues() {
+        Map<String, Object> input = new HashMap<>();
+        Map<String, Object> innerMap = new HashMap<>();
+        innerMap.put("innerKey1", "innerValue1");
+        innerMap.put("innerKey2", "innerValue2");
+        input.put("outerKey", innerMap);
+
+        Map<String, String> expectedOutput = new HashMap<>();
+        expectedOutput.put("innerValue1", ".outerKey.innerKey1");
+        expectedOutput.put("innerValue2", ".outerKey.innerKey2");
+        expectedOutput.put("outerKey", ".");
+        expectedOutput.put("innerKey2", ".outerKey");
+        expectedOutput.put("innerKey1", ".outerKey");
 
         assertEquals(expectedOutput, extractStringsFromObject(input));
     }

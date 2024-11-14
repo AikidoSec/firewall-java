@@ -56,20 +56,18 @@ public final class StringExtractor {
             }
         } else if (obj instanceof Map<?, ?> map) {
             for (Object key : map.keySet()) {
-                if (!isPrimitiveType(key)) {
-                    continue; // Key needs to be a primitive in order to create the path
-
-                }
-                if (key instanceof String) {
-                    result.put((String) key, PathBuilder.buildPathToPayload(pathToPayload));
+                if (key instanceof String stringKey) {
+                    result.put(stringKey, PathBuilder.buildPathToPayload(pathToPayload));
                 }
                 ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
-                newPathToPayload.add(new PathBuilder.PathPart("object", key.toString()));
+                if (!isPrimitiveType(key)) {
+                    newPathToPayload.add(new PathBuilder.PathPart("object", "?")); // Use question mark for non-primitives
+                } else {
+                    newPathToPayload.add(new PathBuilder.PathPart("object", key.toString()));
+                }
                 result.putAll(extractStringsRecursive(map.get(key), newPathToPayload));
             }
-        } else if (isPrimitiveType(obj)) {
-            // Do nothing, not a string, so don't check anymore.
-        } else {
+        } else if (!isPrimitiveType(obj)) { // Stop algorithm if it's a primitive type.
             Field[] fields = obj.getClass().getDeclaredFields();
             for (Field field : fields) {
                 try {
