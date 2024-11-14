@@ -7,5 +7,4 @@ Zen protects your Java apps by preventing user input containing dangerous string
 
 ## Installation
 WIP: Download the zip file [here]() and store it in a directory (e.g. `/opt/aikido-zen`).
-Then provide the path to this directory in the environment variable `AIKIDO_DIRECTORY`.
-Write access to this directory is required.
+Please ensure you do not alter the structure of this folder and that the process can read & write to it.

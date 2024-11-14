@@ -1,16 +1,14 @@
 package dev.aikido.agent_api.vulnerabilities.sql_injection;
 
-import static dev.aikido.agent_api.helpers.env.AikidoDir.getAikidoDir;
-
 public final class GetBinaryPath {
     private GetBinaryPath() {}
     public static String getPathForBinary() {
       String fileName = getFileName();
-        String aikidoDirectory = getAikidoDir();
+      String aikidoDirectory = System.getProperty("AIK_agent_dir");
       if (aikidoDirectory == null) {
           return null;
       }
-      return aikidoDirectory + "binaries/" + fileName;
+      return aikidoDirectory + "/binaries/" + fileName;
     }
     private static String getFileName() {
         String os = System.getProperty("os.name").toLowerCase();
