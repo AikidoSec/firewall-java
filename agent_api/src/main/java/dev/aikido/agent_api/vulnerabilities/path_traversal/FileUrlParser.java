@@ -4,6 +4,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathPartsChecker.containsUnsafePathParts;
+
 public final class FileUrlParser {
     private FileUrlParser() {}
     public static String parseAsFileUrl(String path) {
@@ -25,5 +27,14 @@ public final class FileUrlParser {
         } catch (Exception ignored) {
             return null;
         }
+    }
+    public static boolean urlEqualsFilePath(String url, String filePath) {
+        boolean isUrl = false; // Fix later
+        if (isUrl && containsUnsafePathParts(url)) {
+            // Check for URL path traversal
+            String filePathFromUrl = parseAsFileUrl(url);
+            return filePathFromUrl != null && filePathFromUrl.equals(filePath);
+        }
+        return false;
     }
 }
