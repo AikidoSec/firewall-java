@@ -29,6 +29,7 @@ public class Agent {
                 ElementMatchers.nameContainsIgnoreCase("org.postgresql.core")
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.filter.RequestContextFilter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
@@ -50,7 +51,8 @@ public class Agent {
             new FileWrapper(),
             new HttpURLConnectionWrapper(),
             new InetAddressWrapper(),
-            new RuntimeExecWrapper()
+            new RuntimeExecWrapper(),
+            new SpringFrameworkInvokeWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
