@@ -14,50 +14,51 @@ public class ContextObject {
     protected HashMap<String, String> headers;
     protected HashMap<String, String[]> query;
     protected  HashMap<String, String> cookies;
+    protected  HashMap<String, String> params;
     protected Object body;
     // Auxiliary :
     protected User user;
     protected boolean executedMiddleware;
+
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
+
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
     public Object getBody() {
         return body;
     }
     public void setBody(Object newBody) {
         body = newBody;
     }
+
     public String getMethod() {
         return method;
     }
     public String getSource() {
         return source;
     }
-
+    public HashMap<String, String> getParams() { return params; }
     public String getUrl() {
         return url;
     }
-
     public String getRoute() {
         return route;
     }
-
     public String getRemoteAddress() {
         return remoteAddress;
     }
-
     public HashMap<String, String> getHeaders() {
         return headers;
     }
-
     public HashMap<String, String[]> getQuery() {
         return query;
     }
-
     public HashMap<String, String> getCookies() {
         return cookies;
     }
+
     public String toJson() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(this);
