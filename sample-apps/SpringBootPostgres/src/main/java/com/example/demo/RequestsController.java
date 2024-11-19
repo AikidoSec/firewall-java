@@ -8,7 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Scanner;
 
 @RestController
@@ -19,10 +23,10 @@ public class RequestsController {
     @PostMapping(path = "/get",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public String get(@RequestBody RequestsGet requestsGet) throws IOException {
+    public String get(@RequestBody RequestsGet requestsGet) throws IOException, InterruptedException {
         String url = requestsGet.url;
         System.out.println("Making request to: "+ url);
-        return sendGetRequest(url);
+        return sendGetRequest2(url);
     }
 
     private static String sendGetRequest(String urlString) throws IOException {
@@ -54,5 +58,17 @@ public class RequestsController {
         connection.disconnect();
 
         return result.toString();
+    }
+    private static String sendGetRequest2(String urlString) throws IOException, InterruptedException {
+        StringBuilder result = new StringBuilder();
+        var client = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL) // Allow normal redirects
+                .build();
+
+        var request = HttpRequest
+                .newBuilder(URI.create(urlString))
+                .build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
     }
 }
