@@ -55,7 +55,7 @@ public class InetAddressWrapper implements Wrapper {
                 }
                 classLoader.close(); // Close the class loader
             } catch(Throwable e) {
-                if(e.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                if(e.getCause() != null && e.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
                     throw e; // Do throw an Aikido vulnerability
                 }
                 // Ignore non-aikido throwables.
