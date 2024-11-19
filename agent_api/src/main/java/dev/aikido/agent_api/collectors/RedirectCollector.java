@@ -1,15 +1,18 @@
 package dev.aikido.agent_api.collectors;
 
+
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-public class RedirectCollector {
-    public static void report(URL url, Map<String, List<String>> headers, int statusCode) {
-        List<String> locationHeaders = headers.getOrDefault("location", List.of());
-        if (!locationHeaders.isEmpty()) {
-            System.out.println(url + " With status code: " + statusCode + "\n|-> Redirects to : "+ headers);
-        }
+import static dev.aikido.agent_api.helpers.url.PortParser.getPortFromURL;
 
+public class RedirectCollector {
+    public record RedirectEntry(String hostname, int port) {};
+    public static void report(URL origin, URL dest) {
+        RedirectEntry originEntry = new RedirectEntry(origin.getHost(), getPortFromURL(origin));
+        RedirectEntry destEntry = new RedirectEntry(dest.getHost(), getPortFromURL(dest));
+
+        System.out.println(originEntry + " ↦ " + destEntry);
     }
 }
