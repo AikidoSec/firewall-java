@@ -29,6 +29,7 @@ public class RequestsController {
         StringBuilder result = new StringBuilder();
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setInstanceFollowRedirects(true); // Allow for redirects.
 
         // Set the request method to GET
         connection.setRequestMethod("GET");
@@ -37,7 +38,7 @@ public class RequestsController {
         int responseCode = connection.getResponseCode();
 
         // If the response code is 200 (HTTP_OK), read the response
-        if (responseCode == HttpURLConnection.HTTP_OK) {
+        if (responseCode != -1 && responseCode < 400) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -45,6 +46,7 @@ public class RequestsController {
             }
             reader.close();
         } else {
+            System.out.println(connection.getResponseMessage());
             System.out.println("GET request failed: " + responseCode);
         }
 
