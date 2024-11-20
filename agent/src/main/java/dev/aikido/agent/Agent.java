@@ -31,7 +31,7 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.net.URLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.lang"))
@@ -54,7 +54,7 @@ public class Agent {
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
             new HttpClientWrapper(),
-            new URLConnectionWrapper()
+            new HttpConnectionRedirectWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
