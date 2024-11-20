@@ -3,8 +3,10 @@ package dev.aikido.agent_api.context;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
@@ -20,6 +22,7 @@ public class SpringContextObject extends ContextObject{
         this.cookies = extractCookies(request);
         this.route = buildRouteFromUrl(this.url);
         this.source = "SpringFramework";
+        this.redirectStartNodes = new ArrayList<>();
     }
     private static HashMap<String, String> extractHeaders(HttpServletRequest request) {
         HashMap<String, String> headersMap = new HashMap<>();
