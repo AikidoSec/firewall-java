@@ -15,20 +15,15 @@ public class RedirectNode {
         this.url = destination;
         this.child = null;
     }
-
     public RedirectNode(URL destination) {
         // Create a starter node :
         this(null, destination);
-    }
-    public boolean isStart() {
-        return this.origin == null;
     }
 
     public RedirectNode getOrigin() { return origin; }
     public RedirectNode getChild() { return child; }
     public URL getUrl() { return url; }
-
-
+    
     public void setChild(RedirectNode child) {
         RedirectNode currentOrigin = this.origin;
         while (currentOrigin != null) {
