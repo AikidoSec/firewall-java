@@ -8,7 +8,8 @@ import java.util.List;
 
 import static dev.aikido.agent_api.helpers.url.PortParser.getPortFromURL;
 
-public class RedirectOriginFinder {
+public final class RedirectOriginFinder {
+    private RedirectOriginFinder() {}
     public static URL getRedirectOrigin(String hostname, int port) {
         List<RedirectNode> redirectStartNodes = Context.get().getRedirectStartNodes();
 

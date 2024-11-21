@@ -191,5 +191,21 @@ public class RedirectOriginFinderTest {
 
         assertEquals("https://example.com", getRedirectOrigin("example.com", 443).toString());
     }
+    @Test
+    public void testRedirectWithMatchingPort() throws MalformedURLException {
+        RedirectCollector.report(new URL("https://example.com"), new URL("https://hackers.com:443"));
+        assertNotNull(getRedirectOrigin("hackers.com", 443));
+        assertEquals("https://example.com", getRedirectOrigin("hackers.com", 443).toString());
+    }
 
+    @Test
+    public void testRedirectWithNonMatchingPort() throws MalformedURLException {
+        RedirectCollector.report(new URL("https://example.com"), new URL("https://hackers.com:442"));
+        assertNull(getRedirectOrigin("hackers.com", 443));
+    }
+    @Test
+    public void testRedirectWithNonMatchingPort2() throws MalformedURLException {
+        RedirectCollector.report(new URL("https://example.com"), new URL("https://hackers.com"));
+        assertNull(getRedirectOrigin("hackers.com", 442));
+    }
 }

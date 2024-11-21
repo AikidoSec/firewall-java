@@ -8,7 +8,8 @@ import dev.aikido.agent_api.storage.RedirectNode;
 import java.net.URL;
 import java.util.List;
 
-public class RedirectCollector {
+public final class RedirectCollector {
+    private RedirectCollector() {}
     public static void report(URL origin, URL dest) {
         ContextObject context = Context.get();
 
