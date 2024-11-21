@@ -9,6 +9,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.lang.reflect.Executable;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
@@ -31,7 +32,7 @@ public final class JDBCConnectionAdvice {
             @Advice.This(typing = DYNAMIC, optional = true) Connection connection,
             @Advice.Origin Executable method,
             @Advice.Argument(0) String sql
-    ) {
+    ) throws Throwable {
         if (sql != null) {
             try {
                 DatabaseMetaData metaData = connection.getMetaData();
@@ -39,7 +40,11 @@ public final class JDBCConnectionAdvice {
                 String dialect = metaData.getDatabaseProductName().toLowerCase();
                 SQLCollector.report(sql, dialect, operation);
 
-            } catch (Throwable ignored) {}
+            } catch (Throwable e) {
+                if(e.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                    throw e;
+                }
+            }
         }
     }
 }
