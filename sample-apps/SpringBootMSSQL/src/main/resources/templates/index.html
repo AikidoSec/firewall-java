@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pets Overview (Microsoft SQL)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .pet-info {
+            font-weight: bold;
+            flex-grow: 1;
+            padding: 0px 10px;
+        }
+
+        .pet-owner {
+            font-style: italic;
+            color: #555;
+        }
+
+        .pet-id {
+            background: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            cursor: pointer; /* Change cursor to pointer */
+            background: #e9ecef;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Pets Overview</h1>
+    <a href="/create">Add a New Dog</a> <!-- Link to create page -->
+    <ul id="petsList"></ul>
+</div>
+
+<script>
+    fetch('/api/pets/')
+        .then(response => response.json())
+        .then(pets => {
+            const petsList = document.getElementById('petsList');
+            pets.forEach(pet => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <a href="/pet_page/${pet.pet_id}">
+                    <span class="pet-id">${pet.pet_id}</span>
+                    <span class="pet-info">${pet.name}</span>
+                    <span class="pet-owner">Owned by: ${pet.owner}</span>
+                    </a>
+                `;
+                petsList.appendChild(li);
+            });
+        })
+        .catch(error => console.error('Error fetching pets:', error));
+</script>
+</body>
+</html>
