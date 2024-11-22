@@ -1,5 +1,6 @@
 package dev.aikido.agent;
 
+import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
 import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
 import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
 import dev.aikido.agent_api.background.BackgroundProcess;
@@ -36,6 +37,7 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.lang"))
                 .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc.Connection"))
 
             )
             .transform(AikidoTransformer.get())
@@ -55,7 +57,8 @@ public class Agent {
             new HttpURLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
-            new MysqlCJWrapper()
+            new MysqlCJWrapper(),
+            new MariaDBWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
