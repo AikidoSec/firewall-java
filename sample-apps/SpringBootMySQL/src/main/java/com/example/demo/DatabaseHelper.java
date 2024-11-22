@@ -7,9 +7,9 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class DatabaseHelper {
-    private static Connection getDBConnection() {
+    private static Connection getDBConnection(String driver) {
         // The url specifies the address of our database along with username and password credentials
-        final String url = "jdbc:mysql://localhost:3306/db";
+        final String url = "jdbc:" + driver + "://localhost:3306/db";
         final String user = "user"; // replace with your MySQL username
         final String password = "password"; // replace with your MySQL password
         try {
@@ -22,7 +22,7 @@ public class DatabaseHelper {
 
     public static ArrayList<Object> getAllPets() {
         ArrayList<Object> pets = new ArrayList<>();
-        Connection conn = getDBConnection();
+        Connection conn = getDBConnection("mysql");
         if (conn == null) {
             return pets;
         }
@@ -42,7 +42,7 @@ public class DatabaseHelper {
     }
     public static Pet getPetById(Integer id) {
         ArrayList<Object> pets = new ArrayList<>();
-        Connection conn = getDBConnection();
+        Connection conn = getDBConnection("mysql");
         if (conn == null) {
             return null;
         }
@@ -61,9 +61,9 @@ public class DatabaseHelper {
         }
         return new Pet(0, "Unknown", "Unknown");
     }
-    public static Integer createPetByName(String pet_name) {
+    public static Integer createPetByName(String pet_name, String driver) {
         String sql = "INSERT INTO pets (pet_name, owner) VALUES (\"" + pet_name  + "\", \"Aikido Security\")";
-        Connection conn = getDBConnection();
+        Connection conn = getDBConnection(driver);
         if (conn == null) {
             return 0;
         }

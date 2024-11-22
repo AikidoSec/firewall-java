@@ -24,5 +24,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	compileOnly 'org.projectlombok:lombok'
 	implementation 'mysql:mysql-connector-java:8.0.33'
+	implementation 'org.mariadb.jdbc:mariadb-java-client:3.0.5'
 	annotationProcessor 'org.projectlombok:lombok'
 }
