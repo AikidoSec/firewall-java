@@ -37,6 +37,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: pkg-build
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'adopt'
       - name: Debug
         run: |
           ls -la
