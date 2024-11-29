@@ -1,10 +1,13 @@
 package dev.aikido.agent.wrappers.jdbc;
 
 import dev.aikido.agent_api.collectors.SQLCollector;
+import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Executable;
 import java.sql.Connection;
@@ -14,6 +17,7 @@ import java.sql.SQLException;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
 public final class JDBCConnectionAdvice {
+    public static final Logger logger = LogManager.getLogger(JDBCConnectionAdvice.class);
     private JDBCConnectionAdvice() {}
     public static ElementMatcher<? super MethodDescription> getMatcher(String module) {
         return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase(module)).and(
@@ -40,10 +44,10 @@ public final class JDBCConnectionAdvice {
                 String dialect = metaData.getDatabaseProductName().toLowerCase();
                 SQLCollector.report(sql, dialect, operation);
 
+            } catch (AikidoException e) {
+                throw e;
             } catch (Throwable e) {
-                if(e.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    throw e;
-                }
+                logger.debug(e);
             }
         }
     }

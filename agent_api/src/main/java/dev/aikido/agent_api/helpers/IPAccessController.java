@@ -16,7 +16,7 @@ public final class IPAccessController {
 
         for (Endpoint endpoint : endpoints) {
             if (endpoint.getAllowedIPAddresses() == null) {
-                // This feature is not supported by the current server version
+                // Feature might not be enabled
                 continue;
             }
             if (endpoint.getAllowedIPAddresses().isEmpty()) {
