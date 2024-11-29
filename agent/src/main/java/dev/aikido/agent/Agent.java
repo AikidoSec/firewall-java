@@ -6,6 +6,7 @@ import dev.aikido.agent.wrappers.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,7 @@ public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
     public static void premain(String agentArgs, Instrumentation inst) {
         logger.info("Aikido Java Agent loaded.");
+        setAikidoSysProperties();
         // Bytecode instrumentation :
         new AgentBuilder.Default()
             //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
@@ -62,5 +64,12 @@ public class Agent {
             }
             return adviceAgentBuilder;
         }
+    }
+    private static void setAikidoSysProperties() {
+        String pathToAgentJar = Agent.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String pathToAikidoDirectory = new File(pathToAgentJar).getParent();
+        String jarPath = "file:" + pathToAikidoDirectory + "/agent_api.jar";
+        System.setProperty("AIK_agent_dir", pathToAikidoDirectory);
+        System.setProperty("AIK_agent_api_jar", jarPath);
     }
 }
