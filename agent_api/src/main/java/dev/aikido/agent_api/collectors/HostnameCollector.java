@@ -8,7 +8,6 @@ import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.Attack;
-import dev.aikido.agent_api.vulnerabilities.Scanner;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +19,8 @@ import java.util.List;
 
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 
-public class HostnameCollector {
+public final class HostnameCollector {
+    private HostnameCollector() {}
     private static final Logger logger = LogManager.getLogger(HostnameCollector.class);
     public static void report(String hostname, InetAddress[] inetAddresses) {
         // Convert inetAddresses array to a List of IP strings :
@@ -29,6 +29,9 @@ public class HostnameCollector {
             ipAddresses.add(inetAddress.getHostAddress());
         }
         // Currently using hostnames from thread cache, might not be as accurate as using Context-dependant hostnames.
+        if (ThreadCache.get() == null || ThreadCache.get().getHostnames() == null) {
+            return;
+        }
         for (Hostnames.HostnameEntry hostnameEntry: ThreadCache.get().getHostnames().asArray()) {
             if(!hostnameEntry.getHostname().equals(hostname)) {
                 continue;

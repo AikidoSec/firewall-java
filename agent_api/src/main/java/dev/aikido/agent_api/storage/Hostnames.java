@@ -45,12 +45,7 @@ public class Hostnames {
             this.port = port;
             this.hits = 0;
         }
-        public HostnameEntry(String hostname, int port, int hits) {
-            this.hostname = hostname;
-            this.port = port;
-            this.hits = hits;
-        }
-
+        
         public void incrementHits() {
             hits++;
         }

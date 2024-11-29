@@ -18,9 +18,9 @@ class RoutesTest {
     @BeforeEach
     void setUp() {
         routes = new Routes(2); // Set max size to 2 for testing
-        routeMetadata1 = new RouteMetadata("GET", "", "/api/test1");
-        routeMetadata2 = new RouteMetadata("POST", "", "/api/test2");
-        routeMetadata3 = new RouteMetadata("PUT", "", "/api/test3");
+        routeMetadata1 = new RouteMetadata("/api/test1", "/api/test1", "GET");
+        routeMetadata2 = new RouteMetadata( "/api/test2", "/api/test2", "POST");
+        routeMetadata3 = new RouteMetadata("/api/test3", "/api/test3", "PUT");
     }
 
     @Test
@@ -89,6 +89,20 @@ class RoutesTest {
         RouteEntry entry = routes.get(routeMetadata1);
         assertNotNull(entry);
         assertEquals(5, entry.getHits());
+    }
+
+    @Test
+    void testDefaultConstructor() {
+        routes = new Routes();
+        routes.initializeRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata1); // Increment hits for routeMetadata1
+        routes.initializeRoute(routeMetadata2);
+        for (int i = 0; i < (1000 - 1); i++) {
+            routes.initializeRoute(new RouteMetadata(String.valueOf(i), "api/test3", "GET"));
+        }
+        assertEquals(1000, routes.asList().length);
+        assertNull(routes.get(routeMetadata2)); // routeMetadata2 should be evicted
+        assertNotNull(routes.get(routeMetadata1)); // routeMetadata1 should still exist
     }
 
     @Test

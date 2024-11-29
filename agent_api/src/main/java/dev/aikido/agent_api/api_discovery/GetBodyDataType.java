@@ -3,7 +3,8 @@ package dev.aikido.agent_api.api_discovery;
 import java.util.List;
 import java.util.Map;
 
-public class GetBodyDataType {
+public final class GetBodyDataType {
+    private GetBodyDataType() {}
 
     private static final List<String> JSON_CONTENT_TYPES = List.of(
             "application/json",

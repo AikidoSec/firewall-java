@@ -6,18 +6,18 @@ import com.google.gson.GsonBuilder;
 import java.util.HashMap;
 
 public class ContextObject {
-    String method;
-    String source;
-    String url;
-    String route;
-    String remoteAddress;
-    HashMap<String, String> headers;
-    HashMap<String, String[]> query;
-    HashMap<String, String> cookies;
-    Object body;
+    protected String method;
+    protected String source;
+    protected String url;
+    protected String route;
+    protected String remoteAddress;
+    protected HashMap<String, String> headers;
+    protected HashMap<String, String[]> query;
+    protected  HashMap<String, String> cookies;
+    protected Object body;
     // Auxiliary :
-    User user;
-    boolean executedMiddleware;
+    protected User user;
+    protected boolean executedMiddleware;
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
     public User getUser() { return user; }

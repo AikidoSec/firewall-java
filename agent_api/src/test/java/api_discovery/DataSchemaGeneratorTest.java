@@ -59,6 +59,31 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.BOOL, schema.properties().get("arr").items().properties().get("sub").type());
         assertEquals(DataSchemaType.EMPTY, schema.properties().get("x").type());
     }
+    private record MyRecord(String a, Number abc, List<String> stringslist) {}
+    @Test
+    public void testExtractsFromClasses() {
+        MyRecord myRecord = new MyRecord("Hello World", null, List.of("Abc", "def", "ghi"));
+        Map<String, Object> input = new HashMap<>();
+        input.put("record", myRecord);
+        DataSchemaItem schema = DataSchemaGenerator.getDataSchema(input);
+        assertEquals(DataSchemaType.OBJECT, schema.type());
+        assertEquals(DataSchemaType.OBJECT, schema.properties().get("record").type());
+        Map<String, DataSchemaItem> props = schema.properties().get("record").properties();
+        assertEquals(DataSchemaType.STRING, props.get("a").type());
+        assertEquals(DataSchemaType.EMPTY, props.get("abc").type());
+        assertEquals(DataSchemaType.ARRAY, props.get("stringslist").type());
+        assertEquals(DataSchemaType.STRING, props.get("stringslist").items().type());
+    }
+
+    @Test
+    void testUndefinedPrimitives() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("character", 'a');
+        DataSchemaItem schema = DataSchemaGenerator.getDataSchema(input);
+        assertEquals(DataSchemaType.OBJECT, schema.type());
+        // Character not recognized, seen as an Object :
+        assertEquals(DataSchemaType.OBJECT, schema.properties().get("character").type());
+    }
 
     @Test
     public void testMaxDepth() {

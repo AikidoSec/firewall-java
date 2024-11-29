@@ -3,7 +3,8 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 
-public class WebRequestCollector {
+public final class WebRequestCollector {
+    private WebRequestCollector() {}
     /**
      * This function gets called in the initial phases of a request.
      * @param newContext is the new ContextObject that holds headers, query, ...

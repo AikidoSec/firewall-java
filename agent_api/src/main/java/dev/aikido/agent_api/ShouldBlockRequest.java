@@ -17,7 +17,8 @@ import java.util.Optional;
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
 import static dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder.getRateLimitedEndpoint;
 
-public class ShouldBlockRequest {
+public final class ShouldBlockRequest {
+    private ShouldBlockRequest() {}
     public record ShouldBlockRequestResult(boolean block, BlockedRequestResult data) {}
     public record BlockedRequestResult(String type, String trigger, String ip) {}
     public static ShouldBlockRequestResult shouldBlockRequest() {

@@ -31,9 +31,6 @@ public class ShouldRateLimitCommand implements Command {
         Gson gson = new Gson();
         Req request = gson.fromJson(data, Req.class);
         ShouldRateLimit.RateLimitDecision response = shouldRateLimit(request.routeMetadata(), request.user(), request.remoteAddress(), connectionManager);
-        if (response == null) {
-            return Optional.empty();
-        }
         String jsonResponse = gson.toJson(response);
         return Optional.of(jsonResponse);
     }

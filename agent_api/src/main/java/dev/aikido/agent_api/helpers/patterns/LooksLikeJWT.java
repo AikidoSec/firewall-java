@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import java.util.Objects;
 
-public class LooksLikeJWT {
+public final class LooksLikeJWT {
+    private LooksLikeJWT() {}
 
     public static Result tryDecodeAsJwt(String jwt) {
         // Check if the JWT contains the required parts
@@ -32,40 +33,21 @@ public class LooksLikeJWT {
     }
 
     // Helper class to hold the result
-    public static class Result {
-        private final boolean success;
-        private final Map<String, Object> payload;
-
-        public Result(boolean success, Map<String, Object> payload) {
-            this.success = success;
-            this.payload = payload;
-        }
-
-        public boolean isSuccess() {
-            return success;
-        }
-
-        public Map<String, Object> getPayload() {
-            return payload;
-        }
+        public record Result(boolean success, Map<String, Object> payload) {
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Result)) return false;
-            Result result = (Result) o;
-            return success == result.success && Objects.equals(payload, result.payload);
-        }
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (!(o instanceof Result)) return false;
+                Result result = (Result) o;
+                return success == result.success && Objects.equals(payload, result.payload);
+            }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(success, payload);
+            public String toString() {
+                return "Result{" +
+                        "success=" + success +
+                        ", payload=" + payload +
+                        '}';
+            }
         }
-        @Override
-        public String toString() {
-            return "Result{" +
-                    "success=" + success +
-                    ", payload=" + payload +
-                    '}';
-        }
-    }
 }

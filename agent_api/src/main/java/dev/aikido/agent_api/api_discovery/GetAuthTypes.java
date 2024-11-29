@@ -9,7 +9,8 @@ import java.util.Map;
 
 import static dev.aikido.agent_api.helpers.patterns.HttpAuthScheme.isHttpAuthScheme;
 
-public class GetAuthTypes {
+public final class GetAuthTypes {
+    private GetAuthTypes() {}
     private static final String[] COMMON_API_KEY_HEADER_NAMES = {
             "x-api-key", "api-key", "apikey", "x-token", "token"
     };

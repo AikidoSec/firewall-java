@@ -6,10 +6,10 @@ import dev.aikido.agent_api.context.RouteMetadata;
 import static dev.aikido.agent_api.api_discovery.APISpecMerger.mergeAPISpecs;
 
 public class RouteEntry {
-    private final String method;
-    private final String path;
+    final String method;
+    final String path;
     private int hits;
-    private APISpec apispec;
+    public APISpec apispec;
 
     public RouteEntry(String method, String path) {
         this.method = method;
@@ -29,19 +29,7 @@ public class RouteEntry {
         return hits;
     }
 
-    public String getMethod() {
-        return method;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
     public void updateApiSpec(APISpec newApiSpec) {
-        APISpec mergedAPISpec = mergeAPISpecs(newApiSpec, this.apispec);
-        this.apispec = mergedAPISpec;
-    }
-    public APISpec getApispec() {
-        return apispec;
+        this.apispec = mergeAPISpecs(newApiSpec, this.apispec);
     }
 }

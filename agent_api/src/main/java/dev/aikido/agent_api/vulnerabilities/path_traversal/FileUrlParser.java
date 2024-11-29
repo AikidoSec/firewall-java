@@ -4,8 +4,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class FileUrlParser {
-
+public final class FileUrlParser {
+    private FileUrlParser() {}
     public static String parseAsFileUrl(String path) {
         try {
             Path filePath = null;

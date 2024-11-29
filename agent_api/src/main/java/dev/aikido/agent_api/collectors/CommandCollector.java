@@ -3,7 +3,8 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.vulnerabilities.Scanner;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
 
-public class CommandCollector {
+public final class CommandCollector {
+    private CommandCollector() {}
     public static void report(Object command) {
         if (command instanceof String commandStr) {
             if (commandStr.isEmpty()) {

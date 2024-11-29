@@ -15,7 +15,8 @@ import org.apache.logging.log4j.Logger;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
 
-public class Scanner {
+public final class Scanner {
+    private Scanner() {}
     private static final Logger logger = LogManager.getLogger(Scanner.class);
     private record AttackCommandData(Attack attack, ContextObject context) {}
     public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
