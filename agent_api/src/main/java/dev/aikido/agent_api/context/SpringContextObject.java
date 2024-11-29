@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
@@ -20,6 +21,13 @@ public class SpringContextObject extends ContextObject{
         this.cookies = extractCookies(request);
         this.route = buildRouteFromUrl(this.url);
         this.source = "SpringFramework";
+
+        // We don't have access yet to the route parameters: doFilter() is called before the Controller
+        // So the parameters will be set later.
+        this.params = null;
+    }
+    public void setParams(Object params) {
+        this.params = params;
     }
     private static HashMap<String, String> extractHeaders(HttpServletRequest request) {
         HashMap<String, String> headersMap = new HashMap<>();

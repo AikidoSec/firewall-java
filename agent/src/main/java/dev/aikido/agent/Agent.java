@@ -34,6 +34,7 @@ public class Agent {
                 ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc.PgConnection")
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.filter.RequestContextFilter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
@@ -59,6 +60,7 @@ public class Agent {
             new HttpURLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
+            new SpringFrameworkInvokeWrapper(),
             new MysqlCJWrapper(),
             new MariaDBWrapper()
     );
