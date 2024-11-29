@@ -11,6 +11,7 @@ all: build
 .PHONY: build
 build:
 	@echo "Building the project..."
+	chmod +x $(GRADLEW)
 	$(GRADLEW) build
 
 # Run the application with the Java agent
