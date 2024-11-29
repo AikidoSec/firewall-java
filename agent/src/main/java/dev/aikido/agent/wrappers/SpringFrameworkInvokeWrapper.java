@@ -11,6 +11,11 @@ import net.bytebuddy.matcher.ElementMatchers;
 
 import java.io.IOException;
 
+/**
+ * SpringFrameworkInvokeWrapper is a wrapper for the invokeHandlerMethod function
+ * This functions gets called after the path variables are set (/post/:id)
+ * So we fetch the path variables and store them inside the context.
+ */
 public class SpringFrameworkInvokeWrapper implements Wrapper {
     @Override
     public String getName() {
