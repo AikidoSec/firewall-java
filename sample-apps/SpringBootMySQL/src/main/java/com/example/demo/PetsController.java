@@ -25,7 +25,15 @@ public class PetsController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Rows create(@RequestBody PetCreate pet_data) {
-        Integer rowsCreated = DatabaseHelper.createPetByName(pet_data.name);
+        Integer rowsCreated = DatabaseHelper.createPetByName(pet_data.name, "mysql");
+        return new Rows(rowsCreated);
+    }
+
+    @PostMapping(path = "/create/mariadb",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public Rows createmariadb(@RequestBody PetCreate pet_data) {
+        Integer rowsCreated = DatabaseHelper.createPetByName(pet_data.name, "mariadb");
         return new Rows(rowsCreated);
     }
 }

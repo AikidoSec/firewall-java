@@ -19,6 +19,10 @@ public class HtmlController {
     public String create(Model model) {
         return "create"; // This will resolve to src/main/resources/templates/create.html
     }
+    @GetMapping("/create/mariadb")
+    public String create_mariadb(Model model) {
+        return "create_mariadb"; // This will resolve to src/main/resources/templates/create_mariadb.html
+    }
     @GetMapping("/read_file")
     public String read_file(Model model) {
         return "read"; // This will resolve to src/main/resources/templates/read.html
