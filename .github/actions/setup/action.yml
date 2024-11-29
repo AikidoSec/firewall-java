@@ -1,0 +1,27 @@
+# .github/actions/setup/action.yml
+name: "Setup"
+description: "A composite action to Setup end2end environment"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: pkg-build
+
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: "21"
+        distribution: 'adopt'
+
+    - name: Start mock server
+      working-directory: ./end2end/server
+      run: |
+        docker build -t mock_core . 
+        docker run --name mock_core -d -p 5000:5000 mock_core
+
+    - name: Start databases
+      working-directory: ./sample-apps/databases
+      run: docker compose up --build -d
