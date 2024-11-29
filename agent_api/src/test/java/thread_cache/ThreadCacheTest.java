@@ -35,7 +35,7 @@ public class ThreadCacheTest {
         // Arrange
         Set<String> blockedUserIds = Set.of("user1", "user2");
         Routes routes = new Routes(); // Assuming Routes has a default constructor
-        ThreadCacheObject expectedCache = new ThreadCacheObject(Collections.emptyList(), blockedUserIds, routes);
+        ThreadCacheObject expectedCache = new ThreadCacheObject(Collections.emptyList(), blockedUserIds, Set.of(), routes);
         ThreadCache.set(expectedCache);
 
         // Act

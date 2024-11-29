@@ -12,14 +12,16 @@ import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 public class ThreadCacheObject {
     private final List<Endpoint> endpoints;
     private final Set<String> blockedUserIds;
+    private final Set<String> bypassedIPs;
     private final long lastRenewedAtMS;
     private final Hostnames hostnames;
     private final Routes routes;
-    public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Routes routes) {
+    public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes) {
         this.lastRenewedAtMS = getUnixTimeMS();
         // Set endpoints :
         this.endpoints = endpoints;
         this.blockedUserIds = blockedUserIDs;
+        this.bypassedIPs = bypassedIPs;
         this.routes = routes;
         this.hostnames = new Hostnames(5000);
     }
@@ -46,5 +48,8 @@ public class ThreadCacheObject {
     }
     public Routes getRoutes() {
         return routes;
+    }
+    public boolean isBypassedIP(String ip) {
+        return bypassedIPs.contains(ip);
     }
 }

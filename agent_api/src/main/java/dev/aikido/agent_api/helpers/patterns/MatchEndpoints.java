@@ -13,7 +13,7 @@ import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrlPath;
 public final class MatchEndpoints {
     private MatchEndpoints() {}
     public static List<Endpoint> matchEndpoints(RouteMetadata routeMetadata, List<Endpoint> endpoints) {
-        if (routeMetadata == null || routeMetadata.method() == null || routeMetadata.url() == null || routeMetadata.route() == null) {
+        if (routeMetadata == null || routeMetadata.method() == null || routeMetadata.url() == null || routeMetadata.route() == null || endpoints == null) {
             return null;
         }
 

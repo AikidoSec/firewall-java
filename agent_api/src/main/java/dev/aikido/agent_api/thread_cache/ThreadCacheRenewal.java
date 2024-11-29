@@ -7,7 +7,8 @@ import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 
 import java.util.Optional;
 
-public class ThreadCacheRenewal {
+public final class ThreadCacheRenewal {
+    private ThreadCacheRenewal() {}
     public static ThreadCacheObject renewThreadCache() {
         // Fetch thread cache over IPC:
         IPCClient client = new IPCDefaultClient();
@@ -16,7 +17,7 @@ public class ThreadCacheRenewal {
             Gson gson = new Gson();
             SyncDataCommand.SyncDataResult res = gson.fromJson(result.get(), SyncDataCommand.SyncDataResult.class);
             if (res != null) {
-                return new ThreadCacheObject(res.endpoints(), res.blockedUserIDs(), res.routes());
+                return new ThreadCacheObject(res.endpoints(), res.blockedUserIDs(), res.bypassedIPs(), res.routes());
             }
         }
         return null;

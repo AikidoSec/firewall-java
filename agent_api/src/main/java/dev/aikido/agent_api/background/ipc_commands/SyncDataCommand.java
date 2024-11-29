@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class SyncDataCommand implements Command {
-    public record SyncDataResult(List<Endpoint> endpoints, Set<String> blockedUserIDs, Routes routes) {}
+    public record SyncDataResult(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes) {}
     @Override
     public boolean returnsData() {
         // Returns JSON of SyncDataResult
@@ -32,8 +32,9 @@ public class SyncDataCommand implements Command {
     public Optional<String> execute(String data, CloudConnectionManager connectionManager) {
         List<Endpoint> endpoints = connectionManager.getConfig().getEndpoints();
         Set<String> blockedUserIDs = connectionManager.getConfig().getBlockedUserIDs();
+        Set <String> bypassedIPs = connectionManager.getConfig().getBypassedIPs();
         Routes routes = connectionManager.getRoutes();
-        SyncDataResult syncDataResult = new SyncDataResult(endpoints, blockedUserIDs, routes);
+        SyncDataResult syncDataResult = new SyncDataResult(endpoints, blockedUserIDs, bypassedIPs, routes);
 
         Gson gson = new Gson();
         String syncDataResultJson = gson.toJson(syncDataResult);
