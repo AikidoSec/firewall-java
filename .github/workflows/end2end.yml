@@ -32,10 +32,8 @@ jobs:
   spring_boot_postgres:
     runs-on: ubuntu-latest
     needs: build
+    uses: ./.github/workflows/setup.yml
     steps:
-      - name: Import setup steps
-        uses: ./.github/workflows/end2end/setup.yml
-
       - name: Start SpringBootPostgres (with and without Zen)
         working-directory: ./sample-apps/SpringBootPostgres
         run: |
@@ -52,10 +50,8 @@ jobs:
   spring_boot_mysql:
     runs-on: ubuntu-latest
     needs: build
+    uses: ./.github/workflows/setup.yml
     steps:
-      - name: Import setup steps
-        uses: ./.github/workflows/end2end/setup.yml
-
       - name: Start SpringBootMySQL (with and without Zen)
         working-directory: ./sample-apps/SpringBootMySQL
         run: |
