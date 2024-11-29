@@ -59,4 +59,4 @@ jobs:
 
       - name: Run End-to-End tests
         working-directory: ./
-        run: python end2end/spring_boot_postgres.py
+        run: sleep 10 && python end2end/spring_boot_postgres.py
