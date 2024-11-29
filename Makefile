@@ -24,10 +24,10 @@ mock_stop:
 	docker kill mock_core && docker rm mock_core
 
 test:
-	AIKIDO_DIRECTORY="$(shell pwd)/dist" ./gradlew test
+	./gradlew test
 
 cov:
-	AIKIDO_DIRECTORY="$(shell pwd)/dist" ./gradlew test jacocoTestReport
+	./gradlew test jacocoTestReport
 
 BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.26
 FILES = \

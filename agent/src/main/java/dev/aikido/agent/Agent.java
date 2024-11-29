@@ -1,11 +1,15 @@
 package dev.aikido.agent;
 
+import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
+import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
+import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
 import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent.wrappers.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import java.io.File;
 import java.lang.instrument.Instrumentation;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +21,7 @@ public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
     public static void premain(String agentArgs, Instrumentation inst) {
         logger.info("Aikido Java Agent loaded.");
+        setAikidoSysProperties();
         // Bytecode instrumentation :
         new AgentBuilder.Default()
             //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
@@ -26,7 +31,7 @@ public class Agent {
             .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
             .ignore(ElementMatchers.none())
             .type(
-                ElementMatchers.nameContainsIgnoreCase("org.postgresql.core")
+                ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc.PgConnection")
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.filter.RequestContextFilter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
@@ -34,6 +39,9 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.lang"))
+                .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc.Connection"))
+
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
@@ -52,7 +60,9 @@ public class Agent {
             new HttpURLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
-            new SpringFrameworkInvokeWrapper()
+            new SpringFrameworkInvokeWrapper(),
+            new MysqlCJWrapper(),
+            new MariaDBWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
@@ -64,5 +74,12 @@ public class Agent {
             }
             return adviceAgentBuilder;
         }
+    }
+    private static void setAikidoSysProperties() {
+        String pathToAgentJar = Agent.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String pathToAikidoDirectory = new File(pathToAgentJar).getParent();
+        String jarPath = "file:" + pathToAikidoDirectory + "/agent_api.jar";
+        System.setProperty("AIK_agent_dir", pathToAikidoDirectory);
+        System.setProperty("AIK_agent_api_jar", jarPath);
     }
 }
