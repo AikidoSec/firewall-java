@@ -28,6 +28,7 @@ run: build
 .PHONY: runWithoutZen
 runWithoutZen: build
 	@echo "Running the application without Zen & ENV (http://localhost:8081)"
+	AIKIDO_TOKEN="token" \
 	nohup java -jar $(JAR_FILE) --server.port=8081 &
 
 # Clean the project
