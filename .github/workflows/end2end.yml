@@ -54,7 +54,7 @@ jobs:
           docker run --name mock_core -d -p 5000:5000 mock_core
       - name: Start databases
         working-directory: ./sample-apps/databases
-        run: docker-compose up --build -d
+        run: docker compose up --build -d
 
       - name: Start SpringBootPostgres (with and without Zen)
         working-directory: ./sample-apps/SpringBootPostgres
