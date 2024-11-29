@@ -33,6 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Check out code
+        uses: actions/checkout@v2
       - name: Setup Environment
         uses: ./.github/actions/setup
 
@@ -53,6 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Check out code
+        uses: actions/checkout@v2
       - name: Setup Environment
         uses: ./.github/actions/setup
 
