@@ -32,8 +32,10 @@ jobs:
   spring_boot_postgres:
     runs-on: ubuntu-latest
     needs: build
-    uses: ./.github/actions/setup
     steps:
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+
       - name: Start SpringBootPostgres (with and without Zen)
         working-directory: ./sample-apps/SpringBootPostgres
         run: |
@@ -50,8 +52,10 @@ jobs:
   spring_boot_mysql:
     runs-on: ubuntu-latest
     needs: build
-    uses: ./.github/actions/setup
     steps:
+      - name: Setup Environment
+        uses: ./.github/actions/setup
+
       - name: Start SpringBootMySQL (with and without Zen)
         working-directory: ./sample-apps/SpringBootMySQL
         run: |
