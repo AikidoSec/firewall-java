@@ -26,19 +26,17 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: ./dist/  # Adjust this path to your actual build output directory
+          name: pkg-build
+          path: ./
 
   spring_boot_postgres:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts
+          name: pkg-build
       - name: Debug
         run: |
           ls -la
