@@ -6,7 +6,6 @@ on:
 jobs:
   spring_boot_postgres:
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Import setup steps
         uses: ./.github/workflows/end2end/setup
