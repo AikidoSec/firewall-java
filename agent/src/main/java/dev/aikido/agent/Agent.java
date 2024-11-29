@@ -1,5 +1,7 @@
 package dev.aikido.agent;
 
+import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
+import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
 import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent.wrappers.*;
@@ -28,13 +30,15 @@ public class Agent {
             .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
             .ignore(ElementMatchers.none())
             .type(
-                ElementMatchers.nameContainsIgnoreCase("org.postgresql.core")
+                ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc.PgConnection")
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.filter.RequestContextFilter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.lang"))
+                .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
+
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
@@ -52,7 +56,8 @@ public class Agent {
             new FileWrapper(),
             new HttpURLConnectionWrapper(),
             new InetAddressWrapper(),
-            new RuntimeExecWrapper()
+            new RuntimeExecWrapper(),
+            new MysqlCJWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
