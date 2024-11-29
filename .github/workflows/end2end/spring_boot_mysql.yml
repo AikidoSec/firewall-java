@@ -1,7 +1,7 @@
 name: Run Spring Boot MySQL End-to-End Tests
 
 on:
-  pull_request:
+  workflow_call:
 
 jobs:
   spring_boot_mysql:
@@ -9,7 +9,7 @@ jobs:
     needs: build
     steps:
       - name: Import setup steps
-        uses: ./.github/actions/setup
+        uses: ./.github/workflows/end2end/setup
 
       - name: Start SpringBootMySQL (with and without Zen)
         working-directory: ./sample-apps/SpringBootMySQL

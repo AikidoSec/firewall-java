@@ -28,5 +28,9 @@ jobs:
         with:
           name: pkg-build
           path: ./
-  # See spring_boot_postgres at : ./end2end/spring_boot_postgres.yml
-  # See spring_boot_mysql at : ./end2end/spring_boot_mysql.yml
+  run_spring_boot_postgres:
+    needs: build
+    uses: ./.github/workflows/end2end/spring_boot_postgres.yml
+  run_spring_boot_mysql:
+    needs: build
+    uses: ./.github/workflows/end2end/spring_boot_mysql.yml
