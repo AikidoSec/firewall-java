@@ -6,12 +6,12 @@ safe_payload = {
     "name": "Bobby"
 }
 unsafe_payload = {
-    "name": 'Malicious Pet", "Gru from the Minions") -- '
+    "name": "Malicious Pet', 'Gru from the Minions'); -- "
 }
 
 # Define the URLs for both applications
-url_with_zen = "http://localhost:8082/api/pets/create"
-url_without_zen = "http://localhost:8083/api/pets/create"
+url_with_zen = "http://localhost:8084/api/pets/create"
+url_without_zen = "http://localhost:8085/api/pets/create"
 
 # Function to make a POST request
 def make_post_request(url, data, status_code):
@@ -22,22 +22,15 @@ def make_post_request(url, data, status_code):
 
     # If you want to check the response content, you can do so here
     print(f"Success: {response.json()}")
-# MySQL driver :
+
 print("Making safe request to app with Zen...")
 make_post_request(url_with_zen, safe_payload, status_code=200)
+
 print("Making safe request to app without Zen...")
 make_post_request(url_without_zen, safe_payload, status_code=200)
+
 print("Making unsafe request to app with Zen...")
 make_post_request(url_with_zen, unsafe_payload, status_code=500)
+
 print("Making unsafe request to app without Zen...")
 make_post_request(url_without_zen, unsafe_payload, status_code=200)
-
-# MariaDB driver :
-print("Making safe request to app with Zen...")
-make_post_request(url_with_zen  + "/mariadb", safe_payload, status_code=200)
-print("Making safe request to app without Zen...")
-make_post_request(url_without_zen + "/mariadb", safe_payload, status_code=200)
-print("Making unsafe request to app with Zen...")
-make_post_request(url_with_zen + "/mariadb", unsafe_payload, status_code=500)
-print("Making unsafe request to app without Zen...")
-make_post_request(url_without_zen + "/mariadb", unsafe_payload, status_code=200)
