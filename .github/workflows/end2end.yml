@@ -1,4 +1,4 @@
-name: Run End-to-End tests
+name: Build and Run End-to-End Tests
 
 on:
   pull_request:
@@ -28,9 +28,11 @@ jobs:
         with:
           name: pkg-build
           path: ./
+
   run_spring_boot_postgres:
     needs: build
     uses: ./.github/workflows/end2end/spring_boot_postgres.yml
+
   run_spring_boot_mysql:
     needs: build
     uses: ./.github/workflows/end2end/spring_boot_mysql.yml

@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Import setup steps
-        uses: ./.github/workflows/end2end/setup
+        uses: ./.github/workflows/end2end/setup.yml
 
       - name: Start SpringBootPostgres (with and without Zen)
         working-directory: ./sample-apps/SpringBootPostgres
