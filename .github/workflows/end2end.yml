@@ -39,6 +39,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
+      - name: Debug
+        run: |
+          ls -la
+          cd dist && ls -la
 
       - name: Start mock server
         working-directory: ./end2end/server
