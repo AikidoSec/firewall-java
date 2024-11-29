@@ -113,4 +113,40 @@ public class MatchEndpointsTest {
 
         assertEquals(expected, matchEndpoints(sampleRouteMetadata("http://localhost:4000/api/coach", null, "/api/coach"), endpoints));
     }
+
+    @Test
+    void testItPrefersSpecificMethodOverWildcardFirstCase() {
+        RouteMetadata routeMetadata = sampleRouteMetadata(
+                "http://localhost:4000/api/test", "POST", "/api/test"
+        );
+
+        List<Endpoint> endpoints = List.of(
+                new Endpoint("*", "/api/test", 20, 60000, List.of(), false, false, true),
+                new Endpoint("POST", "/api/test", 100, 60000, List.of(), false, false, true)
+        );
+
+        List<Endpoint> expected = List.of(
+                endpoints.get(1),
+                endpoints.get(0)
+        );
+        assertEquals(expected, matchEndpoints(routeMetadata, endpoints));
+    }
+
+    @Test
+    void testItPrefersSpecificMethodOverWildcardSecondCase() {
+        RouteMetadata routeMetadata = sampleRouteMetadata(
+                "http://localhost:4000/api/test", "POST", "/api/test"
+        );
+
+        List<Endpoint> endpoints = List.of(
+                new Endpoint("POST", "/api/test", 100, 60000, List.of(), false, false, true),
+                new Endpoint("*", "/api/test", 20, 60000, List.of(), false, false, true)
+        );
+
+        List<Endpoint> expected = List.of(
+                endpoints.get(0),
+                endpoints.get(1)
+        );
+        assertEquals(expected, matchEndpoints(routeMetadata, endpoints));
+    }
 }

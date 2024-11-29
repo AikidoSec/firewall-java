@@ -33,6 +33,7 @@ dependencies {
 test {
     jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
     jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
+    systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
     useJUnitPlatform()
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
