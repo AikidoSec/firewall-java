@@ -20,12 +20,16 @@ public class PetsController {
     }
 
     private record PetCreate(String name) {}
-    public record Rows(Integer rows) {}
+    public record Rows(Integer rows, String comment) {}
     @PostMapping(path = "/create",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Rows create(@RequestBody PetCreate pet_data) {
-        Integer rowsCreated = DatabaseHelper.createPetByName(pet_data.name);
-        return new Rows(rowsCreated);
+        try {
+            Integer rowsCreated = DatabaseHelper.createPetByName(pet_data.name);
+            return new Rows(rowsCreated, null);
+        } catch (Throwable e) {
+            return new Rows(0, e.toString());
+        }
     }
 }
