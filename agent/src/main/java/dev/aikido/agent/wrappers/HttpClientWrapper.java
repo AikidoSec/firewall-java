@@ -7,6 +7,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
@@ -35,21 +36,20 @@ public class HttpClientWrapper implements Wrapper {
                 @Advice.This(typing = DYNAMIC, optional = true) Object target,
                 @Advice.Argument(0) Object uriObject,
                 @Advice.Argument(2) Object httpRequestObject
-        ) throws Throwable {
-            URI uri = (URI) uriObject;
-            HttpRequest httpRequest = (HttpRequest) httpRequestObject;
-            URL originUrl = httpRequest.uri().toURL();
+        ) {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
-                URL[] urls = { new URL(jarFilePath) };
-                classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
-            if (classLoader == null) {
-                return;
-            }
-
-            try {
+                URI uri = (URI) uriObject;
+                HttpRequest httpRequest = (HttpRequest) httpRequestObject;
+                URL originUrl = httpRequest.uri().toURL();
+                try {
+                    URL[] urls = { new URL(jarFilePath) };
+                    classLoader = new URLClassLoader(urls);
+                } catch (MalformedURLException ignored) {}
+                if (classLoader == null) {
+                    return;
+                }
                 // Load the class from the JAR
                 Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
 
@@ -60,13 +60,10 @@ public class HttpClientWrapper implements Wrapper {
                         break;
                     }
                 }
-            } catch (InvocationTargetException invocationTargetException) {
-                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    throw invocationTargetException.getCause();
-                }
-                // Ignore non-aikido throwables.
             } catch(Throwable e) {}
-            classLoader.close(); // Close the class loader
+            try {
+                classLoader.close(); // Close the class loader
+            } catch (IOException ignored) {}
         }
     }
 }
