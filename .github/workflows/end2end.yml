@@ -121,7 +121,7 @@ jobs:
         working-directory: ./sample-apps/databases
         run: |
           docker compose down --volumes
-          docker compose up --build
+          docker compose up --build -d
 
       - name: Start SpringBootMSSQL (with and without Zen)
         working-directory: ./sample-apps/SpringBootMSSQL
