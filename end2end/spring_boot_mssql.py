@@ -10,8 +10,8 @@ unsafe_payload = {
 }
 
 # Define the URLs for both applications
-url_with_zen = "http://localhost:8084/api/pets/create"
-url_without_zen = "http://localhost:8085/api/pets/create"
+url_with_zen = "http://localhost:8086/api/pets/create"
+url_without_zen = "http://localhost:8087/api/pets/create"
 
 # Function to make a POST request
 def make_post_request(url, data, status_code):
