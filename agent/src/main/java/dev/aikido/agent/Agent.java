@@ -49,9 +49,9 @@ public class Agent {
             .installOn(inst);
         logger.info("Instrumentation installed.");
         // Background process :
-        //BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
-        //backgroundProcess.setDaemon(true);
-        //backgroundProcess.start();
+        BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
+        backgroundProcess.setDaemon(true);
+        backgroundProcess.start();
     }
     private static final List<Wrapper> wrappers = Arrays.asList(
             new PostgresWrapper(),
