@@ -42,8 +42,7 @@ public class HttpClientWrapper implements Wrapper {
                 HttpRequest httpRequest = (HttpRequest) httpRequestObject;
 
                 // Call to collector :
-                String pathToAikidoFolder = System.getenv("AIKIDO_DIRECTORY");
-                String jarFilePath = "file:" + pathToAikidoFolder + "agent_api.jar";
+                String jarFilePath = System.getProperty("AIK_agent_api_jar");
                 URL[] urls = { new URL(jarFilePath) };
                 URLClassLoader classLoader = new URLClassLoader(urls);
 
