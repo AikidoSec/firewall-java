@@ -18,12 +18,17 @@ public final class MatchEndpoints {
         }
 
         // First filter based on method:
+        List<Endpoint> exactMethodMatches = new ArrayList<>();
         List<Endpoint> possible = new ArrayList<>();
         for (Endpoint endpoint : endpoints) {
-            if ("*".equals(endpoint.getMethod()) || endpoint.getMethod().equals(routeMetadata.method())) {
+            if (endpoint.getMethod().equals(routeMetadata.method())) {
+                exactMethodMatches.add(endpoint);
+            } else if ("*".equals(endpoint.getMethod())) {
                 possible.add(endpoint);
             }
         }
+        // Make sure the exact matches come first:
+        possible.addAll(0, exactMethodMatches);
 
         // If routes match exact add to results
         List<Endpoint> results = new ArrayList<>();

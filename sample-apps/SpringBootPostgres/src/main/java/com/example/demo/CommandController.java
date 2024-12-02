@@ -1,10 +1,7 @@
 package com.example.demo;
 
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +21,16 @@ public class CommandController {
 
         Process process = Runtime.getRuntime()
                 .exec(command);
+
+        return String.valueOf(process.waitFor());
+    }
+
+    @GetMapping(path = "/execute/{command_name}")
+    public String read(@PathVariable("command_name") String commandName) throws IOException, InterruptedException {
+        System.out.println("Executing command: "+ commandName);
+
+        Process process = Runtime.getRuntime()
+                .exec(commandName);
 
         return String.valueOf(process.waitFor());
     }

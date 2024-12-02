@@ -26,13 +26,13 @@ public class HttpURLConnectionWrapper implements Wrapper {
     public static class ConstructorAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
-        // To bypass this issue we load collectors from a .jar file, specified with the AIKIDO_DIRECTORY env variable
-        @Advice.OnMethodExit
-        public static void after(
-                @Advice.This(typing = DYNAMIC, optional = true) HttpURLConnection target
+        // To bypass this issue we load collectors from a .jar file
+        @Advice.OnMethodEnter
+        public static void before(
+                @Advice.This(typing = DYNAMIC, optional = true) HttpURLConnection target,
+                @Advice.Origin Executable method
         ) {
-            String pathToAikidoFolder = System.getenv("AIKIDO_DIRECTORY");
-            String jarFilePath = "file:" + pathToAikidoFolder + "agent_api.jar";
+            String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
                 URL[] urls = { new URL(jarFilePath) };
