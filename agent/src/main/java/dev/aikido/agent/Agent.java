@@ -27,9 +27,8 @@ public class Agent {
         new AgentBuilder.Default()
             //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
             .disableClassFormatChanges()
-            // After careful consideration we decided not to retransform pre-existing classes, most are either from other agents or from the JDK
-            // Using retransformation causes compatibility issues and since our agent is not dynamically loaded, is unnecessary.
-            .with(AgentBuilder.RedefinitionStrategy.DISABLED)
+            // Disabling this would impair our ability to wrap Java's own classes :
+            .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
             .ignore(ElementMatchers.none())
             .type(
                 ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc.PgConnection")
