@@ -134,4 +134,4 @@ jobs:
 
       - name: Run End-to-End tests
         working-directory: ./
-        run: sleep 20 && python end2end/spring_boot_mssql.py
+        run: sleep 25 && python end2end/spring_boot_mssql.py
