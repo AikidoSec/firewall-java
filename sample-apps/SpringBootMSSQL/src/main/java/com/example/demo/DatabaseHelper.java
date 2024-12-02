@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class DatabaseHelper {
     // We can create a method to create and return a DataSource for our Postgres DB
-    private static Connection  createDataConn() throws SQLException {
+    private static Connection  createDataConn() {
         // The url specifies the address of our database along with username and password credentials
         // you should replace these with your own username and password
         String url = "jdbc:sqlserver://localhost:1433;databaseName=db;encrypt=false"; // Change to your database
@@ -15,10 +15,9 @@ public class DatabaseHelper {
         try {
             return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
-            throw e;
-            //System.out.println("Exception in createDataSource(): " + e);
+            System.out.println("Exception in createDataSource(): " + e);
         }
-        //return null;
+        return null;
     }
     public static ArrayList<Object> getAllPets() {
         ArrayList<Object> pets = new ArrayList<>();
