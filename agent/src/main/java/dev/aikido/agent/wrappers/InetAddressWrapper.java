@@ -1,15 +1,13 @@
 package dev.aikido.agent.wrappers;
+import dev.aikido.agent_api.collectors.HostnameCollector;
+import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
@@ -30,31 +28,11 @@ public class InetAddressWrapper implements Wrapper {
         public static void after(
                 @Advice.Enter String hostname,
                 @Advice.Return InetAddress[] inetAddresses
-        ) throws Throwable {
-            String jarFilePath = System.getProperty("AIK_agent_api_jar");
-            URLClassLoader classLoader = null;
+        ) throws AikidoException {
             try {
-                URL[] urls = { new URL(jarFilePath) };
-                classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
-            if (classLoader == null) {
-                return;
-            }
-
-            try {
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.HostnameCollector");
-
-                // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        method2.invoke(null, hostname, inetAddresses);
-                        break;
-                    }
-                }
-                classLoader.close(); // Close the class loader
+                HostnameCollector.report(hostname, inetAddresses);
             } catch(Throwable e) {
-                if(e.getCause() != null && e.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                if(e instanceof AikidoException) {
                     throw e; // Do throw an Aikido vulnerability
                 }
                 // Ignore non-aikido throwables.

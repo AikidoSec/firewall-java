@@ -27,9 +27,9 @@ public class Agent {
         new AgentBuilder.Default()
             //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
             .disableClassFormatChanges()
-            // Applies a retransformation to all classes that are already loaded and that would have been transformed if the
-            // built agent was registered before they were loaded.
-            .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
+            // After careful consideration we decided not to retransform pre-existing classes, most are either from other agents or from the JDK
+            // Using retransformation causes compatibility issues and since our agent is not dynamically loaded, is unnecessary.
+            .with(AgentBuilder.RedefinitionStrategy.DISABLED)
             .ignore(ElementMatchers.none())
             .type(
                 ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc.PgConnection")
@@ -49,7 +49,7 @@ public class Agent {
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
             .installOn(inst);
-
+        logger.info("Instrumentation installed.");
         // Background process :
         BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
         backgroundProcess.setDaemon(true);
