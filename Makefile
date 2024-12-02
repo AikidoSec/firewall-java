@@ -27,7 +27,7 @@ test:
 	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test
 
 cov:
-	./gradlew test jacocoTestReport
+	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test jacocoTestReport
 
 BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.26
 FILES = \
