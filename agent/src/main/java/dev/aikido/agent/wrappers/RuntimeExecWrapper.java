@@ -1,16 +1,12 @@
 package dev.aikido.agent.wrappers;
+import dev.aikido.agent_api.collectors.CommandCollector;
+import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.io.IOException;
 import java.lang.reflect.Executable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
@@ -33,36 +29,15 @@ public class RuntimeExecWrapper implements Wrapper {
                 @Advice.This(typing = DYNAMIC, optional = true) Object target,
                 @Advice.Origin Executable method,
                 @Advice.Argument(0) Object argument
-        ) throws Throwable {
-            if (!(argument instanceof String)) {
+        ) throws AikidoException {
+            if (!(argument instanceof String strArgument)) {
                 return;
             }
-            String jarFilePath = System.getProperty("AIK_agent_api_jar");
-            URLClassLoader classLoader = null;
             try {
-                URL[] urls = { new URL(jarFilePath) };
-                classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
-            if (classLoader == null) {
-                return;
-            }
-
-            try {
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.CommandCollector");
-
-                // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        method2.invoke(null, argument);
-                        break;
-                    }
-                }
-                classLoader.close(); // Close the class loader
+                CommandCollector.report(strArgument);
             } catch(Throwable e) {
-                if(e.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    // Aikido vuln :
-                    throw e;
+                if(e instanceof AikidoException) {
+                    throw e; // Do throw an Aikido vulnerability
                 }
                 // Ignore non-aikido throwables.
             }
