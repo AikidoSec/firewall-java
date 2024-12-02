@@ -53,14 +53,14 @@ public class DatabaseHelper {
         }
         return new Pet(0, "Unknown", "Unknown");
     }
-    public static Integer createPetByName(String pet_name) {
+    public static Integer createPetByName(String pet_name) throws SQLException {
         String sql = "INSERT INTO pets (pet_name, owner) VALUES ('" + pet_name  + "', 'Aikido Security')";
         try {
             Connection conn = createDataConn();
             PreparedStatement insertStmt = conn.prepareStatement(sql);
             return insertStmt.executeUpdate();
-        } catch (SQLException ignored) {
+        } catch (SQLException e) {
+            throw e;
         }
-        return 0;
     }
 }
