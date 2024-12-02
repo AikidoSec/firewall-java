@@ -1,8 +1,5 @@
 package dev.aikido.agent.wrappers;
 
-import dev.aikido.agent_api.collectors.RedirectCollector;
-import dev.aikido.agent_api.collectors.URLCollector;
-import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -10,15 +7,10 @@ import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
@@ -43,19 +35,38 @@ public class HttpClientWrapper implements Wrapper {
                 @Advice.This(typing = DYNAMIC, optional = true) Object target,
                 @Advice.Argument(0) Object uriObject,
                 @Advice.Argument(2) Object httpRequestObject
-        ) throws AikidoException {
+        ) throws Throwable {
+            URI uri = (URI) uriObject;
+            HttpRequest httpRequest = (HttpRequest) httpRequestObject;
+            URL originUrl = httpRequest.uri().toURL();
+            String jarFilePath = System.getProperty("AIK_agent_api_jar");
+            URLClassLoader classLoader = null;
             try {
-                // Cast :
-                URI uri = (URI) uriObject;
-                HttpRequest httpRequest = (HttpRequest) httpRequestObject;
-                URL originUrl = httpRequest.uri().toURL();
-                RedirectCollector.report(originUrl, uri.toURL());
-            } catch(Throwable e) {
-                if(e instanceof AikidoException aikidoException) {
-                    throw aikidoException; // Do throw an Aikido vulnerability
+                URL[] urls = { new URL(jarFilePath) };
+                classLoader = new URLClassLoader(urls);
+            } catch (MalformedURLException ignored) {}
+            if (classLoader == null) {
+                return;
+            }
+
+            try {
+                // Load the class from the JAR
+                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
+
+                // Run report with "argument"
+                for (Method method2: clazz.getMethods()) {
+                    if(method2.getName().equals("report")) {
+                        method2.invoke(null, originUrl, uri.toURL());
+                        break;
+                    }
+                }
+            } catch (InvocationTargetException invocationTargetException) {
+                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                    throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            }
+            } catch(Throwable e) {}
+            classLoader.close(); // Close the class loader
         }
     }
 }
