@@ -59,13 +59,12 @@ public class RuntimeExecWrapper implements Wrapper {
                     }
                 }
                 classLoader.close(); // Close the class loader
-            } catch(Throwable e) {
-                if(e.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    // Aikido vuln :
-                    throw e;
+            } catch (InvocationTargetException invocationTargetException) {
+                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                    throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            }
+            } catch(Throwable e) {}
         }
     }
 }

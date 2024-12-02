@@ -5,6 +5,7 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.reflect.Executable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -52,14 +53,13 @@ public class FileWrapper implements Wrapper {
                         break;
                     }
                 }
-                classLoader.close(); // Close the class loader
-            } catch(Throwable e) {
-                if(e.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    // Aikido vuln :
-                    throw e;
+            } catch (InvocationTargetException invocationTargetException) {
+                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                    throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            }
+            } catch(Throwable e) {}
+            classLoader.close(); // Close the class loader
         }
     }
 }
