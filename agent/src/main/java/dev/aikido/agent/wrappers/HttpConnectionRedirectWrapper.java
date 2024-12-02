@@ -8,6 +8,8 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
+import java.util.List;
+import java.util.Map;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
@@ -31,7 +33,7 @@ public class HttpConnectionRedirectWrapper implements Wrapper {
         public static void before(
                 @Advice.This(typing = DYNAMIC, optional = true) HttpURLConnection target,
                 @Advice.Argument(2) URL destUrl
-        ) throws Throwable {
+        ) {
             URL origin = target.getURL();
             if (origin == null || destUrl == null) {
                 return;
@@ -57,13 +59,8 @@ public class HttpConnectionRedirectWrapper implements Wrapper {
                         break;
                     }
                 }
-            } catch (InvocationTargetException invocationTargetException) {
-                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    throw invocationTargetException.getCause();
-                }
-                // Ignore non-aikido throwables.
-            } catch(Throwable e) {}
-            classLoader.close(); // Close the class loader
+                classLoader.close(); // Close the class loader
+            } catch(Throwable ignored) {}
         }
     }
 }
