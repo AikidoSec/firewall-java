@@ -1,14 +1,13 @@
 package dev.aikido.agent.wrappers;
 
+import dev.aikido.agent_api.collectors.RedirectCollector;
+import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.lang.reflect.Method;
 import java.net.*;
-import java.util.List;
-import java.util.Map;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
@@ -32,35 +31,19 @@ public class HttpConnectionRedirectWrapper implements Wrapper {
         public static void before(
                 @Advice.This(typing = DYNAMIC, optional = true) HttpURLConnection target,
                 @Advice.Argument(2) URL destUrl
-        ) {
+        ) throws AikidoException {
             URL origin = target.getURL();
             if (origin == null || destUrl == null) {
                 return;
             }
-            String pathToAikidoFolder = System.getenv("AIKIDO_DIRECTORY");
-            String jarFilePath = "file:" + pathToAikidoFolder + "agent_api.jar";
-            URLClassLoader classLoader = null;
             try {
-                URL[] urls = { new URL(jarFilePath) };
-                classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
-            if (classLoader == null) {
-                return;
-            }
-
-            try {
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
-
-                // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        method2.invoke(null, origin, destUrl);
-                        break;
-                    }
+                RedirectCollector.report(origin, destUrl);
+            } catch(Throwable e) {
+                if(e instanceof AikidoException) {
+                    throw e; // Do throw an Aikido vulnerability
                 }
-                classLoader.close(); // Close the class loader
-            } catch(Throwable ignored) {}
+                // Ignore non-aikido throwables.
+            }
         }
     }
 }

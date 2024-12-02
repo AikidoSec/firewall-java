@@ -1,5 +1,8 @@
 package dev.aikido.agent.wrappers;
 
+import dev.aikido.agent_api.collectors.RedirectCollector;
+import dev.aikido.agent_api.collectors.URLCollector;
+import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -40,31 +43,19 @@ public class HttpClientWrapper implements Wrapper {
                 @Advice.This(typing = DYNAMIC, optional = true) Object target,
                 @Advice.Argument(0) Object uriObject,
                 @Advice.Argument(2) Object httpRequestObject
-        ) {
+        ) throws AikidoException {
             try {
                 // Cast :
                 URI uri = (URI) uriObject;
                 HttpRequest httpRequest = (HttpRequest) httpRequestObject;
-
-                // Call to collector :
-                String pathToAikidoFolder = System.getenv("AIKIDO_DIRECTORY");
-                String jarFilePath = "file:" + pathToAikidoFolder + "agent_api.jar";
-                URL[] urls = { new URL(jarFilePath) };
-                URLClassLoader classLoader = new URLClassLoader(urls);
-
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
-
-                // Run report func with its arguments
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        URL originUrl = httpRequest.uri().toURL();
-                        method2.invoke(null, originUrl, uri.toURL());
-                        break;
-                    }
+                URL originUrl = httpRequest.uri().toURL();
+                RedirectCollector.report(originUrl, uri.toURL());
+            } catch(Throwable e) {
+                if(e instanceof AikidoException aikidoException) {
+                    throw aikidoException; // Do throw an Aikido vulnerability
                 }
-                classLoader.close(); // Close the class loader
-            } catch (Throwable ignored) {}
+                // Ignore non-aikido throwables.
+            }
         }
     }
 }
