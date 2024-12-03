@@ -99,6 +99,52 @@ public class InetAddressTest {
         assertEquals("dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery", exception.getMessage());
     }
 
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
+    public void testSSRFWithoutPortAndWithoutContext() throws Exception {
+        setContextAndLifecycle("http://localhost:80");
+        Context.set(null);
+        assertThrows(ConnectException.class, () -> {
+            fetchResponse("http://localhost/api/test");
+        });
+    }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
+    public void testSSRFWithoutPortAndWithoutThreadCache() throws Exception {
+        setContextAndLifecycle("http://localhost:80");
+        ThreadCache.set(null);
+        assertThrows(ConnectException.class, () -> {
+            fetchResponse("http://localhost/weirdroute");
+        });
+    }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
+    public void testSSRFWithHttpClient() {
+        setContextAndLifecycle("http://localhost:5000/");
+
+        Exception exception1 = assertThrows(Exception.class, () -> {
+            fetchResponseHttpClient("http://localhost:5000/config");
+        });
+        assertTrue(exception1.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
+
+        Exception exception2 = assertThrows(Exception.class, () -> {
+            fetchResponseHttpClient("http://localhost:5000/mock/events");
+        });
+        assertTrue(exception2.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
+        
+        Exception exception3 = assertThrows(Exception.class, () -> {
+            fetchResponseHttpClient("https://localhost:5000/api/runtime/config");
+        });
+        assertTrue(exception3.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
+
+
+    }
+
     private void fetchResponse(String urlString) throws IOException, SSRFException {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -109,5 +155,14 @@ public class InetAddressTest {
         connection.setReadTimeout(5000); // Set read timeout
 
         int responseCode = connection.getResponseCode();
+    }
+    private void fetchResponseHttpClient(String urlString) throws InterruptedException, IOException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlString))
+                .GET() // GET is the default method, so this line is optional
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 }

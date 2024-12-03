@@ -15,7 +15,7 @@ public final class URLCollector {
     private URLCollector() {}
     public static void report(URL url) {
         ThreadCacheObject threadCache = ThreadCache.get();
-        if(threadCache != null) {
+        if(threadCache != null && url != null) {
             logger.trace("Adding a new URL to the cache: {}", url);
             int port = getPortFromURL(url);
             threadCache.getHostnames().add(url.getHost(), port);

@@ -37,6 +37,7 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
                 .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
@@ -67,7 +68,8 @@ public class Agent {
             new MSSQLWrapper(),
             new MariaDBWrapper(),
             new HttpClientWrapper(),
-            new HttpConnectionRedirectWrapper()
+            new HttpConnectionRedirectWrapper(),
+            new HttpClientSendWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
