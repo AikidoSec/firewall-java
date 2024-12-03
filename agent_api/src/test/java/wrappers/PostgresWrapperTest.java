@@ -12,10 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +55,6 @@ public class PostgresWrapperTest {
         Context.set(null);
         ThreadCache.set(null);
     }
-
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
@@ -89,5 +85,31 @@ public class PostgresWrapperTest {
         assertDoesNotThrow(() -> {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
         });
+        Context.set(new SampleContextObject("pets"));
+        assertDoesNotThrow(() -> {
+            connection.prepareStatement("SELECT * FROM pets;").executeQuery();
+        });
+        Context.set(new SampleContextObject("SELECT *"));
+        assertDoesNotThrow(() -> {
+            connection.prepareStatement("SELECT * FROM pets;").executeQuery();
+        });
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    public void testSelectSqlWithPreparedStatementWithoutExecute() throws SQLException {
+        ThreadCache.set(null);
+
+        Context.set(new SampleContextObject("SELECT * FROM notpets;"));
+        assertDoesNotThrow(() -> {
+            connection.prepareStatement("SELECT pet_name FROM pets;");
+        });
+
+        Context.set(new SampleContextObject("* FROM pets"));
+        Exception exception = assertThrows(SQLInjectionException.class, () -> {
+            connection.prepareStatement("SELECT * FROM pets;");
+        });
+        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: PostgreSQL",  exception.getMessage());
     }
 }
