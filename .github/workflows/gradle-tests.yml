@@ -24,6 +24,9 @@ jobs:
       - name: Build with Gradle
         working-directory: ./
         run: chmod +x gradlew && make binaries && make build
+      - name: Start databases
+        working-directory: ./sample-apps/databases
+        run: docker compose up --build -d
       - name: Start mock server
         working-directory: ./end2end/server
         run: docker build -t mock_core . && docker run --name mock_core -d -p 5000:5000 mock_core
