@@ -6,7 +6,7 @@ public class Dialect {
     private final int rustDialectInt;
     private final String humanName;
     public Dialect(String dialect) {
-        if (Objects.equals(dialect, "postgres")) {
+        if (Objects.equals(dialect, "postgresql")) {
             rustDialectInt = 9;
             humanName = "PostgreSQL";
         } else if (Objects.equals(dialect, "mysql")) {
