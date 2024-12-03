@@ -48,7 +48,7 @@ public class MariadbWrapperTest {
     @BeforeEach
     public void setUp() throws SQLException {
         // Connect to the MySQL database
-        connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/db", "user", "password");
+        connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/db?useSSL=false", "user", "password");
         ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
     }
 
