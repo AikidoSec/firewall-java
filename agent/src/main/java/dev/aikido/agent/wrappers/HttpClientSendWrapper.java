@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
@@ -22,7 +23,7 @@ public class HttpClientSendWrapper implements Wrapper {
         return SendFunctionAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
+        return ElementMatchers.isDeclaredBy(ElementMatchers.isSubTypeOf(HttpClient.class))
                 .and(ElementMatchers.named("send").or(ElementMatchers.named("sendAsync")));
     }
     public static class SendFunctionAdvice {
