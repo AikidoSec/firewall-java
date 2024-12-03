@@ -10,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RustSQLInterfaceTest {
     @Test
     public void testItWorks() {
-        boolean injectionResult = RustSQLInterface.detectSqlInjection("SELECT * FROM table;", "table;", new Dialect("postgres"));
+        boolean injectionResult = RustSQLInterface.detectSqlInjection("SELECT * FROM table;", "table;", new Dialect("postgresql"));
         assertTrue(injectionResult);
-        injectionResult = RustSQLInterface.detectSqlInjection("SELECT * FROM table;", "table", new Dialect("postgres"));
+        injectionResult = RustSQLInterface.detectSqlInjection("SELECT * FROM table;", "table", new Dialect("postgresql"));
         assertFalse(injectionResult);
     }
 }
