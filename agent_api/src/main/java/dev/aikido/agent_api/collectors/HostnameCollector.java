@@ -23,6 +23,7 @@ public final class HostnameCollector {
     private HostnameCollector() {}
     private static final Logger logger = LogManager.getLogger(HostnameCollector.class);
     public static void report(String hostname, InetAddress[] inetAddresses) {
+        logger.trace("HostnameCollector called with {} & inet addresses: {}", hostname, inetAddresses);
         // Convert inetAddresses array to a List of IP strings :
         List<String> ipAddresses = new ArrayList<>();
         for(InetAddress inetAddress: inetAddresses) {
@@ -30,6 +31,7 @@ public final class HostnameCollector {
         }
         // Currently using hostnames from thread cache, might not be as accurate as using Context-dependant hostnames.
         if (ThreadCache.get() == null || ThreadCache.get().getHostnames() == null) {
+            logger.trace("Thread cache is empty, returning.");
             return;
         }
         for (Hostnames.HostnameEntry hostnameEntry: ThreadCache.get().getHostnames().asArray()) {
@@ -44,6 +46,7 @@ public final class HostnameCollector {
             if(attack == null) {
                 continue;
             }
+            logger.debug("SSRF Attack detected due to: {}:{}", hostname, hostnameEntry.getPort());
 
             Gson gson = new Gson();
             String json = gson.toJson(new AttackCommand.AttackCommandData(attack, Context.get()));
@@ -53,7 +56,6 @@ public final class HostnameCollector {
                     "ATTACK$" + json, // data
                     false // receive
             );
-            logger.info("Sent attack data");
             if(shouldBlock()) {
                 logger.debug("Blocking SSRF attack...");
                 throw SSRFException.get();

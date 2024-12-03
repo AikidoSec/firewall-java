@@ -4,15 +4,23 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.RedirectNode;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.URL;
 import java.util.List;
 
 public final class RedirectCollector {
+    private static final Logger logger = LogManager.getLogger(RedirectCollector.class);
+
     private RedirectCollector() {}
     public static void report(URL origin, URL dest) {
+        logger.trace("Redirect detected: [Origin]<{}> -> [Destination]<{}>", origin, dest);
         ContextObject context = Context.get();
+        // Report destination URL :
+        URLCollector.report(dest);
 
+        // Add as a node :
         List<RedirectNode> redirectStarterNodes = context.getRedirectStartNodes();
         for (RedirectNode node : redirectStarterNodes) {
             RedirectNode currentChild = node.getChild();
