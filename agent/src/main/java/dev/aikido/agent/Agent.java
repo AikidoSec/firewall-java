@@ -38,7 +38,7 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.lang"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
                 .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
                 .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc.SQLServerConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc.Connection"))
