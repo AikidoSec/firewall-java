@@ -13,7 +13,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-import wrappers.HttpURLConnectionRedirectTest;
 
 import java.net.MalformedURLException;
 import java.net.URL;
