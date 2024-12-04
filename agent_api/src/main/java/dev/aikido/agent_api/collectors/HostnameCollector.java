@@ -5,6 +5,7 @@ import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
 import dev.aikido.agent_api.background.utilities.IPCClient;
 import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.context.SanitizedContextObject;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.AikidoException;
@@ -51,7 +52,7 @@ public final class HostnameCollector {
                 logger.debug("SSRF Attack detected due to: {}:{}", hostname, hostnameEntry.getPort());
 
                 Gson gson = new Gson();
-                String json = gson.toJson(new AttackCommand.AttackCommandData(attack, Context.get()));
+                String json = gson.toJson(new AttackCommand.AttackCommandData(attack, new SanitizedContextObject(Context.get())));
 
                 IPCClient client = new IPCDefaultClient();
                 client.sendData(
