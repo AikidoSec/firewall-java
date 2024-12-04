@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FileWrapperTest {
-    private HttpClient httpClient;
     public static class SampleContextObject extends ContextObject {
         public SampleContextObject(String argument) {
             this.method = "GET";
@@ -51,7 +50,6 @@ public class FileWrapperTest {
     }
     @BeforeEach
     void clearThreadCache() {
-        httpClient = HttpClient.newHttpClient();
         cleanup();
         ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
     }
