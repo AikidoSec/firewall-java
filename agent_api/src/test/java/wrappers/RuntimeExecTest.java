@@ -55,7 +55,7 @@ public class RuntimeExecTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
-    public void testShellInjection() throws Exception {
+    public void testShellInjection() {
         setContextAndLifecycle(" -la");
         Exception exception1 = assertThrows(RuntimeException.class, () -> {
             Runtime.getRuntime().exec("ls -la");
@@ -74,5 +74,26 @@ public class RuntimeExecTest {
         assertDoesNotThrow(() -> {
             Runtime.getRuntime().exec("whoami && ls -la");
         });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Runtime.getRuntime().exec("");
+        });
+    }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
+    public void testOnlyScansStrings() {
+        setContextAndLifecycle("whoami");
+        assertDoesNotThrow(() -> {
+            Runtime.getRuntime().exec(new String[]{"whoami"});
+        });
+        assertDoesNotThrow(() -> {
+            Runtime.getRuntime().exec(new String[]{"whoami"}, new String[]{"MyEnvironmentVar=1"});
+        });
+
+        Exception exception1 = assertThrows(RuntimeException.class, () -> {
+            Runtime.getRuntime().exec("whoami", new String[]{"MyEnvironmentVar=1"});
+        });
+        assertEquals("Aikido Zen has blocked Shell Injection", exception1.getMessage());
     }
 }
