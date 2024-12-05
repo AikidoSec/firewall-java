@@ -32,6 +32,7 @@ dependencies {
     testImplementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation 'org.mariadb.jdbc:mariadb-java-client:3.0.5'
     testImplementation 'com.microsoft.sqlserver:mssql-jdbc:10.2.0.jre8'
+    testImplementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
