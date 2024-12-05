@@ -28,7 +28,6 @@ public class OkHttpWrapper implements Wrapper {
     public class OkHttpAdvice {
         @Advice.OnMethodEnter
         public static void before(
-                @Advice.Origin Executable method,
                 @Advice.Argument(0) Object request
         ) {
             // This Object is an okhttp3.Request object, we will use reflection to access the URL:
