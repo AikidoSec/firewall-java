@@ -46,6 +46,8 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc.SQLServerConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc.Connection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("okhttp3.OkHttpClient"))
+                .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("CloseableHttpClient")))
+                .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("MinimalHttpClient")))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
@@ -71,7 +73,8 @@ public class Agent {
             new HttpClientWrapper(),
             new HttpConnectionRedirectWrapper(),
             new HttpClientSendWrapper(),
-            new OkHttpWrapper()
+            new OkHttpWrapper(),
+            new ApacheHttpClientWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
