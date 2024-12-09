@@ -16,6 +16,9 @@ public final class URLCollector {
     public static void report(URL url) {
         ThreadCacheObject threadCache = ThreadCache.get();
         if(threadCache != null && url != null) {
+            if (!url.getProtocol().startsWith("http")) {
+                return; // Non-HTTP(S) URL
+            }
             logger.trace("Adding a new URL to the cache: {}", url);
             int port = getPortFromURL(url);
             threadCache.getHostnames().add(url.getHost(), port);

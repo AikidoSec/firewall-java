@@ -36,7 +36,7 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.net.URLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
                 .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
@@ -63,7 +63,7 @@ public class Agent {
             new SpringFrameworkWrapper(),
             new SpringFrameworkBodyWrapper(),
             new FileWrapper(),
-            new HttpURLConnectionWrapper(),
+            new URLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
             new SpringFrameworkInvokeWrapper(),
