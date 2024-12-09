@@ -55,6 +55,7 @@ public class PostgresWrapperTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
@@ -112,4 +113,26 @@ public class PostgresWrapperTest {
         });
         assertEquals("Aikido Zen has blocked SQL Injection, Dialect: PostgreSQL",  exception.getMessage());
     }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    public void testWithTransactions() throws SQLException {
+        ThreadCache.set(null);
+        connection.setAutoCommit(false);
+        Context.set(new SampleContextObject("SELECT * FROM notpets;"));
+        Statement stmt = connection.createStatement();
+        assertDoesNotThrow(() -> {
+            stmt.executeQuery("SELECT pet_name FROM pets;");
+            connection.commit();
+        });
+
+        Statement stmt2 = connection.createStatement();
+        Context.set(new SampleContextObject("* FROM pets"));
+        Exception exception = assertThrows(SQLInjectionException.class, () -> {
+            stmt2.executeQuery("SELECT * FROM pets;");
+            connection.commit();
+        });
+        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: PostgreSQL",  exception.getMessage());
+    }   
 }
