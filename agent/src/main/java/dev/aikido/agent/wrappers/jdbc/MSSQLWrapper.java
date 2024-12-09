@@ -9,6 +9,6 @@ public class MSSQLWrapper implements Wrapper {
         return JDBCConnectionAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return JDBCConnectionAdvice.getMatcher("com.microsoft.sqlserver.jdbc.SQLServerConnection");
+        return JDBCConnectionAdvice.getMatcher("com.microsoft.sqlserver.jdbc");
     }
 }

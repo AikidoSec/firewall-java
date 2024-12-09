@@ -9,6 +9,6 @@ public class MariaDBWrapper implements Wrapper {
         return JDBCConnectionAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return JDBCConnectionAdvice.getMatcher("org.mariadb.jdbc.Connection");
+        return JDBCConnectionAdvice.getMatcher("org.mariadb.jdbc");
     }
 }

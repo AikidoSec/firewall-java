@@ -18,6 +18,6 @@ public class MysqlCJWrapper implements Wrapper {
         return JDBCConnectionAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return JDBCConnectionAdvice.getMatcher("com.mysql.cj.jdbc.ConnectionImpl");
+        return JDBCConnectionAdvice.getMatcher("com.mysql.cj.jdbc");
     }
 }

@@ -16,6 +16,6 @@ public class PostgresWrapper implements Wrapper {
         return JDBCConnectionAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return JDBCConnectionAdvice.getMatcher("org.postgresql.jdbc.PgConnection");
+        return JDBCConnectionAdvice.getMatcher("org.postgresql.jdbc");
     }
 }
