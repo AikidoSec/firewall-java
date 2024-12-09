@@ -15,6 +15,7 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class MSSQLWrapperTest {
 
     @BeforeEach
     public void setUp() throws SQLException {
-        // Connect to the MySQL database
+        // Connect to the Microsoft SQL database
         String url = "jdbc:sqlserver://localhost:1433;databaseName=db;encrypt=false"; // Change to your database
         String user = "sa"; // Change to your username
         String password = "Strong!Passw0rd"; // Change to your password
@@ -118,6 +119,108 @@ public class MSSQLWrapperTest {
         Context.set(new SampleContextObject("* FROM pets"));
         Exception exception = assertThrows(SQLInjectionException.class, () -> {
             connection.prepareStatement("SELECT * FROM pets;");
+        });
+        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: Microsoft SQL", exception.getMessage());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    public void testExecute() throws SQLException {
+        Statement stmt = connection.createStatement();
+        Context.set(new PostgresWrapperTest.SampleContextObject("SELECT * FROM notpets;"));
+
+        // Valid query
+        assertDoesNotThrow(() -> {
+            stmt.execute("SELECT pet_name FROM pets;");
+        });
+
+        // Invalid query (SQL Injection)
+        Context.set(new PostgresWrapperTest.SampleContextObject("* FROM pets"));
+        Exception exception = assertThrows(SQLInjectionException.class, () -> {
+            stmt.execute("SELECT * FROM pets;");
+        });
+        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: Microsoft SQL", exception.getMessage());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    public void testAddBatch() throws SQLException {
+        Statement stmt = connection.createStatement();
+        Context.set(new PostgresWrapperTest.SampleContextObject("Fluffy"));
+
+        // Valid batch
+        assertDoesNotThrow(() -> {
+            stmt.addBatch("INSERT INTO pets (pet_name, owner) VALUES ('Fluffy', 'test');");
+            stmt.executeBatch();
+        });
+
+        // Invalid batch (SQL Injection)
+        Context.set(new PostgresWrapperTest.SampleContextObject("'Fluffy2', 'test'"));
+        Exception exception = assertThrows(SQLInjectionException.class, () -> {
+            stmt.addBatch("INSERT INTO pets (pet_name, owner) VALUES ('Fluffy2', 'test');");
+            stmt.executeBatch();
+        });
+        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: Microsoft SQL", exception.getMessage());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    public void testExecuteLargeUpdate() throws SQLException {
+        Statement stmt = connection.createStatement();
+        Context.set(new PostgresWrapperTest.SampleContextObject("Buddy"));
+
+        // Valid update
+        assertDoesNotThrow(() -> {
+            stmt.executeLargeUpdate("UPDATE pets SET pet_name = 'Buddy' WHERE pet_name = 'Fluffy';");
+        });
+
+        // Invalid update (SQL Injection)
+        Context.set(new PostgresWrapperTest.SampleContextObject("pet_name = 'Fluffy2'"));
+        Exception exception = assertThrows(SQLInjectionException.class, () -> {
+            stmt.executeLargeUpdate("UPDATE pets SET pet_name = 'Buddy2' WHERE pet_name = 'Fluffy2';");
+        });
+        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: Microsoft SQL", exception.getMessage());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    public void testExecuteQuery() throws SQLException {
+        Statement stmt = connection.createStatement();
+        Context.set(new PostgresWrapperTest.SampleContextObject("* FROM pets"));
+
+        // Valid query
+        assertDoesNotThrow(() -> {
+            stmt.executeQuery("SELECT pet_name FROM pets;");
+        });
+
+        // Invalid query (SQL Injection)
+        Exception exception = assertThrows(SQLInjectionException.class, () -> {
+            stmt.executeQuery("SELECT * FROM pets;");
+        });
+        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: Microsoft SQL", exception.getMessage());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    public void testExecuteUpdate() throws SQLException {
+        Statement stmt = connection.createStatement();
+        Context.set(new PostgresWrapperTest.SampleContextObject("UPDATE"));
+
+        // Valid update
+        assertDoesNotThrow(() -> {
+            int rowsAffected = stmt.executeUpdate("UPDATE pets SET pet_name = 'Buddy' WHERE pet_name = 'Fluffy';");
+            assertTrue(rowsAffected >= 0); // Ensure that the update was successful
+        });
+
+        // Invalid update (SQL Injection)
+        Context.set(new PostgresWrapperTest.SampleContextObject("pet_name = 'Fluffy2'"));
+        Exception exception = assertThrows(SQLInjectionException.class, () -> {
+            stmt.executeUpdate("UPDATE pets SET pet_name = 'Buddy2' WHERE pet_name = 'Fluffy2';");
         });
         assertEquals("Aikido Zen has blocked SQL Injection, Dialect: Microsoft SQL", exception.getMessage());
     }
