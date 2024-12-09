@@ -59,7 +59,6 @@ public class HttpURLConnectionRedirectTest {
     }
 
     private void setContextAndLifecycle(String url) {
-        System.err.println("\nsetContextAndLifecycle() \n");
         Context.set(new SampleContextObject(url));
         ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
     }
@@ -68,7 +67,6 @@ public class HttpURLConnectionRedirectTest {
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testSrrfTest() {
-        System.err.println("ENTERING testSrrfTest \n \n \n");
         setContextAndLifecycle(SSRF_TEST);
 
         Exception exception1 = assertThrows(RuntimeException.class, () -> {
