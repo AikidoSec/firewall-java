@@ -57,7 +57,6 @@ public class URLConnectionTest {
     }
 
     private void setContextAndLifecycle(String url) {
-        System.err.println("\nsetContextAndLifecycle() \n");
         Context.set(new SampleContextObject(url));
         ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
     }
