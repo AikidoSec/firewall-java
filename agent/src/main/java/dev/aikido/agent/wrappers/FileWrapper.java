@@ -1,17 +1,21 @@
 package dev.aikido.agent.wrappers;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.implementation.bytecode.Throw;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import java.io.File;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
+import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class FileWrapper implements Wrapper {
     public String getName() {
@@ -20,7 +24,7 @@ public class FileWrapper implements Wrapper {
         return FileAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.isDeclaredBy(ElementMatchers.named("java.io.File")).and(ElementMatchers.isConstructor());
+        return isDeclaredBy(isSubTypeOf(File.class)).and(isConstructor());
     }
     public static class FileAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated
@@ -28,10 +32,14 @@ public class FileWrapper implements Wrapper {
         // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodEnter
         public static void before(
-                @Advice.This(typing = DYNAMIC, optional = true) Object target,
-                @Advice.Origin Executable method,
-                @Advice.Argument(0) Object argument
+                @Advice.AllArguments(typing = DYNAMIC) Object[] argument
         ) throws Throwable {
+            try {
+                String prop = System.getProperty("AIK_INTERNAL_coverage_run");
+                if (prop != null && prop.equals("1")) {
+                    return;
+                }
+            } catch (Throwable e) {return;}
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
