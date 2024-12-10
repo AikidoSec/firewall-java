@@ -21,7 +21,7 @@ jobs:
           java-version: '21'
           distribution: 'adopt'
 
-      - name: Build with Gradle
+      - name: Download binaries & Build with Gradle
         working-directory: ./
         run: chmod +x gradlew && make binaries && make build
       - name: Start databases
@@ -30,13 +30,14 @@ jobs:
       - name: Start mock server
         working-directory: ./end2end/server
         run: docker build -t mock_core . && docker run --name mock_core -d -p 5000:5000 mock_core
+
       - name: Run test cases
         working-directory: ./
         run: chmod +x gradlew && make test
+
       - name: Run coverage with Gradle
         working-directory: ./
-        run: chmod +x gradlew && make cov
-
+        run: chmod +x gradlew && ./gradlew clean && make cov
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v4
         with:
