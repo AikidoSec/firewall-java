@@ -8,7 +8,40 @@ on:
 
 
 jobs:
-  build:
+  test-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'adopt'
+
+      - name: Build with Gradle
+        working-directory: ./
+        run: chmod +x gradlew && make binaries && make build
+      - name: Start databases
+        working-directory: ./sample-apps/databases
+        run: docker compose up --build -d && sleep 10
+      - name: Start mock server
+        working-directory: ./end2end/server
+        run: docker build -t mock_core . && docker run --name mock_core -d -p 5000:5000 mock_core
+      - name: Run coverage with Gradle
+        working-directory: ./
+        run: chmod +x gradlew && make cov
+
+      - name: Upload coverage report to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          files: ./agent_api/build/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,12 +65,4 @@ jobs:
         run: docker build -t mock_core . && docker run --name mock_core -d -p 5000:5000 mock_core
       - name: Run tests with Gradle
         working-directory: ./
-        run: chmod +x gradlew && make cov
-
-      - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          fail_ci_if_error: true
-          files: ./agent_api/build/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
+        run: chmod +x gradlew && make test

@@ -49,15 +49,27 @@ test {
     }
 }
 
+task testWithCoverage(type: Test) {
+    jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
+    jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
+    jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
+    systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
+    systemProperty 'AIK_INTERNAL_coverage_run', '1'
+    useJUnitPlatform()
+
+    jacoco {
+        destinationFile = file("${buildDir}/jacoco/testWithCoverage.exec")
+    }
+}
+
 jacocoTestReport {
+    dependsOn testWithCoverage
     reports {
         xml.required = true
         csv.required = false
         html.required = false
     }
-    dependsOn test // tests are required to run before generating the report
 }
-
 
 shadowJar {
     mergeServiceFiles()
