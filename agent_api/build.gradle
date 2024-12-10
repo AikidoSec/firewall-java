@@ -58,7 +58,7 @@ task testWithCoverage(type: Test) {
     useJUnitPlatform()
 
     jacoco {
-        destinationFile = file("${buildDir}/jacoco/testWithCoverage.exec")
+        
     }
 }
 
