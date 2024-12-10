@@ -53,8 +53,8 @@ public class FileWrapperTest {
     void clearThreadCache() {
         cleanup();
         ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
-        boolean coverageEnabled = System.getProperty("AIK_INTERNAL_coverage_run").equals("1");
-        Assumptions.assumeFalse(coverageEnabled, "With coverage enabled we skip File(...) test cases.");
+        String prop = System.getProperty("AIK_INTERNAL_coverage_run");
+        Assumptions.assumeFalse(prop != null && prop.equals("1"), "With coverage enabled we skip File(...) test cases.");
     }
     private void setContextAndLifecycle(String url) {
         Context.set(new SampleContextObject(url));
