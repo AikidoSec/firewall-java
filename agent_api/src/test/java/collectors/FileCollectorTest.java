@@ -71,6 +71,18 @@ public class FileCollectorTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
+    public void testStringArrays() {
+        isPathTraversalAttack(new String[]{"/etc/home/../../test.txt.js"});
+        isNotPathTraversalAttack(new String[]{"/etc/home/./../test.txt.js", "test.txt.js", "/etc/home"});
+        isPathTraversalAttack(new String[]{"unrelated", "/etc/home/../../../test.txt.js", "nottest"});
+        isNotPathTraversalAttack(new String[]{"/etc/home/../../folder/../test.txt.js"});
+        isPathTraversalAttack(new String[]{"a", "b", "c", "d", "e", "/../../test.txt"});
+        isNotPathTraversalAttack(new String[]{"/test.txt"});
+    }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
     public void testFileURIs() throws URISyntaxException {
         isPathTraversalAttack(new URI("file:///etc/home/../../test.txt.js"));
         isNotPathTraversalAttack(new URI("file:///etc/home/./../test.txt.js"));

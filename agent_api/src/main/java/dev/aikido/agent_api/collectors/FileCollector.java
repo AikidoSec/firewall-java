@@ -26,6 +26,11 @@ public final class FileCollector {
             // Some functions on Path also accept other paths
             String filePathString = filePathAsPath.toString();
             Scanner.scanForGivenVulnerability(vulnerability, operation, new String[]{filePathString});
+        } else if (filePath instanceof Object[] filePaths) {
+            // In Paths.get() sometimes you can have multiple paths provided, scan them individually :
+            for (int i = 0; i < filePaths.length; i++) {
+                report(filePaths[i], operation);
+            }
         }
     }
 }
