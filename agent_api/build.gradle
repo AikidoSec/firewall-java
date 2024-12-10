@@ -64,6 +64,7 @@ jacocoTestReport {
         csv.required = false
         html.required = false
     }
+    reportsDirectory = layout.buildDirectory.dir('jacoco')
 }
 
 shadowJar {
