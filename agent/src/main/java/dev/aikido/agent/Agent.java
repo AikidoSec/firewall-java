@@ -66,7 +66,8 @@ public class Agent {
             new MysqlCJWrapper(),
             new MSSQLWrapper(),
             new MariaDBWrapper(),
-            new PathWrapper()
+            new PathWrapper(),
+            new PathsWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
