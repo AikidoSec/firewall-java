@@ -1,45 +1,35 @@
 package dev.aikido.agent.wrappers;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.implementation.bytecode.Throw;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.io.File;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
-public class FileWrapper implements Wrapper {
+public class PathsWrapper implements Wrapper {
     public String getName() {
-        // Wrap File constructor.
-        // https://docs.oracle.com/javase/8/docs/api/java/io/File.html
-        return FileAdvice.class.getName();
+        // Wrap Paths.get(...)
+        // https://docs.oracle.com/javase/8/docs/api/java/nio/file/Paths.html#get-java.lang.String-java.lang.String...-
+        return GetFunctionAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return isDeclaredBy(isSubTypeOf(File.class)).and(isConstructor());
+        return isDeclaredBy(nameContains("java.nio.file.Paths")).and(named("get")).and(takesArgument(0, String.class));
     }
-    public static class FileAdvice {
+    public static class GetFunctionAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodEnter
-        public static void before(
-                @Advice.AllArguments(typing = DYNAMIC) Object[] argument
-        ) throws Throwable {
-            try {
-                String prop = System.getProperty("AIK_INTERNAL_coverage_run");
-                if (prop != null && prop.equals("1")) {
-                    return;
-                }
-            } catch (Throwable e) {return;}
+        public static void before(@Advice.AllArguments Object[] argument) throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
@@ -57,7 +47,7 @@ public class FileWrapper implements Wrapper {
                 // Run report with "argument"
                 for (Method method2: clazz.getMethods()) {
                     if(method2.getName().equals("report")) {
-                        method2.invoke(null, argument, "java.io.File");
+                        method2.invoke(null, argument, "java.nio.file.Paths.get");
                         break;
                     }
                 }
