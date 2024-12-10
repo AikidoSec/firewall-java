@@ -4,6 +4,11 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
+jacoco {
+    toolVersion "0.8.12"
+    reportsDirectory = layout.buildDirectory.dir('jacoco')
+}
+
 dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -35,36 +40,28 @@ test {
     jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
     jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
     jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
+
     systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
+    if (project.hasProperty('coverageRun')) {
+        systemProperty 'AIK_INTERNAL_coverage_run', '1'
+    }
+
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
 }
-jacoco {
-    toolVersion "0.8.12"
-    reportsDirectory = layout.buildDirectory.dir('jacoco')
-}
-
-task testWithCoverage(type: Test) {
-    jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
-    jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
-    jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
-    systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
-    systemProperty 'AIK_INTERNAL_coverage_run', '1'
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
-}
 
 jacocoTestReport {
-    dependsOn testWithCoverage
     reports {
         xml.required = true
         csv.required = false
         html.required = false
     }
-    reportsDirectory = layout.buildDirectory.dir('jacoco')
+    dependsOn test
 }
 
 shadowJar {
