@@ -40,35 +40,28 @@ test {
     jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
     jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
     jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
+
     systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
+    if (project.hasProperty('coverageRun')) {
+        systemProperty 'AIK_INTERNAL_coverage_run', '1'
+    }
+
     useJUnitPlatform()
-    finalizedBy jacocoTestReport // report is always generated after tests run
+    finalizedBy jacocoTestReport
+
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
 }
 
-task testWithCoverage(type: Test) {
-    jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
-    jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
-    jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
-    systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
-    systemProperty 'AIK_INTERNAL_coverage_run', '1'
-    useJUnitPlatform()
-
-    jacoco {
-        destinationFile = file("${buildDir}/jacoco/testWithCoverage.exec")
-    }
-}
-
 jacocoTestReport {
-    dependsOn testWithCoverage
     reports {
         xml.required = true
         csv.required = false
         html.required = false
     }
+    dependsOn test
 }
 
 shadowJar {
