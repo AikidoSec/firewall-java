@@ -8,7 +8,7 @@ on:
 
 
 jobs:
-  build:
+  test-and-coverage:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,7 +32,10 @@ jobs:
       - name: Start mock server
         working-directory: ./end2end/server
         run: docker build -t mock_core . && docker run --name mock_core -d -p 5000:5000 mock_core
-      - name: Run tests with Gradle
+      - name: Run test cases
+        working-directory: ./
+        run: chmod +x gradlew && make test
+      - name: Run coverage with Gradle
         working-directory: ./
         run: chmod +x gradlew && make cov
 
