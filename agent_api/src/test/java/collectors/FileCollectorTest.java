@@ -12,12 +12,18 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FileCollectorTest {
+    public static Path filePath1 = Paths.get("/../../test.txt");
+    public static Path filePath2 = Paths.get("/.././../../test.txt");
+    public static Path filePath3 = Paths.get("/../../test3.txt");
+    public static Path filePath4 = Paths.get("/test.txt");
 
     public static class SampleContextObject extends ContextObject {
         public SampleContextObject() {
@@ -54,6 +60,17 @@ public class FileCollectorTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
+    public void testPaths() {
+        isPathTraversalAttack(filePath1);
+        isPathTraversalAttack(filePath2);
+
+        isNotPathTraversalAttack(filePath3);
+        isNotPathTraversalAttack(filePath4);
+    }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
     public void testFileURIs() throws URISyntaxException {
         isPathTraversalAttack(new URI("file:///etc/home/../../test.txt.js"));
         isNotPathTraversalAttack(new URI("file:///etc/home/./../test.txt.js"));
@@ -79,14 +96,14 @@ public class FileCollectorTest {
 
     public void isPathTraversalAttack(Object filePath) {
         Exception exception = assertThrows(AikidoException.class, () -> {
-            FileCollector.report(filePath);
+            FileCollector.report(filePath, "testOp");
         });
         assertEquals("Aikido Zen has blocked Path Traversal", exception.getMessage());
     }
 
     public void isNotPathTraversalAttack(Object filePath) {
         assertDoesNotThrow(() -> {
-            FileCollector.report(filePath);
+            FileCollector.report(filePath, "testOp");
         });
     }
 }

@@ -49,7 +49,7 @@ public class FileWrapper implements Wrapper {
                 // Run report with "argument"
                 for (Method method2: clazz.getMethods()) {
                     if(method2.getName().equals("report")) {
-                        method2.invoke(null, argument);
+                        method2.invoke(null, argument, "java.io.File");
                         break;
                     }
                 }
