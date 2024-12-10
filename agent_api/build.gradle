@@ -4,11 +4,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
-jacoco {
-    toolVersion "0.8.12"
-    reportsDirectory = layout.buildDirectory.dir('jacoco')
-}
-
 dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
     implementation 'com.google.code.gson:gson:2.10.1'
@@ -42,11 +37,14 @@ test {
     jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
     systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
     useJUnitPlatform()
-    finalizedBy jacocoTestReport // report is always generated after tests run
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
+}
+jacoco {
+    toolVersion "0.8.12"
+    reportsDirectory = layout.buildDirectory.dir('jacoco')
 }
 
 task testWithCoverage(type: Test) {
@@ -56,10 +54,7 @@ task testWithCoverage(type: Test) {
     systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
     systemProperty 'AIK_INTERNAL_coverage_run', '1'
     useJUnitPlatform()
-
-    jacoco {
-        
-    }
+    finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
