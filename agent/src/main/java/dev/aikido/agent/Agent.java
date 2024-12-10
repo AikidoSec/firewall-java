@@ -18,6 +18,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
+
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
     public static void premain(String agentArgs, Instrumentation inst) {
@@ -48,11 +50,22 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("okhttp3.OkHttpClient"))
                 .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("CloseableHttpClient")))
                 .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("MinimalHttpClient")))
+                .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
             .installOn(inst);
         logger.info("Instrumentation installed.");
+
+        if (parseAgentArgs(agentArgs).containsKey("mode")) {
+            String mode = parseAgentArgs(agentArgs).get("mode");
+            if (mode.equals("daemon-disabled")) {
+                // Background process is disabled, return :
+                logger.info("Running with background process disabled (mode: daemon-disabled)");
+                return;
+            }
+        }
         // Background process :
         BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
         backgroundProcess.setDaemon(true);
@@ -74,7 +87,9 @@ public class Agent {
             new HttpConnectionRedirectWrapper(),
             new HttpClientSendWrapper(),
             new OkHttpWrapper(),
-            new ApacheHttpClientWrapper()
+            new ApacheHttpClientWrapper(),
+            new PathWrapper(),
+            new PathsWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
