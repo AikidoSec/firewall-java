@@ -63,12 +63,11 @@ public class FileWrapperTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
-    public void testPathTraversal() throws Exception {
+    public void testPathTraversalString() throws Exception {
         setContextAndLifecycle("../file.txt");
         assertThrows(RuntimeException.class, () -> {
             new File("/var/../file.txt");
         });
-
         cleanup();
         setContextAndLifecycle("/../file.txt");
         assertThrows(RuntimeException.class, () -> {
@@ -80,4 +79,25 @@ public class FileWrapperTest {
             new File("/var/../file.txt");
         });
     }
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
+    public void testPathTraversalTwoStrings() throws Exception {
+        setContextAndLifecycle("../file.txt");
+        assertThrows(RuntimeException.class, () -> {
+            new File("/var", "/../file.txt");
+        });
+
+        setContextAndLifecycle("/../../etc/");
+        assertThrows(RuntimeException.class, () -> {
+            new File("/var/../../etc/", "./test.txt");
+        });
+
+        cleanup();
+        assertDoesNotThrow(() -> {
+            new File("/var", "/../file.txt");
+            new File("/var/../etc/", "./test.txt");
+        });
+    }
+
 }
