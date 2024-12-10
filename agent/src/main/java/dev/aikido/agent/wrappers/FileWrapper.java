@@ -32,6 +32,9 @@ public class FileWrapper implements Wrapper {
                 @Advice.Origin Executable method,
                 @Advice.Argument(0) Object argument
         ) throws Throwable {
+            if (System.getProperty("AIK_INTERNAL_coverage_run").equals("1")) {
+                return;
+            }
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
