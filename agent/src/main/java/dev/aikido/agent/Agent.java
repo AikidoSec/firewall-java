@@ -42,6 +42,8 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
                 .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc.SQLServerConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc.Connection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
@@ -63,7 +65,8 @@ public class Agent {
             new SpringFrameworkInvokeWrapper(),
             new MysqlCJWrapper(),
             new MSSQLWrapper(),
-            new MariaDBWrapper()
+            new MariaDBWrapper(),
+            new PathWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
