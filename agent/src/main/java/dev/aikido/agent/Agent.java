@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.agent.ByteBuddyInitializer.createAgentBuilder;
+import static dev.aikido.agent.DaemonStarter.startDaemon;
 import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
 
 public class Agent {
@@ -54,20 +55,10 @@ public class Agent {
             )
             .transform(AikidoTransformer.get())
             .installOn(inst);
-        logger.info("Instrumentation installed.");
 
-        if (parseAgentArgs(agentArgs).containsKey("mode")) {
-            String mode = parseAgentArgs(agentArgs).get("mode");
-            if (mode.equals("daemon-disabled")) {
-                // Background process is disabled, return :
-                logger.info("Running with background process disabled (mode: daemon-disabled)");
-                return;
-            }
-        }
-        // Background process :
-        BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
-        backgroundProcess.setDaemon(true);
-        backgroundProcess.start();
+        logger.info("Instrumentation installed.");
+        
+        startDaemon(agentArgs);
     }
     private static final List<Wrapper> wrappers = Arrays.asList(
             new PostgresWrapper(),

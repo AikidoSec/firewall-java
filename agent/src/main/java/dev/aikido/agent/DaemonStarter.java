@@ -1,0 +1,39 @@
+package dev.aikido.agent;
+
+import dev.aikido.agent_api.background.BackgroundProcess;
+import dev.aikido.agent_api.helpers.env.Token;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
+
+public final class DaemonStarter {
+    private DaemonStarter() {}
+    private static final Logger logger = LogManager.getLogger(DaemonStarter.class);
+
+    public static void startDaemon(String agentArgs) {
+        DAEMON_MODE daemonMode = getDaemonMode(agentArgs);
+        if (daemonMode == DAEMON_MODE.DAEMON_ENABLED) {
+            // Start the background process only if the daemon is enabled.
+            BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
+            backgroundProcess.setDaemon(true);
+            backgroundProcess.start();
+        }
+    }
+
+    private enum DAEMON_MODE {
+        DAEMON_DISABLED,
+        DAEMON_ENABLED
+    }
+    private static DAEMON_MODE getDaemonMode(String agentArgs) {
+        if (parseAgentArgs(agentArgs).containsKey("mode")) {
+            String mode = parseAgentArgs(agentArgs).get("mode");
+            if (mode.equals("daemon-disabled")) {
+                // Background process is disabled, return :
+                logger.info("Running with background process disabled (mode: daemon-disabled)");
+                return DAEMON_MODE.DAEMON_DISABLED;
+            }
+        }
+        return DAEMON_MODE.DAEMON_ENABLED;
+    }
+}
