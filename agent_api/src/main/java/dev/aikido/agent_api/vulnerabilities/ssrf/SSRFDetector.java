@@ -14,6 +14,7 @@ import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.FindHostnameInContext.findHostnameInContext;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.containsPrivateIP;
+import static dev.aikido.agent_api.vulnerabilities.ssrf.PrivateIPRedirectFinder.isRedirectToPrivateIP;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.imds.Resolver.resolvesToImdsIp;
 
 public class SSRFDetector {
@@ -39,6 +40,9 @@ public class SSRFDetector {
             return null;
         }
         FindHostnameInContext.Res attackFindings = findHostnameInContext(hostname, context, port);
+        if (attackFindings == null) {
+            attackFindings = isRedirectToPrivateIP(hostname, port);
+        }
         if(attackFindings != null) {
             return new Attack(
                     operation,
