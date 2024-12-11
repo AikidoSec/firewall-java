@@ -18,6 +18,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
+
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
     public static void premain(String agentArgs, Instrumentation inst) {
@@ -42,11 +44,25 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc"))
                 .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc"))
+                .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
+                .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc.SQLServerConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc.Connection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
             .installOn(inst);
         logger.info("Instrumentation installed.");
+
+        if (parseAgentArgs(agentArgs).containsKey("mode")) {
+            String mode = parseAgentArgs(agentArgs).get("mode");
+            if (mode.equals("daemon-disabled")) {
+                // Background process is disabled, return :
+                logger.info("Running with background process disabled (mode: daemon-disabled)");
+                return;
+            }
+        }
         // Background process :
         BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
         backgroundProcess.setDaemon(true);
@@ -63,7 +79,9 @@ public class Agent {
             new SpringFrameworkInvokeWrapper(),
             new MysqlCJWrapper(),
             new MSSQLWrapper(),
-            new MariaDBWrapper()
+            new MariaDBWrapper(),
+            new PathWrapper(),
+            new PathsWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
