@@ -2,7 +2,6 @@ package dev.aikido.agent_api.vulnerabilities;
 
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.utilities.IPCClient;
-import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 
@@ -12,6 +11,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static dev.aikido.agent_api.background.utilities.IPCClientFactory.getDefaultIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
 import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
@@ -59,11 +59,13 @@ public final class Scanner {
         Gson gson = new Gson();
         String json = gson.toJson(new AttackCommandData(attack, ctx));
 
-        IPCClient client = new IPCDefaultClient();
+        IPCClient client = getDefaultIPCClient();
         logger.info("Attack detected: {}", json);
-        client.sendData(
-                "ATTACK$" + json, // data
-                false // receive
-        );
+        if (client != null) {
+            client.sendData(
+                    "ATTACK$" + json, // data
+                    false // receive
+            );
+        }
     }
 }

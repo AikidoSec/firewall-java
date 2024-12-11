@@ -3,15 +3,19 @@ package dev.aikido.agent_api.thread_cache;
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.ipc_commands.SyncDataCommand;
 import dev.aikido.agent_api.background.utilities.IPCClient;
-import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 
 import java.util.Optional;
+
+import static dev.aikido.agent_api.background.utilities.IPCClientFactory.getDefaultIPCClient;
 
 public final class ThreadCacheRenewal {
     private ThreadCacheRenewal() {}
     public static ThreadCacheObject renewThreadCache() {
         // Fetch thread cache over IPC:
-        IPCClient client = new IPCDefaultClient();
+        IPCClient client = getDefaultIPCClient();
+        if (client == null) {
+            return null;
+        }
         Optional<String> result = client.sendData("SYNC_DATA$", true);
         if(result.isPresent()) {
             Gson gson = new Gson();

@@ -4,7 +4,6 @@ package thread_cache;
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.ipc_commands.SyncDataCommand;
 import dev.aikido.agent_api.background.utilities.IPCClient;
-import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;

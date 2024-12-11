@@ -1,10 +1,7 @@
 package dev.aikido.agent.wrappers;
 
-import com.google.gson.Gson;
-import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
-import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.SpringContextObject;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,10 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Executable;
-import java.util.Map;
-import java.util.Optional;
-
-import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public class SpringFrameworkWrapper implements Wrapper {
     public static final Logger logger = LogManager.getLogger(SpringFrameworkWrapper.class);
