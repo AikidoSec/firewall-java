@@ -29,9 +29,13 @@ public class ServiceConfiguration {
             return;
         }
         this.blockingEnabled = apiResponse.block();
-        this.bypassedIPs = new HashSet<>(apiResponse.allowedIPAddresses());
-        this.blockedUserIDs = new HashSet<>(apiResponse.blockedUserIds());
-        this.endpoints = apiResponse.endpoints();
+        if (apiResponse.allowedIPAddresses() != null) {
+            this.bypassedIPs = new HashSet<>(apiResponse.allowedIPAddresses());
+        } if (apiResponse.blockedUserIds() != null) {
+            this.blockedUserIDs = new HashSet<>(apiResponse.blockedUserIds());
+        } if (apiResponse.endpoints() != null) {
+            this.endpoints = apiResponse.endpoints();
+        }
     }
     // Getters :
     public String getServerless() {
