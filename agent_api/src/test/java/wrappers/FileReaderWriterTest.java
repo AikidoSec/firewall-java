@@ -5,26 +5,22 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.http.HttpClient;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class FileWrapperTest {
+public class FileReaderWriterTest {
     public static class SampleContextObject extends ContextObject {
         public SampleContextObject(String argument) {
             this.method = "GET";
@@ -63,40 +59,46 @@ public class FileWrapperTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
-    public void testPathTraversalString() throws Exception {
+    public void testFileReader() throws Exception {
         setContextAndLifecycle("../file.txt");
-        assertThrows(RuntimeException.class, () -> {
-            new File("/var/../file.txt");
+        Exception exception1 = assertThrows(RuntimeException.class, () -> {
+            new FileReader("/var/../file.txt");
         });
+        assertEquals("Aikido Zen has blocked Path Traversal", exception1.getMessage());
+
         cleanup();
         setContextAndLifecycle("/../file.txt");
-        assertThrows(RuntimeException.class, () -> {
-            new File("/var/../file.txt");
+        Exception exception2 = assertThrows(RuntimeException.class, () -> {
+            new FileReader("/var/../file.txt");
         });
+        assertEquals("Aikido Zen has blocked Path Traversal", exception2.getMessage());
         
         cleanup();
-        assertDoesNotThrow(() -> {
-            new File("/var/../file.txt");
+        assertThrows(FileNotFoundException.class, () -> {
+            new FileReader("/var/../file.txt");
         });
     }
+
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
-    public void testPathTraversalTwoStrings() throws Exception {
+    public void testFileWriter() throws Exception {
         setContextAndLifecycle("../file.txt");
-        assertThrows(RuntimeException.class, () -> {
-            new File("/var", "/../file.txt");
+        Exception exception1 = assertThrows(RuntimeException.class, () -> {
+            new FileWriter("/var/../file.txt");
         });
-
-        setContextAndLifecycle("/../../etc/");
-        assertThrows(RuntimeException.class, () -> {
-            new File("/var/../../etc/", "./test.txt");
-        });
+        assertEquals("Aikido Zen has blocked Path Traversal", exception1.getMessage());
 
         cleanup();
-        assertDoesNotThrow(() -> {
-            new File("/var", "/../file.txt");
-            new File("/var/../etc/", "./test.txt");
+        setContextAndLifecycle("/../file.txt");
+        Exception exception2 = assertThrows(RuntimeException.class, () -> {
+            new FileWriter("/var/../file.txt");
+        });
+        assertEquals("Aikido Zen has blocked Path Traversal", exception2.getMessage());
+
+        cleanup();
+        assertThrows(FileNotFoundException.class, () -> {
+            new FileWriter("/var/../file.txt");
         });
     }
 

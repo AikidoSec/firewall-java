@@ -18,6 +18,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
+
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
     public static void premain(String agentArgs, Instrumentation inst) {
@@ -31,28 +33,44 @@ public class Agent {
             .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
             .ignore(ElementMatchers.none())
             .type(
-                ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc.PgConnection")
+                // Database wrappers :
+                ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc")
+                .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc"))
+                .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc"))
+                // Spring wrappers :
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.filter.RequestContextFilter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
+                // File/Path Wrappers :
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
+                .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
+                // Net wrappers :
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.URLConnection"))
-                .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
                 .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
                 .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
-                .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
-                .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc.SQLServerConnection"))
-                .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc.Connection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("okhttp3.OkHttpClient"))
                 .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("CloseableHttpClient")))
                 .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("MinimalHttpClient")))
+                // Shell wrappers :
+                .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
             .installOn(inst);
         logger.info("Instrumentation installed.");
+
+        if (parseAgentArgs(agentArgs).containsKey("mode")) {
+            String mode = parseAgentArgs(agentArgs).get("mode");
+            if (mode.equals("daemon-disabled")) {
+                // Background process is disabled, return :
+                logger.info("Running with background process disabled (mode: daemon-disabled)");
+                return;
+            }
+        }
         // Background process :
         BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
         backgroundProcess.setDaemon(true);
@@ -74,7 +92,9 @@ public class Agent {
             new HttpConnectionRedirectWrapper(),
             new HttpClientSendWrapper(),
             new OkHttpWrapper(),
-            new ApacheHttpClientWrapper()
+            new ApacheHttpClientWrapper(),
+            new PathWrapper(),
+            new PathsWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
