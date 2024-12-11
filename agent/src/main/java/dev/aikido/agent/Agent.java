@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static dev.aikido.agent.ByteBuddyInitializer.createAgentBuilder;
 import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
 
 public class Agent {
@@ -25,13 +26,9 @@ public class Agent {
     public static void premain(String agentArgs, Instrumentation inst) {
         logger.info("Aikido Java Agent loaded.");
         setAikidoSysProperties();
+
         // Bytecode instrumentation :
-        new AgentBuilder.Default()
-            //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
-            .disableClassFormatChanges()
-            // Disabling this would impair our ability to wrap Java's own classes :
-            .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
-            .ignore(ElementMatchers.none())
+        createAgentBuilder()
             .type(
                 // Database wrappers :
                 ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc")
@@ -56,7 +53,6 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
             )
             .transform(AikidoTransformer.get())
-            .with(AgentBuilder.TypeStrategy.Default.DECORATE)
             .installOn(inst);
         logger.info("Instrumentation installed.");
 
