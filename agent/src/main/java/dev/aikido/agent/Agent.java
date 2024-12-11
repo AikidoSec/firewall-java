@@ -33,22 +33,27 @@ public class Agent {
             .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
             .ignore(ElementMatchers.none())
             .type(
-                ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc.PgConnection")
+                // Database wrappers :
+                ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc")
+                .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc"))
+                .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc"))
+                .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc"))
+                // Spring wrappers :
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.filter.RequestContextFilter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
+                // File/Path Wrappers :
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
-                .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
-                .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
-                .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
-                .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
-                .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc.SQLServerConnection"))
-                .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc.Connection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
+                // Net wrappers :
+                .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
+                .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
+                // Shell wrappers :
+                .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
