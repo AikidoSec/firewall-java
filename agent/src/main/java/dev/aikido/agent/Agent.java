@@ -43,7 +43,7 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
                 // File/Path Wrappers :
-                .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
+                //.or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
                 // Net wrappers :
@@ -80,7 +80,7 @@ public class Agent {
             new PostgresWrapper(),
             new SpringFrameworkWrapper(),
             new SpringFrameworkBodyWrapper(),
-            new FileWrapper(),
+            //new FileWrapper(),
             new URLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
