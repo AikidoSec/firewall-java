@@ -27,15 +27,32 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.0.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.0.0'
     testImplementation 'org.junit-pioneer:junit-pioneer:2.2.0'
+    // Sink tests :
+    testImplementation 'org.postgresql:postgresql:42.2.23'
+    testImplementation 'mysql:mysql-connector-java:8.0.33'
+    testImplementation 'org.mariadb.jdbc:mariadb-java-client:3.0.5'
+    testImplementation 'com.microsoft.sqlserver:mssql-jdbc:10.2.0.jre8'
+
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
 
 test {
     jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
     jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
+    jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
+
     systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
+    if (project.hasProperty('coverageRun')) {
+        systemProperty 'AIK_INTERNAL_coverage_run', '1'
+    }
+
     useJUnitPlatform()
-    finalizedBy jacocoTestReport // report is always generated after tests run
+    finalizedBy jacocoTestReport
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
 }
 
 jacocoTestReport {
@@ -44,9 +61,8 @@ jacocoTestReport {
         csv.required = false
         html.required = false
     }
-    dependsOn test // tests are required to run before generating the report
+    dependsOn test
 }
-
 
 shadowJar {
     mergeServiceFiles()

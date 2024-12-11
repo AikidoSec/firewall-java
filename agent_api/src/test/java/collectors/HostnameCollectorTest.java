@@ -22,25 +22,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class HostnameCollectorTest {
+    InetAddress inetAddress1;
+    InetAddress inetAddress2;
+    @BeforeEach
+    void setup() throws UnknownHostException {
+        // We want to define InetAddresses here so it does not interfere with counts of getHostname()
+        inetAddress1 = InetAddress.getByName("1.1.1.1");
+        inetAddress2 = InetAddress.getByName("127.0.0.1");
+    }
+
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "token")
     @Test
-    public void testThreadCacheNull() throws UnknownHostException {
+    public void testThreadCacheNull() {
         // Early return because of Thread Cache being null :
         HostnameCollector.report("dev.aikido", new InetAddress[]{
-                InetAddress.getByName("1.1.1.1"),
-                InetAddress.getByName("127.0.0.1")
+                inetAddress1, inetAddress2
         });
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "token")
     @Test
-    public void testThreadCacheHostnames() throws UnknownHostException {
+    public void testThreadCacheHostnames() {
         ThreadCacheObject myThreadCache = mock(ThreadCacheObject.class);
         when(myThreadCache.getLastRenewedAtMS()).thenReturn(getUnixTimeMS());
         ThreadCache.set(myThreadCache);
         HostnameCollector.report("dev.aikido", new InetAddress[]{
-                InetAddress.getByName("1.1.1.1"),
-                InetAddress.getByName("127.0.0.1")
+                inetAddress1, inetAddress2
         });
         verify(myThreadCache).getHostnames();
 
@@ -52,15 +59,14 @@ public class HostnameCollectorTest {
 
         ThreadCache.set(myThreadCache);
         HostnameCollector.report("dev.aikido", new InetAddress[]{
-                InetAddress.getByName("1.1.1.1"),
-                InetAddress.getByName("127.0.0.1")
+                inetAddress1, inetAddress2
         });
         verify(myThreadCache, times(2)).getHostnames();
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "token")
     @Test
-    public void testHostnameSame() throws UnknownHostException {
+    public void testHostnameSame() {
         ThreadCacheObject myThreadCache = mock(ThreadCacheObject.class);
         when(myThreadCache.getLastRenewedAtMS()).thenReturn(getUnixTimeMS());
 
@@ -71,8 +77,7 @@ public class HostnameCollectorTest {
 
         ThreadCache.set(myThreadCache);
         HostnameCollector.report("dev.aikido", new InetAddress[]{
-                InetAddress.getByName("1.1.1.1"),
-                InetAddress.getByName("127.0.0.1")
+                inetAddress1, inetAddress2
         });
         verify(myThreadCache, times(2)).getHostnames();
     }
@@ -107,7 +112,7 @@ public class HostnameCollectorTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "1")
     @Test
-    public void testHostnameSameWithContextAsAttack() throws UnknownHostException {
+    public void testHostnameSameWithContextAsAttack() {
         ThreadCacheObject myThreadCache = mock(ThreadCacheObject.class);
         when(myThreadCache.getLastRenewedAtMS()).thenReturn(getUnixTimeMS());
 
@@ -120,9 +125,8 @@ public class HostnameCollectorTest {
         Context.set(new SampleContextObject());
         Exception exception = assertThrows(SSRFException.class, () -> {
             HostnameCollector.report("dev.aikido", new InetAddress[]{
-                            InetAddress.getByName("1.1.1.1"),
-                            InetAddress.getByName("127.0.0.1")
-                    });
+                    inetAddress1, inetAddress2
+            });
         });
         verify(myThreadCache, times(2)).getHostnames();
         assertEquals("Aikido Zen has blocked a server-side request forgery", exception.getMessage());

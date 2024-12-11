@@ -18,6 +18,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
+
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
     public static void premain(String agentArgs, Instrumentation inst) {
@@ -27,8 +29,7 @@ public class Agent {
         new AgentBuilder.Default()
             //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
             .disableClassFormatChanges()
-            // Applies a retransformation to all classes that are already loaded and that would have been transformed if the
-            // built agent was registered before they were loaded.
+            // Disabling this would impair our ability to wrap Java's own classes :
             .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
             .ignore(ElementMatchers.none())
             .type(
@@ -39,15 +40,26 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.lang"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
                 .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
                 .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc.SQLServerConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc.Connection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
             )
             .transform(AikidoTransformer.get())
             .with(AgentBuilder.TypeStrategy.Default.DECORATE)
             .installOn(inst);
+        logger.info("Instrumentation installed.");
 
+        if (parseAgentArgs(agentArgs).containsKey("mode")) {
+            String mode = parseAgentArgs(agentArgs).get("mode");
+            if (mode.equals("daemon-disabled")) {
+                // Background process is disabled, return :
+                logger.info("Running with background process disabled (mode: daemon-disabled)");
+                return;
+            }
+        }
         // Background process :
         BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
         backgroundProcess.setDaemon(true);
@@ -64,7 +76,9 @@ public class Agent {
             new SpringFrameworkInvokeWrapper(),
             new MysqlCJWrapper(),
             new MSSQLWrapper(),
-            new MariaDBWrapper()
+            new MariaDBWrapper(),
+            new PathWrapper(),
+            new PathsWrapper()
     );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {

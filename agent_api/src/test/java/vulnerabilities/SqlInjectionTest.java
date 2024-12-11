@@ -15,8 +15,8 @@ public class SqlInjectionTest {
             result = detectSqlInjection(sql, input, new Dialect("mysql"));
             assertFalse(result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
         }
-        if ("postgres".equals(dialect) || "all".equals(dialect)) {
-            result = detectSqlInjection(sql, input, new Dialect("postgres"));
+        if ("postgresql".equals(dialect) || "all".equals(dialect)) {
+            result = detectSqlInjection(sql, input, new Dialect("postgresql"));
             assertFalse(result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
         }
     }
@@ -26,8 +26,8 @@ public class SqlInjectionTest {
             result = detectSqlInjection(sql, input, new Dialect("mysql"));
             assertTrue(result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
         }
-        if ("postgres".equals(dialect) || "all".equals(dialect)) {
-            result = detectSqlInjection(sql, input, new Dialect("postgres"));
+        if ("postgresql".equals(dialect) || "all".equals(dialect)) {
+            result = detectSqlInjection(sql, input, new Dialect("postgresql"));
             assertTrue(result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
         }
     }
@@ -125,7 +125,7 @@ public class SqlInjectionTest {
         // User input is empty
         assertTrue(SqlDetector.shouldReturnEarly("SELECT * FROM users", ""));
 
-        // User input is a single char"postgres"acter
+        // User input is a single char"postgresql"acter
         assertTrue(SqlDetector.shouldReturnEarly("SELECT * FROM users", "a"));
 
         // User input is larger than query
@@ -234,7 +234,7 @@ public class SqlInjectionTest {
         );
 
         // Invalid query in postgres, tests fallback:
-        isSqlInjection("SELECT * FROM `comm` ents", "`comm` ents", "postgres");
+        isSqlInjection("SELECT * FROM `comm` ents", "`comm` ents", "postgresql");
 
         // MySQL Specific code:
         isSqlInjection("SELECT * FROM `comm` ents", "`comm` ents", "mysql");

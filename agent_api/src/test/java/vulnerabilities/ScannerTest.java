@@ -107,14 +107,14 @@ class ScannerTest {
     @Test
     void testScanSafeSQLCode() {
         // Safe :
-        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgres"});
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgresql"});
         // Argument-mismatch, safe :
         Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM"});
         Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
 
         // Unsafe :
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
@@ -125,29 +125,29 @@ class ScannerTest {
     void testBypassedIPs() {
         // Thread cache does not force any protection off :
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
         // Add IP to bypassed IP's :
         Context.set(new SampleContextObject2("1.1.1.1"));
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
         Context.set(new SampleContextObject2("3.3.3.3"));
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
 
         // Set to IP where protection is not forced off :
         Context.set(new SampleContextObject2("6.6.6.6"));
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
 
         // Set to bypassed IP, but first reset the thread cache :
         Context.set(new SampleContextObject2("1.1.1.1"));
         ThreadCache.set(null);
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
@@ -158,22 +158,22 @@ class ScannerTest {
     void testForceProtectionOff() {
         // Thread cache does not force any protection off :
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
         // Set to protection forced off route :
         Context.set(new SampleContextObject3("/api2/test/2/4"));
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
         Context.set(new SampleContextObject3("/api2/"));
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
 
         // Set to IP where route exists but protection is not forced off :
         Context.set(new SampleContextObject3("/api3/test"));
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
@@ -183,7 +183,7 @@ class ScannerTest {
     void testDoesNotRunWithContextNull() {
         Context.set(null);
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
@@ -193,7 +193,7 @@ class ScannerTest {
     void TestStillThrowsWithThreadCacheUndefined() {
         ThreadCache.set(null);
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgres"});
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 }

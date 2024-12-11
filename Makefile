@@ -24,10 +24,10 @@ mock_stop:
 	docker kill mock_core && docker rm mock_core
 
 test:
-	./gradlew test
+	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test
 
 cov:
-	./gradlew test jacocoTestReport
+	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test -PcoverageRun jacocoTestReport
 
 BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.26
 FILES = \

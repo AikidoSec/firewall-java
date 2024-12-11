@@ -1,10 +1,12 @@
 package dev.aikido.agent.wrappers;
+import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.reflect.Executable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -53,12 +55,12 @@ public class InetAddressWrapper implements Wrapper {
                     }
                 }
                 classLoader.close(); // Close the class loader
-            } catch(Throwable e) {
-                if(e.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    throw e; // Do throw an Aikido vulnerability
+            } catch (InvocationTargetException invocationTargetException) {
+                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                    throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            }
+            } catch(Throwable e) {}
         }
         @Advice.OnMethodEnter
         public static String before(
