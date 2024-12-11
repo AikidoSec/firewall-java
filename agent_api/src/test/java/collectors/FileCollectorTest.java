@@ -118,4 +118,27 @@ public class FileCollectorTest {
             FileCollector.report(filePath, "testOp");
         });
     }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
+    public void testMaxRecursion() {
+        isPathTraversalAttack(new Object[]{new Object[]{"/etc/home/../../test.txt.js"}}); // Depth of 1
+        isPathTraversalAttack(
+            new Object[]{
+                new Object[]{
+                    new Object[]{"/etc/home/../../test.txt.js"}
+                }
+            }
+        ); // Depth of
+        isNotPathTraversalAttack(
+            new Object[]{
+                new Object[]{
+                    new Object[]{
+                        new Object[]{"/etc/home/../../test.txt.js"}
+                    }
+                }
+            }
+        ); // Depth of 3
+    }
 }
