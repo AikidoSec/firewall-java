@@ -47,11 +47,14 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
                 // Net wrappers :
-                .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.net.URLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
                 .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
+                .or(ElementMatchers.nameContainsIgnoreCase("okhttp3.OkHttpClient"))
+                .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("CloseableHttpClient")))
+                .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("MinimalHttpClient")))
                 // Shell wrappers :
                 .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
             )
@@ -78,7 +81,7 @@ public class Agent {
             new SpringFrameworkWrapper(),
             new SpringFrameworkBodyWrapper(),
             new FileWrapper(),
-            new HttpURLConnectionWrapper(),
+            new URLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
             new SpringFrameworkInvokeWrapper(),
@@ -88,6 +91,8 @@ public class Agent {
             new HttpClientWrapper(),
             new HttpConnectionRedirectWrapper(),
             new HttpClientSendWrapper(),
+            new OkHttpWrapper(),
+            new ApacheHttpClientWrapper(),
             new PathWrapper(),
             new PathsWrapper()
     );
