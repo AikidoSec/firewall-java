@@ -15,13 +15,16 @@ import java.nio.file.Path;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
+/**
+ * This class wraps functions on the Path class, so once a Path object already exists,
+ * The following functions can still accept user input :
+ * - resolve(String|Path other)
+ * - relativize(Path other)
+ * - resolveSibling(String|Path other)
+ * See Oracle docs for more: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html
+ */
 public class PathWrapper implements Wrapper {
     public String getName() {
-        // Wrap Path functions :
-        // * resolve(String|Path other)
-        // * relativize(Path other)
-        // * resolveSibling(String|Path other)
-        // https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html
         return PathAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {

@@ -10,7 +10,12 @@ import java.nio.file.Path;
 
 public final class FileCollector {
     private FileCollector() {}
+    private static final int MAX_RECURSION_DEPTH = 3;
+
     public static void report(Object filePath, String operation) {
+        report(filePath, operation, 0); // Start with depth of zero
+    }
+    public static void report(Object filePath, String operation, int depth) {
         if (filePath == null) {
             return; // Make sure filePath is defined
         }
@@ -28,8 +33,11 @@ public final class FileCollector {
             Scanner.scanForGivenVulnerability(vulnerability, operation, new String[]{filePathString});
         } else if (filePath instanceof Object[] filePaths) {
             // In Paths.get() sometimes you can have multiple paths provided, scan them individually :
+            if (depth >= MAX_RECURSION_DEPTH) {
+                return;
+            }
             for (int i = 0; i < filePaths.length; i++) {
-                report(filePaths[i], operation);
+                report(filePaths[i], operation, depth + 1);
             }
         }
     }
