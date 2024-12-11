@@ -29,11 +29,10 @@ public class ApacheHttpClientWrapper implements Wrapper {
     }
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("CloseableHttpClient"))
-                .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("MinimalHttpClient")));
+        return ElementMatchers.nameContains("org.apache").and(ElementMatchers.nameEndsWith("HttpClient"));
     }
     public class ApacheHttpClientAdvice {
-        @Advice.OnMethodEnter
+        @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
                 @Advice.Argument(0) Object request
         ) {
@@ -49,7 +48,7 @@ public class ApacheHttpClientWrapper implements Wrapper {
                     Method toUriMethod = request.getClass().getMethod("getUri");
                     uri = (URI) toUriMethod.invoke(request);
 
-                } else {
+                } else if (request.getClass().toString().contains("HttpHost")) {
                     // This Object is an HttpHost object, we will use reflection to access the URL:
                     // We want to (safely) access request.toURI() (which returns a string)
                     Method toUriMethodString = request.getClass().getMethod("toURI");
