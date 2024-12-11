@@ -51,13 +51,15 @@ def run_benchmark(route1, route2, descriptor, percentage_limit, ms_limit):
 
         delta_in_ms = round(result_fw[1] - result_nofw[1], 2)
         print(f"-> Delta in ms: {delta_in_ms}ms after running load test on {descriptor}")
-        if delta_in_ms > ms_limit:
-            sys.exit(1)
+
         delay_percentage = round(
             (result_nofw[0] - result_fw[0]) / result_nofw[0] * 100
         )
         print(
             f"-> {delay_percentage}% decrease in throughput after running load test on {descriptor} \n"
         )
+
+        if delta_in_ms > ms_limit:
+            sys.exit(1)
         if delay_percentage > percentage_limit:
             sys.exit(1)
