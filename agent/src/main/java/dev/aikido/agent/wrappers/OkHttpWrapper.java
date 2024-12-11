@@ -32,7 +32,7 @@ public class OkHttpWrapper implements Wrapper {
                 .and(ElementMatchers.nameContainsIgnoreCase("newCall"));
     }
     public class OkHttpAdvice {
-        @Advice.OnMethodEnter
+        @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
                 @Advice.Argument(0) Object request
         ) {
