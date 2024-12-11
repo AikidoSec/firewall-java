@@ -15,10 +15,14 @@ import java.nio.file.Paths;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
+/**
+ * This class wraps the static get() function of Paths, this function is used
+ * to convert user input into a Path which leads to Path Traversal
+ * - Paths.get(...)
+ * See oracle docs for more: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Paths.html#get-java.lang.String-java.lang.String...-
+ */
 public class PathsWrapper implements Wrapper {
     public String getName() {
-        // Wrap Paths.get(...)
-        // https://docs.oracle.com/javase/8/docs/api/java/nio/file/Paths.html#get-java.lang.String-java.lang.String...-
         return GetFunctionAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
