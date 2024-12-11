@@ -47,7 +47,7 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
                 // Net wrappers :
-                .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("java.net.URLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
                 .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
                 .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
@@ -81,7 +81,7 @@ public class Agent {
             new SpringFrameworkWrapper(),
             new SpringFrameworkBodyWrapper(),
             new FileWrapper(),
-            new HttpURLConnectionWrapper(),
+            new URLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
             new SpringFrameworkInvokeWrapper(),

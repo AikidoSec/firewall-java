@@ -4,22 +4,19 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.io.IOException;
-import java.lang.reflect.Executable;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
-public class HttpURLConnectionWrapper implements Wrapper {
+public class URLConnectionWrapper implements Wrapper {
     public String getName() {
-        // Wrap Constructor of HttpURLConnection
-        // https://docs.oracle.com/javase/8/docs/api/java/net/HttpURLConnection.html
+        // Wrap Constructor of URLConnection
+        // https://docs.oracle.com/javase/8/docs/api/java/net/URLConnection.html
         return ConstructorAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
+        return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("java.net.URLConnection"))
                 .and(ElementMatchers.isConstructor());
     }
     public static class ConstructorAdvice {
