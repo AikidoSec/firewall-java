@@ -31,34 +31,32 @@ public class HttpClientWrapper implements Wrapper {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file, specified with the AIKIDO_DIRECTORY env variable
-        @Advice.OnMethodEnter
+        @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
                 @Advice.This(typing = DYNAMIC, optional = true) Object target,
                 @Advice.Argument(0) Object uriObject,
                 @Advice.Argument(2) Object httpRequestObject
-        ) {
-            try {
-                URI uri = (URI) uriObject;
-                HttpRequest httpRequest = (HttpRequest) httpRequestObject;
+        ) throws Exception {
+            URI uri = (URI) uriObject;
+            HttpRequest httpRequest = (HttpRequest) httpRequestObject;
 
-                // Call to collector :
-                String jarFilePath = System.getProperty("AIK_agent_api_jar");
-                URL[] urls = { new URL(jarFilePath) };
-                URLClassLoader classLoader = new URLClassLoader(urls);
+            // Call to collector :
+            String jarFilePath = System.getProperty("AIK_agent_api_jar");
+            URL[] urls = { new URL(jarFilePath) };
+            URLClassLoader classLoader = new URLClassLoader(urls);
 
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
+            // Load the class from the JAR
+            Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
 
-                // Run report func with its arguments
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        URL originUrl = httpRequest.uri().toURL();
-                        method2.invoke(null, originUrl, uri.toURL());
-                        break;
-                    }
+            // Run report func with its arguments
+            for (Method method2: clazz.getMethods()) {
+                if(method2.getName().equals("report")) {
+                    URL originUrl = httpRequest.uri().toURL();
+                    method2.invoke(null, originUrl, uri.toURL());
+                    break;
                 }
-                classLoader.close(); // Close the class loader
-            } catch (Throwable ignored) {}
+            }
+            classLoader.close(); // Close the class loader
         }
     }
 }

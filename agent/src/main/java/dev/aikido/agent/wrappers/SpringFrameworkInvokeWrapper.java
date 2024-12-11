@@ -32,7 +32,7 @@ public class SpringFrameworkInvokeWrapper implements Wrapper {
     }
 
     private static class SpringFrameworkInvokeWrapperAdvice {
-        @Advice.OnMethodEnter
+        @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(@Advice.Argument(0) HttpServletRequest httpServletRequest  ) {
             if (httpServletRequest == null) {
                 return;

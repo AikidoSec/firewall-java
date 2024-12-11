@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.lang.reflect.Executable;
 
 public class SpringFrameworkWrapper implements Wrapper {
@@ -39,32 +40,27 @@ public class SpringFrameworkWrapper implements Wrapper {
          * @return the first value of Object is used as a boolean, if it's true code will
          * not execute (skip execution). The second value is the servlet request.
          */
-        @Advice.OnMethodEnter(skipOn = SkipOnWrapper.class)
+        @Advice.OnMethodEnter(skipOn = SkipOnWrapper.class, suppress = Throwable.class)
         public static Object interceptOnEnter(
                 @Advice.Origin Executable method,
                 @Advice.Argument(0) Object request,
-                @Advice.Argument(1) Object response) {
-            try {
-                ContextObject contextObject = new SpringContextObject((HttpServletRequest) request);
+                @Advice.Argument(1) Object response) throws Throwable {
+            ContextObject contextObject = new SpringContextObject((HttpServletRequest) request);
 
-                // Write a new response:
-                WebRequestCollector.Res res = WebRequestCollector.report(contextObject);
-                if (res != null) {
-                    logger.debug("Writing a new response");
-                    HttpServletResponse newResponse = (HttpServletResponse) response;
-                    newResponse.setStatus(res.status());
-                    newResponse.setContentType("text/plain");
-                    newResponse.getWriter().write(res.msg());
-                    return new SkipOnWrapper(newResponse);
-                }
-                return response;
-            } catch (Throwable e) {
-                logger.debug(e);
+            // Write a new response:
+            WebRequestCollector.Res res = WebRequestCollector.report(contextObject);
+            if (res != null) {
+                logger.debug("Writing a new response");
+                HttpServletResponse newResponse = (HttpServletResponse) response;
+                newResponse.setStatus(res.status());
+                newResponse.setContentType("text/plain");
+                newResponse.getWriter().write(res.msg());
+                return new SkipOnWrapper(newResponse);
             }
-            return null;
+            return response;
         }
 
-        @Advice.OnMethodExit
+        @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
         public static void interceptOnExit(@Advice.Enter Object response) {
             if (response == null) {
                 return;

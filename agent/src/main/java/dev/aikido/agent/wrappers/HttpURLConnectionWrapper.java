@@ -26,10 +26,10 @@ public class HttpURLConnectionWrapper implements Wrapper {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file
-        @Advice.OnMethodExit
+        @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
         public static void before(
                 @Advice.This(typing = DYNAMIC, optional = true) HttpURLConnection target
-        ) {
+        ) throws Exception {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
@@ -39,23 +39,20 @@ public class HttpURLConnectionWrapper implements Wrapper {
             if (classLoader == null) {
                 return;
             }
+            if (target == null || target.getURL() == null) {
+                return;
+            }
+            // Load the class from the JAR
+            Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.URLCollector");
 
-            try {
-                if (target == null || target.getURL() == null) {
-                    return;
+            // Run report with "argument"
+            for (Method method2: clazz.getMethods()) {
+                if(method2.getName().equals("report")) {
+                    method2.invoke(null, target.getURL());
+                    break;
                 }
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.URLCollector");
-
-                // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        method2.invoke(null, target.getURL());
-                        break;
-                    }
-                }
-                classLoader.close(); // Close the class loader
-            } catch(Throwable ignored) {}
+            }
+            classLoader.close(); // Close the class loader
         }
     }
 }

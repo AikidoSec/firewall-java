@@ -23,7 +23,7 @@ public class SpringFrameworkBodyWrapper implements Wrapper {
     }
 
     private static class SpringFrameworkBodyWrapperAdvice {
-        @Advice.OnMethodExit
+        @Advice.OnMethodExit(suppress = Throwable.class)
         public static void interceptOnExit(@Advice.Return Object body) {
             RequestBodyCollector.report(body);
         }

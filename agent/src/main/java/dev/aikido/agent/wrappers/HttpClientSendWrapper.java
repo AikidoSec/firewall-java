@@ -30,7 +30,7 @@ public class HttpClientSendWrapper implements Wrapper {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file
-        @Advice.OnMethodEnter
+        @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
                 @Advice.Argument(0) HttpRequest httpRequest
         ) throws Exception {
@@ -47,19 +47,17 @@ public class HttpClientSendWrapper implements Wrapper {
                 return;
             }
 
-            try {
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.URLCollector");
+            // Load the class from the JAR
+            Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.URLCollector");
 
-                // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        method2.invoke(null, httpRequest.uri().toURL());
-                        break;
-                    }
+            // Run report with "argument"
+            for (Method method2: clazz.getMethods()) {
+                if(method2.getName().equals("report")) {
+                    method2.invoke(null, httpRequest.uri().toURL());
+                    break;
                 }
-                classLoader.close(); // Close the class loader
-            } catch(Throwable ignored) {}
+            }
+            classLoader.close(); // Close the class loader
         }
     }
 }
