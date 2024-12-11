@@ -39,6 +39,9 @@ public class Agent {
                 .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
+                .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
+                .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
                 .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
                 .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc.ConnectionImp"))
@@ -77,6 +80,9 @@ public class Agent {
             new MysqlCJWrapper(),
             new MSSQLWrapper(),
             new MariaDBWrapper(),
+            new HttpClientWrapper(),
+            new HttpConnectionRedirectWrapper(),
+            new HttpClientSendWrapper(),
             new PathWrapper(),
             new PathsWrapper()
     );

@@ -20,7 +20,9 @@ jobs:
         with:
           java-version: '21'
           distribution: 'adopt'
-
+      - name: Add local.aikido.io to /etc/hosts
+        run: |
+          sudo echo "127.0.0.1 local.aikido.io" | sudo tee -a /etc/hosts
       - name: Download binaries & Build with Gradle
         working-directory: ./
         run: chmod +x gradlew && make binaries && make build

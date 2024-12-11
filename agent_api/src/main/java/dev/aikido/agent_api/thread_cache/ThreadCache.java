@@ -1,9 +1,14 @@
 package dev.aikido.agent_api.thread_cache;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static dev.aikido.agent_api.thread_cache.ThreadCacheRenewal.renewThreadCache;
 
 public final class ThreadCache {
+    private static final Logger logger = LogManager.getLogger(ThreadCache.class);
+
     private ThreadCache() {}
 
     static final long timeToLiveMS = 60 * 1000; // 60 seconds
@@ -19,6 +24,7 @@ public final class ThreadCache {
             long timeElapsedSinceLastSync = getUnixTimeMS() - currentThreadCache.getLastRenewedAtMS();
             if (timeElapsedSinceLastSync > timeToLiveMS) {
                 // TTL exceeded, reset the cache.
+                logger.debug("TTL exceeded on a Thread Cache, renewing...");
                 reset();
                 currentThreadCache = null;
             }
@@ -34,6 +40,7 @@ public final class ThreadCache {
         return currentThreadCache;
     }
     public static void set(ThreadCacheObject threadCacheObject) {
+        logger.trace("Thread cache initialized or updated.");
         threadCache.set(threadCacheObject);
     }
     public static void reset() {
