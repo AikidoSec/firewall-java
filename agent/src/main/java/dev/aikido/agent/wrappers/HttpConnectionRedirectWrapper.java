@@ -2,12 +2,14 @@ package dev.aikido.agent.wrappers;
 
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,10 @@ public class HttpConnectionRedirectWrapper implements Wrapper {
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.nameContainsIgnoreCase("followRedirect0");
+    }
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.isSubTypeOf(HttpURLConnection.class);
     }
     public static class FollowRedirect0Advice {
         // Since we have to wrap a native Java Class stuff gets more complicated

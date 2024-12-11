@@ -3,6 +3,7 @@ package dev.aikido.agent.wrappers;
 import dev.aikido.agent_api.collectors.URLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,7 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.http.HttpClient;
 
 public class OkHttpWrapper implements Wrapper {
     public static final Logger logger = LogManager.getLogger(OkHttpWrapper.class);
@@ -20,6 +22,10 @@ public class OkHttpWrapper implements Wrapper {
         // Wrap newCall function which makes a HTTP Request
         // https://square.github.io/okhttp/5.x/okhttp/okhttp3/-ok-http-client/new-call.html
         return OkHttpAdvice.class.getName();
+    }
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.nameContains("okhttp3.OkHttpClient");
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("OkHttpClient"))

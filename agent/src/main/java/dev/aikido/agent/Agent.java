@@ -8,10 +8,16 @@ import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent.wrappers.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.asm.Advice;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.implementation.bytecode.StackManipulation;
+import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +26,9 @@ import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.agent.ByteBuddyInitializer.createAgentBuilder;
 import static dev.aikido.agent.DaemonStarter.startDaemon;
+import static dev.aikido.agent.Wrappers.WRAPPERS;
 import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
+import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
@@ -28,34 +36,14 @@ public class Agent {
         logger.info("Aikido Java Agent loaded.");
         setAikidoSysProperties();
 
+        ElementMatcher.Junction wrapperTypeDescriptors = ElementMatchers.none();
+        for(Wrapper wrapper: WRAPPERS) {
+            wrapperTypeDescriptors = wrapperTypeDescriptors.or(wrapper.getTypeMatcher());
+        }
+
         // Bytecode instrumentation :
         createAgentBuilder()
-            .type(
-                // Database wrappers :
-                ElementMatchers.nameContainsIgnoreCase("org.postgresql.jdbc")
-                .or(ElementMatchers.nameContainsIgnoreCase("com.mysql.cj.jdbc"))
-                .or(ElementMatchers.nameContainsIgnoreCase("com.microsoft.sqlserver.jdbc"))
-                .or(ElementMatchers.nameContainsIgnoreCase("org.mariadb.jdbc"))
-                // Spring wrappers :
-                .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.filter.RequestContextFilter"))
-                .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver"))
-                .or(ElementMatchers.nameContainsIgnoreCase("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"))
-                // File/Path Wrappers :
-                .or(ElementMatchers.nameContainsIgnoreCase("java.io.File"))
-                .or(ElementMatchers.nameContainsIgnoreCase("sun.nio.fs"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.nio.file.Path"))
-                // Net wrappers :
-                .or(ElementMatchers.nameContainsIgnoreCase("java.net.URLConnection"))
-                .or(ElementMatchers.nameContainsIgnoreCase("sun.net.www.protocol.http.HttpURLConnection"))
-                .or(ElementMatchers.nameContainsIgnoreCase("HttpClient"))
-                .or(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
-                .or(ElementMatchers.nameContainsIgnoreCase("java.net.InetAddress"))
-                .or(ElementMatchers.nameContainsIgnoreCase("okhttp3.OkHttpClient"))
-                .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("CloseableHttpClient")))
-                .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("MinimalHttpClient")))
-                // Shell wrappers :
-                .or(ElementMatchers.nameContainsIgnoreCase("java.lang.Runtime"))
-            )
+            .type(wrapperTypeDescriptors)
             .transform(AikidoTransformer.get())
             .installOn(inst);
 
@@ -63,31 +51,11 @@ public class Agent {
         
         startDaemon(agentArgs);
     }
-    private static final List<Wrapper> wrappers = Arrays.asList(
-            new PostgresWrapper(),
-            new SpringFrameworkWrapper(),
-            new SpringFrameworkBodyWrapper(),
-            new FileWrapper(),
-            new URLConnectionWrapper(),
-            new InetAddressWrapper(),
-            new RuntimeExecWrapper(),
-            new SpringFrameworkInvokeWrapper(),
-            new MysqlCJWrapper(),
-            new MSSQLWrapper(),
-            new MariaDBWrapper(),
-            new HttpClientWrapper(),
-            new HttpConnectionRedirectWrapper(),
-            new HttpClientSendWrapper(),
-            new OkHttpWrapper(),
-            new ApacheHttpClientWrapper(),
-            new PathWrapper(),
-            new PathsWrapper()
-    );
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
             var adviceAgentBuilder = new AgentBuilder.Transformer.ForAdvice()
                     .include(Agent.class.getClassLoader());
-            for(Wrapper wrapper: wrappers) {
+            for(Wrapper wrapper: WRAPPERS) {
                 // Add wrapper as advice :
                 adviceAgentBuilder = adviceAgentBuilder.advice(wrapper.getMatcher(), wrapper.getName());
             }

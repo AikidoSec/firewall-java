@@ -2,6 +2,7 @@ package dev.aikido.agent.wrappers;
 
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
@@ -25,6 +26,10 @@ public class HttpClientSendWrapper implements Wrapper {
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.isDeclaredBy(ElementMatchers.isSubTypeOf(HttpClient.class))
                 .and(ElementMatchers.named("send").or(ElementMatchers.named("sendAsync")));
+    }
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.isSubTypeOf(HttpClient.class);
     }
     public static class SendFunctionAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated

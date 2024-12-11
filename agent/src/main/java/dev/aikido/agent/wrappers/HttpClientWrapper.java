@@ -2,6 +2,7 @@ package dev.aikido.agent.wrappers;
 
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
@@ -26,6 +28,10 @@ public class HttpClientWrapper implements Wrapper {
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("jdk.internal.net.http.HttpRequestImpl"))
                 .and(ElementMatchers.nameContainsIgnoreCase("newInstanceForRedirection"));
+    }
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.isSubTypeOf(HttpClient.class);
     }
     public static class HttpClientAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated

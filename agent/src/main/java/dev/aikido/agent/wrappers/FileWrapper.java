@@ -1,6 +1,7 @@
 package dev.aikido.agent.wrappers;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.bytecode.Throw;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -24,8 +25,14 @@ public class FileWrapper implements Wrapper {
         return FileAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return isDeclaredBy(isSubTypeOf(File.class)).and(isConstructor());
+        return isDeclaredBy(none()).and(isConstructor());
     }
+
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.none();
+    }
+
     public static class FileAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
@@ -33,19 +40,22 @@ public class FileWrapper implements Wrapper {
         @Advice.OnMethodEnter
         public static void before(
                 @Advice.AllArguments(typing = DYNAMIC) Object[] argument
-        ) throws Throwable {
+        ) {
             try {
                 String prop = System.getProperty("AIK_INTERNAL_coverage_run");
                 if (prop != null && prop.equals("1")) {
                     return;
                 }
-            } catch (Throwable e) {return;}
+            } catch (Throwable e) {
+                return;
+            }
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
-                URL[] urls = { new URL(jarFilePath) };
+                URL[] urls = {new URL(jarFilePath)};
                 classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
+            } catch (MalformedURLException ignored) {
+            }
             if (classLoader == null) {
                 return;
             }
@@ -55,19 +65,20 @@ public class FileWrapper implements Wrapper {
                 Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.FileCollector");
 
                 // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
+                for (Method method2 : clazz.getMethods()) {
+                    if (method2.getName().equals("report")) {
                         method2.invoke(null, argument, "java.io.File");
                         break;
                     }
                 }
+                classLoader.close(); // Close the class loader
             } catch (InvocationTargetException invocationTargetException) {
-                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    throw invocationTargetException.getCause();
+                if (invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                    //throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            } catch(Throwable e) {}
-            classLoader.close(); // Close the class loader
+            } catch (Throwable e) {
+            }
         }
     }
 }

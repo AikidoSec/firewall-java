@@ -3,6 +3,7 @@ package dev.aikido.agent.wrappers;
 import dev.aikido.agent_api.collectors.URLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +26,11 @@ public class ApacheHttpClientWrapper implements Wrapper {
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("org.apache.http").and(ElementMatchers.nameContains("HttpClient")))
                 .and(ElementMatchers.nameContainsIgnoreCase("execute"));
+    }
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("CloseableHttpClient"))
+                .or(ElementMatchers.nameContains("org.apache.http").and(ElementMatchers.nameContainsIgnoreCase("MinimalHttpClient")));
     }
     public class ApacheHttpClientAdvice {
         @Advice.OnMethodEnter

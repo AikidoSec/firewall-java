@@ -5,8 +5,11 @@ import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
+
+import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class SpringFrameworkBodyWrapper implements Wrapper {
     @Override
@@ -20,6 +23,11 @@ public class SpringFrameworkBodyWrapper implements Wrapper {
     @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.nameContainsIgnoreCase("readWithMessageConverters");
+    }
+
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return nameContains("org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodArgumentResolver");
     }
 
     private static class SpringFrameworkBodyWrapperAdvice {

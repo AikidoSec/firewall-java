@@ -1,6 +1,7 @@
 package dev.aikido.agent.wrappers;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
@@ -13,6 +14,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
+import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
 /**
@@ -31,6 +33,12 @@ public class PathWrapper implements Wrapper {
         return ElementMatchers.isDeclaredBy(ElementMatchers.isSubTypeOf(Path.class)).and(
                 named("resolve").or(named("resolveSibling").or(named("relativize"))));
     }
+
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return nameContains("java.nio.file.Path");
+    }
+
     public static class PathAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
