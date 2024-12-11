@@ -62,4 +62,4 @@ jobs:
 
       - name: Run benchmark on spring-boot-postgres
         working-directory: ./benchmarks/wrk_benchmark
-        run: sleep 10 && make sb_postgres
+        run: sleep 20 && make sb_postgres
