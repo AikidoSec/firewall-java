@@ -25,12 +25,12 @@ public class FileWrapper implements Wrapper {
         return FileAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return isDeclaredBy(none()).and(isConstructor());
+        return isDeclaredBy(isSubTypeOf(File.class)).and(isConstructor()).and(takesArgument(0, String.class));
     }
 
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return ElementMatchers.none();
+        return ElementMatchers.isSubTypeOf(File.class);
     }
 
     public static class FileAdvice {
@@ -39,8 +39,8 @@ public class FileWrapper implements Wrapper {
         // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodEnter
         public static void before(
-                @Advice.AllArguments(typing = DYNAMIC) Object[] argument
-        ) {
+                @Advice.Argument(0) Object argument
+        ) throws Throwable {
             try {
                 String prop = System.getProperty("AIK_INTERNAL_coverage_run");
                 if (prop != null && prop.equals("1")) {
@@ -74,7 +74,7 @@ public class FileWrapper implements Wrapper {
                 classLoader.close(); // Close the class loader
             } catch (InvocationTargetException invocationTargetException) {
                 if (invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    //throw invocationTargetException.getCause();
+                    throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
             } catch (Throwable e) {
