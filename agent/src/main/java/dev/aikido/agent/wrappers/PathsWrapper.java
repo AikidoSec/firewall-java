@@ -40,7 +40,10 @@ public class PathsWrapper implements Wrapper {
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodEnter
-        public static void before(@Advice.AllArguments Object[] argument) throws Throwable {
+        public static void before(
+                @Advice.Argument(0) String argument1,
+                @Advice.Argument(value = 1, optional = true) String[] argument2
+            ) throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
@@ -58,7 +61,12 @@ public class PathsWrapper implements Wrapper {
                 // Run report with "argument"
                 for (Method method2: clazz.getMethods()) {
                     if(method2.getName().equals("report")) {
-                        method2.invoke(null, argument, "java.nio.file.Paths.get");
+                        if (argument1 != null) {
+                            method2.invoke(null, argument1, "java.nio.file.Paths.get");
+                        }
+                        if (argument2 != null) {
+                            method2.invoke(null, argument2, "java.nio.file.Paths.get");
+                        }
                         break;
                     }
                 }
