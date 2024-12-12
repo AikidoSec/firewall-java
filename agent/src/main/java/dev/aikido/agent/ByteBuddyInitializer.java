@@ -26,7 +26,11 @@ public final class ByteBuddyInitializer {
 
                 .with(AgentBuilder.DescriptionStrategy.Default.POOL_ONLY)
 
-                .ignore(ElementMatchers.none())
+                // Ignore Byte Buddy and Aikido's internal code:
+                .ignore(
+                        ElementMatchers.nameContains("bytebuddy")
+                        .or(ElementMatchers.nameContains("dev.aikido.agent"))
+                )
 
                 .with(AgentBuilder.TypeStrategy.Default.DECORATE);
     }
