@@ -15,7 +15,14 @@ public final class DaemonStarter {
         DAEMON_MODE daemonMode = getDaemonMode(agentArgs);
         if (daemonMode == DAEMON_MODE.DAEMON_ENABLED) {
             // Start the background process only if the daemon is enabled.
-            BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", Token.fromEnv());
+            Token token;
+            try {
+                token = Token.fromEnv();
+            } catch (Error e) {
+                logger.info("Failed to start background process due to an invalid token: {}", e.getMessage());
+                return;
+            }
+            BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", token);
             backgroundProcess.setDaemon(true);
             backgroundProcess.start();
         }
