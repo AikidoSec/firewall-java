@@ -12,11 +12,11 @@ import java.util.List;
 public final class Wrappers {
     private Wrappers() {}
     public static final List<Wrapper> WRAPPERS = Arrays.asList(
-            //new PostgresWrapper(),
-            new SpringFrameworkWrapper()
-            //new SpringFrameworkBodyWrapper()
-            //new SpringFrameworkInvokeWrapper()
-            /*new FileWrapper(),
+            new PostgresWrapper(),
+            new SpringFrameworkWrapper(),
+            new SpringFrameworkBodyWrapper(),
+            new SpringFrameworkInvokeWrapper(),
+            new FileWrapper(),
             new URLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
@@ -29,6 +29,6 @@ public final class Wrappers {
             new OkHttpWrapper(),
             new ApacheHttpClientWrapper(),
             new PathWrapper(),
-            new PathsWrapper()*/
+            new PathsWrapper()
     );
 }

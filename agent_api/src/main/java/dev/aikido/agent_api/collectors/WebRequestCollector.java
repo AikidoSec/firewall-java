@@ -29,7 +29,6 @@ public final class WebRequestCollector {
 
         // Check if IP is allowed :
         ThreadCacheObject threadCache = ThreadCache.get();
-        /*
         if (threadCache != null) {
             List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), threadCache.getEndpoints());
             if (!ipAllowedToAccessRoute(newContext.getRemoteAddress(), matchedEndpoints)) {
@@ -37,7 +36,7 @@ public final class WebRequestCollector {
                 msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
                 return new Res(msg, 403);
             }
-        }*/
+        }
         return null;
     }
 }
