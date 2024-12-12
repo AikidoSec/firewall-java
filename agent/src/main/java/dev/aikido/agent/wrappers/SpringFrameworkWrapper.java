@@ -57,6 +57,7 @@ public class SpringFrameworkWrapper implements Wrapper {
 
             // Write a new response:
             WebRequestCollector.Res res = WebRequestCollector.report(contextObject);
+            /*
             if (res != null) {
                 logger.debug("Writing a new response");
                 HttpServletResponse newResponse = (HttpServletResponse) response;
@@ -64,11 +65,11 @@ public class SpringFrameworkWrapper implements Wrapper {
                 newResponse.setContentType("text/plain");
                 newResponse.getWriter().write(res.msg());
                 return new SkipOnWrapper(newResponse);
-            }
+            }*/
             return response;
         }
 
-        @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
+        //@Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
         public static void interceptOnExit(@Advice.Enter Object response) {
             if (response == null) {
                 return;
