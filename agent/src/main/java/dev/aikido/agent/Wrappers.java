@@ -13,7 +13,7 @@ public final class Wrappers {
     private Wrappers() {}
     public static final List<Wrapper> WRAPPERS = Arrays.asList(
             new PostgresWrapper(),
-            //new SpringFrameworkWrapper(),
+            new SpringFrameworkWrapper(),
             //new SpringFrameworkBodyWrapper(),
             new FileWrapper(),
             new URLConnectionWrapper(),
