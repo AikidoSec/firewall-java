@@ -26,8 +26,8 @@ public final class Wrappers {
             new HttpClientWrapper(),
             new HttpConnectionRedirectWrapper(),
             new HttpClientSendWrapper(),
-            //new OkHttpWrapper(),
-            //new ApacheHttpClientWrapper(),
+            new OkHttpWrapper(),
+            new ApacheHttpClientWrapper(),
             new PathWrapper(),
             new PathsWrapper()
     );
