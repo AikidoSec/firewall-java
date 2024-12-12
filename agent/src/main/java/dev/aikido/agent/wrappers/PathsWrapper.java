@@ -32,7 +32,7 @@ public class PathsWrapper implements Wrapper {
 
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return nameContains("java.nio.file.Paths");
+        return isSubTypeOf(Paths.class);
     }
 
     public static class GetFunctionAdvice {

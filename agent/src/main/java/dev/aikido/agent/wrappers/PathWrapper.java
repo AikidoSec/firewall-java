@@ -14,8 +14,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
-import static net.bytebuddy.matcher.ElementMatchers.nameContains;
-import static net.bytebuddy.matcher.ElementMatchers.named;
+import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
  * This class wraps functions on the Path class, so once a Path object already exists,
@@ -36,7 +35,7 @@ public class PathWrapper implements Wrapper {
 
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return nameContains("java.nio.file.Path");
+        return isSubTypeOf(Path.class);
     }
 
     public static class PathAdvice {
@@ -46,7 +45,7 @@ public class PathWrapper implements Wrapper {
         @Advice.OnMethodEnter
         public static void before(
                 @Advice.Origin Executable method,
-                @Advice.Argument(0) Object argument
+                @Advice.Argument(value = 0, optional = true) Object argument
         ) throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
