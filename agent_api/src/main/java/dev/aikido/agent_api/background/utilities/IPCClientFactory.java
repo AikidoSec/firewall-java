@@ -9,12 +9,10 @@ public final class IPCClientFactory {
     private IPCClientFactory() {}
 
     public static IPCClient getDefaultIPCClient() {
-        try {
-            Token token = Token.fromEnv();
-            return new IPCClient(UDSPath.getUDSPath(token));
-        } catch (Error e) {
-            logger.debug("Failed to parse token. : {}", e.getMessage());
+        Token token = Token.fromEnv();
+        if (token == null) {
+            logger.debug("Invalid token");
         }
-        return null;
+        return new IPCClient(UDSPath.getUDSPath(token));
     }
 }

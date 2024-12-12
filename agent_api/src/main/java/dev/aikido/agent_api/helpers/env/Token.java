@@ -18,7 +18,11 @@ public class Token {
         return token;
     }
     public static Token fromEnv() {
-        return new Token(System.getenv("AIKIDO_TOKEN"));
+        String token = System.getenv("AIKIDO_TOKEN");
+        if (token == null || token.isEmpty()) {
+            return null;
+        }
+        return new Token(token);
     }
 
     /**
