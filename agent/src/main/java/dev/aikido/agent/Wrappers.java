@@ -12,23 +12,25 @@ import java.util.List;
 public final class Wrappers {
     private Wrappers() {}
     public static final List<Wrapper> WRAPPERS = Arrays.asList(
-            //new PostgresWrapper(),
-            //new SpringFrameworkWrapper(),
-            //new SpringFrameworkBodyWrapper(),
-            //new FileWrapper(),
-            //new URLConnectionWrapper(),
-            //new InetAddressWrapper(),
-            //new RuntimeExecWrapper(),
-            //new SpringFrameworkInvokeWrapper(),
-            //new MysqlCJWrapper(),
-            //new MSSQLWrapper(),
-            //new MariaDBWrapper(),
-            //new HttpClientWrapper(),
-            //new HttpConnectionRedirectWrapper(),
-            //new HttpClientSendWrapper(),
-            //new OkHttpWrapper(),
-            //new ApacheHttpClientWrapper()
-            //new PathWrapper(),
-            //new PathsWrapper()
+            new PostgresWrapper()
+            /*
+            new SpringFrameworkWrapper(),
+            new SpringFrameworkBodyWrapper(),
+            new FileWrapper(),
+            new URLConnectionWrapper(),
+            new InetAddressWrapper(),
+            new RuntimeExecWrapper(),
+            new SpringFrameworkInvokeWrapper(),
+            new MysqlCJWrapper(),
+            new MSSQLWrapper(),
+            new MariaDBWrapper(),
+            new HttpClientWrapper(),
+            new HttpConnectionRedirectWrapper(),
+            new HttpClientSendWrapper(),
+            new OkHttpWrapper(),
+            new ApacheHttpClientWrapper(),
+            new PathWrapper(),
+            new PathsWrapper()
+             */
     );
 }
