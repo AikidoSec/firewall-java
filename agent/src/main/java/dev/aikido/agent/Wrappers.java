@@ -15,20 +15,20 @@ public final class Wrappers {
             new PostgresWrapper(),
             new SpringFrameworkWrapper(),
             new SpringFrameworkBodyWrapper(),
-            new FileWrapper(),
-            new URLConnectionWrapper(),
-            new InetAddressWrapper(),
-            new RuntimeExecWrapper(),
+            //new FileWrapper(),
+            //new URLConnectionWrapper(),
+            //new InetAddressWrapper(),
+            //new RuntimeExecWrapper(),
             new SpringFrameworkInvokeWrapper(),
             new MysqlCJWrapper(),
             new MSSQLWrapper(),
             new MariaDBWrapper(),
-            new HttpClientWrapper(),
-            new HttpConnectionRedirectWrapper(),
-            new HttpClientSendWrapper(),
+            //new HttpClientWrapper(),
+            //new HttpConnectionRedirectWrapper(),
+            //new HttpClientSendWrapper(),
             new OkHttpWrapper(),
-            new ApacheHttpClientWrapper(),
-            new PathWrapper(),
-            new PathsWrapper()
+            new ApacheHttpClientWrapper()
+            //new PathWrapper(),
+            //new PathsWrapper()
     );
 }
