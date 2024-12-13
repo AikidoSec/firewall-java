@@ -1,12 +1,11 @@
 package dev.aikido.agent;
 
+import dev.aikido.agent_api.background.BackgroundProcess;
+import dev.aikido.agent_api.helpers.env.Token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Method;
-
 import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
-import static dev.aikido.agent.helpers.ClassLoader.fetchMethod;
 
 public final class DaemonStarter {
     private DaemonStarter() {}
@@ -16,12 +15,14 @@ public final class DaemonStarter {
         DAEMON_MODE daemonMode = getDaemonMode(agentArgs);
         if (daemonMode == DAEMON_MODE.DAEMON_ENABLED) {
             // Start the background process only if the daemon is enabled.
-            Method startMethod = fetchMethod("dev.aikido.agent_api.background.Starter", "start");
-            try {
-                startMethod.invoke(null);
-            } catch (Exception e) {
-                logger.info(e);
+            Token token = Token.fromEnv();
+            if (token == null) {
+                logger.info("Failed to start background process due to an invalid token");
+                return;
             }
+            BackgroundProcess backgroundProcess = new BackgroundProcess("main-background-process", token);
+            backgroundProcess.setDaemon(true);
+            backgroundProcess.start();
         }
     }
 
