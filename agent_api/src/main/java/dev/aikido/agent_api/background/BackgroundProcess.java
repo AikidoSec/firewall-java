@@ -8,6 +8,7 @@ import dev.aikido.agent_api.helpers.env.Token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Timer;
@@ -31,8 +32,7 @@ public class BackgroundProcess extends Thread {
         if (!Thread.currentThread().isDaemon() && token == null) {
             return; // Can only run if thread is daemon and token needs to be defined.
         }
-        Path socketPath = UDSPath.getUDSPath(token);
-        logger.debug("Background Process started, Listening on : {}", socketPath);
+        logger.debug("Background Process started");
         // Create a cloud-connection manager:
         this.connectionManager = new CloudConnectionManager(new BlockingEnv().getValue(), token, null);
         // Create a queue and a thread to handle attacks that need reporting in the background:
@@ -55,7 +55,8 @@ public class BackgroundProcess extends Thread {
                 /* delay: */ 0, /* interval: */ 2 * 1000 // Clear queue every 2 seconds
         );
         try {
-            IPCServer server = new IPCServer(socketPath, this);
+            File queueDir = UDSPath.getQueueDir(token);
+            IPCServer server = new IPCServer(queueDir, this);
         } catch (IOException | InterruptedException ignored) {
         }
         logger.debug("Background thread closing.");
