@@ -8,6 +8,7 @@ import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
+import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 
@@ -34,25 +35,29 @@ public final class WebResponseCollector {
             return;
         }
         IPCClient ipcClient = getDefaultIPCClient();
+        ThreadCacheObject threadCache = ThreadCache.get();
         Gson gson = new Gson();
-        // Report route :
-        if (ipcClient != null) {
+        if (threadCache == null || ipcClient == null || threadCache.getRoutes() == null) {
+            return;
+        }
+        Routes routes = threadCache.getRoutes();
+        RouteEntry currentRoute = routes.get(routeMetadata);
+        if (currentRoute == null) {
+            // Report route :
             String data = "INIT_ROUTE$" + gson.toJson(routeMetadata);
             ipcClient.sendData(data, false /* does not receive a response*/);
+
+            routes.initializeRoute(routeMetadata); // Initialize route in thread cache
+            currentRoute = routes.get(routeMetadata);
         }
 
         // API Spec code :
-        ThreadCacheObject threadCache = ThreadCache.get();
-        if (threadCache != null && threadCache.getRoutes() != null) {
-            threadCache.getRoutes().initializeRoute(routeMetadata); // Make sure route exists
-            RouteEntry route = threadCache.getRoutes().get(routeMetadata);
-            route.incrementHits(); // Increment hits so we can limit with constant:
-            if (route.getHits() <= ANALYSIS_ON_FIRST_X_REQUESTS && ipcClient != null) {
-                APISpec apiSpec = getApiInfo(context);
-                ApiDiscoveryCommand.Req req = new ApiDiscoveryCommand.Req(apiSpec, routeMetadata);
-                String apiDiscoveryStr = "API_DISCOVERY$" + gson.toJson(req);
-                ipcClient.sendData(apiDiscoveryStr, false /* does not receive a response*/);
-            }
+        currentRoute.incrementHits(); // Increment hits so we can limit with constant:
+        if (currentRoute.getHits() <= ANALYSIS_ON_FIRST_X_REQUESTS) {
+            APISpec apiSpec = getApiInfo(context);
+            ApiDiscoveryCommand.Req req = new ApiDiscoveryCommand.Req(apiSpec, routeMetadata);
+            String apiDiscoveryStr = "API_DISCOVERY$" + gson.toJson(req);
+            ipcClient.sendData(apiDiscoveryStr, false); // does not receive a response
         }
     }
 }
