@@ -3,7 +3,7 @@ package dev.aikido.agent_api;
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.ipc_commands.ShouldRateLimitCommand;
-import dev.aikido.agent_api.background.utilities.IPCClient;
+import dev.aikido.agent_api.background.utilities.ThreadClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
@@ -13,7 +13,7 @@ import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import java.util.List;
 import java.util.Optional;
 
-import static dev.aikido.agent_api.background.utilities.IPCClientFactory.getDefaultIPCClient;
+import static dev.aikido.agent_api.background.utilities.ThreadClientFactory.getDefaultThreadClient;
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
 import static dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder.getRateLimitedEndpoint;
 
@@ -43,8 +43,8 @@ public final class ShouldBlockRequest {
         // Rate-limiting :
         if (matches != null && getRateLimitedEndpoint(matches, context.getRoute()) != null) {
             // As an optimization check if the route is rate limited before sending over IPC
-            IPCClient ipcClient = getDefaultIPCClient();
-            if (ipcClient == null) {
+            ThreadClient threadClient = getDefaultThreadClient();
+            if (threadClient == null) {
                 return new ShouldBlockRequestResult(false, null); // Blocking false
             }
 

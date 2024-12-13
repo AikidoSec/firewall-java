@@ -12,7 +12,7 @@ public final class ThreadCacheRenewal {
     private ThreadCacheRenewal() {}
     public static ThreadCacheObject renewThreadCache() {
         // Fetch thread cache over IPC:
-        IPCClient client = getDefaultIPCClient();
+        ThreadClient client = getDefaultIPCClient();
         if (client == null) {
             return null;
         }

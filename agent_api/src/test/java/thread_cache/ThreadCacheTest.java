@@ -1,31 +1,26 @@
 package thread_cache;
 
 
-import com.google.gson.Gson;
-import dev.aikido.agent_api.background.ipc_commands.SyncDataCommand;
-import dev.aikido.agent_api.background.utilities.IPCClient;
+import dev.aikido.agent_api.background.utilities.ThreadClient;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import dev.aikido.agent_api.thread_cache.ThreadCacheRenewal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class ThreadCacheTest {
 
-    private IPCClient mockClient;
+    private ThreadClient mockClient;
 
     @BeforeEach
     public void setUp() {
-        mockClient = Mockito.mock(IPCClient.class);
+        mockClient = Mockito.mock(ThreadClient.class);
         //IPCDefaultClient.setClient(mockClient); // Assuming you have a way to set the client
     }
 
@@ -55,7 +50,7 @@ public class ThreadCacheTest {
         // Simulate time passing
         Thread.sleep(timeToLiveMS + 1);
 
-        // Mock the IPCClient to return a new cache
+        // Mock the ThreadClient to return a new cache
         SyncDataCommand.SyncDataResult result = new SyncDataCommand.SyncDataResult(Collections.emptyList(), Set.of("user3"), new Routes());
         String jsonResult = new Gson().toJson(result);
         when(mockClient.sendData("SYNC_DATA$", true)).thenReturn(Optional.of(jsonResult));

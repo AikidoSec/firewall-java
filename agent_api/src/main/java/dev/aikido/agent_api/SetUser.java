@@ -1,14 +1,14 @@
 package dev.aikido.agent_api;
 
 import com.google.gson.Gson;
-import dev.aikido.agent_api.background.utilities.IPCClient;
+import dev.aikido.agent_api.background.utilities.ThreadClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static dev.aikido.agent_api.background.utilities.IPCClientFactory.getDefaultIPCClient;
+import static dev.aikido.agent_api.background.utilities.ThreadClientFactory.getDefaultThreadClient;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public final class SetUser {
@@ -37,10 +37,10 @@ public final class SetUser {
         Context.set(currentContext);
 
         // Register user (Send to cloud)
-        IPCClient ipcClient = getDefaultIPCClient();
-        if (ipcClient != null) {
+        ThreadClient threadClient = getDefaultThreadClient();
+        if (threadClient != null) {
             String jsonDataPacket = new Gson().toJson(validatedUser);
-            ipcClient.sendData("REGISTER_USER$" + jsonDataPacket, false);
+            threadClient.send("REGISTER_USER$" + jsonDataPacket);
         }
     }
 }
