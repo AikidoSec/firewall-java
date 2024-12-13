@@ -1,11 +1,13 @@
 package dev.aikido.agent_api.helpers;
 
-import dev.aikido.agent_api.background.utilities.ThreadClient;
+import com.google.gson.Gson;
 import dev.aikido.agent_api.background.ipc_commands.BlockingEnabledCommand;
+import dev.aikido.agent_api.background.utilities.ThreadClient;
 import dev.aikido.agent_api.helpers.env.BlockingEnv;
 
-import static dev.aikido.agent_api.background.utilities.ThreadClientFactory.getDefaultThreadClient;
+import java.util.Optional;
 
+import static dev.aikido.agent_api.background.utilities.ThreadClientFactory.getDefaultThreadClient;
 
 public final class ShouldBlockHelper {
     private ShouldBlockHelper() {}
@@ -20,7 +22,7 @@ public final class ShouldBlockHelper {
             // Fallback on environment variable :
             return new BlockingEnv().getValue();
         }
-        Optional<String> response = client.sendData(
+        Optional<String> response = client.send(
                 "BLOCKING_ENABLED$", // data
                 true // receives a response
         );
@@ -31,6 +33,7 @@ public final class ShouldBlockHelper {
                 return res.isBlockingEnabled();
             }
         }
+
         // Fallback on environment variable :
         return new BlockingEnv().getValue();
     }

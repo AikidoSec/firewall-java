@@ -53,15 +53,14 @@ public final class ShouldBlockRequest {
             );
             Gson gson = new Gson();
             String jsonDataPacket = gson.toJson(shouldRateLimitReq);
-
-            Optional<String> res = ipcClient.sendData("SHOULD_RATE_LIMIT$" + jsonDataPacket, true);
+            Optional<String> res = threadClient.send("SHOULD_RATE_LIMIT$" + jsonDataPacket, true);
             if (res.isPresent() && !res.get().isEmpty()) {
                 ShouldRateLimit.RateLimitDecision rateLimitDecision = gson.fromJson(res.get(), ShouldRateLimit.RateLimitDecision.class);
                 if(rateLimitDecision.block()) {
                     BlockedRequestResult blockedRequestResult = new BlockedRequestResult(
                             "ratelimited", rateLimitDecision.trigger(), context.getRemoteAddress()
                     );
-                    return new ShouldBlockRequestResult(/*block:*/ true, blockedRequestResult);
+                    return new ShouldBlockRequestResult(true, blockedRequestResult);
                 }
             }
         }
