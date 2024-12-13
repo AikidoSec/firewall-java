@@ -14,12 +14,8 @@ public final class ThreadClientFactory {
         Token token = Token.fromEnv();
         if (token == null) {
             logger.debug("Invalid token");
+            return null;
         }
-        try {
-            return new ThreadClient(UDSPath.getQueueDir(token));
-        } catch (IOException e) {
-            logger.debug(e);
-        }
-        return null;
+        return new ThreadClient(UDSPath.getUDSPath(token));
     }
 }

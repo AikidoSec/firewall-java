@@ -40,7 +40,7 @@ public final class SetUser {
         ThreadClient threadClient = getDefaultThreadClient();
         if (threadClient != null) {
             String jsonDataPacket = new Gson().toJson(validatedUser);
-            threadClient.send("REGISTER_USER$" + jsonDataPacket);
+            threadClient.send("REGISTER_USER$" + jsonDataPacket, false);
         }
     }
 }

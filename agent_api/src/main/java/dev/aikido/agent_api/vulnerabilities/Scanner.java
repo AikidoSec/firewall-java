@@ -62,7 +62,7 @@ public final class Scanner {
         ThreadClient client = getDefaultThreadClient();
         logger.info("Attack detected: {}", json);
         if (client != null) {
-            client.send("ATTACK$" + json);
+            client.send("ATTACK$" + json, false);
         }
     }
 }

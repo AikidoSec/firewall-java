@@ -11,8 +11,9 @@ import java.nio.file.Path;
 public final class UDSPath {
     private UDSPath() {}
     private static final String prefix = "aikido_java";
-    public static File getQueueDir(Token token) throws IOException {
-        String tempName = String.format("%s_%s", prefix, token.hash());
-        return Files.createTempDirectory(tempName).toFile();
+    public static File getUDSPath(Token token) {
+        String temporaryDir = TemporaryDir.getTemporaryDir();
+        String hash = token.hash();
+        return Path.of(String.format("%s/%s_%s.sock", temporaryDir, prefix, hash)).toFile();
     }
 }

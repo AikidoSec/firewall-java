@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Timer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -55,8 +54,8 @@ public class BackgroundProcess extends Thread {
                 /* delay: */ 0, /* interval: */ 2 * 1000 // Clear queue every 2 seconds
         );
         try {
-            File queueDir = UDSPath.getQueueDir(token);
-            IPCServer server = new IPCServer(queueDir, this);
+            File queueDir = UDSPath.getUDSPath(token);
+            BackgroundReceiver server = new BackgroundReceiver(queueDir, this);
         } catch (IOException | InterruptedException ignored) {
         }
         logger.debug("Background thread closing.");

@@ -55,7 +55,7 @@ public final class HostnameCollector {
 
                 ThreadClient client = getDefaultThreadClient();
                 if (client != null) {
-                    client.send("ATTACK$" + json);
+                    client.send("ATTACK$" + json, false);
                 }
 
                 if (shouldBlock()) {
