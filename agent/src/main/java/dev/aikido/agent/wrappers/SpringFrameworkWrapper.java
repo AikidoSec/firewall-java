@@ -1,9 +1,5 @@
 package dev.aikido.agent.wrappers;
 
-import dev.aikido.agent_api.collectors.WebRequestCollector;
-import dev.aikido.agent_api.collectors.WebResponseCollector;
-import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.context.SpringContextObject;
 import jakarta.servlet.http.HttpServletResponse;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
@@ -17,7 +13,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Executable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
+import static dev.aikido.agent.helpers.ClassLoader.fetchMethod;
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class SpringFrameworkWrapper implements Wrapper {
@@ -44,6 +43,7 @@ public class SpringFrameworkWrapper implements Wrapper {
     private static class SpringFrameworkAdvice {
         // Wrapper to skip if it's inside this wrapper (i.e. our own response : )
         public record SkipOnWrapper(HttpServletResponse response) {};
+        public record Res(String msg, Integer status) {};
         /**
          * @return the first value of Object is used as a boolean, if it's true code will
          * not execute (skip execution). The second value is the servlet request.
@@ -53,9 +53,10 @@ public class SpringFrameworkWrapper implements Wrapper {
                 @Advice.Origin Executable method,
                 @Advice.Argument(0) Object request,
                 @Advice.Argument(1) Object response) throws Throwable {
-            ContextObject contextObject = new SpringContextObject((HttpServletRequest) request);
+            Method reportRequestMethod = fetchMethod("dev.aikido.agent_api.collectors.WebRequestCollector", "reportServletRequest");
+            Object rawResponse = reportRequestMethod.invoke(null, (HttpServletRequest) request);
+            Res res = (Res) rawResponse;
             // Write a new response:
-            WebRequestCollector.Res res = WebRequestCollector.report(contextObject);
             if (res != null) {
                 logger.debug("Writing a new response");
                 HttpServletResponse newResponse = (HttpServletResponse) response;
@@ -68,12 +69,13 @@ public class SpringFrameworkWrapper implements Wrapper {
         }
 
         @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
-        public static void interceptOnExit(@Advice.Enter Object response) {
+        public static void interceptOnExit(@Advice.Enter Object response) throws Exception {
             if (response == null) {
                 return;
             }
             if (response instanceof HttpServletResponse httpServletResponse) {
-                WebResponseCollector.report(httpServletResponse.getStatus()); // Report status code.
+                Method reportResponseMethod = fetchMethod("dev.aikido.agent_api.collectors.WebResponseCollector", "report");
+                reportResponseMethod.invoke(null, httpServletResponse.getStatus());
             }
         }
     }

@@ -1,6 +1,5 @@
 package dev.aikido.agent.wrappers;
 
-import dev.aikido.agent_api.collectors.URLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -9,11 +8,10 @@ import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URL;
+
+import static dev.aikido.agent.helpers.ClassLoader.fetchMethod;
 
 public class ApacheHttpClientWrapper implements Wrapper {
     public static final Logger logger = LogManager.getLogger(ApacheHttpClientWrapper.class);
@@ -57,10 +55,11 @@ public class ApacheHttpClientWrapper implements Wrapper {
                 }
                 if (uri != null) {
                     // Report the URL :
-                    URLCollector.report(uri.toURL());
+                    Method reportUrlCollector = fetchMethod("dev.aikido.agent_api.collectors.URLCollector", "report");
+                    reportUrlCollector.invoke(null, uri.toURL());
                 }
             } catch (Throwable e) {
-                logger.trace(e);
+                logger.debug(e);
             }
         }
     }

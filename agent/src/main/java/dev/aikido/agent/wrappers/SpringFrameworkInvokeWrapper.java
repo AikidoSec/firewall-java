@@ -1,8 +1,5 @@
 package dev.aikido.agent.wrappers;
 
-import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.SpringContextObject;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
@@ -10,7 +7,9 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.io.IOException;
+import java.lang.reflect.Method;
+
+import static dev.aikido.agent.helpers.ClassLoader.fetchMethod;
 
 /**
  * SpringFrameworkInvokeWrapper is a wrapper for the invokeHandlerMethod function
@@ -39,18 +38,13 @@ public class SpringFrameworkInvokeWrapper implements Wrapper {
 
     private static class SpringFrameworkInvokeWrapperAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static void before(@Advice.Argument(0) HttpServletRequest httpServletRequest  ) {
+        public static void before(@Advice.Argument(0) HttpServletRequest httpServletRequest  ) throws Exception {
             if (httpServletRequest == null) {
                 return;
             }
             Object pathVariables = httpServletRequest.getAttribute("org.springframework.web.servlet.HandlerMapping.uriTemplateVariables");
-            if (pathVariables != null) {
-                if (Context.get() instanceof SpringContextObject springContextObject) {
-                    // Set path variables in context object :
-                    springContextObject.setParams(pathVariables);
-                    Context.set(springContextObject);
-                }
-            }
+            Method reportParamsMethod = fetchMethod("dev.aikido.agent_api.collectors.ParamsCollector", "report");
+            reportParamsMethod.invoke(null, pathVariables);
         }
     }
 }

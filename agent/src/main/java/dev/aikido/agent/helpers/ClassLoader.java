@@ -10,18 +10,15 @@ import java.net.URLClassLoader;
 
 public final class ClassLoader {
     private static final Logger logger = LogManager.getLogger(ClassLoader.class);
-
+    public static final ThreadLocal<URLClassLoader> threadClassLoader = new ThreadLocal<>();
     public static Method fetchMethod(String classPkg, String methodName) {
         try {
-            String jarFilePath = System.getProperty("AIK_agent_api_jar");
-            URLClassLoader classLoader = null;
-            URL[] urls = {new URL(jarFilePath)};
-            classLoader = new URLClassLoader(urls);
-            if (classLoader == null) {
-                return null;
+            if (threadClassLoader.get() == null) {
+                String jarFilePath = System.getProperty("AIK_agent_api_jar");
+                URL[] urls = {new URL(jarFilePath)};
+                threadClassLoader.set(new URLClassLoader(urls, ClassLoader.class.getClassLoader()));
             }
-
-            // Load the class from the JAR
+            URLClassLoader classLoader = threadClassLoader.get();
             Class<?> clazz = classLoader.loadClass(classPkg);
 
             // Run report with "argument"

@@ -1,14 +1,14 @@
 package dev.aikido.agent.wrappers;
 
-import dev.aikido.agent_api.collectors.RequestBodyCollector;
-import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import java.lang.reflect.Method;
+
+import static dev.aikido.agent.helpers.ClassLoader.fetchMethod;
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class SpringFrameworkBodyWrapper implements Wrapper {
@@ -32,8 +32,9 @@ public class SpringFrameworkBodyWrapper implements Wrapper {
 
     private static class SpringFrameworkBodyWrapperAdvice {
         @Advice.OnMethodExit(suppress = Throwable.class)
-        public static void interceptOnExit(@Advice.Return Object body) {
-            RequestBodyCollector.report(body);
+        public static void interceptOnExit(@Advice.Return Object body) throws Exception {
+            Method reportBodyMethod = fetchMethod("dev.aikido.agent_api.collectors.RequestBodyCollector", "report");
+            reportBodyMethod.invoke(null, body);
         }
     }
 }

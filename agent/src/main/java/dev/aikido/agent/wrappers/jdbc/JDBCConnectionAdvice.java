@@ -1,7 +1,5 @@
 package dev.aikido.agent.wrappers.jdbc;
 
-import dev.aikido.agent_api.collectors.SQLCollector;
-import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -10,10 +8,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Executable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 
+import static dev.aikido.agent.helpers.ClassLoader.fetchMethod;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
 public final class JDBCConnectionAdvice {
@@ -42,10 +42,13 @@ public final class JDBCConnectionAdvice {
                 DatabaseMetaData metaData = connection.getMetaData();
                 String operation = "(" + metaData.getDriverName() + ") java.sql.Connection." + method.getName();
                 String dialect = metaData.getDatabaseProductName().toLowerCase();
-                SQLCollector.report(sql, dialect, operation);
 
-            } catch (AikidoException e) {
-                throw e;
+                Method reportSqlMethod = fetchMethod("dev.aikido.agent_api.collectors.SQLCollector", "report");
+                reportSqlMethod.invoke(null, sql, dialect, operation);
+            } catch (InvocationTargetException invocationTargetException) {
+                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                    throw invocationTargetException;
+                }
             } catch (Throwable e) {
                 logger.debug(e);
             }

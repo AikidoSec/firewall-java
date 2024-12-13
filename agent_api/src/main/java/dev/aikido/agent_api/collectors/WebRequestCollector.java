@@ -3,8 +3,11 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.context.SpringContextObject;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,5 +41,10 @@ public final class WebRequestCollector {
             }
         }
         return null;
+    }
+
+    public static Res reportServletRequest(HttpServletRequest request) {
+        ContextObject contextObject = new SpringContextObject(request);
+        return report(contextObject);
     }
 }
