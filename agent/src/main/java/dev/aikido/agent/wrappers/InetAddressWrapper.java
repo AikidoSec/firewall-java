@@ -1,5 +1,4 @@
 package dev.aikido.agent.wrappers;
-import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -13,7 +12,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.http.HttpClient;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 

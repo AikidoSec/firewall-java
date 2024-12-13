@@ -1,25 +1,12 @@
 package dev.aikido.agent;
 
-import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
-import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
-import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
-import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
-import dev.aikido.agent_api.background.BackgroundProcess;
-import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent.wrappers.*;
 import net.bytebuddy.agent.builder.AgentBuilder;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,8 +14,6 @@ import org.apache.logging.log4j.Logger;
 import static dev.aikido.agent.ByteBuddyInitializer.createAgentBuilder;
 import static dev.aikido.agent.DaemonStarter.startDaemon;
 import static dev.aikido.agent.Wrappers.WRAPPERS;
-import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
-import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
