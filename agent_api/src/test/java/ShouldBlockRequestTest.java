@@ -16,6 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.sql.SQLException;
@@ -196,6 +197,32 @@ public class ShouldBlockRequestTest {
         // Test with match & rate-limiting enabled :
         var res2 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(res2.block());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "")
+    public void testThreadClientInvalid() throws SQLException {
+        Context.set(new SampleContextObject());
+        ThreadCache.set(new ThreadCacheObject(List.of(
+                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
+        ), Set.of(), Set.of(), new Routes()));
+
+        // Test with match & rate-limiting enabled :
+        var res1 = ShouldBlockRequest.shouldBlockRequest();
+        assertFalse(res1.block());
+    }
+
+    @Test
+    @ClearEnvironmentVariable(key = "AIKIDO_TOKEN")
+    public void testThreadClientInvalid2() throws SQLException {
+        Context.set(new SampleContextObject());
+        ThreadCache.set(new ThreadCacheObject(List.of(
+                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
+        ), Set.of(), Set.of(), new Routes()));
+
+        // Test with match & rate-limiting enabled :
+        var res1 = ShouldBlockRequest.shouldBlockRequest();
+        assertFalse(res1.block());
     }
 
 }
