@@ -21,7 +21,7 @@ public class ApiDiscoveryCommand extends Command<ApiDiscoveryCommand.Req, Comman
 
     @Override
     public Optional<EmptyResult> execute(Req request, CloudConnectionManager connectionManager) {
-        if (request != null) {
+        if (request != null && request.routeMetadata() != null) {
             RouteEntry route = connectionManager.getRoutes().get(request.routeMetadata());
             if (route != null) {
                 route.updateApiSpec(request.apiSpec());
