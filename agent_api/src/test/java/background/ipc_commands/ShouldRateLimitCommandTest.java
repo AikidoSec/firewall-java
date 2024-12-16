@@ -1,8 +1,6 @@
 package background.ipc_commands;
 
 
-import com.google.gson.Gson;
-import dev.aikido.agent_api.Config;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
@@ -13,8 +11,6 @@ import dev.aikido.agent_api.ratelimiting.RateLimiter;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -25,13 +21,11 @@ import static org.mockito.Mockito.*;
 class ShouldRateLimitCommandTest {
     private ShouldRateLimitCommand command;
     private CloudConnectionManager connectionManager;
-    private Gson gson;
 
     @BeforeEach
     void setUp() {
         command = new ShouldRateLimitCommand();
         connectionManager = mock(CloudConnectionManager.class);
-        gson = new Gson();
     }
 
     @Test
@@ -54,16 +48,15 @@ class ShouldRateLimitCommandTest {
         when(rateLimiter.isAllowed(anyString(), anyLong(), anyLong())).thenReturn(true);
         when(connectionManager.getRateLimiter()).thenReturn(rateLimiter);
         // Create the request JSON
-        String requestJson = gson.toJson(new ShouldRateLimitCommand.Req(routeMetadata, user1, remoteAddress));
+        ShouldRateLimitCommand.Req req = new ShouldRateLimitCommand.Req(routeMetadata, user1, remoteAddress);
 
         // Act
-        Optional<String> result = command.execute(requestJson, connectionManager);
+        Optional<ShouldRateLimit.RateLimitDecision> result = command.execute(req, connectionManager);
 
         // Assert
         assertTrue(result.isPresent());
-        ShouldRateLimit.RateLimitDecision response = gson.fromJson(result.get(), ShouldRateLimit.RateLimitDecision.class);
-        assertFalse(response.block());
-        assertNull(response.trigger());
+        assertFalse(result.get().block());
+        assertNull(result.get().trigger());
     }
     @Test
     void testExecuteWithValidDataAndUserBlocked() {
@@ -85,16 +78,15 @@ class ShouldRateLimitCommandTest {
         when(rateLimiter.isAllowed(anyString(), anyLong(), anyLong())).thenReturn(false);
         when(connectionManager.getRateLimiter()).thenReturn(rateLimiter);
         // Create the request JSON
-        String requestJson = gson.toJson(new ShouldRateLimitCommand.Req(routeMetadata, user1, remoteAddress));
+        ShouldRateLimitCommand.Req req = new ShouldRateLimitCommand.Req(routeMetadata, user1, remoteAddress);
 
         // Act
-        Optional<String> result = command.execute(requestJson, connectionManager);
+        Optional<ShouldRateLimit.RateLimitDecision> result = command.execute(req, connectionManager);
 
         // Assert
         assertTrue(result.isPresent());
-        ShouldRateLimit.RateLimitDecision response = gson.fromJson(result.get(), ShouldRateLimit.RateLimitDecision.class);
-        assertTrue(response.block());
-        assertEquals("user", response.trigger());
+        assertTrue(result.get().block());
+        assertEquals("user", result.get().trigger());
     }
 
     @Test
@@ -118,16 +110,15 @@ class ShouldRateLimitCommandTest {
         when(connectionManager.getRateLimiter()).thenReturn(rateLimiter);
 
         // Create the request JSON
-        String requestJson = gson.toJson(new ShouldRateLimitCommand.Req(routeMetadata, user, remoteAddress));
+        ShouldRateLimitCommand.Req req = new ShouldRateLimitCommand.Req(routeMetadata, user, remoteAddress);
 
         // Act
-        Optional<String> result = command.execute(requestJson, connectionManager);
+        Optional<ShouldRateLimit.RateLimitDecision> result = command.execute(req, connectionManager);
 
         // Assert
         assertTrue(result.isPresent());
-        ShouldRateLimit.RateLimitDecision response = gson.fromJson(result.get(), ShouldRateLimit.RateLimitDecision.class);
-        assertTrue(response.block());
-        assertEquals("ip", response.trigger()); // Expecting the trigger to be "ip" since there's no user
+        assertTrue(result.get().block());
+        assertEquals("ip", result.get().trigger()); // Expecting the trigger to be "ip" since there's no user
     }
 
     @Test
@@ -151,16 +142,15 @@ class ShouldRateLimitCommandTest {
         when(connectionManager.getRateLimiter()).thenReturn(rateLimiter);
 
         // Create the request JSON
-        String requestJson = gson.toJson(new ShouldRateLimitCommand.Req(routeMetadata, user, remoteAddress));
+        ShouldRateLimitCommand.Req req = new ShouldRateLimitCommand.Req(routeMetadata, user, remoteAddress);
 
         // Act
-        Optional<String> result = command.execute(requestJson, connectionManager);
+        Optional<ShouldRateLimit.RateLimitDecision> result = command.execute(req, connectionManager);
 
         // Assert
         assertTrue(result.isPresent());
-        ShouldRateLimit.RateLimitDecision response = gson.fromJson(result.get(), ShouldRateLimit.RateLimitDecision.class);
-        assertTrue(response.block());
-        assertEquals("ip", response.trigger()); // Expecting the trigger to be "ip" since there's no user
+        assertTrue(result.get().block());
+        assertEquals("ip", result.get().trigger()); // Expecting the trigger to be "ip" since there's no user
     }
 
 }
