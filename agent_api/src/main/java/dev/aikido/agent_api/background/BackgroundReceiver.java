@@ -35,11 +35,11 @@ public class BackgroundReceiver {
     private void listen() throws IOException, InterruptedException {
         while (!socket.isClosed()) {
             AFUNIXSocket channel = socket.accept();
-            Optional<String> message = readFromSocket(channel);
+            Optional<byte[]> message = readFromSocket(channel);
             if (message.isEmpty()) {
                 continue;
             }
-            Optional<String> response = commandRouter.parseIPCInput(message.get());
+            Optional<byte[]> response = commandRouter.parseIPCInput(message.get());
             if (response.isPresent() && channel.isConnected()) {
                 writeToSocket(channel, response.get()); // Write response
             }
