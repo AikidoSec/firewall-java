@@ -33,10 +33,10 @@ public class ThreadClient {
 
             // Write a message :
             if (socket.isConnected()) {
-                writeToSocket(socket, data.toString());
+                writeToSocket(socket, data);
             }
             if (receive && socket.isConnected()) {
-                byte[] response = readFromSocket(socket).get().getBytes("utf-8");
+                byte[] response = readFromSocket(socket).get();
                 socket.close();
                 return Optional.of(response);
             }
