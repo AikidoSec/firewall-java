@@ -17,7 +17,7 @@ public final class SetUser {
 
     public record UserObject(String id, String name) {}
     public static void setUser(UserObject user) {
-        if(user.id().isEmpty() || user.name().isEmpty()) {
+        if(user.id() == null || user.id().isEmpty() || user.name() == null || user.name().isEmpty()) {
             logger.info("User ID or name cannot be empty.");
             return;
         }
