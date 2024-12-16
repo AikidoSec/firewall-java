@@ -13,8 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 public class CommandRouterTest {
@@ -31,7 +30,7 @@ public class CommandRouterTest {
     }
     @Test
     public void testIPCInputIsMalformed() {
-        Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED${}".getBytes(StandardCharsets.UTF_8));
+        Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED%{}".getBytes(StandardCharsets.UTF_8));
         assertTrue(result.isEmpty());
     }
 
@@ -46,11 +45,11 @@ public class CommandRouterTest {
         when(cloudConnectionManager.shouldBlock()).thenReturn(true);
         Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED${}".getBytes(StandardCharsets.UTF_8));
         assertTrue(result.isPresent());
-        assertEquals(Serializer.serializeData(new BlockingEnabledCommand.Res(true)), result.get());
+        assertArrayEquals(Serializer.serializeData(new BlockingEnabledCommand.Res(true)), result.get());
 
         when(cloudConnectionManager.shouldBlock()).thenReturn(false);
         Optional<byte[]> result2 = commandRouter.parseIPCInput("BLOCKING_ENABLED${}".getBytes(StandardCharsets.UTF_8));
         assertTrue(result2.isPresent());
-        assertEquals(Serializer.serializeData(new BlockingEnabledCommand.Res(false)), result2.get());
+        assertArrayEquals(Serializer.serializeData(new BlockingEnabledCommand.Res(false)), result2.get());
     }
 }
