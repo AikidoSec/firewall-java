@@ -55,7 +55,7 @@ public final class HostnameCollector {
 
                 ThreadIPCClient client = getDefaultThreadIPCClient();
                 if (client != null) {
-                    client.send("ATTACK$" + json, false);
+                    AttackCommand.sendAttack(client, req);
                 }
 
                 if (shouldBlock()) {

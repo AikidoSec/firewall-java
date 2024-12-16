@@ -39,8 +39,7 @@ public final class SetUser {
         // Register user (Send to cloud)
         ThreadIPCClient threadClient = getDefaultThreadIPCClient();
         if (threadClient != null) {
-            String jsonDataPacket = new Gson().toJson(validatedUser);
-            threadClient.send("REGISTER_USER$" + jsonDataPacket, false);
+            new RegisterUserCommand().send(threadClient, validatedUser);
         }
     }
 }

@@ -1,6 +1,5 @@
 package dev.aikido.agent_api.vulnerabilities;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
@@ -56,13 +55,9 @@ public final class Scanner {
         }
     }
     public static void reportAttack(Attack attack, ContextObject ctx) {
-        Gson gson = new Gson();
-        String json = gson.toJson(new AttackCommandData(attack, ctx));
 
-        ThreadIPCClient client = getDefaultThreadIPCClient();
-        logger.info("Attack detected: {}", json);
         if (client != null) {
-            client.send("ATTACK$" + json, false);
+            AttackCommand.sendAttack(client, new AttackCommand.Req(attack, ctx));
         }
     }
 }

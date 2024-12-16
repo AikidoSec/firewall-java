@@ -1,6 +1,5 @@
 package dev.aikido.agent_api.collectors;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
@@ -40,7 +39,6 @@ public final class WebResponseCollector {
         }
         ThreadIPCClient threadClient = getDefaultThreadIPCClient();
         ThreadCacheObject threadCache = ThreadCache.get();
-        Gson gson = new Gson();
         if (threadCache == null || threadClient == null || threadCache.getRoutes() == null) {
             return;
         }
@@ -48,9 +46,7 @@ public final class WebResponseCollector {
         RouteEntry currentRoute = routes.get(routeMetadata);
         if (currentRoute == null) {
             // Report route :
-            String data = "INIT_ROUTE$" + gson.toJson(routeMetadata);
-            threadClient.send(data, false);
-
+            new InitRouteCommand().send(threadClient, routeMetadata);
             routes.initializeRoute(routeMetadata); // Initialize route in thread cache
             currentRoute = routes.get(routeMetadata);
         }
@@ -60,8 +56,7 @@ public final class WebResponseCollector {
         if (currentRoute.getHits() <= ANALYSIS_ON_FIRST_X_REQUESTS) {
             APISpec apiSpec = getApiInfo(context);
             ApiDiscoveryCommand.Req req = new ApiDiscoveryCommand.Req(apiSpec, routeMetadata);
-            String apiDiscoveryStr = "API_DISCOVERY$" + gson.toJson(req);
-            threadClient.send(apiDiscoveryStr, false);
+            new ApiDiscoveryCommand().send(threadClient, req);
         }
     }
 }
