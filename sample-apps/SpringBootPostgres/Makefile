@@ -19,7 +19,7 @@ build:
 run: build
 	@echo "Running SpringBootPostgres with Zen & ENV (http://localhost:8080)"
 	AIKIDO_LOG_LEVEL="error" \
-	AIKIDO_TOKEN="random-invalid-token" \
+	AIKIDO_TOKEN="token" \
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCKING=1 \
