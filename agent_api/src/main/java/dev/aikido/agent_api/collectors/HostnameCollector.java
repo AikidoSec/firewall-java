@@ -1,10 +1,8 @@
 package dev.aikido.agent_api.collectors;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.FilteredContextObject;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.Attack;

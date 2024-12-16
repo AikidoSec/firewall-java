@@ -20,7 +20,7 @@ public class ContextObject implements Serializable {
     protected HashMap<String, String[]> query;
     protected HashMap<String, String> cookies;
     protected Serializable params;
-    protected Serializable body;
+    protected transient Object body;
     // Auxiliary :
     protected User user;
     protected boolean executedMiddleware;
@@ -32,10 +32,10 @@ public class ContextObject implements Serializable {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
-    public Serializable getBody() {
+    public Object getBody() {
         return body;
     }
-    public void setBody(Serializable newBody) {
+    public void setBody(Object newBody) {
         body = newBody;
     }
 
