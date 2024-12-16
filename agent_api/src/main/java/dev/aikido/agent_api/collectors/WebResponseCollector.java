@@ -30,7 +30,6 @@ public final class WebResponseCollector {
      * @param statusCode is the response status code
      */
     public static void report(int statusCode) {
-        if (statusCode <= 0) {
         ContextObject context = Context.get();
         if (statusCode <= 0 || context == null) {
             return; // Status code below or equal to zero: Invalid request
