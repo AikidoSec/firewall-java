@@ -13,7 +13,7 @@ public final class RequestBodyCollector {
      */
     public static void report(Object body) {
         ContextObject contextObj = Context.get();
-        contextObj.setBody((Serializable) body);
+        contextObj.setBody(body);
         Context.set(contextObj);
     }
 }

@@ -1,10 +1,8 @@
 package dev.aikido.agent_api.collectors;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
 import dev.aikido.agent_api.background.utilities.ThreadClient;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.FilteredContextObject;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.Attack;
@@ -51,7 +49,7 @@ public final class HostnameCollector {
                 logger.debug("SSRF Attack detected due to: {}:{}", hostname, hostnameEntry.getPort());
 
                 ThreadClient client = getDefaultThreadClient();
-                AttackCommand.Req req = new AttackCommand.Req(attack, new FilteredContextObject(Context.get()));
+                AttackCommand.Req req = new AttackCommand.Req(attack, Context.get());
                 if (client != null) {
                     AttackCommand.sendAttack(client, req);
                 }
