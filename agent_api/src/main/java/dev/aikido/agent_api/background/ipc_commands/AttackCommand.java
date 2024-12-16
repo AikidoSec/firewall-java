@@ -9,11 +9,12 @@ import dev.aikido.agent_api.vulnerabilities.Attack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
 public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResult> {
-    public record Req(Attack attack, ContextObject context) {}
+    public record Req(Attack attack, ContextObject context) implements Serializable {}
 
     private static final Logger logger = LogManager.getLogger(AttackCommand.class);
     private final BlockingQueue<APIEvent> queue;

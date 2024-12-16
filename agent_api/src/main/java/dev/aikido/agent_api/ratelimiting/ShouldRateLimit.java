@@ -5,6 +5,7 @@ import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
 
+import java.io.Serializable;
 import java.util.List;
 
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
@@ -12,7 +13,7 @@ import static dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder.getRat
 
 public final class ShouldRateLimit {
     private ShouldRateLimit() {}
-    public record RateLimitDecision(boolean block, String trigger) {}
+    public record RateLimitDecision(boolean block, String trigger) implements Serializable {}
     public static RateLimitDecision shouldRateLimit(
             RouteMetadata routeMetadata, User user, String remoteAddress, CloudConnectionManager connectionManager
     ) {

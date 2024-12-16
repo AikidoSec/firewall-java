@@ -4,12 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.aikido.agent_api.storage.RedirectNode;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-public class ContextObject {
+public class ContextObject implements Serializable {
     protected String method;
     protected String source;
     protected String url;
@@ -18,12 +19,12 @@ public class ContextObject {
     protected HashMap<String, String> headers;
     protected HashMap<String, String[]> query;
     protected HashMap<String, String> cookies;
-    protected Object params;
-    protected Object body;
+    protected Serializable params;
+    protected Serializable body;
     // Auxiliary :
     protected User user;
     protected boolean executedMiddleware;
-    protected ArrayList<RedirectNode> redirectStartNodes;
+    protected transient ArrayList<RedirectNode> redirectStartNodes;
 
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
@@ -31,10 +32,10 @@ public class ContextObject {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
-    public Object getBody() {
+    public Serializable getBody() {
         return body;
     }
-    public void setBody(Object newBody) {
+    public void setBody(Serializable newBody) {
         body = newBody;
     }
 
@@ -47,7 +48,7 @@ public class ContextObject {
     public List<RedirectNode> getRedirectStartNodes() { return redirectStartNodes; }
     public void addRedirectNode(RedirectNode node) { this.redirectStartNodes.add(node); }
 
-    public Object getParams() { return params; }
+    public Serializable getParams() { return params; }
     public String getUrl() {
         return url;
     }

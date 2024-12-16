@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,7 +83,7 @@ public class StringsFromContextTest {
 
     @Test
     public void testExtractsFromRequestAndBody() {
-        springContextObject.setBody(List.of("1", "20", "2"));
+        springContextObject.setBody((Serializable) List.of("1", "20", "2"));
         Map<String, Map<String, String>> strings = new StringsFromContext(springContextObject).getAll();
         assertEquals(Map.of(
                 "body", Map.of("1", ".[0]", "2", ".[2]", "20",".[1]"),
@@ -105,7 +106,7 @@ public class StringsFromContextTest {
     }
     @Test
     public void testExtractsFromRequestAndRouteParams() {
-        springContextObject.setParams(List.of("1", "20", "2"));
+        springContextObject.setParams((Serializable) List.of("1", "20", "2"));
         Map<String, Map<String, String>> strings = new StringsFromContext(springContextObject).getAll();
         assertEquals(Map.of(
                 "body", Map.of(),
