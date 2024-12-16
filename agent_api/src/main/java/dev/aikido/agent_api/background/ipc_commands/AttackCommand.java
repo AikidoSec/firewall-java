@@ -23,6 +23,7 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
         this.queue = queue;
     }
     public static void sendAttack(ThreadClient client, Req req) {
+        logger.debug("Attack detected: {}", req);
         new AttackCommand(null).send(client, req);
     }
 
