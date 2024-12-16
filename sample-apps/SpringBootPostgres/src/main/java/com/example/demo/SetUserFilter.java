@@ -21,7 +21,7 @@ public class SetUserFilter implements Filter {
             ServletRequest request,
             ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-        //setUser(new SetUser.UserObject("123", "John Doe"));
+        setUser(new SetUser.UserObject("123", "John Doe"));
         chain.doFilter(request, response);
     }
 }
