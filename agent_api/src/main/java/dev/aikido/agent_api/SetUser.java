@@ -1,6 +1,6 @@
 package dev.aikido.agent_api;
 
-import com.google.gson.Gson;
+import dev.aikido.agent_api.background.ipc_commands.RegisterUserCommand;
 import dev.aikido.agent_api.background.utilities.ThreadClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
@@ -39,8 +39,7 @@ public final class SetUser {
         // Register user (Send to cloud)
         ThreadClient threadClient = getDefaultThreadClient();
         if (threadClient != null) {
-            String jsonDataPacket = new Gson().toJson(validatedUser);
-            threadClient.send("REGISTER_USER$" + jsonDataPacket, false);
+            new RegisterUserCommand().send(threadClient, validatedUser);
         }
     }
 }

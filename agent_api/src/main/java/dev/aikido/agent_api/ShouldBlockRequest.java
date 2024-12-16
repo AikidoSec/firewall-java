@@ -1,6 +1,5 @@
 package dev.aikido.agent_api;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.ipc_commands.ShouldRateLimitCommand;
 import dev.aikido.agent_api.background.utilities.ThreadClient;
@@ -47,15 +46,13 @@ public final class ShouldBlockRequest {
             if (threadClient == null) {
                 return new ShouldBlockRequestResult(false, null); // Blocking false
             }
-
             ShouldRateLimitCommand.Req shouldRateLimitReq = new ShouldRateLimitCommand.Req(
                     context.getRouteMetadata(), context.getUser(), context.getRemoteAddress()
             );
-            Gson gson = new Gson();
-            String jsonDataPacket = gson.toJson(shouldRateLimitReq);
-            Optional<String> res = threadClient.send("SHOULD_RATE_LIMIT$" + jsonDataPacket, true);
-            if (res.isPresent() && !res.get().isEmpty()) {
-                ShouldRateLimit.RateLimitDecision rateLimitDecision = gson.fromJson(res.get(), ShouldRateLimit.RateLimitDecision.class);
+            Optional<ShouldRateLimit.RateLimitDecision> res =
+                    new ShouldRateLimitCommand().send(threadClient, shouldRateLimitReq);
+            if (res.isPresent()) {
+                ShouldRateLimit.RateLimitDecision rateLimitDecision = res.get();
                 if(rateLimitDecision.block()) {
                     BlockedRequestResult blockedRequestResult = new BlockedRequestResult(
                             "ratelimited", rateLimitDecision.trigger(), context.getRemoteAddress()
