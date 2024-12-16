@@ -1,8 +1,9 @@
 package dev.aikido.agent_api.vulnerabilities;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Attack {
+public class Attack implements Serializable {
     public final String operation;
     public final String kind;
     public final String source;

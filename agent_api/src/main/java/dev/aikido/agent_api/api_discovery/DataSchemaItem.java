@@ -1,5 +1,6 @@
 package dev.aikido.agent_api.api_discovery;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,7 +10,7 @@ public record DataSchemaItem(
         DataSchemaItem items,
         Map<String, DataSchemaItem> properties,
         Boolean optional
-) {
+) implements Serializable {
     public DataSchemaItem(DataSchemaType type) {
         // Set items and properties to null
         this(type, null, null, /* optional: */ false);

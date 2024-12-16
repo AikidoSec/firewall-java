@@ -15,7 +15,7 @@ public final class SetUser {
     private SetUser() {}
     private static final Logger logger = LogManager.getLogger(SetUser.class);
 
-    public record UserObject(String id, String name) {}
+    public record UserObject(String id, String name) implements Serializable {}
     public static void setUser(UserObject user) {
         if(user.id() == null || user.id().isEmpty() || user.name() == null || user.name().isEmpty()) {
             logger.info("User ID or name cannot be empty.");

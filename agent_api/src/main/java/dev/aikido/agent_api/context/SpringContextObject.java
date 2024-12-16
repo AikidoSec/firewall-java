@@ -3,6 +3,7 @@ package dev.aikido.agent_api.context;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public class SpringContextObject extends ContextObject{
         // So the parameters will be set later.
         this.params = null;
     }
-    public void setParams(Object params) {
+    public void setParams(Serializable params) {
         this.params = params;
     }
     private static HashMap<String, String> extractHeaders(HttpServletRequest request) {

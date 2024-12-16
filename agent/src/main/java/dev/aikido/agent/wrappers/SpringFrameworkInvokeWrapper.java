@@ -11,6 +11,7 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * SpringFrameworkInvokeWrapper is a wrapper for the invokeHandlerMethod function
@@ -47,7 +48,7 @@ public class SpringFrameworkInvokeWrapper implements Wrapper {
             if (pathVariables != null) {
                 if (Context.get() instanceof SpringContextObject springContextObject) {
                     // Set path variables in context object :
-                    springContextObject.setParams(pathVariables);
+                    springContextObject.setParams((Serializable) pathVariables);
                     Context.set(springContextObject);
                 }
             }

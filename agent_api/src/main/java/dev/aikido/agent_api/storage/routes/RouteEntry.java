@@ -3,13 +3,15 @@ package dev.aikido.agent_api.storage.routes;
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.context.RouteMetadata;
 
+import java.io.Serializable;
+
 import static dev.aikido.agent_api.api_discovery.APISpecMerger.mergeAPISpecs;
 
-public class RouteEntry {
+public class RouteEntry implements Serializable {
     final String method;
     final String path;
     private int hits;
-    public APISpec apispec;
+    public transient APISpec apispec;
 
     public RouteEntry(String method, String path) {
         this.method = method;

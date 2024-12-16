@@ -5,12 +5,13 @@ import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import static dev.aikido.agent_api.ratelimiting.ShouldRateLimit.shouldRateLimit;
 
 public class ShouldRateLimitCommand extends Command<ShouldRateLimitCommand.Req, ShouldRateLimit.RateLimitDecision> {
-    public record Req(RouteMetadata routeMetadata, User user, String remoteAddress) {}
+    public record Req(RouteMetadata routeMetadata, User user, String remoteAddress) implements Serializable {}
     @Override
     public boolean returnsData() {
         return true; // Returns a record with data on whether to rate-limit.
