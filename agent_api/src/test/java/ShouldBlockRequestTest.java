@@ -1,5 +1,6 @@
 import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.ShouldBlockRequest;
+import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -150,6 +152,50 @@ public class ShouldBlockRequestTest {
         var res4 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(res4.block());
         assertTrue(Context.get().middlewareExecuted());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    public void testEndpointsExistButNoMatch() throws SQLException {
+        Context.set(null);
+        ThreadCache.set(new ThreadCacheObject(List.of(
+                new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, false)
+        ), Set.of(), Set.of(), new Routes()));
+
+        // Test with thread cache set & rate-limiting disabled :
+        var res1 = ShouldBlockRequest.shouldBlockRequest();
+        assertFalse(res1.block());
+
+        Context.set(null);
+        ThreadCache.set(new ThreadCacheObject(List.of(
+                new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, true)
+        ), Set.of(), Set.of(), new Routes()));
+
+        // Test with thread cache set & rate-limiting enabled :
+        var res2 = ShouldBlockRequest.shouldBlockRequest();
+        assertFalse(res2.block());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    public void testEndpointsExistWithMatch() throws SQLException {
+        Context.set(null);
+        ThreadCache.set(new ThreadCacheObject(List.of(
+                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, false)
+        ), Set.of(), Set.of(), new Routes()));
+
+        // Test with match & rate-limiting disabled :
+        var res1 = ShouldBlockRequest.shouldBlockRequest();
+        assertFalse(res1.block());
+
+        Context.set(null);
+        ThreadCache.set(new ThreadCacheObject(List.of(
+                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
+        ), Set.of(), Set.of(), new Routes()));
+
+        // Test with match & rate-limiting enabled :
+        var res2 = ShouldBlockRequest.shouldBlockRequest();
+        assertFalse(res2.block());
     }
 
 }
