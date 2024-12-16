@@ -32,14 +32,12 @@ public abstract class Command<I, O> {
     public abstract Optional<O> execute(I data, CloudConnectionManager connectionManager);
 
     public Optional<O> send(ThreadClient threadClient, I input) {
-        logger.debug("[--> Sending over IPC: {}", input);
         try {
             byte[] inputAsBytes = serializeData(input);
             byte[] identifier = (getName() + "$").getBytes(StandardCharsets.UTF_8);
             Optional<byte[]> response = threadClient.send(joinByteArrays(identifier, inputAsBytes), returnsData());
             if(!response.isEmpty()) {
                 O data = deserializeData(response.get());
-                logger.debug("[<-- Data returned: {}", data);
                 return Optional.of(data);
             }
         } catch (Exception e) {

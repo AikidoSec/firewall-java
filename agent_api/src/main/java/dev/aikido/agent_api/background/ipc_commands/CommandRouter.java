@@ -52,7 +52,6 @@ public class CommandRouter {
             if (command.matchesName(commandName)) {
                 try {
                     Object deserializedInput = command.deserializeInput(data);
-                    logger.debug("-->] Received: {}", deserializedInput);
                     Optional<?> commandResult = command.execute(deserializedInput, this.connectionManager);
                     if (command.returnsData()) {
                         return Optional.of(serializeData(commandResult.get()));
