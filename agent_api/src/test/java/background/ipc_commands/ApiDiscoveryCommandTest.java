@@ -34,7 +34,7 @@ class ApiDiscoveryCommandTest {
         connectionManager = new CloudConnectionManager(true, new Token("token"), null);
         commandRouter = new CommandRouter(connectionManager, queue);
     }
-    
+
     @Test
     void testApiDiscoveryCommandWithInvalidRoute() {
         RouteMetadata routeMetadata = new RouteMetadata("/api/nonexistent", "localhost:5000/api/test", "GET"); // Create a valid RouteMetadata object

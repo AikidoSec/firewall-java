@@ -31,25 +31,25 @@ public class CommandRouterTest {
     }
     @Test
     public void testIPCInputIsMalformed() {
-        Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED%{}".getBytes(StandardCharsets.UTF_8));
+        Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED${}".getBytes(StandardCharsets.UTF_8));
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void testNonExistingCommand() {
-        Optional<byte[]> result = commandRouter.parseIPCInput("INVALID_COMMAND%{}".getBytes(StandardCharsets.UTF_8));
+        Optional<byte[]> result = commandRouter.parseIPCInput("INVALID_COMMAND${}".getBytes(StandardCharsets.UTF_8));
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void testShouldBlockCommand() throws IOException {
         when(cloudConnectionManager.shouldBlock()).thenReturn(true);
-        Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED%{}".getBytes(StandardCharsets.UTF_8));
+        Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED${}".getBytes(StandardCharsets.UTF_8));
         assertTrue(result.isPresent());
         assertEquals(Serializer.serializeData(new BlockingEnabledCommand.Res(true)), result.get());
 
         when(cloudConnectionManager.shouldBlock()).thenReturn(false);
-        Optional<byte[]> result2 = commandRouter.parseIPCInput("BLOCKING_ENABLED%{}".getBytes(StandardCharsets.UTF_8));
+        Optional<byte[]> result2 = commandRouter.parseIPCInput("BLOCKING_ENABLED${}".getBytes(StandardCharsets.UTF_8));
         assertTrue(result2.isPresent());
         assertEquals(Serializer.serializeData(new BlockingEnabledCommand.Res(false)), result2.get());
     }
