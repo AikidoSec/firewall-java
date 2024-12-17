@@ -29,7 +29,7 @@ run: build
 .PHONY: runWithoutZen
 runWithoutZen: build
 	@echo "Running SpringBootPostgres without Zen & ENV (http://localhost:8081)"
-	AIKIDO_TOKEN="random-invalid-token" \
+	AIKIDO_TOKEN="" \
 	nohup java -jar $(JAR_FILE) --server.port=8081 &
 
 # Clean the project
