@@ -4,6 +4,11 @@ import java.util.Map;
 
 public interface Detector {
     DetectorResult run(String userInput, String[] arguments);
+
+    default boolean returnEarly(String[] args) {
+        return false;
+    }
+
     public static class DetectorResult {
         private final boolean detectedAttack;
         private final Map<String, String> metadata;

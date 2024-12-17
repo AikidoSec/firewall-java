@@ -20,6 +20,10 @@ public final class Scanner {
     private Scanner() {}
     private static final Logger logger = LogManager.getLogger(Scanner.class);
     public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
+        Detector detector = vulnerability.getDetector();
+        if (detector.returnEarly(arguments)) {
+            return; // If input is in no way dangerous, do not loop oer user input
+        }
         ContextObject ctx = Context.get();
         if (shouldSkipVulnerabilityScan(ctx)) {
             return; // Bypassed IPs, protection forced off, ...
@@ -34,7 +38,7 @@ public final class Scanner {
                     String userInput = entry.getKey();
                     String path = entry.getValue();
                     // Run attack code :
-                    Detector.DetectorResult detectorResult = vulnerability.getDetector().run(userInput, arguments);
+                    Detector.DetectorResult detectorResult = detector.run(userInput, arguments);
                     if (!detectorResult.isDetectedAttack()) {
                         continue;
                     }
