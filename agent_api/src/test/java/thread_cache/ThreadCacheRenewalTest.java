@@ -26,7 +26,7 @@ public class ThreadCacheRenewalTest {
         BackgroundProcess backgroundProcess = new BackgroundProcess("test-background-process", new Token("token-2"));
         backgroundProcess.setDaemon(true);
         backgroundProcess.start();
-        Thread.sleep(4000); // Wait for bg process to initialize
+        Thread.sleep(8000); // Wait for bg process to initialize
 
         ThreadCacheObject threadCacheObject = ThreadCacheRenewal.renewThreadCache();
         assertNotNull(threadCacheObject);
