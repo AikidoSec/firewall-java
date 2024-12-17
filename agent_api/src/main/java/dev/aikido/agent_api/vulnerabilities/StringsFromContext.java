@@ -11,42 +11,23 @@ public class StringsFromContext {
     private final Map<String, String> headersStrings;
     private final Map<String, String> cookieStrings;
     private final Map<String, String> routeParamStrings;
+
     public StringsFromContext(ContextObject contextObject) {
-        // Body :
-        if (!contextObject.getCache().containsKey("body")) {
-            bodyStrings = StringExtractor.extractStringsFromObject(contextObject.getBody());
-            contextObject.getCache().put("body", bodyStrings);
-        } else {
-            bodyStrings = contextObject.getCache().get("body");
+        bodyStrings = loadFromCache(contextObject, "body", contextObject.getBody());
+        queryStrings = loadFromCache(contextObject, "query", contextObject.getQuery());
+        headersStrings = loadFromCache(contextObject, "headers", contextObject.getHeaders());
+        cookieStrings = loadFromCache(contextObject, "cookies", contextObject.getCookies());
+        routeParamStrings = loadFromCache(contextObject, "routeParams", contextObject.getParams());
+    }
+    private static Map<String, String> loadFromCache(ContextObject contextObject, String prop, Object data) {
+        if (contextObject.getCache().containsKey(prop)) {
+            return contextObject.getCache().get(prop);
         }
-        // Query :
-        if (!contextObject.getCache().containsKey("query")) {
-            queryStrings = StringExtractor.extractStringsFromObject(contextObject.getQuery());
-            contextObject.getCache().put("query", queryStrings);
-        } else {
-            queryStrings = contextObject.getCache().get("query");
+        Map<String, String> extractedStrings = StringExtractor.extractStringsFromObject(data);
+        if (extractedStrings != null && !extractedStrings.isEmpty()) {
+            contextObject.getCache().put(prop, extractedStrings);
         }
-        // Headers :
-        if (!contextObject.getCache().containsKey("headers")) {
-            headersStrings = StringExtractor.extractStringsFromObject(contextObject.getHeaders());
-            contextObject.getCache().put("headers", headersStrings);
-        } else {
-            headersStrings = contextObject.getCache().get("headers");
-        }
-        // Cookies :
-        if (!contextObject.getCache().containsKey("cookies")) {
-            cookieStrings = StringExtractor.extractStringsFromObject(contextObject.getCookies());
-            contextObject.getCache().put("cookies", cookieStrings);
-        } else {
-            cookieStrings = contextObject.getCache().get("cookies");
-        }
-        // route parameters :
-        if (!contextObject.getCache().containsKey("routeParams")) {
-            routeParamStrings = StringExtractor.extractStringsFromObject(contextObject.getParams());
-            contextObject.getCache().put("routeParams", routeParamStrings);
-        } else {
-            routeParamStrings = contextObject.getCache().get("routeParams");
-        }
+        return extractedStrings;
     }
     public Map<String, Map<String, String>> getAll() {
         return Map.of(
