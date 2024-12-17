@@ -1,4 +1,9 @@
 # Zen, in-app firewall for Java | by Aikido
+[![Codecov](https://img.shields.io/codecov/c/github/AikidoSec/firewall-java?style=flat-square&token=AJK9LU35GY)](https://app.codecov.io/gh/aikidosec/firewall-java) 
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Unit tests](https://github.com/AikidoSec/firewall-java/actions/workflows/gradle-tests.yml/badge.svg)](https://github.com/AikidoSec/firewall-java/actions/workflows/gradle-tests.yml)
+[![End to end tests](https://github.com/AikidoSec/firewall-java/actions/workflows/end2end.yml/badge.svg)](https://github.com/AikidoSec/firewall-java/actions/workflows/end2end.yml)
+
 Zen, your in-app firewall for peace of mind– at runtime.
 
 Zen is an embedded Web Application Firewall that autonomously protects your Java apps against common and critical attacks.
