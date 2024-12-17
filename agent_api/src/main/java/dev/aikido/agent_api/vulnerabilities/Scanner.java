@@ -19,7 +19,6 @@ import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.
 public final class Scanner {
     private Scanner() {}
     private static final Logger logger = LogManager.getLogger(Scanner.class);
-    private record AttackCommandData(Attack attack, ContextObject context) {}
     public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
         ContextObject ctx = Context.get();
         if (shouldSkipVulnerabilityScan(ctx)) {
