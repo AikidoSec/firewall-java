@@ -25,6 +25,7 @@ public class ContextObject implements Serializable {
     protected User user;
     protected boolean executedMiddleware;
     protected transient ArrayList<RedirectNode> redirectStartNodes;
+    protected transient Map<String, Map<String, String>> cache = new HashMap<>();
 
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
@@ -67,6 +68,7 @@ public class ContextObject implements Serializable {
     public HashMap<String, String> getCookies() {
         return cookies;
     }
+    public Map<String, Map<String, String>> getCache() { return cache; }
 
     public String toJson() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
