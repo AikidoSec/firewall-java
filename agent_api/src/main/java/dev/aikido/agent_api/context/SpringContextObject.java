@@ -12,17 +12,9 @@ import java.util.List;
 
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
-public class SpringContextObject extends ContextObject{
+public class SpringContextObject extends JakartaContextObject {
     public SpringContextObject(HttpServletRequest request) {
-        this.method = request.getMethod();
-        if (request.getRequestURL() != null) {
-            this.url = request.getRequestURL().toString();
-        }
-        this.remoteAddress = request.getRemoteAddr();
-        this.headers = extractHeaders(request);
-        this.query = extractQueryParameters(request);
-        this.cookies = extractCookies(request);
-        this.route = buildRouteFromUrl(this.url);
+        super(request);
         this.source = "SpringFramework";
         this.redirectStartNodes = new ArrayList<>();
 
@@ -32,31 +24,5 @@ public class SpringContextObject extends ContextObject{
     }
     public void setParams(Serializable params) {
         this.params = params;
-    }
-    private static HashMap<String, String> extractHeaders(HttpServletRequest request) {
-        HashMap<String, String> headersMap = new HashMap<>();
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames != null && headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = request.getHeader(headerName);
-            headersMap.put(headerName, headerValue);
-        }
-
-        return headersMap;
-    }
-    private static HashMap<String, String[]> extractQueryParameters(HttpServletRequest request) {
-        return new HashMap<>(request.getParameterMap());
-    }
-    private static HashMap<String, String> extractCookies(HttpServletRequest request) {
-        HashMap<String, String> cookiesMap = new HashMap<>();
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                cookiesMap.put(cookie.getName(), cookie.getValue());
-            }
-        }
-
-        return cookiesMap;
     }
 }
