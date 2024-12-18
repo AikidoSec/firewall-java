@@ -92,7 +92,8 @@ class ScannerTest {
         Scanner.scanForGivenVulnerability(mockVulnerability, "operation", new String[]{"arg1"});
 
         // Verify that no interactions occur when context is null
-        verifyNoInteractions(mockDetector);
+        verify(mockDetector, times(1)).returnEarly(new String[]{"arg1"}); // Verify returnEarly is called once
+        verifyNoMoreInteractions(mockDetector); // Verify no other methods are
     }
 
     // Disable IPC :
