@@ -29,6 +29,7 @@ public final class Wrappers {
             new OkHttpWrapper(),
             new ApacheHttpClientWrapper(),
             new PathWrapper(),
-            new PathsWrapper()
+            new PathsWrapper(),
+            new JavalinWrapper()
     );
 }
