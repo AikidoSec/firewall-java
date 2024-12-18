@@ -1,6 +1,5 @@
 package dev.aikido;
 
-import dev.aikido.models.Pet;
 import io.javalin.Javalin;
 
 import java.io.BufferedReader;
@@ -10,15 +9,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static dev.aikido.Helpers.*;
-import static io.javalin.util.FileUtil.readFile;
 
-public class Main {
+public class JavalinPostgres {
     public static class CommandRequest { public String userCommand;}
     public static class RequestRequest { public String url;}
     public static class CreateRequest { public String name;}
 
     public static void main(String[] args) {
-        Javalin app = Javalin.create().start(7000);
+        Javalin app = Javalin.create().start(Integer.valueOf(System.getProperty("portNumber", "8088")));
         // Serve the HTML pages
         app.get("/", ctx -> {
             ctx.html(loadHtmlFromFile("src/main/resources/index.html"));

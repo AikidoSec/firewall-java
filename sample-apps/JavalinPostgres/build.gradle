@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 group = 'dev.aikido'
@@ -21,4 +22,13 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+shadowJar {
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                'Main-Class': 'dev.aikido.JavalinPostgres'
+        )
+    }
 }
