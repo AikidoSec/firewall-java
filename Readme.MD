@@ -1,3 +1,6 @@
+![Zen by Aikido for Java](./docs/banner.svg)
+
+
 # Zen, in-app firewall for Java | by Aikido
 [![Codecov](https://img.shields.io/codecov/c/github/AikidoSec/firewall-java?style=flat-square&token=AJK9LU35GY)](https://app.codecov.io/gh/aikidosec/firewall-java) 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
