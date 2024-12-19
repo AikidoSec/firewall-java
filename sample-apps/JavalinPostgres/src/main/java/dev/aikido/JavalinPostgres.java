@@ -75,6 +75,11 @@ public class JavalinPostgres {
             String content = Helpers.readFile(filePath);
             ctx.result(content);
         });
+        app.get("/api/read/{path}", ctx -> {
+            String filePath = ctx.pathParam("path");
+            String content = Helpers.readFile(filePath);
+            ctx.result(content);
+        });
     }
 
     private static String loadHtmlFromFile(String filePath) {

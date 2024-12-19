@@ -30,6 +30,7 @@ public final class Wrappers {
             new PathWrapper(),
             new PathsWrapper(),
             new JavalinWrapper(),
-            new JavalinBodyWrapper()
+            new JavalinContextWrapper(),
+            new JavalinPathParamWrapper()
     );
 }
