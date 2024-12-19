@@ -1,10 +1,9 @@
 package dev.aikido.agent;
 
 import dev.aikido.agent.wrappers.*;
-import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
-import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
-import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
-import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
+import dev.aikido.agent.wrappers.javalin.*;
+import dev.aikido.agent.wrappers.jdbc.*;
+import dev.aikido.agent.wrappers.spring.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +29,7 @@ public final class Wrappers {
             new ApacheHttpClientWrapper(),
             new PathWrapper(),
             new PathsWrapper(),
-            new JavalinWrapper()
+            new JavalinWrapper(),
+            new JavalinBodyWrapper()
     );
 }

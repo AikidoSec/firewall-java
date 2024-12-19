@@ -1,8 +1,7 @@
-package dev.aikido.agent.wrappers;
+package dev.aikido.agent.wrappers.spring;
 
+import dev.aikido.agent.wrappers.Wrapper;
 import dev.aikido.agent_api.collectors.RequestBodyCollector;
-import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;

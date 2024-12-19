@@ -1,5 +1,6 @@
-package dev.aikido.agent.wrappers;
+package dev.aikido.agent.wrappers.spring;
 
+import dev.aikido.agent.wrappers.Wrapper;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.ContextObject;
@@ -15,7 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.lang.reflect.Executable;
 
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;

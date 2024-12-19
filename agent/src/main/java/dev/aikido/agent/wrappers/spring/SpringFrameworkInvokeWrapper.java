@@ -1,8 +1,8 @@
-package dev.aikido.agent.wrappers;
+package dev.aikido.agent.wrappers.spring;
 
+import dev.aikido.agent.wrappers.Wrapper;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.SpringContextObject;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
@@ -10,7 +10,6 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 /**
