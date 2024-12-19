@@ -28,6 +28,9 @@ public class URLConnectionWrapper implements Wrapper {
                 nameContains("JarURLConnection")
                 .or(nameContains("FileURLConnection"))
                 .or(nameContains("JavaRuntimeURLConnection"))
+                // Spring boot names to  be ignored :
+                .or(nameContains("JarUrlConnection"))
+                .or(nameContains("NestedUrlConnection"))
         ));
     }
 
