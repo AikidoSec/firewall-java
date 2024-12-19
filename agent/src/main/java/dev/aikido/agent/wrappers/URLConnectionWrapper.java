@@ -23,7 +23,12 @@ public class URLConnectionWrapper implements Wrapper {
 
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return ElementMatchers.nameContainsIgnoreCase("URLConnection");
+        return ElementMatchers.isSubTypeOf(URLConnection.class).and(not(
+                // Names to be ignored :
+                nameContains("JarURLConnection")
+                .or(nameContains("FileURLConnection"))
+                .or(nameContains("JavaRuntimeURLConnection"))
+        ));
     }
 
     public static class ConstructorAdvice {
