@@ -11,12 +11,23 @@ public class StringsFromContext {
     private final Map<String, String> headersStrings;
     private final Map<String, String> cookieStrings;
     private final Map<String, String> routeParamStrings;
+
     public StringsFromContext(ContextObject contextObject) {
-        bodyStrings = StringExtractor.extractStringsFromObject(contextObject.getBody());
-        queryStrings = StringExtractor.extractStringsFromObject(contextObject.getQuery());
-        headersStrings = StringExtractor.extractStringsFromObject(contextObject.getHeaders());
-        cookieStrings = StringExtractor.extractStringsFromObject(contextObject.getCookies());
-        routeParamStrings = StringExtractor.extractStringsFromObject(contextObject.getParams());
+        bodyStrings = loadFromCache(contextObject, "body", contextObject.getBody());
+        queryStrings = loadFromCache(contextObject, "query", contextObject.getQuery());
+        headersStrings = loadFromCache(contextObject, "headers", contextObject.getHeaders());
+        cookieStrings = loadFromCache(contextObject, "cookies", contextObject.getCookies());
+        routeParamStrings = loadFromCache(contextObject, "routeParams", contextObject.getParams());
+    }
+    private static Map<String, String> loadFromCache(ContextObject contextObject, String prop, Object data) {
+        if (contextObject.getCache().containsKey(prop)) {
+            return contextObject.getCache().get(prop);
+        }
+        Map<String, String> extractedStrings = StringExtractor.extractStringsFromObject(data);
+        if (extractedStrings != null && !extractedStrings.isEmpty()) {
+            contextObject.getCache().put(prop, extractedStrings);
+        }
+        return extractedStrings;
     }
     public Map<String, Map<String, String>> getAll() {
         return Map.of(

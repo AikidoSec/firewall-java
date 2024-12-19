@@ -36,4 +36,10 @@ public class HtmlController {
     public String pet_page(@PathVariable("id") Integer id) {
         return "pet_page";
     }
+
+    @GetMapping("/benchmark_1ms")
+    public String benchmark_route() throws InterruptedException {
+        Thread.sleep(1); // Sleep 1 millisecond
+        return "OK";
+    }
 }
