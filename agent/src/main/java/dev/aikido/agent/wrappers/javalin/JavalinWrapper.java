@@ -1,10 +1,10 @@
-package dev.aikido.agent.wrappers;
+package dev.aikido.agent.wrappers.javalin;
 
+import dev.aikido.agent.wrappers.Wrapper;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.JavalinContextObject;
-import dev.aikido.agent_api.context.SpringContextObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import net.bytebuddy.asm.Advice;
@@ -16,9 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.lang.reflect.Executable;
 
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class JavalinWrapper implements Wrapper {
@@ -34,13 +32,13 @@ public class JavalinWrapper implements Wrapper {
     }
     @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.named("handle").and(isDeclaredBy(nameContainsIgnoreCase("JavalinServlet")));
+        // io.javalin.http.servlet.JavalinServlet.handle
+        return ElementMatchers.named("handle").and(isDeclaredBy(nameEndsWith("JavalinServlet")));
     }
 
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return nameContains("io.javalin.http.servlet.JavalinServlet");
-        // io.javalin.http.servlet.JavalinServlet.handle
+        return nameEndsWith("io.javalin.http.servlet.JavalinServlet");
     }
 
     private static class JavalinAdvice {
