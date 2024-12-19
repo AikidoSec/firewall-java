@@ -17,6 +17,11 @@ public class JavalinPostgres {
 
     public static void main(String[] args) {
         Javalin app = Javalin.create().start(Integer.valueOf(System.getProperty("portNumber", "8088")));
+        // Register middleware:
+        app.before(new SetUserMiddleware());
+        app.before(new RateLimitingMiddleware());
+
+
         // Serve the HTML pages
         app.get("/", ctx -> {
             ctx.html(loadHtmlFromFile("src/main/resources/index.html"));
