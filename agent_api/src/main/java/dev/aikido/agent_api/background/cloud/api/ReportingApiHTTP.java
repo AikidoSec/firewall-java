@@ -1,7 +1,9 @@
 package dev.aikido.agent_api.background.cloud.api;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
+import dev.aikido.agent_api.storage.routes.RouteEntry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -70,7 +72,10 @@ public class ReportingApiHTTP extends ReportingApi {
             .header("Content-Type", "application/json") // Set Content-Type header
             .header("Authorization", token); // Set Authorization header
         if (event.isPresent()) {
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    // Use a custom serializer because api spec is transient in RouteEntry :
+                    .registerTypeAdapter(RouteEntry.class, new RouteEntry.RouteEntrySerializer())
+                    .create();
             String requestPayload = gson.toJson(event.get());
             return requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
                 .build();
