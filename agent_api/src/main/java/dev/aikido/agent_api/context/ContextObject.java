@@ -38,6 +38,7 @@ public class ContextObject implements Serializable {
     }
     public void setBody(Object newBody) {
         body = newBody;
+        this.cache.remove("body"); // Reset cache
     }
 
     public String getMethod() {
