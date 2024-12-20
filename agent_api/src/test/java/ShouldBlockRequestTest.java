@@ -38,7 +38,8 @@ public class ShouldBlockRequestTest {
             this.headers = new HashMap<>();
             this.query = new HashMap<>();
             this.cookies = new HashMap<>();
-            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
+            this.body = new HashMap<>();
+            this.body.put("test", "{\"key\":\"value\"}"); // Body as a JSON string
             this.executedMiddleware = false; // Start with "executed middleware" as false
         }
     }

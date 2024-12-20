@@ -38,7 +38,8 @@ public class SetUserTest {
             this.headers = new HashMap<>();
             this.query = new HashMap<>();
             this.cookies = new HashMap<>();
-            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
+            this.body = new HashMap<>();
+            this.body.put("test", "{\"key\":\"value\"}"); // Body as a JSON string
             this.executedMiddleware = true; // Start with "executed middleware" as true
         }
     }
