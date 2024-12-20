@@ -23,11 +23,14 @@ public class StringsFromContext {
         if (contextObject.getCache().containsKey(prop)) {
             return contextObject.getCache().get(prop);
         }
+
         Map<String, String> extractedStrings = StringExtractor.extractStringsFromObject(data);
-        if (extractedStrings != null && !extractedStrings.isEmpty()) {
+        if (extractedStrings != null) {
             contextObject.getCache().put(prop, extractedStrings);
+            return extractedStrings;
         }
-        return extractedStrings;
+
+        return Map.of();
     }
     public Map<String, Map<String, String>> getAll() {
         return Map.of(
