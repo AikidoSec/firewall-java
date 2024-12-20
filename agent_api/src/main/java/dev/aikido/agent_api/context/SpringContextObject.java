@@ -13,6 +13,8 @@ import java.util.List;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
 public class SpringContextObject extends ContextObject{
+    // We use this map for when @RequestBody does not get used :
+    protected transient Map<String, Object> bodyMap = new HashMap<>();
     public SpringContextObject(HttpServletRequest request) {
         this.method = request.getMethod();
         if (request.getRequestURL() != null) {
@@ -29,6 +31,18 @@ public class SpringContextObject extends ContextObject{
         // We don't have access yet to the route parameters: doFilter() is called before the Controller
         // So the parameters will be set later.
         this.params = null;
+    }
+    @Override
+    public Object getBody() {
+        if (this.body != null) {
+            // @RequestBody was used, all data is available :
+            return this.body;
+        }
+        return this.bodyMap; // Use the selected fields that were extracted.
+    }
+    public void setBodyElement(String key, Object value) {
+        bodyMap.put(key, value);
+        cache.remove("body"); // Reset body cache.
     }
     public void setParams(Serializable params) {
         this.params = params;

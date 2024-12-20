@@ -64,28 +64,21 @@ public class SpringFrameworkBodyWrapper implements Wrapper {
             Parameter[] parameters = method.getParameters();
             for (int i = 0; i < parameters.length; i++) {
                 Parameter parameter = parameters[i];
-                String key = checkAnnotationsArray(parameter.getDeclaredAnnotations(), parameter);
-                if (key != null) {
-                    Object value = args[i];
-                    RequestBodyCollector.report(key, value);
+                for (Annotation annotation: parameter.getDeclaredAnnotations()) {
+                    String annotStr = annotation.toString();
+                    if (annotStr.contains("org.springframework.web.bind.annotation.RequestBody")) {
+                        // RequestBody includes all data so we report everything as one block:
+                        // Also important for API Discovery that we get the exact overview
+                        RequestBodyCollector.report(args[i]);
+                        return; // You can safely return here without missing more data
+                    }
+                    if (annotStr.contains("org.springframework.web.bind.annotation.RequestParam")) {
+                        String identifier = parameter.getName();
+                        RequestBodyCollector.report(identifier, args[i]);
+                        break; // You can safely exit for-loop, but we still want to scan other arguments.
+                    }
                 }
             }
         }
-    }
-
-    public static String checkAnnotationsArray(Annotation[] annotations, Parameter parameter) {
-        for (Annotation annotation: annotations) {
-            String annotStr = annotation.toString();
-            if (annotStr.contains("org.springframework.web.bind.annotation.RequestBody") ||
-                    annotStr.contains("org.springframework.web.bind.annotation.RequestParam")) {
-                if (parameter.getName() != null) {
-                    return parameter.getName(); // Return the name of the parameter
-                }
-                // Return the simplified name of the class that contains the data :
-                return parameter.getType().getSimpleName();
-            }
-        }
-
-        return null;
     }
 }
