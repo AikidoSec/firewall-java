@@ -32,6 +32,7 @@ public class SpringContextObject extends ContextObject{
     }
     public void setParams(Serializable params) {
         this.params = params;
+        this.cache.remove("routeParams"); // Reset cache
     }
     private static HashMap<String, String> extractHeaders(HttpServletRequest request) {
         HashMap<String, String> headersMap = new HashMap<>();
