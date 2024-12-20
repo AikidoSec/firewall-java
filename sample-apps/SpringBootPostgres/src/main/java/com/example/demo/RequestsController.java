@@ -16,8 +16,8 @@ import java.util.Scanner;
 @RequestMapping("/api/requests") // Base URL for all routes in this controller
 public class RequestsController {
     @PostMapping(path = "/get",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+            produces = MediaType.TEXT_HTML_VALUE)
     public String get(@RequestParam(name="url") String url2) throws IOException, InterruptedException {
         System.out.println("Making request to: "+ url2);
         return sendGetRequest2(url2);

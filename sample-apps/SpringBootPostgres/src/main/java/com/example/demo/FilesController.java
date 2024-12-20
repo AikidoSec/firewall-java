@@ -11,7 +11,7 @@ import java.util.Scanner;
 @RequestMapping("/api/files") // Base URL for all routes in this controller
 public class FilesController {
     @PostMapping(path = "/read",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public String read(@RequestParam String fileName) {
         System.out.println("Reading file: "+ fileName);
