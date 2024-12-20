@@ -83,7 +83,7 @@ public class StringsFromContextTest {
 
     @Test
     public void testExtractsFromRequestAndBody() {
-        springContextObject.setBody((Serializable) List.of("1", "20", "2"));
+        springContextObject.setBodyElement("main", List.of("1", "20", "2"));
         Map<String, Map<String, String>> strings = new StringsFromContext(springContextObject).getAll();
         assertEquals(Map.of(
                 "body", Map.of("1", ".[0]", "2", ".[2]", "20",".[1]"),

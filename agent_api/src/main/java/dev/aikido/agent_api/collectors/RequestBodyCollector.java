@@ -11,9 +11,9 @@ public final class RequestBodyCollector {
      * Handles body of request (which comes later than request)
      * @param body can be any object representing incoming data.
      */
-    public static void report(Object body) {
+    public static void report(String identifier, Object body) {
         ContextObject contextObj = Context.get();
-        contextObj.setBody(body);
+        contextObj.setBodyElement(identifier, body);
         Context.set(contextObj);
     }
 }

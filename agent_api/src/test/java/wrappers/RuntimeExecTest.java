@@ -34,7 +34,8 @@ public class RuntimeExecTest {
             this.query.put("arg", new String[]{argument});
 
             this.cookies = new HashMap<>();
-            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
+            this.body = new HashMap<>();
+            this.body.put("test", "{\"key\":\"value\"}"); // Body as a JSON string
         }
     }
 
