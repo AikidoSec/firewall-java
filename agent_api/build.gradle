@@ -11,7 +11,7 @@ jacoco {
 
 dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0' // For Context object (Spring Boot)
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2' // For JWTs
     implementation 'com.github.jnr:jnr-ffi:2.2.17'
