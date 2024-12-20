@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -49,8 +48,7 @@ class AttackCommandTest {
             this.cookies.put("sessionId", "abc123");
 
             // Set the body
-            this.body = new HashMap<>();
-            this.body.put("test", "{\"key\":\"value\"}"); // Body as a JSON string
+            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
         }
     }
     @BeforeEach

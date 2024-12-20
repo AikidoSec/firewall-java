@@ -35,8 +35,7 @@ public class MariadbWrapperTest {
             this.query = new HashMap<>();
             this.query.put("sql1", new String[]{argument});
             this.cookies = new HashMap<>();
-            this.body = new HashMap<>();
-            this.body.put("test", "{\"key\":\"value\"}"); // Body as a JSON string
+            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
         }
     }
 

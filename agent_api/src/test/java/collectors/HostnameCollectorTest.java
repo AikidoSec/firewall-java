@@ -105,8 +105,7 @@ public class HostnameCollectorTest {
             this.cookies.put("sessionId", "dev.aikido");
 
             // Set the body
-            this.body = new HashMap<>();
-            this.body.put("test", "{\"key\":\"value\"}"); // Body as a JSON string
+            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
         }
     }
 
