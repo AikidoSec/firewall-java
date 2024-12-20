@@ -1,7 +1,9 @@
 package dev.aikido.agent_api.helpers.patterns;
 
 import java.util.Base64;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -24,8 +26,10 @@ public final class LooksLikeJWT {
         try {
             // Decode the middle part (payload) of the JWT
             String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> jwtPayload = objectMapper.readValue(payload, Map.class);
+
+            Gson gson = new Gson();
+            Map<String, Object> jwtPayload = gson.fromJson(payload, new TypeToken<Map<String, Object>>(){}.getType());
+
             return new Result(true, jwtPayload);
         } catch (Exception ignored) {
             return new Result(false, null);
