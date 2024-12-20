@@ -86,7 +86,7 @@ public class StringsFromContextTest {
         springContextObject.setBodyElement("main", List.of("1", "20", "2"));
         Map<String, Map<String, String>> strings = new StringsFromContext(springContextObject).getAll();
         assertEquals(Map.of(
-                "body", Map.of("1", ".[0]", "2", ".[2]", "20",".[1]"),
+                "body", Map.of("1", ".main.[0]", "2", ".main.[2]", "20",".main.[1]"),
                 "headers", Map.of(
                         "Content-Type", ".",
                         "Authorization", ".",
