@@ -20,6 +20,9 @@ public enum DataSchemaType implements Serializable {
     @SerializedName("object")
     OBJECT,
 
+    @SerializedName("enum")
+    ENUM,
+
     @SerializedName("null")
     EMPTY;
 }
