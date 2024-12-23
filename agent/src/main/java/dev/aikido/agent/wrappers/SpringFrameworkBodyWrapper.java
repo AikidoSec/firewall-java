@@ -72,7 +72,9 @@ public class SpringFrameworkBodyWrapper implements Wrapper {
                         RequestBodyCollector.report(args[i]);
                         return; // You can safely return here without missing more data
                     }
-                    if (annotStr.contains("org.springframework.web.bind.annotation.RequestParam")) {
+                    if (annotStr.contains("org.springframework.web.bind.annotation.RequestParam") ||
+                            annotStr.contains("org.springframework.web.bind.annotation.RequestPart")) {
+                        // RequestPart and RequestParam both contain partial data.
                         String identifier = parameter.getName();
                         RequestBodyCollector.report(identifier, args[i]);
                         break; // You can safely exit for-loop, but we still want to scan other arguments.
