@@ -105,4 +105,10 @@ class AttackCommandTest {
         assertTrue(result.isEmpty());
         assertEquals(0, queue.size());
     }
+
+    @Test
+    void testThatInputOutputClassIsCorrect() {
+        assertEquals(Command.EmptyResult.class, new AttackCommand(null).getOutputClass());
+        assertEquals(AttackCommand.Req.class, new AttackCommand(null).getInputClass());
+    }
 }

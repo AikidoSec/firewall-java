@@ -1,21 +1,19 @@
 package dev.aikido.agent_api.storage.routes;
 
 import com.google.gson.*;
-import com.google.gson.annotations.Expose;
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.context.RouteMetadata;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 
 import static dev.aikido.agent_api.api_discovery.APISpecMerger.mergeAPISpecs;
 
-public class RouteEntry implements Serializable {
+public class RouteEntry {
     final String method;
     final String path;
     private int hits;
 
-    // apispec field is transient because we do not serialize it, since this should not be sent over IPC.
+    // apispec field is transient because we do not send it over IPC.
     // We created a RouteEntrySerializer so we can still send it over HTTP
     public transient APISpec apispec;
 

@@ -4,8 +4,6 @@ import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.SpringContextObject;
 
-import java.io.Serializable;
-
 public final class RequestBodyCollector {
     private RequestBodyCollector() {}
     /**

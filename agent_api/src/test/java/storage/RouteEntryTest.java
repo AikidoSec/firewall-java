@@ -5,23 +5,18 @@ import com.google.gson.GsonBuilder;
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.api_discovery.DataSchemaItem;
 import dev.aikido.agent_api.api_discovery.DataSchemaType;
-import dev.aikido.agent_api.helpers.Serializer;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class RouteEntryTest {
-    // Test serializability :
     private RouteEntry route1;
 
     @BeforeEach
@@ -33,7 +28,7 @@ public class RouteEntryTest {
     }
 
     @Test
-    public void testGson() {
+    public void testGsonWithSerializer() {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(RouteEntry.class, new RouteEntry.RouteEntrySerializer())
                 .create();
@@ -45,10 +40,14 @@ public class RouteEntryTest {
     }
 
     @Test
-    public void testSerialize() throws IOException {
-        byte[] dataSerialized = Serializer.serializeData(route1);
-        String data = new String(dataSerialized);
-        assertFalse(data.contains("apiKey"));
+    public void testGsonWithoutSerializer() throws IOException {
+        Gson gson = new GsonBuilder()
+                .create();
+        String json = gson.toJson(route1);
+        assertEquals(
+                "{\"method\":\"GET\",\"path\":\"/api/1\",\"hits\":0}",
+                json
+        );
     }
 
 }

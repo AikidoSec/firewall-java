@@ -4,6 +4,7 @@ package background.ipc_commands;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
+import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
 import dev.aikido.agent_api.background.ipc_commands.ShouldRateLimitCommand;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
@@ -151,6 +152,12 @@ class ShouldRateLimitCommandTest {
         assertTrue(result.isPresent());
         assertTrue(result.get().block());
         assertEquals("ip", result.get().trigger()); // Expecting the trigger to be "ip" since there's no user
+    }
+
+    @Test
+    void testThatInputOutputClassIsCorrect() {
+        assertEquals(ShouldRateLimit.RateLimitDecision.class, new ShouldRateLimitCommand().getOutputClass());
+        assertEquals(ShouldRateLimitCommand.Req.class, new ShouldRateLimitCommand().getInputClass());
     }
 
 }
