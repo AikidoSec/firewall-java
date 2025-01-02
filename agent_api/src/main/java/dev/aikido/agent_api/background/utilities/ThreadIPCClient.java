@@ -14,10 +14,10 @@ import java.util.Optional;
 import static dev.aikido.agent_api.background.utilities.IPCFacilitator.readFromSocket;
 import static dev.aikido.agent_api.background.utilities.IPCFacilitator.writeToSocket;
 
-public class ThreadClient {
-    private static final Logger logger = LogManager.getLogger(ThreadClient.class);
+public class ThreadIPCClient {
+    private static final Logger logger = LogManager.getLogger(ThreadIPCClient.class);
     private final AFUNIXSocketAddress socketAddress;
-    public ThreadClient(File socketFile) {
+    public ThreadIPCClient(File socketFile) {
         try {
             this.socketAddress = AFUNIXSocketAddress.of(socketFile);
         } catch (SocketException e) {

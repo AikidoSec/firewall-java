@@ -2,7 +2,7 @@ package dev.aikido.agent_api.collectors;
 
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
-import dev.aikido.agent_api.background.utilities.ThreadClient;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.FilteredContextObject;
 import dev.aikido.agent_api.storage.Hostnames;
@@ -17,7 +17,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.aikido.agent_api.background.utilities.ThreadClientFactory.getDefaultThreadClient;
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 
 public final class HostnameCollector {
@@ -53,7 +53,7 @@ public final class HostnameCollector {
                 Gson gson = new Gson();
                 String json = gson.toJson(new AttackCommand.AttackCommandData(attack, new FilteredContextObject(Context.get())));
 
-                ThreadClient client = getDefaultThreadClient();
+                ThreadIPCClient client = getDefaultThreadIPCClient();
                 if (client != null) {
                     client.send("ATTACK$" + json, false);
                 }

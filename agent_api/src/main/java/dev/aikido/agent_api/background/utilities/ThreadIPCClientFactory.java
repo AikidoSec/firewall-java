@@ -4,18 +4,16 @@ import dev.aikido.agent_api.helpers.env.Token;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
+public final class ThreadIPCClientFactory {
+    private static final Logger logger = LogManager.getLogger(ThreadIPCClientFactory.class);
+    private ThreadIPCClientFactory() {}
 
-public final class ThreadClientFactory {
-    private static final Logger logger = LogManager.getLogger(ThreadClientFactory.class);
-    private ThreadClientFactory() {}
-
-    public static ThreadClient getDefaultThreadClient() {
+    public static ThreadIPCClient getDefaultThreadIPCClient() {
         Token token = Token.fromEnv();
         if (token == null) {
             logger.debug("Invalid token");
             return null;
         }
-        return new ThreadClient(UDSPath.getUDSPath(token));
+        return new ThreadIPCClient(UDSPath.getUDSPath(token));
     }
 }

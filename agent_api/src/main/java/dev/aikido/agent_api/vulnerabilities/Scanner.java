@@ -1,7 +1,7 @@
 package dev.aikido.agent_api.vulnerabilities;
 
 import com.google.gson.Gson;
-import dev.aikido.agent_api.background.utilities.ThreadClient;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 
@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static dev.aikido.agent_api.background.utilities.ThreadClientFactory.getDefaultThreadClient;
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
 import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
@@ -59,7 +59,7 @@ public final class Scanner {
         Gson gson = new Gson();
         String json = gson.toJson(new AttackCommandData(attack, ctx));
 
-        ThreadClient client = getDefaultThreadClient();
+        ThreadIPCClient client = getDefaultThreadIPCClient();
         logger.info("Attack detected: {}", json);
         if (client != null) {
             client.send("ATTACK$" + json, false);
