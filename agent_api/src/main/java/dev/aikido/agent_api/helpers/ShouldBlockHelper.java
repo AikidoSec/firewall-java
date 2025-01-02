@@ -2,6 +2,7 @@ package dev.aikido.agent_api.helpers;
 
 import dev.aikido.agent_api.background.ipc_commands.BlockingEnabledCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
+import dev.aikido.agent_api.background.ipc_commands.Command;
 import dev.aikido.agent_api.helpers.env.BlockingEnv;
 
 import java.util.Optional;

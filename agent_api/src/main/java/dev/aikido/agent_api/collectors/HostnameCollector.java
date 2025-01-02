@@ -48,10 +48,8 @@ public final class HostnameCollector {
                 }
                 logger.debug("SSRF Attack detected due to: {}:{}", hostname, hostnameEntry.getPort());
 
-                Gson gson = new Gson();
-                String json = gson.toJson(new AttackCommand.AttackCommandData(attack, new FilteredContextObject(Context.get())));
-
                 ThreadIPCClient client = getDefaultThreadIPCClient();
+                AttackCommand.Req req = new AttackCommand.Req(attack, Context.get());
                 if (client != null) {
                     AttackCommand.sendAttack(client, req);
                 }

@@ -3,6 +3,7 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
+import dev.aikido.agent_api.background.ipc_commands.InitRouteCommand;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;

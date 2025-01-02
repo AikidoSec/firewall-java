@@ -1,7 +1,7 @@
 package dev.aikido.agent_api;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
+import dev.aikido.agent_api.background.ipc_commands.RegisterUserCommand;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
+import java.io.Serializable;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public final class SetUser {

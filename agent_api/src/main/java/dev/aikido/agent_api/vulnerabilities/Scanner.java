@@ -59,7 +59,7 @@ public final class Scanner {
         }
     }
     public static void reportAttack(Attack attack, ContextObject ctx) {
-
+        ThreadIPCClient client = getDefaultThreadIPCClient();
         if (client != null) {
             AttackCommand.sendAttack(client, new AttackCommand.Req(attack, ctx));
         }
