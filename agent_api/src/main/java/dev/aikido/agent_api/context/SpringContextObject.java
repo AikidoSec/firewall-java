@@ -6,10 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
-public class SpringContextObject extends ContextObject{
+public class SpringContextObject extends ContextObject {
     // We use this map for when @RequestBody does not get used :
     protected transient Map<String, Object> bodyMap = new HashMap<>();
     public SpringContextObject(HttpServletRequest request) {
