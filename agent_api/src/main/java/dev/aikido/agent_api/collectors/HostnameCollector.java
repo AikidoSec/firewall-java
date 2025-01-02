@@ -1,7 +1,7 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
-import dev.aikido.agent_api.background.utilities.ThreadClient;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
@@ -15,7 +15,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.aikido.agent_api.background.utilities.ThreadClientFactory.getDefaultThreadClient;
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 
 public final class HostnameCollector {
@@ -48,7 +48,7 @@ public final class HostnameCollector {
                 }
                 logger.debug("SSRF Attack detected due to: {}:{}", hostname, hostnameEntry.getPort());
 
-                ThreadClient client = getDefaultThreadClient();
+                ThreadIPCClient client = getDefaultThreadIPCClient();
                 AttackCommand.Req req = new AttackCommand.Req(attack, Context.get());
                 if (client != null) {
                     AttackCommand.sendAttack(client, req);
