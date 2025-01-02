@@ -14,6 +14,8 @@ public class UnsafePathCheckerTest {
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/home/user/file.txt", "/home"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/usr/local/bin", "/usr"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/var/log/syslog", "/var"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/var/log/syslog", "/VaR"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/home/user/file.txt", "/HoMe"));
     }
 
     @Test
