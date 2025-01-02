@@ -1,7 +1,7 @@
 package dev.aikido.agent_api.background.ipc_commands;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
-import dev.aikido.agent_api.background.utilities.ThreadClient;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,7 +31,7 @@ public abstract class Command<I, O> {
 
     public abstract Optional<O> execute(I data, CloudConnectionManager connectionManager);
 
-    public Optional<O> send(ThreadClient threadClient, I input) {
+    public Optional<O> send(ThreadIPCClient threadClient, I input) {
         try {
             byte[] inputAsBytes = serializeData(input);
             byte[] identifier = (getName() + "$").getBytes(StandardCharsets.UTF_8);
