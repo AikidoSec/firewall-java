@@ -34,13 +34,13 @@ public final class DataSchemaGenerator {
 
         // Collection is a catch-all for lists, sets, ...
         if (data instanceof Collection<?> dataList) {
-            return getDataSchema(dataList.toArray());
+            return getDataSchema(dataList.toArray(), depth);
         }
         // Arrays are still another thing :
         if (data.getClass().isArray()) {
             DataSchemaItem items = null;
             for (int i = 0; i < Math.min(MAX_ARRAY_DEPTH, Array.getLength(data)); i++) {
-                DataSchemaItem childDataSchemaItem = getDataSchema(Array.get(data, i));
+                DataSchemaItem childDataSchemaItem = getDataSchema(Array.get(data, i), depth);
                 if (items == null) {
                     items = childDataSchemaItem;
                 } else {
@@ -48,6 +48,10 @@ public final class DataSchemaGenerator {
                 }
             }
             return new DataSchemaItem(DataSchemaType.ARRAY, items);
+        }
+        if(data.getClass().isEnum()) {
+            // Handle enums differently as to avoid recursion :
+            return new DataSchemaItem(DataSchemaType.ENUM);
         }
 
         // If the depth is less than the maximum depth, get the schema for each property

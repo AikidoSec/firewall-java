@@ -1,10 +1,7 @@
 package com.example.demo;
 
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -18,15 +15,12 @@ import java.util.Scanner;
 @RestController
 @RequestMapping("/api/requests") // Base URL for all routes in this controller
 public class RequestsController {
-    private record RequestsGet(String url) {}
-
     @PostMapping(path = "/get",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public String get(@RequestBody RequestsGet requestsGet) throws IOException, InterruptedException {
-        String url = requestsGet.url;
-        System.out.println("Making request to: "+ url);
-        return sendGetRequest2(url);
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+            produces = MediaType.TEXT_HTML_VALUE)
+    public String get(@RequestParam(name="url") String url2) throws IOException, InterruptedException {
+        System.out.println("Making request to: "+ url2);
+        return sendGetRequest2(url2);
     }
 
     private static String sendGetRequest(String urlString) throws IOException {

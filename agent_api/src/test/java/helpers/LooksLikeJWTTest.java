@@ -37,7 +37,7 @@ public class LooksLikeJWTTest {
         Map<String, Object> usernameMap = new HashMap<>();
         usernameMap.put("$ne", null); // This is allowed in a HashMap
         expectedPayload.put("username", usernameMap);
-        expectedPayload.put("iat", 1516239022);
+        expectedPayload.put("iat", 1.516239022E9);
         assertEquals(new LooksLikeJWT.Result(true, expectedPayload), LooksLikeJWT.tryDecodeAsJwt(validJwt));
     }
 
@@ -49,7 +49,7 @@ public class LooksLikeJWTTest {
         Map<String, Object> usernameMap = new HashMap<>();
         usernameMap.put("$ne", null); // This is allowed in a HashMap
         expectedPayload.put("username", usernameMap);
-        expectedPayload.put("iat", 1516239022);
+        expectedPayload.put("iat", 1.516239022E9);
         assertEquals(new LooksLikeJWT.Result(true, expectedPayload), LooksLikeJWT.tryDecodeAsJwt(validJwtWithBearer));
     }
 }

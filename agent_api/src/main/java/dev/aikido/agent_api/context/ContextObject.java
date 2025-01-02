@@ -35,8 +35,8 @@ public class ContextObject {
     public Object getBody() {
         return body;
     }
-    public void setBody(Object newBody) {
-        body = newBody;
+    public void setBody(Object body) {
+        this.body = body;
         this.cache.remove("body"); // Reset cache
     }
 
