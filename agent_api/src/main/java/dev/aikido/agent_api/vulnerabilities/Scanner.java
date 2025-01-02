@@ -5,6 +5,9 @@ import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -31,6 +34,16 @@ public final class Scanner {
         Optional<AikidoException> exception = Optional.empty();
         try {
             Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(ctx).getAll();
+            String hash = generateUniqueHash(vulnerability, operation, arguments);
+            if (hash != null) {
+                if(ctx.getCache().get("scanned_hashes") == null) {
+                    ctx.getCache().put("scanned_hashes", new HashMap<>());
+                }
+                boolean hashScanned = ctx.getCache().get("scanned_hashes").containsKey(hash);
+                if (hashScanned) {
+                    return; // Already scanned, return.
+                }
+            }
             for (Map.Entry<String, Map<String, String>> sourceEntry : stringsFromContext.entrySet()) {
                 String source = sourceEntry.getKey();
                 for (Map.Entry<String, String> entry : sourceEntry.getValue().entrySet()) {
@@ -50,6 +63,11 @@ public final class Scanner {
                     break;
                 }
             }
+            // Scan completed : add unique hash
+            if (hash != null) {
+               ctx.getCache().get("scanned_hashes").put(hash, hash);
+               Context.set(ctx);
+            }
         } catch (Throwable e) {
             logger.debug(e);
         }
@@ -64,4 +82,30 @@ public final class Scanner {
             AttackCommand.sendAttack(client, new AttackCommand.Req(attack, ctx));
         }
     }
+    private static String generateUniqueHash(Vulnerabilities.Vulnerability vuln, String operation, String[] arguments) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(vuln.getKind());
+        stringBuilder.append(operation);
+        for (String argument: arguments) {
+            stringBuilder.append(argument);
+        }
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            // Perform the hashing
+            byte[] hashBytes = digest.digest(stringBuilder.toString().getBytes());
+
+            // Convert the byte array to a hexadecimal string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException ignored) {
+        }
+        return null;
+    };
 }
