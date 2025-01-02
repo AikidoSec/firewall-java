@@ -5,11 +5,10 @@ import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 
-import java.io.Serializable;
 import java.util.Optional;
 
 public class ApiDiscoveryCommand extends Command<ApiDiscoveryCommand.Req, Command.EmptyResult> {
-    public record Req(APISpec apiSpec, RouteMetadata routeMetadata) implements Serializable {}
+    public record Req(APISpec apiSpec, RouteMetadata routeMetadata) {}
 
     @Override
     public boolean returnsData() {

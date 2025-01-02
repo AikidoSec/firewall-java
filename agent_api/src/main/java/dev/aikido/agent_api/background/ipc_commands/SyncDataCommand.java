@@ -4,13 +4,12 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.storage.routes.Routes;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataCommand.Res> {
-    public record Res(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes) implements Serializable {}
+    public record Res(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes) {}
     @Override
     public boolean returnsData() {
         // Returns JSON of SyncDataResult

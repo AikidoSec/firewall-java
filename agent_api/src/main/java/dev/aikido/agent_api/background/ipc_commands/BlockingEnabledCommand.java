@@ -2,11 +2,10 @@ package dev.aikido.agent_api.background.ipc_commands;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 
-import java.io.Serializable;
 import java.util.Optional;
 
 public class BlockingEnabledCommand extends Command<Command.EmptyResult, BlockingEnabledCommand.Res> {
-    public record Res(boolean isBlockingEnabled) implements Serializable {}
+    public record Res(boolean isBlockingEnabled) {}
 
     @Override
     public boolean returnsData() {

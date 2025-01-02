@@ -5,8 +5,6 @@ import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.text.html.Option;
-import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -21,7 +19,7 @@ import static dev.aikido.agent_api.helpers.extraction.ByteArrayHelper.joinByteAr
 public abstract class Command<I, O> {
     private static final Logger logger = LogManager.getLogger(Command.class);
 
-    public record EmptyResult() implements Serializable {}
+    public record EmptyResult() {}
     public abstract boolean returnsData();
     public abstract String getName();
 
