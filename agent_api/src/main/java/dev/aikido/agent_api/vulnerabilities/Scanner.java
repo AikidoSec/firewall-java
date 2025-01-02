@@ -1,8 +1,6 @@
 package dev.aikido.agent_api.vulnerabilities;
 
-import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
-import dev.aikido.agent_api.background.utilities.ThreadClient;
-import dev.aikido.agent_api.background.utilities.ThreadClientFactory;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 
@@ -12,6 +10,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
 import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
@@ -55,7 +54,7 @@ public final class Scanner {
         }
     }
     public static void reportAttack(Attack attack, ContextObject ctx) {
-        ThreadClient client = ThreadClientFactory.getDefaultThreadClient();
+        ThreadIPCClient client = getDefaultThreadIPCClient();
         if (client != null) {
             AttackCommand.sendAttack(client, new AttackCommand.Req(attack, ctx));
         }
