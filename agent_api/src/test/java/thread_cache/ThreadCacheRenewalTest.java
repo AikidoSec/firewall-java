@@ -2,7 +2,6 @@ package thread_cache;
 
 import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.background.ipc_commands.InitRouteCommand;
-import dev.aikido.agent_api.background.utilities.ThreadClientFactory;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
@@ -10,6 +9,7 @@ import dev.aikido.agent_api.thread_cache.ThreadCacheRenewal;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ThreadCacheRenewalTest {
@@ -36,7 +36,7 @@ public class ThreadCacheRenewalTest {
 
         // Now report a route :
         RouteMetadata routeMetadata = new RouteMetadata("/myroute", "http://localhost:8080/myroute", "POST");
-        new InitRouteCommand().send(ThreadClientFactory.getDefaultThreadClient(), routeMetadata);
+        new InitRouteCommand().send(getDefaultThreadIPCClient(), routeMetadata);
 
         // Test :
         threadCacheObject = ThreadCacheRenewal.renewThreadCache();
