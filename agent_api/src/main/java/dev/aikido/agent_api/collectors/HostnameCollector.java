@@ -2,8 +2,7 @@ package dev.aikido.agent_api.collectors;
 
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
-import dev.aikido.agent_api.background.utilities.IPCClient;
-import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.FilteredContextObject;
 import dev.aikido.agent_api.storage.Hostnames;
@@ -18,6 +17,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 
 public final class HostnameCollector {
@@ -53,11 +53,11 @@ public final class HostnameCollector {
                 Gson gson = new Gson();
                 String json = gson.toJson(new AttackCommand.AttackCommandData(attack, new FilteredContextObject(Context.get())));
 
-                IPCClient client = new IPCDefaultClient();
-                client.sendData(
-                        "ATTACK$" + json, // data
-                        false // receive
-                );
+                ThreadIPCClient client = getDefaultThreadIPCClient();
+                if (client != null) {
+                    client.send("ATTACK$" + json, false);
+                }
+
                 if (shouldBlock()) {
                     logger.debug("Blocking SSRF attack...");
                     throw SSRFException.get();

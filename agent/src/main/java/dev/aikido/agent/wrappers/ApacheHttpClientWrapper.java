@@ -3,6 +3,7 @@ package dev.aikido.agent.wrappers;
 import dev.aikido.agent_api.collectors.URLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.logging.log4j.LogManager;
@@ -26,8 +27,12 @@ public class ApacheHttpClientWrapper implements Wrapper {
         return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("org.apache.http").and(ElementMatchers.nameContains("HttpClient")))
                 .and(ElementMatchers.nameContainsIgnoreCase("execute"));
     }
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.nameContains("org.apache").and(ElementMatchers.nameEndsWith("HttpClient"));
+    }
     public class ApacheHttpClientAdvice {
-        @Advice.OnMethodEnter
+        @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
                 @Advice.Argument(0) Object request
         ) {
@@ -43,7 +48,7 @@ public class ApacheHttpClientWrapper implements Wrapper {
                     Method toUriMethod = request.getClass().getMethod("getUri");
                     uri = (URI) toUriMethod.invoke(request);
 
-                } else {
+                } else if (request.getClass().toString().contains("HttpHost")) {
                     // This Object is an HttpHost object, we will use reflection to access the URL:
                     // We want to (safely) access request.toURI() (which returns a string)
                     Method toUriMethodString = request.getClass().getMethod("toURI");

@@ -2,10 +2,12 @@ package dev.aikido.agent_api.helpers;
 
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.ipc_commands.BlockingEnabledCommand;
-import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.helpers.env.BlockingEnv;
 
 import java.util.Optional;
+
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 
 public final class ShouldBlockHelper {
     private ShouldBlockHelper() {}
@@ -15,7 +17,12 @@ public final class ShouldBlockHelper {
      * @return true if the attack should be blocked
      */
     public static boolean shouldBlock() {
-        Optional<String> response = new IPCDefaultClient().sendData(
+        ThreadIPCClient client = getDefaultThreadIPCClient();
+        if (client == null) {
+            // Fallback on environment variable :
+            return new BlockingEnv().getValue();
+        }
+        Optional<String> response = client.send(
                 "BLOCKING_ENABLED$", // data
                 true // receives a response
         );
@@ -26,6 +33,7 @@ public final class ShouldBlockHelper {
                 return res.isBlockingEnabled();
             }
         }
+
         // Fallback on environment variable :
         return new BlockingEnv().getValue();
     }

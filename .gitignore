@@ -38,3 +38,6 @@ out/
 .vscode/
 
 **nohup**
+
+### Python ###
+**__pycache__**

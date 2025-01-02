@@ -90,6 +90,17 @@ public class URLConnectionTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
+    public void testNewUrlConnectionWithHttpAsHttp() throws IOException {
+        HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://app.local.aikido.io").openConnection();
+        Hostnames.HostnameEntry[] hostnameArray = ThreadCache.get().getHostnames().asArray();
+        assertEquals(1, hostnameArray.length);
+        assertEquals(80, hostnameArray[0].getPort());
+        assertEquals("app.local.aikido.io", hostnameArray[0].getHostname());
+    }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
     public void testNewUrlConnectionHttps() throws IOException {
         setContextAndLifecycle("");
 

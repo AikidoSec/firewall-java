@@ -1,13 +1,14 @@
 package dev.aikido.agent_api;
 
 import com.google.gson.Gson;
-import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public final class SetUser {
@@ -16,7 +17,7 @@ public final class SetUser {
 
     public record UserObject(String id, String name) {}
     public static void setUser(UserObject user) {
-        if(user.id().isEmpty() || user.name().isEmpty()) {
+        if(user.id() == null || user.id().isEmpty() || user.name() == null || user.name().isEmpty()) {
             logger.info("User ID or name cannot be empty.");
             return;
         }
@@ -36,7 +37,10 @@ public final class SetUser {
         Context.set(currentContext);
 
         // Register user (Send to cloud)
-        String jsonDataPacket = new Gson().toJson(validatedUser);
-        new IPCDefaultClient().sendData("REGISTER_USER$" + jsonDataPacket, false);
+        ThreadIPCClient threadClient = getDefaultThreadIPCClient();
+        if (threadClient != null) {
+            String jsonDataPacket = new Gson().toJson(validatedUser);
+            threadClient.send("REGISTER_USER$" + jsonDataPacket, false);
+        }
     }
 }

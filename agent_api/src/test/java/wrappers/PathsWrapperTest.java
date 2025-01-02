@@ -77,6 +77,11 @@ public class PathsWrapperTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             Paths.get("/var/", "/../opt/", ".");
         });
+        Exception exception2 = assertThrows(RuntimeException.class, () -> {
+            Paths.get("/var/", "/othervar/", "/../opt/", ".");
+        });
         assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+        assertEquals("Aikido Zen has blocked Path Traversal",  exception2.getMessage());
+
     }
 }

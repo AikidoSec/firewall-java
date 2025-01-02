@@ -2,12 +2,14 @@ package dev.aikido.agent.wrappers;
 
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
 
@@ -25,15 +27,19 @@ public class HttpConnectionRedirectWrapper implements Wrapper {
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.nameContainsIgnoreCase("followRedirect0");
     }
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.isSubTypeOf(HttpURLConnection.class);
+    }
     public static class FollowRedirect0Advice {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file, specified with the AIKIDO_DIRECTORY env variable
-        @Advice.OnMethodEnter
+        @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
                 @Advice.This(typing = DYNAMIC, optional = true) HttpURLConnection target,
                 @Advice.Argument(2) URL destUrl
-        ) {
+        ) throws Exception {
             URL origin = target.getURL();
             if (origin == null || destUrl == null) {
                 return;
@@ -47,20 +53,17 @@ public class HttpConnectionRedirectWrapper implements Wrapper {
             if (classLoader == null) {
                 return;
             }
+            // Load the class from the JAR
+            Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
 
-            try {
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
-
-                // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        method2.invoke(null, origin, destUrl);
-                        break;
-                    }
+            // Run report with "argument"
+            for (Method method2: clazz.getMethods()) {
+                if(method2.getName().equals("report")) {
+                    method2.invoke(null, origin, destUrl);
+                    break;
                 }
-                classLoader.close(); // Close the class loader
-            } catch(Throwable ignored) {}
+            }
+            classLoader.close(); // Close the class loader
         }
     }
 }
