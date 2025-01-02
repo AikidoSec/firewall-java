@@ -1,6 +1,5 @@
 package dev.aikido.agent_api.context;
 
-import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public record User(String id, String name, String lastIpAddress, long firstSeenAt, long lastSeenAt) {
     public User(User existingUser, long lastSeenAt) {

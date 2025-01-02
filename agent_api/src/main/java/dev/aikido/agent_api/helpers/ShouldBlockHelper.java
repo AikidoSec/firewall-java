@@ -1,8 +1,8 @@
 package dev.aikido.agent_api.helpers;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.ipc_commands.BlockingEnabledCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
+import dev.aikido.agent_api.background.ipc_commands.Command;
 import dev.aikido.agent_api.helpers.env.BlockingEnv;
 
 import java.util.Optional;
@@ -22,16 +22,9 @@ public final class ShouldBlockHelper {
             // Fallback on environment variable :
             return new BlockingEnv().getValue();
         }
-        Optional<String> response = client.send(
-                "BLOCKING_ENABLED$", // data
-                true // receives a response
-        );
-        if (response.isPresent()) {
-            Gson gson = new Gson();
-            BlockingEnabledCommand.BlockingEnabledResult res = gson.fromJson(response.get(), BlockingEnabledCommand.BlockingEnabledResult.class);
-            if (res != null) {
-                return res.isBlockingEnabled();
-            }
+        Optional<BlockingEnabledCommand.Res> res = new BlockingEnabledCommand().send(client, new Command.EmptyResult());
+        if (!res.isEmpty()) {
+            return res.get().isBlockingEnabled();
         }
 
         // Fallback on environment variable :

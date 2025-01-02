@@ -24,7 +24,7 @@ mock_stop:
 	docker kill mock_core && docker rm mock_core
 
 test:
-	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test --rerun-tasks
+	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test
 
 cov:
 	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test --rerun-tasks -PcoverageRun jacocoTestReport

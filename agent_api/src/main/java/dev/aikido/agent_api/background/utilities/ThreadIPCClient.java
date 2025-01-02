@@ -24,7 +24,7 @@ public class ThreadIPCClient {
             throw new RuntimeException(e);
         }
     }
-    public Optional<String> send(String data, boolean receive) {
+    public Optional<byte[]> send(byte[] data, boolean receive) {
         AFUNIXSocket socket = null;
         try {
             // Start socket
@@ -36,9 +36,9 @@ public class ThreadIPCClient {
                 writeToSocket(socket, data);
             }
             if (receive && socket.isConnected()) {
-                Optional<String> response = readFromSocket(socket);
+                byte[] response = readFromSocket(socket).get();
                 socket.close();
-                return response;
+                return Optional.of(response);
             }
         } catch (IOException e) {
             logger.debug("Something went wrong whilst sending data.");

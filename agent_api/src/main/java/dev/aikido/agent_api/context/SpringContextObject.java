@@ -6,8 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
@@ -31,6 +29,7 @@ public class SpringContextObject extends ContextObject{
     }
     public void setParams(Object params) {
         this.params = params;
+        this.cache.remove("routeParams"); // Reset cache
     }
     private static HashMap<String, String> extractHeaders(HttpServletRequest request) {
         HashMap<String, String> headersMap = new HashMap<>();

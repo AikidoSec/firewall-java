@@ -1,6 +1,5 @@
 package dev.aikido.agent_api.background.ipc_commands;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
@@ -10,7 +9,7 @@ import java.util.Optional;
 
 import static dev.aikido.agent_api.ratelimiting.ShouldRateLimit.shouldRateLimit;
 
-public class ShouldRateLimitCommand implements Command {
+public class ShouldRateLimitCommand extends Command<ShouldRateLimitCommand.Req, ShouldRateLimit.RateLimitDecision> {
     public record Req(RouteMetadata routeMetadata, User user, String remoteAddress) {}
     @Override
     public boolean returnsData() {
@@ -18,20 +17,26 @@ public class ShouldRateLimitCommand implements Command {
     }
 
     @Override
-    public boolean matchesName(String command) {
-        return command.equalsIgnoreCase("SHOULD_RATE_LIMIT");
+    public String getName() { return "SHOULD_RATE_LIMIT"; }
+
+    @Override
+    public Class<Req> getInputClass() {
+        return Req.class;
+    }
+
+    @Override
+    public Class<ShouldRateLimit.RateLimitDecision> getOutputClass() {
+        return ShouldRateLimit.RateLimitDecision.class;
     }
 
     /**
-     * @param data is a JSON string that represents a {@code Req} record.
-     * @return a JSON string that represents a {@code RateLimitDecision} record.
+     * @return an {@code RateLimitDecision} record.
      */
     @Override
-    public Optional<String> execute(String data, CloudConnectionManager connectionManager) {
-        Gson gson = new Gson();
-        Req request = gson.fromJson(data, Req.class);
-        ShouldRateLimit.RateLimitDecision response = shouldRateLimit(request.routeMetadata(), request.user(), request.remoteAddress(), connectionManager);
-        String jsonResponse = gson.toJson(response);
-        return Optional.of(jsonResponse);
+    public Optional<ShouldRateLimit.RateLimitDecision> execute(Req request, CloudConnectionManager connectionManager) {
+        ShouldRateLimit.RateLimitDecision response = shouldRateLimit(
+                request.routeMetadata(), request.user(), request.remoteAddress(), connectionManager
+        );
+        return Optional.of(response);
     }
 }

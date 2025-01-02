@@ -1,6 +1,6 @@
 package dev.aikido.agent_api.thread_cache;
 
-import com.google.gson.Gson;
+import dev.aikido.agent_api.background.ipc_commands.Command;
 import dev.aikido.agent_api.background.ipc_commands.SyncDataCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 
@@ -16,10 +16,9 @@ public final class ThreadCacheRenewal {
         if (client == null) {
             return null;
         }
-        Optional<String> result = client.send("SYNC_DATA$", true);
+        Optional<SyncDataCommand.Res> result = new SyncDataCommand().send(client, new Command.EmptyResult());
         if(result.isPresent()) {
-            Gson gson = new Gson();
-            SyncDataCommand.SyncDataResult res = gson.fromJson(result.get(), SyncDataCommand.SyncDataResult.class);
+            SyncDataCommand.Res res = result.get();
             if (res != null) {
                 return new ThreadCacheObject(res.endpoints(), res.blockedUserIDs(), res.bypassedIPs(), res.routes());
             }

@@ -1,8 +1,6 @@
 package dev.aikido.agent_api.api_discovery;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public record DataSchemaItem(
         DataSchemaType type,

@@ -23,7 +23,8 @@ public class ContextObject {
     // Auxiliary :
     protected User user;
     protected boolean executedMiddleware;
-    protected ArrayList<RedirectNode> redirectStartNodes;
+    protected transient ArrayList<RedirectNode> redirectStartNodes;
+    protected transient Map<String, Map<String, String>> cache = new HashMap<>();
 
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
@@ -36,6 +37,7 @@ public class ContextObject {
     }
     public void setBody(Object newBody) {
         body = newBody;
+        this.cache.remove("body"); // Reset cache
     }
 
     public String getMethod() {
@@ -66,6 +68,7 @@ public class ContextObject {
     public HashMap<String, String> getCookies() {
         return cookies;
     }
+    public Map<String, Map<String, String>> getCache() { return cache; }
 
     public String toJson() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

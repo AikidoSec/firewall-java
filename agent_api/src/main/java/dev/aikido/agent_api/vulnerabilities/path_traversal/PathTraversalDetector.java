@@ -2,7 +2,6 @@ package dev.aikido.agent_api.vulnerabilities.path_traversal;
 
 import dev.aikido.agent_api.vulnerabilities.Detector;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathChecker.startsWithUnsafePath;
@@ -43,5 +42,13 @@ public class PathTraversalDetector implements Detector {
             return new DetectorResult(true, Map.of("filename", filePath), PathTraversalException.get());
         };
         return new DetectorResult();
+    }
+
+    @Override
+    public boolean returnEarly(String[] args) {
+        if (args.length == 1) {
+            return PathTraversalEarlyReturn.shouldReturnEarly(args[0]);
+        }
+        return false;
     }
 }

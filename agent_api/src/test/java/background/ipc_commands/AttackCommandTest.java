@@ -1,24 +1,19 @@
 package background.ipc_commands;
 
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.DetectedAttack;
 import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
+import dev.aikido.agent_api.background.ipc_commands.Command;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.vulnerabilities.Attack;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -68,12 +63,10 @@ class AttackCommandTest {
         // Arrange
         Attack attack = mock(Attack.class);
         ContextObject context = new SampleContextObject();
-        AttackCommand.AttackCommandData commandData = new AttackCommand.AttackCommandData(attack, context);
-        Gson gson = new Gson();
-        String jsonData = gson.toJson(commandData);
+        AttackCommand.Req commandData = new AttackCommand.Req(attack, context);
 
         // Act
-        Optional<String> result = attackCommand.execute(jsonData, connectionManager);
+        Optional<Command.EmptyResult> result = attackCommand.execute(commandData, connectionManager);
 
         // Assert
         assertTrue(result.isEmpty());
@@ -89,12 +82,10 @@ class AttackCommandTest {
     void testExecuteWithMissingAttack() {
         // Arrange
         ContextObject context = mock(ContextObject.class);
-        AttackCommand.AttackCommandData commandData = new AttackCommand.AttackCommandData(null, context);
-        Gson gson = new Gson();
-        String jsonData = gson.toJson(commandData);
+        AttackCommand.Req commandData = new AttackCommand.Req(null, context);
 
         // Act
-        Optional<String> result = attackCommand.execute(jsonData, connectionManager);
+        Optional<?> result = attackCommand.execute(commandData, connectionManager);
 
         // Assert
         assertTrue(result.isEmpty());
@@ -105,15 +96,19 @@ class AttackCommandTest {
     void testExecuteWithMissingContext() {
         // Arrange
         Attack attack = mock(Attack.class);
-        AttackCommand.AttackCommandData commandData = new AttackCommand.AttackCommandData(attack, null);
-        Gson gson = new Gson();
-        String jsonData = gson.toJson(commandData);
+        AttackCommand.Req commandData = new AttackCommand.Req(attack, null);
 
         // Act
-        Optional<String> result = attackCommand.execute(jsonData, connectionManager);
+        Optional<?> result = attackCommand.execute(commandData, connectionManager);
 
         // Assert
         assertTrue(result.isEmpty());
         assertEquals(0, queue.size());
+    }
+
+    @Test
+    void testThatInputOutputClassIsCorrect() {
+        assertEquals(Command.EmptyResult.class, new AttackCommand(null).getOutputClass());
+        assertEquals(AttackCommand.Req.class, new AttackCommand(null).getInputClass());
     }
 }
