@@ -14,8 +14,13 @@ public class UnsafePathCheckerTest {
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/home/user/file.txt", "/home"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/usr/local/bin", "/usr"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/var/log/syslog", "/var"));
+
+        // Capitalization checks :
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/var/log/syslog", "/VaR"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/home/user/file.txt", "/HoMe"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/HOME/user/file.txt", "/home"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/bIn/bash", "/bin"));
+
     }
 
     @Test

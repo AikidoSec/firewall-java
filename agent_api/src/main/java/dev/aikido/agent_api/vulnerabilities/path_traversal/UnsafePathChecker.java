@@ -46,6 +46,8 @@ public final class UnsafePathChecker {
         return false;
     }
     public static boolean startsWithUnsafePath(String filePath, String userInput) {
-        return startsWithUnsafePath(filePath) && filePath.startsWith(userInput.toLowerCase());
+        String filePathLowercase = filePath.toLowerCase();
+        String userinputLowercase = userInput.toLowerCase();
+        return startsWithUnsafePath(filePathLowercase) && filePathLowercase.startsWith(userinputLowercase);
     }
 }
