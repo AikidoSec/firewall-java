@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: linear-gradient(to bottom, #A68BF7, #D1C6F9);
+            margin: 0;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #24104F;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .button {
+            display: block;
+            background-color: #6551F3;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            text-decoration: none;
+            margin: 10px 0;
+        }
+
+        .button:hover {
+            background-color: #24104F;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Home Page</h1>
+    <a href="/pages/create" class="button">(SQL Injection) Create a dog</a>
+    <a href="/pages/execute" class="button">(Shell Injection) Execute a command</a>
+    <a href="/pages/request" class="button">(SSRF) Fetch a page</a>
+    <a href="/pages/read" class="button">(Path Traversal) Read a file</a>
+
+</div>
+</body>
+</html>
