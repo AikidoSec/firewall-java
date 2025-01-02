@@ -4,6 +4,7 @@ import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
+import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
 import dev.aikido.agent_api.background.ipc_commands.Command;
 import dev.aikido.agent_api.background.ipc_commands.CommandRouter;
 import dev.aikido.agent_api.context.RouteMetadata;
@@ -69,5 +70,11 @@ class ApiDiscoveryCommandTest {
 
         // Verify the result
         assertTrue(result.isEmpty(), "Expected no result from malformed API_DISCOVERY command");
+    }
+
+    @Test
+    void testThatInputOutputClassIsCorrect() {
+        assertEquals(ApiDiscoveryCommand.EmptyResult.class, new ApiDiscoveryCommand().getOutputClass());
+        assertEquals(ApiDiscoveryCommand.Req.class, new ApiDiscoveryCommand().getInputClass());
     }
 }
