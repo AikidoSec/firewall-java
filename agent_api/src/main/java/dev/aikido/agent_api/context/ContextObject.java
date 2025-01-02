@@ -19,7 +19,7 @@ public class ContextObject {
     protected HashMap<String, String[]> query;
     protected HashMap<String, String> cookies;
     protected Object params;
-    protected transient Object body;
+    protected Object body;
     // Auxiliary :
     protected User user;
     protected boolean executedMiddleware;

@@ -35,6 +35,16 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
     public String getName() { return "ATTACK"; }
 
     @Override
+    public Class<Req> getInputClass() {
+        return Req.class;
+    }
+
+    @Override
+    public Class<EmptyResult> getOutputClass() {
+        return EmptyResult.class;
+    }
+
+    @Override
     public Optional<EmptyResult> execute(Req data, CloudConnectionManager connectionManager) {
         if (data.attack == null || data.context == null) {
             logger.debug("Attack or context not defined correctly, returning.");

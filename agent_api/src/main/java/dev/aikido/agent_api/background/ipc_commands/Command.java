@@ -1,5 +1,6 @@
 package dev.aikido.agent_api.background.ipc_commands;
 
+import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import org.apache.logging.log4j.LogManager;
@@ -8,8 +9,6 @@ import org.apache.logging.log4j.Logger;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import static dev.aikido.agent_api.helpers.Serializer.deserializeData;
-import static dev.aikido.agent_api.helpers.Serializer.serializeData;
 import static dev.aikido.agent_api.helpers.extraction.ByteArrayHelper.joinByteArrays;
 
 /**
@@ -22,6 +21,8 @@ public abstract class Command<I, O> {
     public record EmptyResult() {}
     public abstract boolean returnsData();
     public abstract String getName();
+    public abstract Class<I> getInputClass();
+    public abstract Class<O> getOutputClass();
 
     public boolean matchesName(String command) {
         return this.getName().equalsIgnoreCase(command);
@@ -31,25 +32,21 @@ public abstract class Command<I, O> {
 
     public Optional<O> send(ThreadIPCClient threadClient, I input) {
         try {
-            byte[] inputAsBytes = serializeData(input);
+            // Convert input data from thread to a byte[] JSON :
+            Gson gson = new Gson();
+            byte[] inputAsBytes = gson.toJson(input).getBytes(StandardCharsets.UTF_8);
+
             byte[] identifier = (getName() + "$").getBytes(StandardCharsets.UTF_8);
             Optional<byte[]> response = threadClient.send(joinByteArrays(identifier, inputAsBytes), returnsData());
+
             if(!response.isEmpty()) {
-                O data = deserializeData(response.get());
+                // Convert background process' response from byte[] JSON to the output object :
+                O data = gson.fromJson(new String(response.get(), StandardCharsets.UTF_8), getOutputClass());
                 return Optional.of(data);
             }
         } catch (Exception e) {
             logger.trace(e);
         }
         return Optional.empty();
-    };
-
-    public I deserializeInput(byte[] input) {
-        try {
-            return deserializeData(input);
-        } catch (Exception e) {
-            logger.trace(e);
-            return null;
-        }
     };
 }

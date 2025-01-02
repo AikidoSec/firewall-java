@@ -19,6 +19,16 @@ public class ApiDiscoveryCommand extends Command<ApiDiscoveryCommand.Req, Comman
     public String getName() { return "API_DISCOVERY"; }
 
     @Override
+    public Class<Req> getInputClass() {
+        return Req.class;
+    }
+
+    @Override
+    public Class<EmptyResult> getOutputClass() {
+        return EmptyResult.class;
+    }
+
+    @Override
     public Optional<EmptyResult> execute(Req request, CloudConnectionManager connectionManager) {
         if (request != null && request.routeMetadata() != null) {
             RouteEntry route = connectionManager.getRoutes().get(request.routeMetadata());

@@ -15,6 +15,16 @@ public class RegisterUserCommand extends Command<User, Command.EmptyResult> {
     public String getName() { return "REGISTER_USER"; }
 
     @Override
+    public Class<User> getInputClass() {
+        return User.class;
+    }
+
+    @Override
+    public Class<EmptyResult> getOutputClass() {
+        return EmptyResult.class;
+    }
+
+    @Override
     public Optional<EmptyResult> execute(User user, CloudConnectionManager connectionManager) {
         if (user != null) {
             // Register user in connection manager:

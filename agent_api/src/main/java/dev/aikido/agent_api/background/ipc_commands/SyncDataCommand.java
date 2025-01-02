@@ -19,6 +19,16 @@ public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataComman
     @Override
     public String getName() { return "SYNC_DATA"; }
 
+    @Override
+    public Class<EmptyResult> getInputClass() {
+        return EmptyResult.class;
+    }
+
+    @Override
+    public Class<Res> getOutputClass() {
+        return Res.class;
+    }
+
     /**
      *
      * @param data is an empty string/nothing

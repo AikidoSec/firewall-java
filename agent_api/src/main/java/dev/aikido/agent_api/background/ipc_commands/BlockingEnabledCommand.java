@@ -17,6 +17,16 @@ public class BlockingEnabledCommand extends Command<Command.EmptyResult, Blockin
     public String getName() { return "BLOCKING_ENABLED"; }
 
     @Override
+    public Class<EmptyResult> getInputClass() {
+        return EmptyResult.class;
+    }
+
+    @Override
+    public Class<Res> getOutputClass() {
+        return Res.class;
+    }
+
+    @Override
     public Optional<Res> execute(EmptyResult data, CloudConnectionManager connectionManager) {
         // "data" can be safely ignored, we just need to return if blocking is enabled
         boolean isBlockingEnabled = connectionManager.shouldBlock();
