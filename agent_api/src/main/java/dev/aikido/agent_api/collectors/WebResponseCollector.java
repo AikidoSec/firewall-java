@@ -2,8 +2,8 @@ package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.background.ipc_commands.InitRouteCommand;
-import dev.aikido.agent_api.background.utilities.ThreadClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
@@ -15,7 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.agent_api.api_discovery.GetApiInfo.getApiInfo;
-import static dev.aikido.agent_api.background.utilities.ThreadClientFactory.getDefaultThreadClient;
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public final class WebResponseCollector {
@@ -38,7 +38,7 @@ public final class WebResponseCollector {
         if (routeMetadata == null || !isUsefulRoute(statusCode, context.getRoute(), context.getMethod())) {
             return;
         }
-        ThreadClient threadClient = getDefaultThreadClient();
+        ThreadIPCClient threadClient = getDefaultThreadIPCClient();
         ThreadCacheObject threadCache = ThreadCache.get();
         if (threadCache == null || threadClient == null || threadCache.getRoutes() == null) {
             return;
