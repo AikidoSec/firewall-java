@@ -14,6 +14,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
+import static net.bytebuddy.matcher.ElementMatchers.is;
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class RuntimeExecWrapper implements Wrapper {
@@ -23,13 +24,13 @@ public class RuntimeExecWrapper implements Wrapper {
         return CommandExecAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("Runtime"))
+        return ElementMatchers.isDeclaredBy(Runtime.class)
                 .and(ElementMatchers.nameContainsIgnoreCase("exec"));
     }
 
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return nameContains("java.lang.Runtime");
+        return is(Runtime.class);
     }
 
     public static class CommandExecAdvice {

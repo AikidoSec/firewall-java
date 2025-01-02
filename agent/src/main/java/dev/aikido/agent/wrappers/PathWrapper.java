@@ -35,7 +35,7 @@ public class PathWrapper implements Wrapper {
 
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return isSubTypeOf(Path.class).or(isSuperTypeOf(Path.class)).or(isDeclaredBy(Path.class));
+        return isSubTypeOf(Path.class).or(isDeclaredBy(Path.class));
     }
 
     public static class PathAdvice {
