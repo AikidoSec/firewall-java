@@ -1,14 +1,12 @@
 package dev.aikido.agent_api.storage.routes;
 import dev.aikido.agent_api.context.RouteMetadata;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static dev.aikido.agent_api.storage.routes.RouteToKeyHelper.routeToKey;
 
-public class Routes implements Serializable {
+public class Routes {
     private final int maxSize;
     private final Map<String, RouteEntry> routes;
 

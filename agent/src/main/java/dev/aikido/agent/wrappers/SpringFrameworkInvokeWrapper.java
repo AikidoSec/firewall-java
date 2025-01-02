@@ -2,16 +2,12 @@ package dev.aikido.agent.wrappers;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.SpringContextObject;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import java.io.IOException;
-import java.io.Serializable;
 
 /**
  * SpringFrameworkInvokeWrapper is a wrapper for the invokeHandlerMethod function
@@ -48,7 +44,7 @@ public class SpringFrameworkInvokeWrapper implements Wrapper {
             if (pathVariables != null) {
                 if (Context.get() instanceof SpringContextObject springContextObject) {
                     // Set path variables in context object :
-                    springContextObject.setParams((Serializable) pathVariables);
+                    springContextObject.setParams(pathVariables);
                     Context.set(springContextObject);
                 }
             }

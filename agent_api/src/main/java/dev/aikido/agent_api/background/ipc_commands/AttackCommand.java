@@ -9,12 +9,11 @@ import dev.aikido.agent_api.vulnerabilities.Attack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.Serializable;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
 public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResult> {
-    public record Req(Attack attack, ContextObject context) implements Serializable {}
+    public record Req(Attack attack, ContextObject context) {}
 
     private static final Logger logger = LogManager.getLogger(AttackCommand.class);
     private final BlockingQueue<APIEvent> queue;
@@ -34,6 +33,16 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
 
     @Override
     public String getName() { return "ATTACK"; }
+
+    @Override
+    public Class<Req> getInputClass() {
+        return Req.class;
+    }
+
+    @Override
+    public Class<EmptyResult> getOutputClass() {
+        return EmptyResult.class;
+    }
 
     @Override
     public Optional<EmptyResult> execute(Req data, CloudConnectionManager connectionManager) {

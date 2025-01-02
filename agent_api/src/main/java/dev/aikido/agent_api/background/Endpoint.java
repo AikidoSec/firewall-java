@@ -1,10 +1,9 @@
 package dev.aikido.agent_api.background;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class Endpoint implements Serializable {
-    public record RateLimitingConfig(long maxRequests, long windowSizeInMS, boolean enabled) implements Serializable {}
+public class Endpoint {
+    public record RateLimitingConfig(long maxRequests, long windowSizeInMS, boolean enabled) {}
     private final String method;
     private final String route;
     private final RateLimitingConfig rateLimiting;

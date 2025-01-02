@@ -1,9 +1,9 @@
 package background.ipc_commands;
 
+import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.ipc_commands.BlockingEnabledCommand;
 import dev.aikido.agent_api.background.ipc_commands.CommandRouter;
-import dev.aikido.agent_api.helpers.Serializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -42,14 +42,24 @@ public class CommandRouterTest {
 
     @Test
     public void testShouldBlockCommand() throws IOException {
+        byte[] blockingTrue = new Gson()
+                .toJson(new BlockingEnabledCommand.Res(true))
+                .getBytes(StandardCharsets.UTF_8);
+        byte[] blockingFalse = new Gson()
+                .toJson(new BlockingEnabledCommand.Res(false))
+                .getBytes(StandardCharsets.UTF_8);
+
         when(cloudConnectionManager.shouldBlock()).thenReturn(true);
         Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED${}".getBytes(StandardCharsets.UTF_8));
+
         assertTrue(result.isPresent());
-        assertArrayEquals(Serializer.serializeData(new BlockingEnabledCommand.Res(true)), result.get());
+        assertArrayEquals(blockingTrue, result.get());
+
 
         when(cloudConnectionManager.shouldBlock()).thenReturn(false);
         Optional<byte[]> result2 = commandRouter.parseIPCInput("BLOCKING_ENABLED${}".getBytes(StandardCharsets.UTF_8));
+
         assertTrue(result2.isPresent());
-        assertArrayEquals(Serializer.serializeData(new BlockingEnabledCommand.Res(false)), result2.get());
+        assertArrayEquals(blockingFalse, result2.get());
     }
 }

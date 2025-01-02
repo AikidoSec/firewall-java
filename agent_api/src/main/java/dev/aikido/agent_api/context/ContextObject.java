@@ -4,13 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.aikido.agent_api.storage.RedirectNode;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-public class ContextObject implements Serializable {
+public class ContextObject {
     protected String method;
     protected String source;
     protected String url;
@@ -19,8 +18,8 @@ public class ContextObject implements Serializable {
     protected HashMap<String, String> headers;
     protected HashMap<String, String[]> query;
     protected HashMap<String, String> cookies;
-    protected Serializable params;
-    protected transient Object body;
+    protected Object params;
+    protected Object body;
     // Auxiliary :
     protected User user;
     protected boolean executedMiddleware;
@@ -50,7 +49,7 @@ public class ContextObject implements Serializable {
     public List<RedirectNode> getRedirectStartNodes() { return redirectStartNodes; }
     public void addRedirectNode(RedirectNode node) { this.redirectStartNodes.add(node); }
 
-    public Serializable getParams() { return params; }
+    public Object getParams() { return params; }
     public String getUrl() {
         return url;
     }

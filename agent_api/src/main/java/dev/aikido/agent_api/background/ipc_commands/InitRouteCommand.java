@@ -16,6 +16,16 @@ public class InitRouteCommand extends Command<RouteMetadata, Command.EmptyResult
         return "INIT_ROUTE";
     }
 
+    @Override
+    public Class<RouteMetadata> getInputClass() {
+        return RouteMetadata.class;
+    }
+
+    @Override
+    public Class<EmptyResult> getOutputClass() {
+        return EmptyResult.class;
+    }
+
     /**
      *
      * @param routeMetadata of class RouteMetadata

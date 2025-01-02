@@ -3,8 +3,6 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 
-import java.io.Serializable;
-
 public final class RequestBodyCollector {
     private RequestBodyCollector() {}
     /**
