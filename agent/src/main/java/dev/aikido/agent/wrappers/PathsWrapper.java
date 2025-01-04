@@ -1,6 +1,7 @@
 package dev.aikido.agent.wrappers;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
@@ -28,12 +29,21 @@ public class PathsWrapper implements Wrapper {
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return isDeclaredBy(nameContains("java.nio.file.Paths")).and(named("get")).and(takesArgument(0, String.class));
     }
+
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return isSubTypeOf(Paths.class);
+    }
+
     public static class GetFunctionAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodEnter
-        public static void before(@Advice.AllArguments Object[] argument) throws Throwable {
+        public static void before(
+                @Advice.Argument(0) String argument1,
+                @Advice.Argument(value = 1, optional = true) String[] argument2
+            ) throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
@@ -51,7 +61,12 @@ public class PathsWrapper implements Wrapper {
                 // Run report with "argument"
                 for (Method method2: clazz.getMethods()) {
                     if(method2.getName().equals("report")) {
-                        method2.invoke(null, argument, "java.nio.file.Paths.get");
+                        if (argument1 != null) {
+                            method2.invoke(null, argument1, "java.nio.file.Paths.get");
+                        }
+                        if (argument2 != null) {
+                            method2.invoke(null, argument2, "java.nio.file.Paths.get");
+                        }
                         break;
                     }
                 }

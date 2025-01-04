@@ -1,6 +1,7 @@
 package dev.aikido.agent.wrappers;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
@@ -13,6 +14,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
+import static net.bytebuddy.matcher.ElementMatchers.is;
+import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class RuntimeExecWrapper implements Wrapper {
     public String getName() {
@@ -21,9 +24,15 @@ public class RuntimeExecWrapper implements Wrapper {
         return CommandExecAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("Runtime"))
+        return ElementMatchers.isDeclaredBy(Runtime.class)
                 .and(ElementMatchers.nameContainsIgnoreCase("exec"));
     }
+
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return is(Runtime.class);
+    }
+
     public static class CommandExecAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.

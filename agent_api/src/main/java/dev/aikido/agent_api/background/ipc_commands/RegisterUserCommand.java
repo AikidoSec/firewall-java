@@ -1,25 +1,31 @@
 package dev.aikido.agent_api.background.ipc_commands;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.User;
 
 import java.util.Optional;
 
-public class RegisterUserCommand implements Command {
+public class RegisterUserCommand extends Command<User, Command.EmptyResult> {
     @Override
     public boolean returnsData() {
         return false;
     }
 
     @Override
-    public boolean matchesName(String command) {
-        return command.equalsIgnoreCase("REGISTER_USER");
+    public String getName() { return "REGISTER_USER"; }
+
+    @Override
+    public Class<User> getInputClass() {
+        return User.class;
     }
 
     @Override
-    public Optional<String> execute(String data, CloudConnectionManager connectionManager) {
-        User user = new Gson().fromJson(data, User.class);
+    public Class<EmptyResult> getOutputClass() {
+        return EmptyResult.class;
+    }
+
+    @Override
+    public Optional<EmptyResult> execute(User user, CloudConnectionManager connectionManager) {
         if (user != null) {
             // Register user in connection manager:
             connectionManager.getUsers().addUser(user);

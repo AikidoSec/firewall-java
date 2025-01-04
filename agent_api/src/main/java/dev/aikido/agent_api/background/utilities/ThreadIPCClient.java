@@ -1,28 +1,30 @@
 package dev.aikido.agent_api.background.utilities;
 
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.newsclub.net.unix.AFUNIXSocket;
 import org.newsclub.net.unix.AFUNIXSocketAddress;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.SocketException;
-import java.nio.file.Path;
 import java.util.Optional;
 
-import static dev.aikido.agent_api.background.utilities.IPCFacilitator.*;
+import static dev.aikido.agent_api.background.utilities.IPCFacilitator.readFromSocket;
+import static dev.aikido.agent_api.background.utilities.IPCFacilitator.writeToSocket;
 
-public class IPCClient {
-    private static final Logger logger = LogManager.getLogger(IPCClient.class);
+public class ThreadIPCClient {
+    private static final Logger logger = LogManager.getLogger(ThreadIPCClient.class);
     private final AFUNIXSocketAddress socketAddress;
-    public IPCClient(Path socketPath) {
+    public ThreadIPCClient(File socketFile) {
         try {
-            this.socketAddress = AFUNIXSocketAddress.of(socketPath.toFile());
+            this.socketAddress = AFUNIXSocketAddress.of(socketFile);
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
     }
-    public Optional<String> sendData(String data, boolean receive) {
+    public Optional<byte[]> send(byte[] data, boolean receive) {
         AFUNIXSocket socket = null;
         try {
             // Start socket
@@ -34,9 +36,9 @@ public class IPCClient {
                 writeToSocket(socket, data);
             }
             if (receive && socket.isConnected()) {
-                Optional<String> response = readFromSocket(socket);
+                byte[] response = readFromSocket(socket).get();
                 socket.close();
-                return response;
+                return Optional.of(response);
             }
         } catch (IOException e) {
             logger.debug("Something went wrong whilst sending data.");

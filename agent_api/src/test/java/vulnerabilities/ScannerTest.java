@@ -1,15 +1,11 @@
 package vulnerabilities;
 
-import com.google.gson.Gson;
 import dev.aikido.agent_api.background.Endpoint;
-import dev.aikido.agent_api.background.utilities.IPCClient;
-import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import dev.aikido.agent_api.vulnerabilities.Detector;
 import dev.aikido.agent_api.vulnerabilities.Scanner;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
@@ -18,8 +14,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import java.util.*;
 
@@ -98,7 +92,8 @@ class ScannerTest {
         Scanner.scanForGivenVulnerability(mockVulnerability, "operation", new String[]{"arg1"});
 
         // Verify that no interactions occur when context is null
-        verifyNoInteractions(mockDetector);
+        verify(mockDetector, times(1)).returnEarly(new String[]{"arg1"}); // Verify returnEarly is called once
+        verifyNoMoreInteractions(mockDetector); // Verify no other methods are
     }
 
     // Disable IPC :

@@ -2,9 +2,12 @@ package dev.aikido.agent_api.context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.aikido.agent_api.storage.RedirectNode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 public class ContextObject {
     protected String method;
@@ -20,6 +23,8 @@ public class ContextObject {
     // Auxiliary :
     protected User user;
     protected boolean executedMiddleware;
+    protected transient ArrayList<RedirectNode> redirectStartNodes;
+    protected transient Map<String, Map<String, String>> cache = new HashMap<>();
 
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
@@ -30,8 +35,9 @@ public class ContextObject {
     public Object getBody() {
         return body;
     }
-    public void setBody(Object newBody) {
-        body = newBody;
+    public void setBody(Object body) {
+        this.body = body;
+        this.cache.remove("body"); // Reset cache
     }
 
     public String getMethod() {
@@ -40,6 +46,9 @@ public class ContextObject {
     public String getSource() {
         return source;
     }
+    public List<RedirectNode> getRedirectStartNodes() { return redirectStartNodes; }
+    public void addRedirectNode(RedirectNode node) { this.redirectStartNodes.add(node); }
+
     public Object getParams() { return params; }
     public String getUrl() {
         return url;
@@ -59,6 +68,7 @@ public class ContextObject {
     public HashMap<String, String> getCookies() {
         return cookies;
     }
+    public Map<String, Map<String, String>> getCache() { return cache; }
 
     public String toJson() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

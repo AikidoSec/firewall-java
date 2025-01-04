@@ -55,41 +55,13 @@
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>Make a GET Request: </h1>
-  <form id="requestForm">
-    <label for="url">URL:</label>
-    <input type="text" id="url" name="url" required>
-    <button type="submit">Make Request</button>
-  </form>
-</div>
-
-<script>
-  document.getElementById('requestForm').addEventListener('submit', function(event) {
-      event.preventDefault(); // Prevent the default form submission
-
-      const url = document.getElementById('url').value;
-
-      // Here you would typically send the data to your server
-      // For example, using fetch:
-      fetch('/api/requests/get', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ url })
-      })
-      .then(async (response) => {
-          if (response.ok) {
-              alert(await response.text());
-              // Optionally redirect to the pets overview page
-              window.location.href = '/';
-          } else {
-              alert('Error adding dog. Please try again.');
-          }
-      })
-      .catch(error => console.error('Error:', error));
-  });
-</script>
+  <div class="container">
+    <h1>Make a GET Request: </h1>
+    <form id="requestForm" action="/api/requests/get" method="POST">
+      <label for="url">URL:</label>
+      <input type="text" id="url" name="url" required>
+      <button type="submit">Make Request</button>
+    </form>
+  </div>
 </body>
 </html>

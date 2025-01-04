@@ -57,39 +57,11 @@
 <body>
 <div class="container">
   <h1>Read file: </h1>
-  <form id="dogForm">
+  <form id="dogForm" action="/api/files/read" method="POST">
     <label for="fileName">Path to file :</label>
     <input type="text" id="fileName" name="fileName" required>
     <button type="submit">Read file</button>
   </form>
 </div>
-
-<script>
-  document.getElementById('dogForm').addEventListener('submit', function(event) {
-      event.preventDefault(); // Prevent the default form submission
-
-      const fileName = document.getElementById('fileName').value;
-
-      // Here you would typically send the data to your server
-      // For example, using fetch:
-      fetch('/api/files/read', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ fileName })
-      })
-      .then(async (response) => {
-          if (response.ok) {
-              alert(await response.text());
-              // Optionally redirect to the pets overview page
-              window.location.href = '/';
-          } else {
-              alert('Error adding dog. Please try again.');
-          }
-      })
-      .catch(error => console.error('Error:', error));
-  });
-</script>
 </body>
 </html>

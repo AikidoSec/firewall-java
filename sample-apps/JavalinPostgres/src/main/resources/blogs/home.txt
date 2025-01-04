@@ -1,0 +1,8 @@
+=== Text Blog Page ===
+Organized per year :
+
+2023/
+|-> day1.txt
+|-> day2.txt
+2024/
+|-> apple.txt

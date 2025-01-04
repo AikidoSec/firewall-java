@@ -1,14 +1,19 @@
 package dev.aikido.agent_api.background.ipc_commands;
 
+import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
+import dev.aikido.agent_api.helpers.extraction.ByteArrayHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
+
+import static dev.aikido.agent_api.helpers.extraction.ByteArrayHelper.splitByteArray;
 
 /**
  * Routes the string command input to the correct class
@@ -34,24 +39,27 @@ public class CommandRouter {
      * @param input raw IPC command.
      * -> E.g. input = "ATTACK${'this': 'that'}"
      */
-    public Optional<String> parseIPCInput(String input) {
-        int indexOfCommandSeparator = input.indexOf('$');
-        if (indexOfCommandSeparator == -1) {
-            logger.debug("Separator not found for malformed IPC command: {}", input);
+    public Optional<byte[]> parseIPCInput(byte[] input) {
+        ByteArrayHelper.CommandData commandData = splitByteArray(input, (byte) '$');
+        if (commandData == null) {
+            logger.debug("Separator not found for malformed IPC command");
             return Optional.empty();
         }
-        String command = input.substring(0, indexOfCommandSeparator);
-        String data = input.substring(indexOfCommandSeparator + 1);
-        return switchCommands(command, data);
+        return switchCommands(commandData.command(), commandData.data());
     }
 
-    public Optional<String> switchCommands(String commandName, String data) {
+    public Optional<byte[]> switchCommands(String commandName, byte[] data) {
         for (Command command: commands) {
             if (command.matchesName(commandName)) {
                 try {
-                    Optional<String> commandResult = command.execute(data, this.connectionManager);
+                    // Parse input for the background process into the input object of the command :
+                    Gson gson = new Gson();
+                    Object deserializedInput = gson.fromJson(new String(data, StandardCharsets.UTF_8), command.getInputClass());
+
+                    Optional<?> commandResult = command.execute(deserializedInput, this.connectionManager);
                     if (command.returnsData()) {
-                        return commandResult;
+                        // Serialize returned data into a byte[] JSON :
+                        return Optional.of(gson.toJson(commandResult.get()).getBytes(StandardCharsets.UTF_8));
                     }
                 } catch (Throwable e) {
                     logger.trace(e);
@@ -59,7 +67,7 @@ public class CommandRouter {
                 return Optional.empty();
             }
         }
-        logger.debug("Command not found: {} (With data: {})", commandName, data);
+        logger.debug("Command not found: {}", commandName);
         return Optional.empty();
     }
 }

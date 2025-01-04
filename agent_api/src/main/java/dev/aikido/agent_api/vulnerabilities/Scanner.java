@@ -1,8 +1,7 @@
 package dev.aikido.agent_api.vulnerabilities;
 
-import com.google.gson.Gson;
-import dev.aikido.agent_api.background.utilities.IPCClient;
-import dev.aikido.agent_api.background.utilities.IPCDefaultClient;
+import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 
@@ -12,6 +11,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
 import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
@@ -19,8 +19,11 @@ import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.
 public final class Scanner {
     private Scanner() {}
     private static final Logger logger = LogManager.getLogger(Scanner.class);
-    private record AttackCommandData(Attack attack, ContextObject context) {}
     public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
+        Detector detector = vulnerability.getDetector();
+        if (detector.returnEarly(arguments)) {
+            return; // If input is in no way dangerous, do not loop oer user input
+        }
         ContextObject ctx = Context.get();
         if (shouldSkipVulnerabilityScan(ctx)) {
             return; // Bypassed IPs, protection forced off, ...
@@ -35,7 +38,7 @@ public final class Scanner {
                     String userInput = entry.getKey();
                     String path = entry.getValue();
                     // Run attack code :
-                    Detector.DetectorResult detectorResult = vulnerability.getDetector().run(userInput, arguments);
+                    Detector.DetectorResult detectorResult = detector.run(userInput, arguments);
                     if (!detectorResult.isDetectedAttack()) {
                         continue;
                     }
@@ -56,14 +59,9 @@ public final class Scanner {
         }
     }
     public static void reportAttack(Attack attack, ContextObject ctx) {
-        Gson gson = new Gson();
-        String json = gson.toJson(new AttackCommandData(attack, ctx));
-
-        IPCClient client = new IPCDefaultClient();
-        logger.info("Attack detected: {}", json);
-        client.sendData(
-                "ATTACK$" + json, // data
-                false // receive
-        );
+        ThreadIPCClient client = getDefaultThreadIPCClient();
+        if (client != null) {
+            AttackCommand.sendAttack(client, new AttackCommand.Req(attack, ctx));
+        }
     }
 }

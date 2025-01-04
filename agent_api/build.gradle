@@ -11,9 +11,8 @@ jacoco {
 
 dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0' // For Context object (Spring Boot)
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2' // For JWTs
     implementation 'com.github.jnr:jnr-ffi:2.2.17'
     // Junixsocket imports :
     implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
@@ -32,6 +31,13 @@ dependencies {
     testImplementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation 'org.mariadb.jdbc:mariadb-java-client:3.0.5'
     testImplementation 'com.microsoft.sqlserver:mssql-jdbc:10.2.0.jre8'
+    testImplementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
+
+    // Spring Web for RestTemplate
+    testImplementation 'org.springframework:spring-web:5.3.20'
+    testImplementation 'org.springframework:spring-webmvc:5.3.20'
+    testImplementation 'org.springframework:spring-test:5.3.20'
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }

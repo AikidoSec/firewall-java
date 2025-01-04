@@ -3,6 +3,7 @@ package helpers;
 import dev.aikido.agent_api.helpers.env.Token;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,6 +38,22 @@ class TokenTest {
     void fromEnv_shouldReturnToken_whenEnvironmentVariableIsSet() {
         Token token = Token.fromEnv();
         assertEquals("envToken", token.get());
+    }
+
+    // Test empty token from ENV:
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "")
+    @Test
+    void fromEnv_emptyToken() {
+        Token token = Token.fromEnv();
+        assertNull(token);
+    }
+
+    // Test null token from ENV:
+    @ClearEnvironmentVariable(key = "AIKIDO_TOKEN")
+    @Test
+    void fromEnv_nullToken() {
+        Token token = Token.fromEnv();
+        assertNull(token);
     }
 
     // Test for hashing a valid token

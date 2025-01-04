@@ -1,7 +1,7 @@
 package dev.aikido.agent.wrappers;
-import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
@@ -23,6 +23,10 @@ public class InetAddressWrapper implements Wrapper {
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.named("getAllByName");
+    }
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.isSubTypeOf(InetAddress.class);
     }
     public static class InetAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated

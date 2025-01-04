@@ -18,6 +18,9 @@ public enum DataSchemaType {
     @SerializedName("object")
     OBJECT,
 
+    @SerializedName("enum")
+    ENUM,
+
     @SerializedName("null")
     EMPTY;
 }

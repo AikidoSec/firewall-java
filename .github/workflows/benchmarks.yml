@@ -1,0 +1,65 @@
+name: Run Benchmarks
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'adopt'
+
+      - name: Build with Gradle
+        working-directory: ./
+        run: |
+          chmod +x gradlew
+          make binaries
+          make build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkg-build
+          path: ./
+
+  spring_boot_postgres:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pkg-build
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: "21"
+          distribution: 'adopt'
+      - name: Start mock server
+        working-directory: ./end2end/server
+        run: |
+          docker build -t mock_core . 
+          docker run --name mock_core -d -p 5000:5000 mock_core
+      - name: Start databases
+        working-directory: ./sample-apps/databases
+        run: docker compose up --build -d
+
+      - name: Start SpringBootPostgres (with and without Zen)
+        working-directory: ./sample-apps/SpringBootPostgres
+        run: |
+          make run
+          make runWithoutZen
+
+      - name: Install Python dependencies
+        run: python -m pip install -r end2end/requirements.txt
+
+      - name: Run benchmark on spring-boot-postgres
+        working-directory: ./benchmarks/wrk_benchmark
+        run: sleep 20 && make sb_postgres

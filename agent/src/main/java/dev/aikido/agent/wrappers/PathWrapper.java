@@ -1,6 +1,7 @@
 package dev.aikido.agent.wrappers;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
@@ -13,7 +14,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
-import static net.bytebuddy.matcher.ElementMatchers.named;
+import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
  * This class wraps functions on the Path class, so once a Path object already exists,
@@ -31,6 +32,12 @@ public class PathWrapper implements Wrapper {
         return ElementMatchers.isDeclaredBy(ElementMatchers.isSubTypeOf(Path.class)).and(
                 named("resolve").or(named("resolveSibling").or(named("relativize"))));
     }
+
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return isSubTypeOf(Path.class).or(isDeclaredBy(Path.class));
+    }
+
     public static class PathAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
@@ -38,7 +45,7 @@ public class PathWrapper implements Wrapper {
         @Advice.OnMethodEnter
         public static void before(
                 @Advice.Origin Executable method,
-                @Advice.Argument(0) Object argument
+                @Advice.Argument(value = 0, optional = true) Object argument
         ) throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;

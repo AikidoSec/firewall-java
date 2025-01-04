@@ -2,14 +2,12 @@ package dev.aikido.agent.wrappers;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.SpringContextObject;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import java.io.IOException;
 
 /**
  * SpringFrameworkInvokeWrapper is a wrapper for the invokeHandlerMethod function
@@ -31,8 +29,13 @@ public class SpringFrameworkInvokeWrapper implements Wrapper {
                 .and(ElementMatchers.named("invokeHandlerMethod"));
     }
 
+    @Override
+    public ElementMatcher<? super TypeDescription> getTypeMatcher() {
+        return ElementMatchers.nameContains("org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter");
+    }
+
     private static class SpringFrameworkInvokeWrapperAdvice {
-        @Advice.OnMethodEnter
+        @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(@Advice.Argument(0) HttpServletRequest httpServletRequest  ) {
             if (httpServletRequest == null) {
                 return;
