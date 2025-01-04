@@ -5,6 +5,10 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 
+import java.sql.Connection;
+import java.sql.Statement;
+
+import static net.bytebuddy.matcher.ElementMatchers.isSubTypeOf;
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class MSSQLWrapper implements Wrapper {
@@ -17,6 +21,7 @@ public class MSSQLWrapper implements Wrapper {
 
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return nameContains("com.microsoft.sqlserver.jdbc.SQLServerConnection");
+        return nameContains("com.microsoft.sqlserver.jdbc")
+                .and(isSubTypeOf(Connection.class).or(isSubTypeOf(Statement.class)));
     }
 }
