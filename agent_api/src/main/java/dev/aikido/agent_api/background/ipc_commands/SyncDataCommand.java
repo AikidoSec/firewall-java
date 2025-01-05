@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataCommand.Res> {
-    public record Res(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedIpRes) {}
+    public record Res(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, ReportingApi.APIListsResponse blockedIpRes) {}
     @Override
     public boolean returnsData() {
         // Returns JSON of SyncDataResult
@@ -42,7 +42,7 @@ public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataComman
         Set <String> bypassedIPs = connectionManager.getConfig().getBypassedIPs();
         Routes routes = connectionManager.getRoutes();
 
-        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, connectionManager.getConfig().blockedIpRes);
+        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, connectionManager.getConfig().blockedIpRes.get());
         return Optional.of(syncDataResult);
     }
 }
