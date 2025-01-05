@@ -13,13 +13,22 @@ import java.util.TimerTask;
 public class HeartbeatTask extends TimerTask {
     private static final Logger logger = LogManager.getLogger(HeartbeatTask.class);
     private final CloudConnectionManager connectionManager;
+    private final boolean shouldCheckForInitialStats;
 
     public HeartbeatTask(CloudConnectionManager connectionManager) {
+        this(connectionManager, false);
+    }
+    public HeartbeatTask(CloudConnectionManager connectionManager, boolean shouldCheckForInitialStats) {
         this.connectionManager = connectionManager;
+        this.shouldCheckForInitialStats = shouldCheckForInitialStats;
     }
 
     @Override
     public void run() {
+        if (shouldCheckForInitialStats && connectionManager.getConfig().hasReceivedAnyStats()) {
+            // Stats were already sent, so return :
+            return;
+        }
         // This gets executed as task (every x seconds)
         logger.debug("Sending out a heartbeat");
 

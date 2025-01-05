@@ -53,6 +53,11 @@ public class BackgroundProcess extends Thread {
                 new AttackQueueConsumerTask(connectionManager, attackQueue), // Consumes from the attack queue (so attacks are reported in background)
                 /* delay: */ 0, /* interval: */ 2 * 1000 // Clear queue every 2 seconds
         );
+        // Report initial statistics if those were not received
+        timer.schedule(
+                new HeartbeatTask(connectionManager, true /* Check for initial statistics */), // Initial heartbeat task
+                60_000 // Delay in ms
+        );
         try {
             File queueDir = UDSPath.getUDSPath(token);
             BackgroundReceiver server = new BackgroundReceiver(queueDir, this);

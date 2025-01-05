@@ -13,6 +13,7 @@ import java.util.List;
 public class ServiceConfiguration {
     private final String serverless;
     private boolean blockingEnabled;
+    private boolean receivedAnyStats;
     private HashSet<String> bypassedIPs =  new HashSet<>();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
@@ -22,7 +23,8 @@ public class ServiceConfiguration {
         }
         this.blockingEnabled = blockingEnabled;
         this.serverless = serverless;
-
+        // This is true by default, awaiting the startup event, if the startup event is unsuccessfull this will remain true.
+        this.receivedAnyStats = true;
     }
     public void updateConfig(APIResponse apiResponse) {
         if (apiResponse == null || !apiResponse.success()) {
@@ -36,6 +38,7 @@ public class ServiceConfiguration {
         } if (apiResponse.endpoints() != null) {
             this.endpoints = apiResponse.endpoints();
         }
+        this.receivedAnyStats = apiResponse.receivedAnyStats();
     }
     // Getters :
     public String getServerless() {
@@ -44,6 +47,7 @@ public class ServiceConfiguration {
     public boolean isBlockingEnabled() {
         return blockingEnabled;
     }
+    public boolean hasReceivedAnyStats() {return receivedAnyStats; }
     public HashSet<String> getBypassedIPs() {
         return bypassedIPs;
     }
