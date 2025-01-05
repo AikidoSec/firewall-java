@@ -15,10 +15,12 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 class WebRequestCollectorTest {
 
@@ -40,7 +42,7 @@ class WebRequestCollectorTest {
     @Test
     void testReport_contextSet() {
         // Mock ThreadCache
-        threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes());
+        threadCacheObject = getEmptyThreadCacheObject();
         ThreadCache.set(threadCacheObject);
 
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
@@ -56,7 +58,7 @@ class WebRequestCollectorTest {
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
                 "GET", "/test", 100, 100,
                 List.of("192.168.0.1"), false, false, false
-        )), Set.of(), Set.of(), new Routes());
+        )), Set.of(), Set.of(), new Routes(), Optional.empty());
         ThreadCache.set(threadCacheObject);
 
 
@@ -74,7 +76,7 @@ class WebRequestCollectorTest {
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
                 "GET", "/test", 100, 100,
                 List.of("192.168.1.1"), false, false, false
-        )), Set.of(), Set.of(), new Routes());
+        )), Set.of(), Set.of(), new Routes(), Optional.empty());
         ThreadCache.set(threadCacheObject);
 
 
