@@ -102,26 +102,11 @@ public class ServiceConfigurationTest {
     }
 
     @Test
-    public void update() {
-        ServiceConfiguration config = serviceConfiguration;
-        config.updateBlockedIps(Optional.of(new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "description", List.of(
-                        "1.2.3.4",
-                        "192.168.2.1/24",
-                        "fd00:1234:5678:9abc::1",
-                        "fd00:3234:5678:9abc::1/64",
-                        "5.6.7.8/32"
-                ))
-        ))));
-
-        assertEquals(new ServiceConfiguration.BlockedResult(true, "description"), config.isIpBlocked("1.2.3.4"));
-        assertEquals(new ServiceConfiguration.BlockedResult(false, null), config.isIpBlocked("2.3.4.5"));
-        assertEquals(new ServiceConfiguration.BlockedResult(true, "description"), config.isIpBlocked("192.168.2.2"));
-        assertEquals(new ServiceConfiguration.BlockedResult(true, "description"), config.isIpBlocked("fd00:1234:5678:9abc::1"));
-        assertEquals(new ServiceConfiguration.BlockedResult(false, null), config.isIpBlocked("fd00:1234:5678:9abc::2"));
-        assertEquals(new ServiceConfiguration.BlockedResult(true, "description"), config.isIpBlocked("fd00:3234:5678:9abc::1"));
-        assertEquals(new ServiceConfiguration.BlockedResult(true, "description"), config.isIpBlocked("fd00:3234:5678:9abc::2"));
-        assertEquals(new ServiceConfiguration.BlockedResult(true, "description"), config.isIpBlocked("5.6.7.8"));
-        assertEquals(new ServiceConfiguration.BlockedResult(false, null), config.isIpBlocked("1.2"));
+    void testSetForBlockedIpRes() {
+        assertTrue(serviceConfiguration.blockedIpRes.isEmpty());
+        serviceConfiguration.storeBlockedIpInRes(Optional.of(new ReportingApi.APIListsResponse(null)));
+        assertTrue(serviceConfiguration.blockedIpRes.isPresent());
+        serviceConfiguration.storeBlockedIpInRes(Optional.empty());
+        assertTrue(serviceConfiguration.blockedIpRes.isPresent());
     }
 }

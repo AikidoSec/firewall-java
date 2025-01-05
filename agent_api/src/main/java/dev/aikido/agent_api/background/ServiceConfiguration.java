@@ -14,14 +14,13 @@ import java.util.Optional;
  * It is essential for e.g. rate limiting
  */
 public class ServiceConfiguration {
-    public record BlockedIpEntry(BlockList blocklist, String description) {}
     private final String serverless;
     private boolean blockingEnabled;
     private boolean receivedAnyStats;
     private HashSet<String> bypassedIPs =  new HashSet<>();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
-    private List<BlockedIpEntry> blockedIps = new ArrayList<>();
+    public Optional<ReportingApi.APIListsResponse> blockedIpRes = Optional.empty();
     public ServiceConfiguration(boolean blockingEnabled, String serverless) {
         if (serverless != null && serverless.isEmpty()) {
             throw new IllegalArgumentException("Serverless cannot be an empty string");
@@ -62,29 +61,9 @@ public class ServiceConfiguration {
     public HashSet<String> getBlockedUserIDs() {
         return blockedUserIDs;
     }
-
-    /**
-     * Check if the IP is blocked (e.g. Geo IP Restrictions)
-     */
-    public BlockedResult isIpBlocked(String ip) {
-        for (BlockedIpEntry entry: blockedIps) {
-            if (entry.blocklist.isBlocked(ip)) {
-                return new BlockedResult(true, entry.description);
-            }
-        }
-        return new BlockedResult(false, null);
-    }
-    public record BlockedResult(boolean blocked, String description) {}
-    public void updateBlockedIps(Optional<ReportingApi.APIListsResponse> apiListsResponse) {
-        if (!apiListsResponse.isEmpty()) {
-            ReportingApi.APIListsResponse res = apiListsResponse.get();
-            for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
-                BlockList blockList = new BlockList();
-                for (String ip : entry.ips()) {
-                    blockList.add(ip);
-                }
-                blockedIps.add(new BlockedIpEntry(blockList, entry.description()));
-            }
+    public void storeBlockedIpInRes(Optional<ReportingApi.APIListsResponse> apiListsResponse) {
+        if (apiListsResponse.isPresent()) {
+            this.blockedIpRes = apiListsResponse;
         }
     }
 }

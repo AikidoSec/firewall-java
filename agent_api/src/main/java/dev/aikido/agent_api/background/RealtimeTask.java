@@ -39,7 +39,7 @@ public class RealtimeTask extends TimerTask {
 
                 // Fetch blocked IPs as well :
                 Optional<ReportingApi.APIListsResponse> blockedIPsRes = connectionManager.getApi().fetchBlockedIPs(connectionManager.getToken());
-                connectionManager.getConfig().updateBlockedIps(blockedIPsRes);
+                connectionManager.getConfig().storeBlockedIpInRes(blockedIPsRes);
 
                 logger.debug("Config updated");
             }
