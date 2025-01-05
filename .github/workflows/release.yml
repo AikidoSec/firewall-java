@@ -1,0 +1,40 @@
+name: Release a new version
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  packages: write
+  deployments: write
+
+jobs:
+  create-release-asset:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'adopt'
+      - name: Download binaries & Build with Gradle
+        working-directory: ./
+        run: chmod +x gradlew && make binaries && make build
+      - name: Create a zip file of the build
+        run:
+          zip -r zen.zip dist
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset: zen.zip
+          asset_name: zen.zip
+          mime_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
