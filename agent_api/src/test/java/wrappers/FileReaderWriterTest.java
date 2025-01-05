@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class FileReaderWriterTest {
     public static class SampleContextObject extends ContextObject {
@@ -48,7 +49,7 @@ public class FileReaderWriterTest {
     @BeforeEach
     void clearThreadCache() {
         cleanup();
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
+        ThreadCache.set(getEmptyThreadCacheObject());
         String prop = System.getProperty("AIK_INTERNAL_coverage_run");
         Assumptions.assumeFalse(prop != null && prop.equals("1"), "With coverage enabled we skip File(...) test cases.");
     }

@@ -20,12 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class SetUserTest {
     public static class SampleContextObject extends ContextObject {
@@ -61,7 +59,7 @@ public class SetUserTest {
         loggerConfig.setLevel(org.apache.logging.log4j.Level.INFO);
         context.updateLoggers();
         // Connect to the MySQL database
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
+        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @AfterEach

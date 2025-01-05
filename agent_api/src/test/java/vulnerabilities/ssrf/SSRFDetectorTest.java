@@ -20,6 +20,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class SSRFDetectorTest {
     public static class SampleContextObject extends ContextObject {
@@ -53,7 +54,7 @@ public class SSRFDetectorTest {
 
     private void setContextAndLifecycle(String url) {
         Context.set(new SampleContextObject(url));
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
+        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
 

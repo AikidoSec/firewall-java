@@ -18,6 +18,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class RestTemplateTest {
 
@@ -53,7 +54,7 @@ public class RestTemplateTest {
 
     private void setContextAndLifecycle(String url) {
         Context.set(new SampleContextObject(url));
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
+        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
