@@ -27,7 +27,10 @@ jobs:
         run: chmod +x gradlew && make binaries && make build
       - name: Create a zip file of the build
         run:
-          zip -r zen.zip dist
+          zip -r zen.zip dist/*
+      - name: Generate SHA checksum
+        run: |
+          shasum -a 256 zen.zip > zen.zip.sha256sum
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
@@ -38,3 +41,12 @@ jobs:
           asset_path: ./zen.zip
           asset_name: zen.zip
           asset_content_type: application/zip
+      - name: Upload Release Asset (SHA)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./zen.zip.sha256sum
+          asset_name: zen.zip.sha256sum
+          asset_content_type: text/plain
