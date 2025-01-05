@@ -25,4 +25,10 @@ public class ReportingAPITest {
         assertEquals("1.2.3.4", res.get().blockedIPAddresses().get(0).ips().get(0));
     }
 
+    @Test
+    public void testListsResponseWithTokenNull() {
+        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedIPs(null);
+        assertTrue(res.isEmpty());
+    }
+
 }

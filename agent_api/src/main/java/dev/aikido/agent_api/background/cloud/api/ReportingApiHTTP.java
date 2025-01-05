@@ -62,6 +62,9 @@ public class ReportingApiHTTP extends ReportingApi {
 
     @Override
     public Optional<APIListsResponse> fetchBlockedIPs(String token) {
+        if (token == null) {
+            return Optional.empty();
+        }
         try {
             // Make a GET request to api/runtime/firewall/lists
             URL url = new URL(reportingUrl + "api/runtime/firewall/lists");
