@@ -48,8 +48,24 @@ Zen operates autonomously on the same server as your Java app to:
 ## Installation
 > 🚧 This area is under construction
 
-WIP: Download the zip file [here]() and store it in a directory (e.g. `/opt/aikido-zen`).
+Download the zip file [here](https://github.com/AikidoSec/firewall-java/releases/latest) and unzip it to a directory (e.g. `/opt/zen`).
 Please ensure you do not alter the structure of this folder and that the process can read & write to it.
+To activate the zen agent you then just have to add the following argument to your Java command :
+```
+-javaagent:/opt/zen/agent.jar
+```
+Replace `/opt/zen` with your chosen directory.
+
+To use user-blocking and/or rate-limiting features, you will have to include the following Jarfile into your repository, for gradle :
+```gradle
+dependencies {
+    # ...
+    implementation files('/opt/zen/agent_api.jar')
+    # ...
+}
+```
+
+We will add a maven repository soon.
 
 ## Reporting to your Aikido Security dashboard
 
