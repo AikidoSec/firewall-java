@@ -20,6 +20,8 @@ dependencies {
     // Log4j 2 :
     implementation 'org.apache.logging.log4j:log4j-core:2.21.1'
     implementation 'org.apache.logging.log4j:log4j-api:2.21.1'
+    // Subnets :
+    implementation 'com.github.seancfoley:ipaddress:5.3.3'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
