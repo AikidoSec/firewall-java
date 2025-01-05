@@ -1,4 +1,6 @@
-from flask import Flask, request, jsonify
+import gzip
+
+from flask import Flask, request, jsonify, Response
 import sys
 import os
 import json
@@ -9,7 +11,31 @@ app = Flask(__name__)
 responses = {
     "config": {
         "receivedAnyStats": False,
-        "success": True
+        "success": True,
+        "endpoints": [
+            {
+                "route": "/test_ratelimiting_1",
+                "method": "*",
+                "forceProtectionOff": False,
+                "rateLimiting": {
+                    "enabled": True,
+                    "maxRequests": 2,
+                    "windowSizeInMS": 1000 * 5,
+                },
+                "graphql": False,
+            }
+        ],
+        "blockedUserIds": [],
+    },
+    "lists": {
+        "success": True,
+        "blockedIPAddresses": [
+            {
+                "source": "geoip",
+                "description": "geo restrictions",
+                "ips": ["1.2.3.4"]
+            }
+        ],
     },
     "configUpdatedAt": 0,
 }
@@ -21,15 +47,18 @@ events = []
 def get_realtime_config():
     return jsonify({"configUpdatedAt": responses["configUpdatedAt"]})
 
-@app.route('/config', methods=['GET'])
-def get_config():
-    return jsonify(responses["configUpdatedAt"])
-
-
 @app.route('/api/runtime/config', methods=['GET'])
 def get_runtime_config():
     return jsonify(responses["config"])
 
+@app.route('/api/runtime/firewall/lists', methods=['GET'])
+def get_fw_lists():
+    json_data = json.dumps(responses["lists"])
+    compressed_data = gzip.compress(json_data.encode('utf-8'))
+
+    response = Response(compressed_data, content_type='application/json')
+    response.headers['Content-Encoding'] = 'gzip'
+    return response
 
 @app.route('/api/runtime/events', methods=['POST'])
 def post_events():
@@ -57,9 +86,9 @@ if __name__ == '__main__':
     if len(sys.argv) < 2 or len(sys.argv) > 3:
         print("Usage: python mock_server.py <port> [config_file]")
         sys.exit(1)
-    
+
     port = int(sys.argv[1])
-    
+
     if len(sys.argv) == 3:
         config_file = sys.argv[2]
         if os.path.exists(config_file):
