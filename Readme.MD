@@ -56,6 +56,16 @@ To activate the zen agent you then just have to add the following argument to yo
 ```
 Replace `/opt/zen` with your chosen directory.
 
+To use user-blocking and/or rate-limiting features, you will have to include the following Jarfile into your repository, for gradle :
+```gradle
+dependencies {
+    # ...
+    implementation files('/opt/zen/agent_api.jar')
+    # ...
+}
+```
+
+We will add a maven repository soon.
 
 ## Reporting to your Aikido Security dashboard
 
