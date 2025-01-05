@@ -14,6 +14,7 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -115,7 +116,7 @@ public class WebResponseCollectorTest {
 
         // Test with emtpy thread cache getRoutes() :
         Context.set(new SampleContextObject());
-        ThreadCache.set(new ThreadCacheObject(null, null, null, null, null));
+        ThreadCache.set(new ThreadCacheObject(null, null, null, null, Optional.empty()));
         assertNull(ThreadCache.get().getRoutes());
         WebResponseCollector.report(200);
         assertNull(ThreadCache.get().getRoutes());
