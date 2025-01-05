@@ -1,8 +1,10 @@
 package dev.aikido.agent_api.background.cloud.api;
 
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
+import dev.aikido.agent_api.vulnerabilities.ssrf.imds.BlockList;
 
 import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class ReportingApi {
@@ -23,4 +25,12 @@ public abstract class ReportingApi {
      * @return
      */
     public abstract Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec);
+
+    public record APIListsResponse(List<ListsResponseEntry> blockedIPAddresses) {}
+    public record ListsResponseEntry(String source, String description, List<String> ips) {}
+    /**
+     * Fetch blocked IPs from the seperate API endpoint
+     * @param token the authentication token
+     */
+    public abstract Optional<APIListsResponse> fetchBlockedIPs(String token);
 }

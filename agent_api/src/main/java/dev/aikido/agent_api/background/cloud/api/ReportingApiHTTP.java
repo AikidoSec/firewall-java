@@ -7,17 +7,23 @@ import dev.aikido.agent_api.storage.routes.RouteEntry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.zip.GZIPInputStream;
 
 public class ReportingApiHTTP extends ReportingApi {
     private static final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
     private final String reportingUrl;
-
+    private final Gson gson = new Gson();
     public ReportingApiHTTP(String reportingUrl) {
         // Reporting URL should end with trailing slash for now.
         this.reportingUrl = reportingUrl;
@@ -53,6 +59,37 @@ public class ReportingApiHTTP extends ReportingApi {
         }
         return Optional.empty();
     }
+
+    @Override
+    public Optional<APIListsResponse> fetchBlockedIPs(String token) {
+        try {
+            // Make a GET request to api/runtime/firewall/lists
+            URL url = new URL(reportingUrl + "api/runtime/firewall/lists");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            // Set the Accept-Encoding header to gzip
+            connection.setRequestProperty("Accept-Encoding", "gzip");
+            connection.setRequestProperty("Authorization", token);
+
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                return Optional.empty();
+            }
+            InputStream inputStream = connection.getInputStream();
+            // Check if the response is gzipped
+            if ("gzip".equalsIgnoreCase(connection.getContentEncoding())) {
+                inputStream = new GZIPInputStream(inputStream);
+            }
+
+            // Read the response :
+            APIListsResponse res = gson.fromJson(new InputStreamReader(inputStream), APIListsResponse.class);
+            return Optional.of(res);
+        } catch (Exception e) {
+            logger.debug(e);
+        }
+        return Optional.empty();
+    }
+
     @Override
     public APIResponse toApiResponse(HttpResponse<String> res) {
         int status = res.statusCode();
