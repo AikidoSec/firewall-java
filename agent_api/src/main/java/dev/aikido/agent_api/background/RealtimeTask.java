@@ -3,6 +3,7 @@ package dev.aikido.agent_api.background;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.RealtimeAPI;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
+import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,6 +36,11 @@ public class RealtimeTask extends TimerTask {
                 configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt); // Store new time of last update
                 Optional<APIResponse> newConfig = connectionManager.getApi().fetchNewConfig(connectionManager.getToken(), /* Timeout in seconds: */ 3);
                 newConfig.ifPresent(connectionManager.getConfig()::updateConfig);
+
+                // Fetch blocked IPs as well :
+                Optional<ReportingApi.APIListsResponse> blockedIPsRes = connectionManager.getApi().fetchBlockedIPs(connectionManager.getToken());
+                connectionManager.getConfig().updateBlockedIps(blockedIPsRes);
+
                 logger.debug("Config updated");
             }
         }
