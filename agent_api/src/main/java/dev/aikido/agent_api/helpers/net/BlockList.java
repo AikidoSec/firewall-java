@@ -9,31 +9,26 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class BlockList {
-    private HashSet<String> blockedAddresses; // Both IPv4 and IPv6
-    private List<IPAddress> blockedSubnets;
+    //private HashSet<String> blockedAddresses; // Both IPv4 and IPv6
+    private List<IPAddress> blockedList;
 
     public BlockList() {
-        this.blockedAddresses = new HashSet<>();
-        this.blockedSubnets = new ArrayList<>();
+        //this.blockedAddresses = new HashSet<>();
+        this.blockedList = new ArrayList<>();
     }
 
-    public void addAddress(String ip) {
-        blockedAddresses.add(ip);
-    }
-
-    public void addSubnet(String plainIp, int ipRange) {
-        IPAddress subnet = new IPAddressString(plainIp + "/" + ipRange).getAddress();
-        if (subnet != null) {
-            blockedSubnets.add(subnet);
+    public void add(String ipOrCIDR) {
+        IPAddress ip = new IPAddressString(ipOrCIDR).getAddress();
+        if (ipOrCIDR.contains("/")) {
+            // CIDR :
+            ip = ip.toPrefixBlock();
+        }
+        if (ip != null) {
+            blockedList.add(ip);
         }
     }
 
     public boolean isBlocked(String ip) {
-        // Check if the IP address is in the blocked addresses
-        if (blockedAddresses.contains(ip)) {
-            return true;
-        }
-
         IPAddressString ipAddressString = new IPAddressString(ip);
         if (!ipAddressString.isValid()) {
             return false; // Invalid IP address
@@ -41,12 +36,11 @@ public class BlockList {
         IPAddress ipAddress = ipAddressString.getAddress();
 
         // Check if the IP address is in any of the blocked subnets
-        for (IPAddress subnet : blockedSubnets) {
+        for (IPAddress subnet : blockedList) {
             if (subnet.contains(ipAddress)) {
                 return true;
             }
         }
-
         return false;
     }
 }
