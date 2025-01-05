@@ -37,6 +37,7 @@ public class ServiceConfigurationTest {
         assertTrue(serviceConfiguration.getBypassedIPs().isEmpty());
         assertTrue(serviceConfiguration.getBlockedUserIDs().isEmpty());
         assertTrue(serviceConfiguration.getEndpoints().isEmpty());
+        assertTrue(serviceConfiguration.hasReceivedAnyStats());
     }
 
     @Test
@@ -56,6 +57,7 @@ public class ServiceConfigurationTest {
         assertTrue(serviceConfiguration.getBypassedIPs().isEmpty());
         assertTrue(serviceConfiguration.getBlockedUserIDs().isEmpty());
         assertTrue(serviceConfiguration.getEndpoints().isEmpty());
+        assertTrue(serviceConfiguration.hasReceivedAnyStats());
     }
 
     @Test
@@ -63,6 +65,8 @@ public class ServiceConfigurationTest {
         APIResponse apiResponse = new APIResponse(true, null, 0, null, null, null, false, false);
         serviceConfiguration.updateConfig(apiResponse);
         assertFalse(serviceConfiguration.isBlockingEnabled());
+        assertFalse(serviceConfiguration.hasReceivedAnyStats());
+
     }
 
     @Test
