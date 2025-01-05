@@ -30,11 +30,11 @@ jobs:
           zip -r zen.zip dist
 
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset: zen.zip
-          asset_name: zen.zip
-          mime_type: application/zip
+        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./zen.zip
+          asset_name: zen.zip
+          asset_content_type: application/zip
