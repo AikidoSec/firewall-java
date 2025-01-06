@@ -104,9 +104,10 @@ public class ServiceConfigurationTest {
     @Test
     void testSetForBlockedIpRes() {
         assertNull(serviceConfiguration.blockedListsRes);
-        serviceConfiguration.storeBlockedListsRes(Optional.of(new ReportingApi.APIListsResponse(null)));
+        serviceConfiguration.storeBlockedListsRes(Optional.of(new ReportingApi.APIListsResponse(null, null)));
         assertNotNull(serviceConfiguration.blockedListsRes);
         serviceConfiguration.storeBlockedListsRes(Optional.empty());
+
         assertNotNull(serviceConfiguration.blockedListsRes);
     }
 }
