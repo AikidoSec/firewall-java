@@ -26,7 +26,7 @@ public class ThreadCacheObject {
     public record BlockedIpEntry(BlockList blocklist, String description) {}
     private List<BlockedIpEntry> blockedIps = new ArrayList<>();
     // User-Agent Blocking (e.g. bot blocking) :
-    private final Pattern blockedUserAgentRegex;
+    private Pattern blockedUserAgentRegex;
     public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedListsRes) {
         this.lastRenewedAtMS = getUnixTimeMS();
         // Set endpoints :
@@ -36,7 +36,6 @@ public class ThreadCacheObject {
         this.routes = routes;
         this.hostnames = new Hostnames(5000);
         this.updateBlockedLists(blockedListsRes);
-        this.blockedUserAgentRegex = null;
     }
 
     public List<Endpoint> getEndpoints() {
@@ -81,12 +80,18 @@ public class ThreadCacheObject {
         if (!blockedListsRes.isEmpty()) {
             ReportingApi.APIListsResponse res = blockedListsRes.get();
             // Update blocked IP addresses (e.g. for geo restrictions) :
-            for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
-                BlockList blockList = new BlockList();
-                for (String ip : entry.ips()) {
-                    blockList.add(ip);
+            if (res.blockedIPAddresses() != null) {
+                for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
+                    BlockList blockList = new BlockList();
+                    for (String ip : entry.ips()) {
+                        blockList.add(ip);
+                    }
+                    blockedIps.add(new BlockedIpEntry(blockList, entry.description()));
                 }
-                blockedIps.add(new BlockedIpEntry(blockList, entry.description()));
+            }
+            // Update Blocked User-Agents regex
+            if (res.blockedUserAgents() != null && !res.blockedUserAgents().isEmpty()) {
+                this.blockedUserAgentRegex = Pattern.compile(res.blockedUserAgents(), Pattern.CASE_INSENSITIVE);
             }
         }
     }
@@ -96,7 +101,7 @@ public class ThreadCacheObject {
      */
     public boolean isBlockedUserAgent(String userAgent) {
         if (blockedUserAgentRegex != null) {
-            return blockedUserAgentRegex.matcher(userAgent).matches();
+            return blockedUserAgentRegex.matcher(userAgent).find();
         }
         return false;
     }
