@@ -42,7 +42,14 @@ public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataComman
         Set <String> bypassedIPs = connectionManager.getConfig().getBypassedIPs();
         Routes routes = connectionManager.getRoutes();
 
-        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, connectionManager.getConfig().blockedIpRes.get());
+        // Fetch blocked ip response : 
+        Optional<ReportingApi.APIListsResponse> blockedIpResOption = connectionManager.getConfig().blockedIpRes;
+        ReportingApi.APIListsResponse blockedIpRes = null;
+        if (blockedIpResOption.isPresent()) {
+            blockedIpRes = blockedIpResOption.get();
+        }
+
+        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, blockedIpRes);
         return Optional.of(syncDataResult);
     }
 }
