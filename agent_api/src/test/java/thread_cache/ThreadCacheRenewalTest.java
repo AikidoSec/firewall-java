@@ -7,6 +7,7 @@ import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import dev.aikido.agent_api.thread_cache.ThreadCacheRenewal;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
@@ -22,8 +23,7 @@ public class ThreadCacheRenewalTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "token-123456")
-    // Set AIKIDO_TMP_DIR to /opt/aikido, this is what gets created for Github workflows
-    @SetEnvironmentVariable(key = "AIKIDO_TMP_DIR", value = "/opt/aikido")
+    @ClearEnvironmentVariable(key = "AIKIDO_TMP_DIR")
     public void renewWithEmptyBackgroundProcess() throws InterruptedException {
         BackgroundProcess backgroundProcess = new BackgroundProcess("test-background-process", new Token("token-123456"));
         backgroundProcess.setDaemon(true);
