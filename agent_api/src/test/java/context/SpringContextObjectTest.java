@@ -6,11 +6,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.mockito.Mockito;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -145,5 +144,47 @@ class SpringContextObjectTest {
         springContextObject = new SpringContextObject(request);
         springContextObject.setParams("12345");
         assertEquals("12345", springContextObject.getParams());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
+    void testIpRequestFeature() {
+        // Arrange
+        Vector<String> headerVector = new Vector<>(List.of("x-forwarded-for"));
+        when(request.getHeaderNames()).thenReturn(headerVector.elements());
+        when(request.getHeader("x-forwarded-for")).thenReturn("invalid.ip, in.va.li.d, 1.2.3.4");
+        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
+        springContextObject = new SpringContextObject(request);
+
+        assertEquals(1, springContextObject.getHeaders().size());
+        assertEquals("1.2.3.4", springContextObject.getRemoteAddress());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
+    void testIpRequestFeature_InvalidHeader() {
+        // Arrange
+        Vector<String> headerVector = new Vector<>(List.of("x-forwarded-for"));
+        when(request.getHeaderNames()).thenReturn(headerVector.elements());
+        when(request.getHeader("x-forwarded-for")).thenReturn("invalid.ip, in.va.li.d");
+        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
+        springContextObject = new SpringContextObject(request);
+
+        assertEquals(1, springContextObject.getHeaders().size());
+        assertEquals("192.168.1.1", springContextObject.getRemoteAddress());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "0")
+    void testIpRequestFeature_TrustProxyOff() {
+        // Arrange
+        Vector<String> headerVector = new Vector<>(List.of("x-forwarded-for"));
+        when(request.getHeaderNames()).thenReturn(headerVector.elements());
+        when(request.getHeader("x-forwarded-for")).thenReturn("invalid.ip, in.va.li.d, 1.2.3.4");
+        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
+        springContextObject = new SpringContextObject(request);
+
+        assertEquals(1, springContextObject.getHeaders().size());
+        assertEquals("192.168.1.1", springContextObject.getRemoteAddress());
     }
 }

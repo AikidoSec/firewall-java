@@ -8,6 +8,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
 public class SpringContextObject extends ContextObject {
@@ -18,11 +19,12 @@ public class SpringContextObject extends ContextObject {
         if (request.getRequestURL() != null) {
             this.url = request.getRequestURL().toString();
         }
-        this.remoteAddress = request.getRemoteAddr();
+        String rawIp = request.getRemoteAddr();
         this.headers = extractHeaders(request);
         this.query = extractQueryParameters(request);
         this.cookies = extractCookies(request);
         this.route = buildRouteFromUrl(this.url);
+        this.remoteAddress = getIpFromRequest(rawIp, this.headers);
         this.source = "SpringFramework";
         this.redirectStartNodes = new ArrayList<>();
 
