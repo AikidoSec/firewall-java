@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Vector;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,6 +35,10 @@ class WebRequestCollectorTest {
         when(request.getMethod()).thenReturn("GET");
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/test"));
         when(request.getRemoteAddr()).thenReturn("192.168.1.1");
+        Vector<String> headerVector = new Vector<>(List.of("content-type", "user-agent"));
+        when(request.getHeaderNames()).thenReturn(headerVector.elements());
+        when(request.getHeader("content-type")).thenReturn("application/json");
+        when(request.getHeader("user-agent")).thenReturn("Mozilla/5.0 (compatible) AI2Bot (+https://www.allenai.org/crawler)");
 
         contextObject = new SpringContextObject(request);
         threadCacheObject = mock(ThreadCacheObject.class);
@@ -104,7 +109,7 @@ class WebRequestCollectorTest {
     void testReport_ipBlockedTwice() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
                 new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.1"))
-        ));
+        ), "");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
                 "GET", "/test", 100, 100,
@@ -125,7 +130,7 @@ class WebRequestCollectorTest {
     void testReport_ipBlockedUsingLists() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
                 new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
-        ));
+        ), "");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
         ThreadCache.set(threadCacheObject);
@@ -140,10 +145,10 @@ class WebRequestCollectorTest {
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
     @Test
-    void testReport_ipNotBlockedUsingLists() {
+    void testReport_ipNotBlockedUsingListsNorUserAgent() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
                 new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
-        ));
+        ), "Unrelated|random");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
         ThreadCache.set(threadCacheObject);
@@ -152,5 +157,23 @@ class WebRequestCollectorTest {
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
 
         assertNull(response);
+    }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
+    @Test
+    void testReport_userAgentBlocked() {
+        ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
+                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
+        ), "AI2Bot|hacker");
+        // Mock ThreadCache
+        threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
+        ThreadCache.set(threadCacheObject);
+
+
+        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
+
+        assertNotNull(response);
+        assertEquals("You are not allowed to access this resource because you have been identified as a bot.", response.msg());
+        assertEquals(403, response.status());
     }
 }
