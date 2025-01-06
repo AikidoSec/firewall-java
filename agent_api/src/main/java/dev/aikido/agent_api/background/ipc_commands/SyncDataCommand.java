@@ -41,13 +41,7 @@ public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataComman
         Set<String> blockedUserIDs = connectionManager.getConfig().getBlockedUserIDs();
         Set <String> bypassedIPs = connectionManager.getConfig().getBypassedIPs();
         Routes routes = connectionManager.getRoutes();
-
-        // Fetch blocked ip response : 
-        Optional<ReportingApi.APIListsResponse> blockedListsResOption = connectionManager.getConfig().blockedListsRes;
-        ReportingApi.APIListsResponse blockedListsRes = null;
-        if (blockedListsResOption.isPresent()) {
-            blockedListsRes = blockedListsResOption.get();
-        }
+        ReportingApi.APIListsResponse blockedListsRes = connectionManager.getConfig().blockedListsRes;
 
         Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, blockedListsRes);
         return Optional.of(syncDataResult);

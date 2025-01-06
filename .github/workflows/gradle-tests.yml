@@ -33,7 +33,9 @@ jobs:
         working-directory: ./end2end/server
         run: docker build -t mock_core . && docker run --name mock_core -d -p 5000:5000 mock_core
       - name: Create temporary directory
-        run: mkdir -p /opt/aikido
+        run: |
+          mkdir -p /opt/aikido
+          chmod 777 /opt/aikido
       - name: Run test cases
         working-directory: ./
         run: chmod +x gradlew && make test

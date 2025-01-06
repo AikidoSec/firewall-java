@@ -19,7 +19,7 @@ public class ServiceConfiguration {
     private HashSet<String> bypassedIPs =  new HashSet<>();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
-    public Optional<ReportingApi.APIListsResponse> blockedListsRes = Optional.empty();
+    public ReportingApi.APIListsResponse blockedListsRes = null;
     public ServiceConfiguration(boolean blockingEnabled, String serverless) {
         if (serverless != null && serverless.isEmpty()) {
             throw new IllegalArgumentException("Serverless cannot be an empty string");
@@ -62,7 +62,7 @@ public class ServiceConfiguration {
     }
     public void storeBlockedListsRes(Optional<ReportingApi.APIListsResponse> apiListsResponse) {
         if (apiListsResponse.isPresent()) {
-            this.blockedListsRes = apiListsResponse;
+            this.blockedListsRes = apiListsResponse.get();
         }
     }
 }
