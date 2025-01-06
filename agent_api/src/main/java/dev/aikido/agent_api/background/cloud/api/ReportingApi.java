@@ -25,7 +25,7 @@ public abstract class ReportingApi {
      */
     public abstract Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec);
 
-    public record APIListsResponse(List<ListsResponseEntry> blockedIPAddresses) {}
+    public record APIListsResponse(List<ListsResponseEntry> blockedIPAddresses, String blockedUserAgents) {}
     public record ListsResponseEntry(String source, String description, List<String> ips) {}
     /**
      * Fetch blocked IPs from the seperate API endpoint
