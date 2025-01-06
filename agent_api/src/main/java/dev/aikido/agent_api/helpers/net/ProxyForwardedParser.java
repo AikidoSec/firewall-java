@@ -14,15 +14,33 @@ public class ProxyForwardedParser {
         BooleanEnv trustProxy = new BooleanEnv("AIKIDO_TRUST_PROXY", /* default : */ true);
         if (xForwardedForHeader != null && !xForwardedForHeader.isEmpty() && trustProxy.getValue()) {
             // Parse X-Forwarded-For and return the correct IP :
-            String[] ips = xForwardedForHeader.split(",");
-            for (String ip : ips) {
-                if (isIPAddress(ip.trim())) {
-                    return ip.trim(); // Return the first valid IP found
-                }
+            String xForwardedForIp = extractIpFromHeader(xForwardedForHeader);
+            if (xForwardedForIp != null) {
+                return xForwardedForIp;
             }
         }
 
         // If no valid IP was found, or if X-Forwarded-For was not present, default to raw ip:
         return rawIp;
+    }
+    private static String extractIpFromHeader(String xForwardedForHeader) {
+        String[] ips = xForwardedForHeader.split(",");
+        for (String ip: ips) {
+            ip = ip.trim();
+
+            // Some proxies pass along port numbers inside x-forwarded-for :
+            if (ip.contains(":")) {
+                String[] ipParts = ip.split(":");
+                if (ipParts.length == 2 && isIPAddress(ipParts[0])) {
+                    return ipParts[0];
+                }
+            }
+
+            // Continue to check the IPs :
+            if (isIPAddress(ip)) {
+                return ip;
+            }
+        }
+        return null;
     }
 }

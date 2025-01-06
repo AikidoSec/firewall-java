@@ -30,6 +30,15 @@ class ProxyForwardedParserTest {
     }
 
     @Test
+    void testGetIpFromRequest_ValidXForwardedForWithPort() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("x-forwarded-for", "192.168.1.1:8080, 203.0.113.5:443");
+
+        String result = parser.getIpFromRequest("10.0.0.1", headers);
+        assertEquals("192.168.1.1", result);
+    }
+
+    @Test
     void testGetIpFromRequest_ValidXForwardedForWithIPv6() {
         Map<String, String> headers = new HashMap<>();
         headers.put("x-forwarded-for", "2001:db8::1, 203.0.113.5");
@@ -42,6 +51,15 @@ class ProxyForwardedParserTest {
     void testGetIpFromRequest_InvalidXForwardedFor() {
         Map<String, String> headers = new HashMap<>();
         headers.put("x-forwarded-for", "invalid.ip.address, 203.0.113.5");
+
+        String result = parser.getIpFromRequest("10.0.0.1", headers);
+        assertEquals("203.0.113.5", result); // Only use 203.0.113.5
+    }
+
+    @Test
+    void testGetIpFromRequest_InvalidXForwardedFor_with_port() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("x-forwarded-for", "invalid.ip.address:443, 203.0.113.5:8080192");
 
         String result = parser.getIpFromRequest("10.0.0.1", headers);
         assertEquals("203.0.113.5", result); // Only use 203.0.113.5
