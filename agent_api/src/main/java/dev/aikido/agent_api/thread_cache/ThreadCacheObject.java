@@ -1,7 +1,6 @@
 package dev.aikido.agent_api.thread_cache;
 
 import dev.aikido.agent_api.background.Endpoint;
-import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.net.BlockList;
 import dev.aikido.agent_api.storage.Hostnames;
@@ -28,7 +27,7 @@ public class ThreadCacheObject {
     private List<BlockedIpEntry> blockedIps = new ArrayList<>();
     // User-Agent Blocking (e.g. bot blocking) :
     private final Pattern blockedUserAgentRegex;
-    public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedIps) {
+    public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedListsRes) {
         this.lastRenewedAtMS = getUnixTimeMS();
         // Set endpoints :
         this.endpoints = endpoints;
@@ -36,7 +35,7 @@ public class ThreadCacheObject {
         this.bypassedIPs = bypassedIPs;
         this.routes = routes;
         this.hostnames = new Hostnames(5000);
-        this.updateBlockedIps(blockedIps);
+        this.updateBlockedLists(blockedListsRes);
         this.blockedUserAgentRegex = null;
     }
 
@@ -78,9 +77,10 @@ public class ThreadCacheObject {
         return new BlockedResult(false, null);
     }
     public record BlockedResult(boolean blocked, String description) {}
-    public void updateBlockedIps(Optional<ReportingApi.APIListsResponse> apiListsResponse) {
-        if (!apiListsResponse.isEmpty()) {
-            ReportingApi.APIListsResponse res = apiListsResponse.get();
+    public void updateBlockedLists(Optional<ReportingApi.APIListsResponse> blockedListsRes) {
+        if (!blockedListsRes.isEmpty()) {
+            ReportingApi.APIListsResponse res = blockedListsRes.get();
+            // Update blocked IP addresses (e.g. for geo restrictions) :
             for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
                 BlockList blockList = new BlockList();
                 for (String ip : entry.ips()) {
