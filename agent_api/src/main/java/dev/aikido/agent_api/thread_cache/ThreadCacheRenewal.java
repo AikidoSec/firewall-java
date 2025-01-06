@@ -8,13 +8,14 @@ import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import java.util.Optional;
 
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
+import static dev.aikido.agent_api.helpers.BackgroundProcessIdentifier.isBackgroundProcess;
 
 public final class ThreadCacheRenewal {
     private ThreadCacheRenewal() {}
     public static ThreadCacheObject renewThreadCache() {
         // Fetch thread cache over IPC:
         ThreadIPCClient client = getDefaultThreadIPCClient();
-        if (client == null) {
+        if (client == null || isBackgroundProcess()) {
             return null;
         }
         Optional<SyncDataCommand.Res> result = new SyncDataCommand().send(client, new Command.EmptyResult());
