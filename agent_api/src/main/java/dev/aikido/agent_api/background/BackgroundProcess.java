@@ -26,6 +26,7 @@ public class BackgroundProcess extends Thread {
         super(name);
         this.token = token;
     }
+
     public void run() {
         if (!Thread.currentThread().isDaemon() && token == null) {
             return; // Can only run if thread is daemon and token needs to be defined.
@@ -63,8 +64,7 @@ public class BackgroundProcess extends Thread {
                 throw new RuntimeException("AIKIDO: Cannot write to socket " +  queueDir.getPath() + ", please verify access");
             }
             BackgroundReceiver server = new BackgroundReceiver(queueDir, this);
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | InterruptedException ignored) {
         }
         logger.debug("Background thread closing.");
     }
