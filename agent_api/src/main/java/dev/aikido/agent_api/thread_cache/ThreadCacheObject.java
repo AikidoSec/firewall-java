@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
@@ -21,8 +23,11 @@ public class ThreadCacheObject {
     private final long lastRenewedAtMS;
     private final Hostnames hostnames;
     private final Routes routes;
+    // IP Blocking (e.g. Geo-IP Restrictions) :
     public record BlockedIpEntry(BlockList blocklist, String description) {}
     private List<BlockedIpEntry> blockedIps = new ArrayList<>();
+    // User-Agent Blocking (e.g. bot blocking) :
+    private final Pattern blockedUserAgentRegex;
     public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedIps) {
         this.lastRenewedAtMS = getUnixTimeMS();
         // Set endpoints :
@@ -32,6 +37,7 @@ public class ThreadCacheObject {
         this.routes = routes;
         this.hostnames = new Hostnames(5000);
         this.updateBlockedIps(blockedIps);
+        this.blockedUserAgentRegex = null;
     }
 
     public List<Endpoint> getEndpoints() {
@@ -50,7 +56,6 @@ public class ThreadCacheObject {
     public long getLastRenewedAtMS() {
         return lastRenewedAtMS;
     }
-
     public Hostnames getHostnames() {
         return hostnames;
     }
@@ -84,5 +89,15 @@ public class ThreadCacheObject {
                 blockedIps.add(new BlockedIpEntry(blockList, entry.description()));
             }
         }
+    }
+
+    /**
+     * Check if a given User-Agent is blocked or not :
+     */
+    public boolean isBlockedUserAgent(String userAgent) {
+        if (blockedUserAgentRegex != null) {
+            return blockedUserAgentRegex.matcher(userAgent).matches();
+        }
+        return false;
     }
 }
