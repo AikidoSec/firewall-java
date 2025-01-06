@@ -28,7 +28,9 @@ public abstract class ReportingApi {
     public record APIListsResponse(List<ListsResponseEntry> blockedIPAddresses) {}
     public record ListsResponseEntry(String source, String description, List<String> ips) {}
     /**
-     * Fetch blocked IPs from the seperate API endpoint
+     * Fetch blocked lists using a separate API call, these can include :
+     * -> blocked IP Addresses (e.g. geo restrictions)
+     * -> blocked User-Agents (e.g. bot blocking)
      * @param token the authentication token
      */
     public abstract Optional<APIListsResponse> fetchBlockedLists(String token);
