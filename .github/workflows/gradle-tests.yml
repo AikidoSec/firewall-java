@@ -38,7 +38,7 @@ jobs:
           chmod 777 /opt/aikido
       - name: Run test cases
         working-directory: ./
-        run: chmod +x gradlew && make test
+        run: chmod a+x gradlew && sudo make test
 
       - name: Run coverage with Gradle
         working-directory: ./
