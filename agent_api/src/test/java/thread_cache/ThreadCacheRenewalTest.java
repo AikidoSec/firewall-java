@@ -22,7 +22,6 @@ public class ThreadCacheRenewalTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "token-123456")
-    @SetEnvironmentVariable(key = "AIKIDO_TMP_DIR", value = "/opt/aikido")
     public void renewWithEmptyBackgroundProcess() throws InterruptedException {
         BackgroundProcess backgroundProcess = new BackgroundProcess("test-background-process", new Token("token-123456"));
         backgroundProcess.setDaemon(true);
