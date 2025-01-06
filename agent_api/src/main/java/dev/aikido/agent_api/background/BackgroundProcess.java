@@ -60,9 +60,8 @@ public class BackgroundProcess extends Thread {
         );
         try {
             File queueDir = UDSPath.getUDSPath(token);
-            if (!queueDir.canWrite()) {
+            if (!queueDir.getParentFile().canWrite()) {
                 logger.error("AIKIDO: Cannot write to socket {}, please verify access", queueDir.getPath());
-                return;
             }
             BackgroundReceiver server = new BackgroundReceiver(queueDir, this);
         } catch (IOException | InterruptedException e) {
