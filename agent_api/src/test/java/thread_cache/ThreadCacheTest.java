@@ -1,6 +1,8 @@
 package thread_cache;
 
 
+import dev.aikido.agent_api.background.ServiceConfiguration;
+import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
@@ -10,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,12 +28,13 @@ public class ThreadCacheTest {
         //IPCDefaultClient.setClient(mockClient); // Assuming you have a way to set the client
     }
 
+
     @Test
     public void testGetCacheWhenNotExpired() {
         // Arrange
         Set<String> blockedUserIds = Set.of("user1", "user2");
         Routes routes = new Routes(); // Assuming Routes has a default constructor
-        ThreadCacheObject expectedCache = new ThreadCacheObject(Collections.emptyList(), blockedUserIds, Set.of(), routes);
+        ThreadCacheObject expectedCache = new ThreadCacheObject(Collections.emptyList(), blockedUserIds, Set.of(), routes, Optional.empty());
         ThreadCache.set(expectedCache);
 
         // Act

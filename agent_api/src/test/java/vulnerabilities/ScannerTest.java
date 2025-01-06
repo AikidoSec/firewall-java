@@ -72,7 +72,8 @@ class ScannerTest {
             ),
             Set.of(),
             Set.of("1.1.1.1", "2.2.2.2", "3.3.3.3"),
-            new Routes()
+            new Routes(),
+            Optional.empty()
         );
         Context.set(new SampleContextObject());
         ThreadCache.set(threadCacheObject);

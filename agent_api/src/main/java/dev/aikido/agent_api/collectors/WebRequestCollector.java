@@ -31,6 +31,15 @@ public final class WebRequestCollector {
         ThreadCacheObject threadCache = ThreadCache.get();
         if (threadCache != null) {
             List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), threadCache.getEndpoints());
+
+            // Blocked IP lists (e.g. Geo restrictions)
+            ThreadCacheObject.BlockedResult ipBlocked = threadCache.isIpBlocked(newContext.getRemoteAddress());
+            if (ipBlocked.blocked()) {
+                String msg = "Your IP address is not allowed to access this resource.";
+                msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
+                return new Res(msg, 403);
+            }
+            // Per-route IP allowlists :
             if (!ipAllowedToAccessRoute(newContext.getRemoteAddress(), matchedEndpoints)) {
                 String msg = "Your IP address is not allowed to access this resource.";
                 msg += " (Your IP: " + newContext.getRemoteAddress() + ")";

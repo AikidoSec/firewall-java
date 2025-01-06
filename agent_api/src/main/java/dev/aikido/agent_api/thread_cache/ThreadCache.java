@@ -40,8 +40,12 @@ public final class ThreadCache {
         return currentThreadCache;
     }
     public static void set(ThreadCacheObject threadCacheObject) {
-        logger.trace("Thread cache initialized or updated.");
-        threadCache.set(threadCacheObject);
+        if (threadCacheObject == null) {
+            reset();
+        } else {
+            logger.trace("Thread cache initialized or updated.");
+            threadCache.set(threadCacheObject);
+        }
     }
     public static void reset() {
         threadCache.remove();

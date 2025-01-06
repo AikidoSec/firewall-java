@@ -14,9 +14,11 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class WebResponseCollectorTest {
     public static class SampleContextObject extends ContextObject {
@@ -46,7 +48,7 @@ public class WebResponseCollectorTest {
     @BeforeEach
     public void setUp() throws SQLException {
         // Connect to the MySQL database
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
+        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @AfterEach
@@ -114,7 +116,7 @@ public class WebResponseCollectorTest {
 
         // Test with emtpy thread cache getRoutes() :
         Context.set(new SampleContextObject());
-        ThreadCache.set(new ThreadCacheObject(null, null, null, null));
+        ThreadCache.set(new ThreadCacheObject(null, null, null, null, Optional.empty()));
         assertNull(ThreadCache.get().getRoutes());
         WebResponseCollector.report(200);
         assertNull(ThreadCache.get().getRoutes());

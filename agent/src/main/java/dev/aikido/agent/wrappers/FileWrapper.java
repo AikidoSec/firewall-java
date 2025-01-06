@@ -46,6 +46,10 @@ public class FileWrapper implements Wrapper {
                 if (prop != null && prop.equals("1")) {
                     return;
                 }
+                if (Thread.currentThread().getClass().toString()
+                        .equals("class dev.aikido.agent_api.background.BackgroundProcess")) {
+                    return; // Do not wrap File calls in background process.
+                }
             } catch (Throwable e) {
                 return;
             }

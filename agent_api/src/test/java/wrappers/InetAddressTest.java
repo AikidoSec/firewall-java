@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class InetAddressTest {
     private HttpClient httpClient;
@@ -55,7 +56,7 @@ public class InetAddressTest {
     }
     private void setContextAndLifecycle(String url) {
         Context.set(new SampleContextObject(url));
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
+        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")

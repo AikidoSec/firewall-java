@@ -3,13 +3,11 @@ package background;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
+import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -101,5 +99,14 @@ public class ServiceConfigurationTest {
         assertEquals(new HashSet<>(Arrays.asList("user1")), serviceConfiguration.getBlockedUserIDs());
         assertEquals(new HashSet<>(Arrays.asList("192.168.1.1")), serviceConfiguration.getBypassedIPs());
         assertEquals(Arrays.asList(endpoint1), serviceConfiguration.getEndpoints());
+    }
+
+    @Test
+    void testSetForBlockedIpRes() {
+        assertNull(serviceConfiguration.blockedListsRes);
+        serviceConfiguration.storeBlockedListsRes(Optional.of(new ReportingApi.APIListsResponse(null)));
+        assertNotNull(serviceConfiguration.blockedListsRes);
+        serviceConfiguration.storeBlockedListsRes(Optional.empty());
+        assertNotNull(serviceConfiguration.blockedListsRes);
     }
 }

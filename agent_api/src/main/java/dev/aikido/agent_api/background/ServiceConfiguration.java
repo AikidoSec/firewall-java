@@ -1,10 +1,12 @@
 package dev.aikido.agent_api.background;
 
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
+import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This class holds all config objects from Aikido's servers, i.e. endpoints, blocked IPs, bypassed users, ...
@@ -17,6 +19,7 @@ public class ServiceConfiguration {
     private HashSet<String> bypassedIPs =  new HashSet<>();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
+    public ReportingApi.APIListsResponse blockedListsRes = null;
     public ServiceConfiguration(boolean blockingEnabled, String serverless) {
         if (serverless != null && serverless.isEmpty()) {
             throw new IllegalArgumentException("Serverless cannot be an empty string");
@@ -56,5 +59,10 @@ public class ServiceConfiguration {
     }
     public HashSet<String> getBlockedUserIDs() {
         return blockedUserIDs;
+    }
+    public void storeBlockedListsRes(Optional<ReportingApi.APIListsResponse> apiListsResponse) {
+        if (apiListsResponse.isPresent()) {
+            this.blockedListsRes = apiListsResponse.get();
+        }
     }
 }

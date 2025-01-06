@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,7 +54,7 @@ public class MSSQLWrapperTest {
         String user = "sa"; // Change to your username
         String password = "Strong!Passw0rd"; // Change to your password
         connection = DriverManager.getConnection(url, user, password);
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
+        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.empty()));
     }
 
     @AfterEach

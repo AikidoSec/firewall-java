@@ -41,8 +41,7 @@ public class ThreadIPCClient {
                 return Optional.of(response);
             }
         } catch (IOException e) {
-            logger.debug("Something went wrong whilst sending data.");
-            logger.trace(e);
+            logger.debug("Something went wrong whilst sending data: {}", e.getMessage());
         } finally {
             // Make sure the socket is also closed in event of a crash :
             if (socket != null && !socket.isClosed()) {

@@ -3,6 +3,7 @@ package dev.aikido.agent_api.background.cloud.api;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 
 import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class ReportingApi {
@@ -23,4 +24,14 @@ public abstract class ReportingApi {
      * @return
      */
     public abstract Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec);
+
+    public record APIListsResponse(List<ListsResponseEntry> blockedIPAddresses) {}
+    public record ListsResponseEntry(String source, String description, List<String> ips) {}
+    /**
+     * Fetch blocked lists using a separate API call, these can include :
+     * -> blocked IP Addresses (e.g. geo restrictions)
+     * -> blocked User-Agents (e.g. bot blocking)
+     * @param token the authentication token
+     */
+    public abstract Optional<APIListsResponse> fetchBlockedLists(String token);
 }

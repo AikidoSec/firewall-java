@@ -20,12 +20,10 @@ import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class ShouldBlockRequestTest {
     public static class SampleContextObject extends ContextObject {
@@ -61,7 +59,7 @@ public class ShouldBlockRequestTest {
         loggerConfig.setLevel(Level.INFO);
         context.updateLoggers();
         // Connect to the MySQL database
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
+        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @AfterEach
@@ -130,7 +128,7 @@ public class ShouldBlockRequestTest {
         ctx.setUser(new User("ID1", "John Doe", "127.0.0.1", 100));
         Context.set(ctx);
 
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of("ID1", "ID2", "ID3"), Set.of(), new Routes()));
+        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of("ID1", "ID2", "ID3"), Set.of(), new Routes(), Optional.empty()));
         var res2 = ShouldBlockRequest.shouldBlockRequest();
         assertTrue(res2.block());
         assertTrue(Context.get().middlewareExecuted());
@@ -161,7 +159,7 @@ public class ShouldBlockRequestTest {
         Context.set(null);
         ThreadCache.set(new ThreadCacheObject(List.of(
                 new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, false)
-        ), Set.of(), Set.of(), new Routes()));
+        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with thread cache set & rate-limiting disabled :
         var res1 = ShouldBlockRequest.shouldBlockRequest();
@@ -170,7 +168,7 @@ public class ShouldBlockRequestTest {
         Context.set(null);
         ThreadCache.set(new ThreadCacheObject(List.of(
                 new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, true)
-        ), Set.of(), Set.of(), new Routes()));
+        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with thread cache set & rate-limiting enabled :
         var res2 = ShouldBlockRequest.shouldBlockRequest();
@@ -183,7 +181,7 @@ public class ShouldBlockRequestTest {
         Context.set(null);
         ThreadCache.set(new ThreadCacheObject(List.of(
                 new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, false)
-        ), Set.of(), Set.of(), new Routes()));
+        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with match & rate-limiting disabled :
         var res1 = ShouldBlockRequest.shouldBlockRequest();
@@ -192,7 +190,7 @@ public class ShouldBlockRequestTest {
         Context.set(null);
         ThreadCache.set(new ThreadCacheObject(List.of(
                 new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
-        ), Set.of(), Set.of(), new Routes()));
+        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with match & rate-limiting enabled :
         var res2 = ShouldBlockRequest.shouldBlockRequest();
@@ -205,7 +203,7 @@ public class ShouldBlockRequestTest {
         Context.set(new SampleContextObject());
         ThreadCache.set(new ThreadCacheObject(List.of(
                 new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
-        ), Set.of(), Set.of(), new Routes()));
+        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with match & rate-limiting enabled :
         var res1 = ShouldBlockRequest.shouldBlockRequest();
@@ -218,7 +216,7 @@ public class ShouldBlockRequestTest {
         Context.set(new SampleContextObject());
         ThreadCache.set(new ThreadCacheObject(List.of(
                 new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
-        ), Set.of(), Set.of(), new Routes()));
+        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with match & rate-limiting enabled :
         var res1 = ShouldBlockRequest.shouldBlockRequest();

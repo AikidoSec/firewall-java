@@ -15,9 +15,11 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class PostgresWrapperTest {
     private Connection connection;
@@ -44,7 +46,7 @@ public class PostgresWrapperTest {
     public void setUp() throws SQLException {
         // Connect to the PostgreSQL database
         connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/db", "user", "password");
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes()));
+        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @AfterEach
