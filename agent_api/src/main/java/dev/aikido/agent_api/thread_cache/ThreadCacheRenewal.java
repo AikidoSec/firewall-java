@@ -1,5 +1,6 @@
 package dev.aikido.agent_api.thread_cache;
 
+import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.background.ipc_commands.Command;
 import dev.aikido.agent_api.background.ipc_commands.SyncDataCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
@@ -20,7 +21,11 @@ public final class ThreadCacheRenewal {
         if(result.isPresent()) {
             SyncDataCommand.Res res = result.get();
             if (res != null) {
-                return new ThreadCacheObject(res.endpoints(), res.blockedUserIDs(), res.bypassedIPs(), res.routes(), Optional.of(res.blockedListsRes()));
+                Optional<ReportingApi.APIListsResponse> blockedListsRes = Optional.empty();
+                if (res.blockedListsRes() != null) {
+                    blockedListsRes = Optional.of(res.blockedListsRes());
+                }
+                return new ThreadCacheObject(res.endpoints(), res.blockedUserIDs(), res.bypassedIPs(), res.routes(), blockedListsRes);
             }
         }
         return null;
