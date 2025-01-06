@@ -64,7 +64,8 @@ public class BackgroundProcess extends Thread {
                 throw new RuntimeException("AIKIDO: Cannot write to socket " +  queueDir.getPath() + ", please verify access");
             }
             BackgroundReceiver server = new BackgroundReceiver(queueDir, this);
-        } catch (IOException | InterruptedException ignored) {
+        } catch (IOException | InterruptedException e) {
+            logger.trace(e);
         }
         logger.debug("Background thread closing.");
     }
