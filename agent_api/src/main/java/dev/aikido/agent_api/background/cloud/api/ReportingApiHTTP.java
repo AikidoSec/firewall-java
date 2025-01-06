@@ -61,7 +61,7 @@ public class ReportingApiHTTP extends ReportingApi {
     }
 
     @Override
-    public Optional<APIListsResponse> fetchBlockedIPs(String token) {
+    public Optional<APIListsResponse> fetchBlockedLists(String token) {
         if (token == null) {
             return Optional.empty();
         }

@@ -44,7 +44,7 @@ public class CloudConnectionManager {
     }
     public void onStart() {
         reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
-        config.storeBlockedIpInRes(api.fetchBlockedIPs(token));
+        config.storeBlockedIpInRes(api.fetchBlockedLists(token));
     }
     public void reportEvent(APIEvent event, boolean updateConfig) {
         Optional<APIResponse> res = this.api.report(this.token, event, timeout);

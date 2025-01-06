@@ -17,7 +17,7 @@ public class ReportingAPITest {
 
     @Test
     public void testListsResponse() {
-        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedIPs("token");
+        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");
         assertTrue(res.isPresent());
         assertEquals(1, res.get().blockedIPAddresses().size());
         assertEquals("geoip", res.get().blockedIPAddresses().get(0).source());
@@ -27,7 +27,7 @@ public class ReportingAPITest {
 
     @Test
     public void testListsResponseWithTokenNull() {
-        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedIPs(null);
+        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists(null);
         assertTrue(res.isEmpty());
     }
 
