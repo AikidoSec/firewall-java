@@ -20,7 +20,7 @@ public final class ThreadCacheRenewal {
         if(result.isPresent()) {
             SyncDataCommand.Res res = result.get();
             if (res != null) {
-                return new ThreadCacheObject(res.endpoints(), res.blockedUserIDs(), res.bypassedIPs(), res.routes(), Optional.of(res.blockedIpRes()));
+                return new ThreadCacheObject(res.endpoints(), res.blockedUserIDs(), res.bypassedIPs(), res.routes(), Optional.of(res.blockedListsRes()));
             }
         }
         return null;

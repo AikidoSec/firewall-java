@@ -2,7 +2,6 @@ package dev.aikido.agent_api.background;
 
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
-import dev.aikido.agent_api.helpers.net.BlockList;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,7 +19,7 @@ public class ServiceConfiguration {
     private HashSet<String> bypassedIPs =  new HashSet<>();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
-    public Optional<ReportingApi.APIListsResponse> blockedIpRes = Optional.empty();
+    public Optional<ReportingApi.APIListsResponse> blockedListsRes = Optional.empty();
     public ServiceConfiguration(boolean blockingEnabled, String serverless) {
         if (serverless != null && serverless.isEmpty()) {
             throw new IllegalArgumentException("Serverless cannot be an empty string");
@@ -61,9 +60,9 @@ public class ServiceConfiguration {
     public HashSet<String> getBlockedUserIDs() {
         return blockedUserIDs;
     }
-    public void storeBlockedIpInRes(Optional<ReportingApi.APIListsResponse> apiListsResponse) {
+    public void storeBlockedListsRes(Optional<ReportingApi.APIListsResponse> apiListsResponse) {
         if (apiListsResponse.isPresent()) {
-            this.blockedIpRes = apiListsResponse;
+            this.blockedListsRes = apiListsResponse;
         }
     }
 }

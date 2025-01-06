@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataCommand.Res> {
-    public record Res(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, ReportingApi.APIListsResponse blockedIpRes) {}
+    public record Res(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, ReportingApi.APIListsResponse blockedListsRes) {}
     @Override
     public boolean returnsData() {
         // Returns JSON of SyncDataResult
@@ -43,13 +43,13 @@ public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataComman
         Routes routes = connectionManager.getRoutes();
 
         // Fetch blocked ip response : 
-        Optional<ReportingApi.APIListsResponse> blockedIpResOption = connectionManager.getConfig().blockedIpRes;
-        ReportingApi.APIListsResponse blockedIpRes = null;
-        if (blockedIpResOption.isPresent()) {
-            blockedIpRes = blockedIpResOption.get();
+        Optional<ReportingApi.APIListsResponse> blockedListsResOption = connectionManager.getConfig().blockedListsRes;
+        ReportingApi.APIListsResponse blockedListsRes = null;
+        if (blockedListsResOption.isPresent()) {
+            blockedListsRes = blockedListsResOption.get();
         }
 
-        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, blockedIpRes);
+        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, blockedListsRes);
         return Optional.of(syncDataResult);
     }
 }
