@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
@@ -20,8 +22,11 @@ public class ThreadCacheObject {
     private final long lastRenewedAtMS;
     private final Hostnames hostnames;
     private final Routes routes;
+    // IP Blocking (e.g. Geo-IP Restrictions) :
     public record BlockedIpEntry(BlockList blocklist, String description) {}
     private List<BlockedIpEntry> blockedIps = new ArrayList<>();
+    // User-Agent Blocking (e.g. bot blocking) :
+    private Pattern blockedUserAgentRegex;
     public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedListsRes) {
         this.lastRenewedAtMS = getUnixTimeMS();
         // Set endpoints :
@@ -49,7 +54,6 @@ public class ThreadCacheObject {
     public long getLastRenewedAtMS() {
         return lastRenewedAtMS;
     }
-
     public Hostnames getHostnames() {
         return hostnames;
     }
@@ -76,13 +80,29 @@ public class ThreadCacheObject {
         if (!blockedListsRes.isEmpty()) {
             ReportingApi.APIListsResponse res = blockedListsRes.get();
             // Update blocked IP addresses (e.g. for geo restrictions) :
-            for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
-                BlockList blockList = new BlockList();
-                for (String ip : entry.ips()) {
-                    blockList.add(ip);
+            if (res.blockedIPAddresses() != null) {
+                for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
+                    BlockList blockList = new BlockList();
+                    for (String ip : entry.ips()) {
+                        blockList.add(ip);
+                    }
+                    blockedIps.add(new BlockedIpEntry(blockList, entry.description()));
                 }
-                blockedIps.add(new BlockedIpEntry(blockList, entry.description()));
+            }
+            // Update Blocked User-Agents regex
+            if (res.blockedUserAgents() != null && !res.blockedUserAgents().isEmpty()) {
+                this.blockedUserAgentRegex = Pattern.compile(res.blockedUserAgents(), Pattern.CASE_INSENSITIVE);
             }
         }
+    }
+
+    /**
+     * Check if a given User-Agent is blocked or not :
+     */
+    public boolean isBlockedUserAgent(String userAgent) {
+        if (blockedUserAgentRegex != null) {
+            return blockedUserAgentRegex.matcher(userAgent).find();
+        }
+        return false;
     }
 }

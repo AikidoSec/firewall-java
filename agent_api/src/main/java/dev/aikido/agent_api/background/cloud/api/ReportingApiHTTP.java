@@ -88,7 +88,7 @@ public class ReportingApiHTTP extends ReportingApi {
             APIListsResponse res = gson.fromJson(new InputStreamReader(inputStream), APIListsResponse.class);
             return Optional.of(res);
         } catch (Exception e) {
-            logger.debug(e);
+            logger.debug("Failed to fetch blocked lists: {}", e);
         }
         return Optional.empty();
     }

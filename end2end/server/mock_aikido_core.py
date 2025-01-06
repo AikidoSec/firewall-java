@@ -36,6 +36,7 @@ responses = {
                 "ips": ["1.2.3.4"]
             }
         ],
+        "blockedUserAgents": "AI2Bot|Bytespider",
     },
     "configUpdatedAt": 0,
 }

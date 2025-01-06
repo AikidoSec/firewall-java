@@ -23,6 +23,7 @@ public class ReportingAPITest {
         assertEquals("geoip", res.get().blockedIPAddresses().get(0).source());
         assertEquals("geo restrictions", res.get().blockedIPAddresses().get(0).description());
         assertEquals("1.2.3.4", res.get().blockedIPAddresses().get(0).ips().get(0));
+        assertEquals("AI2Bot|Bytespider", res.get().blockedUserAgents());
     }
 
     @Test
