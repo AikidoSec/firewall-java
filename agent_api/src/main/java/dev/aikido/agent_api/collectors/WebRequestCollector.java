@@ -26,23 +26,29 @@ public final class WebRequestCollector {
         // Set new context :
         Context.reset();
         Context.set(newContext);
-
-        // Check if IP is allowed :
         ThreadCacheObject threadCache = ThreadCache.get();
-        if (threadCache != null) {
-            List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), threadCache.getEndpoints());
-
-            // Blocked IP lists (e.g. Geo restrictions)
-            ThreadCacheObject.BlockedResult ipBlocked = threadCache.isIpBlocked(newContext.getRemoteAddress());
-            if (ipBlocked.blocked()) {
-                String msg = "Your IP address is not allowed to access this resource.";
-                msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
-                return new Res(msg, 403);
-            }
-            // Per-route IP allowlists :
-            if (!ipAllowedToAccessRoute(newContext.getRemoteAddress(), matchedEndpoints)) {
-                String msg = "Your IP address is not allowed to access this resource.";
-                msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
+        if (threadCache == null) {
+            return null;
+        }
+        // Blocked IP lists (e.g. Geo restrictions)
+        ThreadCacheObject.BlockedResult ipBlocked = threadCache.isIpBlocked(newContext.getRemoteAddress());
+        if (ipBlocked.blocked()) {
+            String msg = "Your IP address is not allowed to access this resource.";
+            msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
+            return new Res(msg, 403);
+        }
+        // Per-route IP allowlists :
+        List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), threadCache.getEndpoints());
+        if (!ipAllowedToAccessRoute(newContext.getRemoteAddress(), matchedEndpoints)) {
+            String msg = "Your IP address is not allowed to access this resource.";
+            msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
+            return new Res(msg, 403);
+        }
+        // User-Agent blocking (e.g. blocking bots)
+        String userAgent = newContext.getHeaders().get("user-agent");
+        if (userAgent != null && !userAgent.isEmpty()) {
+            if (threadCache.isBlockedUserAgent(userAgent)) {
+                String msg = "You are not allowed to access this resource because you have been identified as a bot.";
                 return new Res(msg, 403);
             }
         }
