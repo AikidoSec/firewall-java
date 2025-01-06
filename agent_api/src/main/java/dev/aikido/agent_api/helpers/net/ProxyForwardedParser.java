@@ -4,8 +4,6 @@ import dev.aikido.agent_api.helpers.env.BooleanEnv;
 
 import java.util.Map;
 
-import static dev.aikido.agent_api.helpers.net.IPAddressRegex.isIPAddress;
-
 public class ProxyForwardedParser {
     private static final String X_FORWARDED_FOR = "x-forwarded-for";
 
@@ -31,13 +29,13 @@ public class ProxyForwardedParser {
             // Some proxies pass along port numbers inside x-forwarded-for :
             if (ip.contains(":")) {
                 String[] ipParts = ip.split(":");
-                if (ipParts.length == 2 && isIPAddress(ipParts[0])) {
+                if (ipParts.length == 2 && IPValidator.isIP(ipParts[0])) {
                     return ipParts[0];
                 }
             }
 
             // Continue to check the IPs :
-            if (isIPAddress(ip)) {
+            if (IPValidator.isIP(ip)) {
                 return ip;
             }
         }
