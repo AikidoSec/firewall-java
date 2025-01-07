@@ -1,4 +1,4 @@
-import time 
+import time
 import requests
 import json
 
@@ -11,6 +11,7 @@ class EventHandler:
         time.sleep(1)
     def fetch_events_from_mock(self):
         res = requests.get(self.url + "/mock/events", timeout=5)
+        print(res)
         json_events = json.loads(res.content.decode("utf-8"))
         return json_events
     def fetch_attacks(self):
