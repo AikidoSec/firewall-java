@@ -1,43 +1,38 @@
-import requests
-import json
+import time
+from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads
+from utils.check_events_from_mock import fetch_events_from_mock, filter_on_event_type
+from utils.assert_equals import assert_eq
 
-# Define the data to be sent in the POST request
-safe_payload = {
-    "name": "Bobby"
+payloads = {
+    "safe": { "name": "Bobby" },
+    "unsafe": { "name": 'Malicious Pet", "Gru from the Minions") -- ' }
 }
-unsafe_payload = {
-    "name": 'Malicious Pet", "Gru from the Minions") -- '
+urls = {
+    "disabled": "http://localhost:8083/api/pets/create",
+    "enabled": "http://localhost:8082/api/pets/create"
 }
 
-# Define the URLs for both applications
-url_with_zen = "http://localhost:8082/api/pets/create"
-url_without_zen = "http://localhost:8083/api/pets/create"
+# Now test the reporting of the attacks
+def test_attacks_detected():
+    time.sleep(3) # Wait for attack to be reported (max 2 seconds, 1 second of margin)
+    attacks = filter_on_event_type(fetch_events_from_mock("http://localhost:5000"), "detected_attack")
 
-# Function to make a POST request
-def make_post_request(url, data, status_code):
-    response = requests.post(url, json=data)
+    assert len(attacks) == 2
+    attack1 = attacks[0]["attack"]
+    attack2 = attacks[1]["attack"]
+    print(attacks[0]["attack"])
+    # Test both attacks together :
+    assert_eq(val1=attack1["blocked"], val2=attack2["blocked"], equals=True)
+    assert_eq(val1=attack1["kind"], val2=attack2["kind"], equals="sql_injection")
+    assert_eq(val1=attack1["metadata"], val2=attack2["metadata"],
+            equals={'sql': 'INSERT INTO pets (pet_name, owner) VALUES ("Malicious Pet", "Gru from the Minions") -- ", "Aikido Security")'})
+    assert_eq(val1=attack1["path"], val2=attack2["path"], equals='.name')
+    assert_eq(val1=attack1["payload"], val2=attack2["payload"], equals='Malicious Pet", "Gru from the Minions") -- ')
+    assert_eq(val1=attack1["source"], val2=attack2["source"], equals="body")
+    # Different :
+    assert_eq(attack1["operation"], equals="(MySQL Connector/J) java.sql.Connection.prepareStatement")
+    assert_eq(attack2["operation"], equals="(MariaDB Connector/J) java.sql.Connection.prepareStatement")
 
-    # Assert that the status code is 200
-    assert response.status_code == status_code, f"Expected status code {status_code} but got {response.status_code}"
-
-    # If you want to check the response content, you can do so here
-    print(f"Success: {response.json()}")
-# MySQL driver :
-print("Making safe request to app with Zen...")
-make_post_request(url_with_zen, safe_payload, status_code=200)
-print("Making safe request to app without Zen...")
-make_post_request(url_without_zen, safe_payload, status_code=200)
-print("Making unsafe request to app with Zen...")
-make_post_request(url_with_zen, unsafe_payload, status_code=500)
-print("Making unsafe request to app without Zen...")
-make_post_request(url_without_zen, unsafe_payload, status_code=200)
-
-# MariaDB driver :
-print("Making safe request to app with Zen...")
-make_post_request(url_with_zen  + "/mariadb", safe_payload, status_code=200)
-print("Making safe request to app without Zen...")
-make_post_request(url_without_zen + "/mariadb", safe_payload, status_code=200)
-print("Making unsafe request to app with Zen...")
-make_post_request(url_with_zen + "/mariadb", unsafe_payload, status_code=500)
-print("Making unsafe request to app without Zen...")
-make_post_request(url_without_zen + "/mariadb", unsafe_payload, status_code=200)
+test_safe_vs_unsafe_payloads(payloads, urls) # Test MySQL driver
+test_safe_vs_unsafe_payloads(payloads, urls, "/mariadb") # Also test MariaDB driver
+test_attacks_detected()

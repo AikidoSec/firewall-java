@@ -1,36 +1,12 @@
-import requests
-import json
+from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads
 
-# Define the data to be sent in the POST request
-safe_payload = {
-    "name": "Bobby"
+payloads = {
+    "safe": { "name": "Bobby" },
+    "unsafe": { "name": "Malicious Pet', 'Gru from the Minions'); -- " }
 }
-unsafe_payload = {
-    "name": "Malicious Pet', 'Gru from the Minions'); -- "
+urls = {
+    "disabled": "http://localhost:8087/api/pets/create",
+    "enabled": "http://localhost:8086/api/pets/create"
 }
 
-# Define the URLs for both applications
-url_with_zen = "http://localhost:8086/api/pets/create"
-url_without_zen = "http://localhost:8087/api/pets/create"
-
-# Function to make a POST request
-def make_post_request(url, data, status_code):
-    response = requests.post(url, json=data)
-
-    # Assert that the status code is 200
-    assert response.status_code == status_code, f"Expected status code {status_code} but got {response.status_code} With text: {response.text}"
-
-    # If you want to check the response content, you can do so here
-    print(f"Success: {response.json()}")
-
-print("Making safe request to app with Zen...")
-make_post_request(url_with_zen, safe_payload, status_code=200)
-
-print("Making safe request to app without Zen...")
-make_post_request(url_without_zen, safe_payload, status_code=200)
-
-print("Making unsafe request to app with Zen...")
-make_post_request(url_with_zen, unsafe_payload, status_code=500)
-
-print("Making unsafe request to app without Zen...")
-make_post_request(url_without_zen, unsafe_payload, status_code=200)
+test_safe_vs_unsafe_payloads(payloads, urls) # This makes 4 requests and asserts their status codes

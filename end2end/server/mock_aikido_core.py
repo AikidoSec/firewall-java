@@ -26,6 +26,7 @@ responses = {
             }
         ],
         "blockedUserIds": [],
+        "block": True,
     },
     "lists": {
         "success": True,
