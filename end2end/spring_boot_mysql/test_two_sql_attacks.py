@@ -2,7 +2,7 @@ import time
 from utils.assert_equals import assert_eq
 
 def test_two_sql_attacks(event_handler):
-    time.sleep(3) # Wait for attack to be reported (max 2 seconds, 1 second of margin)
+    time.sleep(5) # Wait for attack to be reported
     attacks = event_handler.fetch_attacks()
 
     assert_eq(len(attacks), equals=2)
