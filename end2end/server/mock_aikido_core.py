@@ -84,7 +84,7 @@ def mock_get_events():
     return jsonify(events)
 
 @app.route('/mock/reset', methods=['GET'])
-def mock_get_events():
+def mock_reset():
     global events
     events = [] # Reset events
     return jsonify({})
