@@ -1,6 +1,5 @@
-import time
 from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads
-from spring_boot_mysql import test_two_sql_attacks
+from spring_boot_mysql.test_two_sql_attacks import test_two_sql_attacks
 from utils.EventHandler import EventHandler
 
 payloads = {

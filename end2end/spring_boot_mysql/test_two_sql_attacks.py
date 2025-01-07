@@ -5,7 +5,7 @@ def test_two_sql_attacks(event_handler):
     time.sleep(3) # Wait for attack to be reported (max 2 seconds, 1 second of margin)
     attacks = event_handler.fetch_attacks()
 
-    assert len(attacks) == 2
+    assert_eq(len(attacks), equals=2)
     attack1 = attacks[0]["attack"]
     attack2 = attacks[1]["attack"]
 
