@@ -16,16 +16,18 @@ FILES = \
 UNAME_S := $(shell uname -s)
 # Set defaults :
 RM = rm -rf
-MKDIR = mkdir -p
 CP = cp -r
 CURL = curl -L -o
 
 # Define the appropriate commands based on the OS
 ifeq ($(UNAME_S),Linux)
+	MKDIR_SYS = mkdir -p
     GRADLE = ./gradlew
 else ifeq ($(UNAME_S),Darwin)
+	MKDIR_SYS = sudo mkdir -p
     GRADLE = ./gradlew
 else ifeq ($(findstring MSYS,$(UNAME_S)),MSYS)  # MSYS2 and MinGW environments
+    MKDIR_SYS = mkdir -p
     GRADLE = gradlew.bat
 else
     $(error Unsupported OS: $(UNAME_S))
@@ -74,5 +76,5 @@ binaries_make_dir:
 
 create_temp_dir_for_gh:
 	@echo "This creates /opt/aikido for the github test cases"
-	$(MKDIR) /opt/aikido
+	$(MKDIR_SYS) /opt/aikido
 	chmod 777 /opt/aikido
