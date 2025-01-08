@@ -29,7 +29,7 @@ else ifeq ($(UNAME_S),Darwin)
     CURL = curl -L -o
     GRADLE = ./gradlew
 else ifeq ($(findstring MSYS,$(UNAME_S)),MSYS)  # MSYS2 and MinGW environments
-    RM = rmdir /S /Q
+    RM = rm -rf
     MKDIR = mkdir
     CP = copy
     CURL = curl -L -o
