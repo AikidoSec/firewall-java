@@ -22,9 +22,16 @@ jobs:
         with:
           java-version: '21'
           distribution: 'adopt'
-      - name: Add local.aikido.io to /etc/hosts
+          
+      - name: Add local.aikido.io to hosts file (Linux and macOS)
+        if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
         run: |
-          sudo echo "127.0.0.1 local.aikido.io" | sudo tee -a /etc/hosts
+          echo "127.0.0.1 local.aikido.io" | sudo tee -a /etc/hosts
+      - name: Add local.aikido.io to hosts file (Windows)
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          echo "127.0.0.1 local.aikido.io" | Out-File -Append -FilePath C:\Windows\System32\drivers\etc\hosts -Encoding ASCII
+
       - name: Download binaries & Build with Gradle
         working-directory: ./
         run: chmod +x gradlew && make binaries && make build
