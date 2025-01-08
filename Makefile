@@ -30,7 +30,7 @@ else ifeq ($(UNAME_S),Darwin)
     GRADLE = ./gradlew
 else ifeq ($(findstring MSYS,$(UNAME_S)),MSYS)  # MSYS2 and MinGW environments
     RM = rm -rf
-    MKDIR = mkdir
+    MKDIR = mkdir -p
     CP = copy
     CURL = curl -L -o
     GRADLE = gradlew.bat
