@@ -7,7 +7,7 @@ class EventHandler:
         self.url = url
     def reset(self):
         print("Resetting stored events on mock server")
-        #res = requests.get(self.url + "/mock/reset", timeout=5)
+        res = requests.get(self.url + "/mock/reset", timeout=5)
         time.sleep(1)
     def fetch_events_from_mock(self):
         res = requests.get(self.url + "/mock/events", timeout=5)
