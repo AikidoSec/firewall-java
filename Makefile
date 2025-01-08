@@ -35,7 +35,7 @@ endif
 
 # Targets
 clean:
-	$(RM) dist/
+	if [ -d "dist/" ]; then $(RM) dist/; fi
 	$(GRADLE) clean
 
 build: clean
@@ -67,7 +67,7 @@ cov:
 binaries: binaries_make_dir $(addprefix .cache/binaries/, $(FILES))
 
 binaries_make_dir:
-	$(RM) .cache/binaries
+	if [ -d ".cache/binaries" ]; then $(RM) .cache/binaries; fi
 	$(MKDIR) .cache/binaries/
 
 .cache/binaries/%:
