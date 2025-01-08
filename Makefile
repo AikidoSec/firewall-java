@@ -18,6 +18,7 @@ UNAME_S := $(shell uname -s)
 RM = rm -rf
 CP = cp -r
 CURL = curl -L -o
+MKDIR = mkdir -p
 
 # Define the appropriate commands based on the OS
 ifeq ($(UNAME_S),Linux)
@@ -35,7 +36,8 @@ endif
 
 # Targets
 clean:
-	if [ -d "dist/" ]; then $(RM) dist/; fi
+	$(MKDIR) dist
+	$(RM) dist
 	$(GRADLE) clean
 
 build: clean
@@ -67,7 +69,8 @@ cov:
 binaries: binaries_make_dir $(addprefix .cache/binaries/, $(FILES))
 
 binaries_make_dir:
-	if [ -d ".cache/binaries" ]; then $(RM) .cache/binaries; fi
+	$(MKDIR) .cache/binaries/
+	$(RM) .cache/binaries
 	$(MKDIR) .cache/binaries/
 
 .cache/binaries/%:
