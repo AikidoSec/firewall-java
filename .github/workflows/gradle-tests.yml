@@ -9,8 +9,10 @@ on:
 
 jobs:
   test-and-coverage:
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -50,3 +52,4 @@ jobs:
           files: ./agent_api/build/jacoco/test/jacocoTestReport.xml
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
+        if: matrix.os == 'ubuntu-latest'
