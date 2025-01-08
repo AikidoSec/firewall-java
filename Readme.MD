@@ -46,7 +46,6 @@ Zen operates autonomously on the same server as your Java app to:
 * ✅ [`Apache HttpClient`](https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient) (*no SSRF redirect coverage*)
 
 ## Installation
-> 🚧 This area is under construction
 
 Download the zip file [here](https://github.com/AikidoSec/firewall-java/releases/latest) and unzip it to a directory (e.g. `/opt/zen`).
 Please ensure you do not alter the structure of this folder and that the process can read & write to it.
@@ -64,8 +63,7 @@ dependencies {
     # ...
 }
 ```
-
-We will add a maven repository soon.
+For further setup continue to your Web Framework of choice ([Click here for Spring](./docs/spring.md))
 
 ## Reporting to your Aikido Security dashboard
 
