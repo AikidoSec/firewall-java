@@ -13,6 +13,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+    services:
+      docker:
+        image: docker:latest
+        options: --privileged
     steps:
       - name: Check out code
         uses: actions/checkout@v2
