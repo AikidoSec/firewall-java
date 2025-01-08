@@ -28,19 +28,7 @@ else ifeq ($(UNAME_S),Darwin)
     CP = cp -r
     CURL = curl -L -o
     GRADLE = ./gradlew
-else ifeq ($(UNAME_S),CYGWIN)  # Cygwin environment
-    RM = rm -rf
-    MKDIR = mkdir -p
-    CP = cp -r
-    CURL = curl -L -o
-    GRADLE = ./gradlew
-else ifeq ($(UNAME_S),MINGW32)  # MinGW environment
-    RM = del /Q /S
-    MKDIR = mkdir
-    CP = copy
-    CURL = curl -L -o
-    GRADLE = gradlew.bat
-else ifeq ($(UNAME_S),MINGW64)  # MinGW64 environment
+else ifeq ($(findstring MSYS,$(UNAME_S)),MSYS)  # MSYS2 and MinGW environments
     RM = del /Q /S
     MKDIR = mkdir
     CP = copy
