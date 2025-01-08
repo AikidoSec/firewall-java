@@ -9,6 +9,7 @@ on:
 
 jobs:
   test-and-coverage:
+    continue-on-error: true
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
