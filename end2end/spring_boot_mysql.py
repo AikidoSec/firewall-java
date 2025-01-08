@@ -1,5 +1,6 @@
 from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads
 from spring_boot_mysql.test_two_sql_attacks import test_two_sql_attacks
+from spring_boot_mysql.test_ip_blocking import test_ip_blocking
 from utils.EventHandler import EventHandler
 
 payloads = {
@@ -15,4 +16,5 @@ event_handler = EventHandler()
 event_handler.reset()
 test_safe_vs_unsafe_payloads(payloads, urls) # Test MySQL driver
 test_safe_vs_unsafe_payloads(payloads, urls, "/mariadb") # Also test MariaDB driver
-test_two_sql_attacks(event_handler)
+#test_ip_blocking("http://localhost:8082/")
+#test_two_sql_attacks(event_handler)

@@ -98,6 +98,9 @@ jobs:
       - name: Run End-to-End tests
         working-directory: ./
         run: sleep 10 && python end2end/spring_boot_mysql.py
+      - name: Logging & Debugging step
+        working-directory: ./sample-apps/SpringBootMySQL
+        run: cat nohup.out
 
   spring_boot_mssql:
     runs-on: ubuntu-latest
