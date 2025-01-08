@@ -47,7 +47,7 @@ else ifeq ($(UNAME_S),MINGW64)  # MinGW64 environment
     CURL = curl -L -o
     GRADLE = gradlew.bat
 else
-    $(error Unsupported OS)
+    $(error Unsupported OS: $(UNAME_S))
 endif
 
 # Targets
