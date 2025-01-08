@@ -82,6 +82,8 @@ jobs:
         run: |
           docker build -t mock_core .
           docker run --name mock_core -d -p 5000:5000 mock_core
+      - name: Setup IPC Folder
+        run: mkdir /opt/aikido && chmod a+rw /opt/aikido
       - name: Start databases
         working-directory: ./sample-apps/databases
         run: docker compose up --build -d
@@ -89,7 +91,7 @@ jobs:
       - name: Start SpringBootMySQL (with and without Zen)
         working-directory: ./sample-apps/SpringBootMySQL
         run: |
-          make run
+          AIKIDO_TMP_DIR="/opt/aikido" make run
           make runWithoutZen
 
       - name: Install Python dependencies
@@ -97,10 +99,7 @@ jobs:
 
       - name: Run End-to-End tests
         working-directory: ./
-        run: sleep 10 && python end2end/spring_boot_mysql.py
-      - name: Logging & Debugging step
-        working-directory: ./sample-apps/SpringBootMySQL
-        run: ls -la && cat ./SpringBootMysql1.log
+        run: tail -f ./sample-apps/SpringBootMysql/SpringBootMysql1.log && sleep 10 && python end2end/spring_boot_mysql.py
 
   spring_boot_mssql:
     runs-on: ubuntu-latest
