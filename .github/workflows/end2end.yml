@@ -100,7 +100,7 @@ jobs:
         run: sleep 10 && python end2end/spring_boot_mysql.py
       - name: Logging & Debugging step
         working-directory: ./sample-apps/SpringBootMySQL
-        run: ls -la && cat ./nohup.out
+        run: ls -la && cat ./SpringBootMysql1.log
 
   spring_boot_mssql:
     runs-on: ubuntu-latest
