@@ -14,25 +14,18 @@ FILES = \
 
 # Determine the OS
 UNAME_S := $(shell uname -s)
+# Set defaults :
+RM = rm -rf
+MKDIR = mkdir -p
+CP = cp -r
+CURL = curl -L -o
 
 # Define the appropriate commands based on the OS
 ifeq ($(UNAME_S),Linux)
-    RM = rm -rf
-    MKDIR = mkdir -p
-    CP = cp -r
-    CURL = curl -L -o
     GRADLE = ./gradlew
 else ifeq ($(UNAME_S),Darwin)
-    RM = rm -rf
-    MKDIR = mkdir -p
-    CP = cp -r
-    CURL = curl -L -o
     GRADLE = ./gradlew
 else ifeq ($(findstring MSYS,$(UNAME_S)),MSYS)  # MSYS2 and MinGW environments
-    RM = rm -rf
-    MKDIR = mkdir -p
-    CP = cp -r
-    CURL = curl -L -o
     GRADLE = gradlew.bat
 else
     $(error Unsupported OS: $(UNAME_S))
