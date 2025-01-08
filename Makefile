@@ -23,12 +23,15 @@ MKDIR = mkdir -p
 # Define the appropriate commands based on the OS
 ifeq ($(UNAME_S),Linux)
 	MKDIR_SYS = mkdir -p
+	CHMOD_SYS = chmod 777
     GRADLE = ./gradlew
 else ifeq ($(UNAME_S),Darwin)
 	MKDIR_SYS = sudo mkdir -p
+	CHMOD_SYS = sudo chmod a+rwx
     GRADLE = ./gradlew
 else ifeq ($(findstring MSYS,$(UNAME_S)),MSYS)  # MSYS2 and MinGW environments
     MKDIR_SYS = mkdir -p
+	CHMOD_SYS = chmod 777
     GRADLE = gradlew.bat
 else
     $(error Unsupported OS: $(UNAME_S))
@@ -80,4 +83,4 @@ binaries_make_dir:
 create_temp_dir_for_gh:
 	@echo "This creates /opt/aikido for the github test cases"
 	$(MKDIR_SYS) /opt/aikido
-	chmod 777 /opt/aikido
+	$(CHMOD_SYS) /opt/aikido
