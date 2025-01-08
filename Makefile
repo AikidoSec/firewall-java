@@ -31,7 +31,7 @@ else ifeq ($(UNAME_S),Darwin)
 else ifeq ($(findstring MSYS,$(UNAME_S)),MSYS)  # MSYS2 and MinGW environments
     RM = rm -rf
     MKDIR = mkdir -p
-    CP = copy
+    CP = cp -r
     CURL = curl -L -o
     GRADLE = gradlew.bat
 else
