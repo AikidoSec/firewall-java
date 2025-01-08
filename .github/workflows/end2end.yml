@@ -99,7 +99,7 @@ jobs:
 
       - name: Run End-to-End tests
         working-directory: ./
-        run: tail -f ./sample-apps/SpringBootMysql/SpringBootMysql1.log && sleep 10 && python end2end/spring_boot_mysql.py
+        run: tail -f ./sample-apps/SpringBootMySQL/SpringBootMysql1.log && sleep 10 && python end2end/spring_boot_mysql.py
 
   spring_boot_mssql:
     runs-on: ubuntu-latest
