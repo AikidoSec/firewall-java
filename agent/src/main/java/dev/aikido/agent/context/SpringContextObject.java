@@ -1,5 +1,6 @@
-package dev.aikido.agent_api.context;
+package dev.aikido.agent.context;
 
+import dev.aikido.agent_api.context.ContextObject;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 

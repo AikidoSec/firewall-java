@@ -1,25 +1,23 @@
 package dev.aikido.agent.wrappers.jdbc;
 
+import dev.aikido.agent.helpers.Logger;
 import dev.aikido.agent_api.collectors.SQLCollector;
 import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Executable;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public final class JDBCConnectionAdvice {
-    public static final Logger logger = LogManager.getLogger(JDBCConnectionAdvice.class);
+    public static final Logger logger = Logger.getLogger();
     private JDBCConnectionAdvice() {}
     public static ElementMatcher<? super MethodDescription> getMatcher(String module) {
         ElementMatcher.Junction<? super MethodDescription> statementMatcher =
@@ -67,7 +65,7 @@ public final class JDBCConnectionAdvice {
             } catch (AikidoException e) {
                 throw e;
             } catch (Throwable e) {
-                logger.debug(e);
+                logger.trace(e);
             }
         }
     }

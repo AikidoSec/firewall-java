@@ -1,15 +1,14 @@
 package dev.aikido.agent;
 
+import dev.aikido.agent.helpers.Logger;
 import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.helpers.env.Token;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
 
 public final class DaemonStarter {
     private DaemonStarter() {}
-    private static final Logger logger = LogManager.getLogger(DaemonStarter.class);
+    private static final Logger logger = Logger.getLogger();
 
     public static void startDaemon(String agentArgs) {
         DAEMON_MODE daemonMode = getDaemonMode(agentArgs);

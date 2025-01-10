@@ -1,27 +1,23 @@
 package dev.aikido.agent.wrappers;
 
+import dev.aikido.agent.helpers.Logger;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.context.SpringContextObject;
+import dev.aikido.agent.context.SpringContextObject;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import jakarta.servlet.http.HttpServletRequest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.IOException;
 import java.lang.reflect.Executable;
 
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class SpringFrameworkWrapper implements Wrapper {
-    public static final Logger logger = LogManager.getLogger(SpringFrameworkWrapper.class);
+    public static final Logger logger = Logger.getLogger();
 
     @Override
     public String getName() {

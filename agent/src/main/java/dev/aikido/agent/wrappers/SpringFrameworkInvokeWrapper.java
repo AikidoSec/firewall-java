@@ -1,7 +1,7 @@
 package dev.aikido.agent.wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.SpringContextObject;
+import dev.aikido.agent.context.SpringContextObject;
 import jakarta.servlet.http.HttpServletRequest;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;

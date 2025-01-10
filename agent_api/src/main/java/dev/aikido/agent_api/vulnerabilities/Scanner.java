@@ -8,9 +8,6 @@ import dev.aikido.agent_api.context.ContextObject;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
@@ -18,7 +15,6 @@ import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.
 
 public final class Scanner {
     private Scanner() {}
-    private static final Logger logger = LogManager.getLogger(Scanner.class);
     public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
         Detector detector = vulnerability.getDetector();
         if (detector.returnEarly(arguments)) {
@@ -51,7 +47,7 @@ public final class Scanner {
                 }
             }
         } catch (Throwable e) {
-            logger.debug(e);
+            System.err.println(e);
         }
         // Run throw code here so it does not get caught :
         if (exception.isPresent() && shouldBlock()) {

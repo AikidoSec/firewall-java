@@ -1,22 +1,18 @@
 package dev.aikido.agent.wrappers;
 
+import dev.aikido.agent.helpers.Logger;
 import dev.aikido.agent_api.collectors.URLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URL;
 
 public class ApacheHttpClientWrapper implements Wrapper {
-    public static final Logger logger = LogManager.getLogger(ApacheHttpClientWrapper.class);
+    public static final Logger logger = Logger.getLogger();
 
     public String getName() {
         // Wrap newCall function which makes an HTTP Request

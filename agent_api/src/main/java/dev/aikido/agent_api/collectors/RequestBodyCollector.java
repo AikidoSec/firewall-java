@@ -2,7 +2,6 @@ package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.context.SpringContextObject;
 
 public final class RequestBodyCollector {
     private RequestBodyCollector() {}
@@ -21,8 +20,11 @@ public final class RequestBodyCollector {
      * @param body can be any object representing incoming data.
      */
     public static void report(String identifier, Object body) {
+        /*
         SpringContextObject contextObj = (SpringContextObject) Context.get();
         contextObj.setBodyElement(identifier, body);
         Context.set(contextObj);
+
+         */
     }
 }
