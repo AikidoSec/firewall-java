@@ -16,8 +16,8 @@ public class ContextObject {
     protected String route;
     protected String remoteAddress;
     protected HashMap<String, String> headers;
-    protected HashMap<String, String[]> query;
-    protected HashMap<String, String> cookies;
+    protected HashMap<String, List<String>> query;
+    protected HashMap<String, List<String>> cookies;
     protected Object params;
     protected Object body;
     // Auxiliary :
@@ -62,10 +62,10 @@ public class ContextObject {
     public HashMap<String, String> getHeaders() {
         return headers;
     }
-    public HashMap<String, String[]> getQuery() {
+    public HashMap<String, List<String>> getQuery() {
         return query;
     }
-    public HashMap<String, String> getCookies() {
+    public HashMap<String, List<String>> getCookies() {
         return cookies;
     }
     public Map<String, Map<String, String>> getCache() { return cache; }

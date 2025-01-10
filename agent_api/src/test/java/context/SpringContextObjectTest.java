@@ -105,10 +105,10 @@ class SpringContextObjectTest {
         springContextObject = new SpringContextObject(request);
 
         // Assert
-        Map<String, String> cookiesMap = springContextObject.getCookies();
+        Map<String, List<String>> cookiesMap = springContextObject.getCookies();
         assertEquals(2, cookiesMap.size());
         assertEquals("abc123", cookiesMap.get("sessionId"));
-        assertEquals("user1", cookiesMap.get("userId"));
+        assertArrayEquals(new String[]{"user1"}, cookiesMap.get("userId").toArray());
     }
     @Test
     void testGetRouteWithSlashTest() {

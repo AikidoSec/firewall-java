@@ -129,8 +129,8 @@ class GetAuthTypesTest {
         ContextObject context = mock(ContextObject.class);
         when(context.getHeaders()).thenReturn(new HashMap<>());
 
-        HashMap<String, String> cookies = new HashMap<>();
-        cookies.put("auth", "some_auth_cookie");
+        HashMap<String, List<String>> cookies = new HashMap<>();
+        cookies.put("auth", List.of("some_auth_cookie"));
         when(context.getCookies()).thenReturn(cookies);
 
         List<Map<String, String>> result = GetAuthTypes.getAuthTypes(context);

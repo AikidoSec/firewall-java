@@ -42,7 +42,7 @@ public final class GetApiInfo {
         return null;
     }
     private static DataSchemaItem getQueryInfo(ContextObject context) {
-        Map<String, String[]> query =  context.getQuery();
+        Map<String, List<String>> query =  context.getQuery();
         if(query != null && !query.isEmpty()) {
             return getDataSchema(query);
         }
