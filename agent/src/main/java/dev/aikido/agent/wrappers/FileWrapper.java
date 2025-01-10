@@ -1,21 +1,14 @@
 package dev.aikido.agent.wrappers;
+import dev.aikido.agent_api.collectors.FileCollector;
+import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.implementation.bytecode.Throw;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.io.File;
-import java.lang.reflect.Executable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class FileWrapper implements Wrapper {
@@ -50,39 +43,11 @@ public class FileWrapper implements Wrapper {
                         .equals("class dev.aikido.agent_api.background.BackgroundProcess")) {
                     return; // Do not wrap File calls in background process.
                 }
-            } catch (Throwable e) {
-                return;
-            }
-            String jarFilePath = System.getProperty("AIK_agent_api_jar");
-            URLClassLoader classLoader = null;
-            try {
-                URL[] urls = {new URL(jarFilePath)};
-                classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {
-            }
-            if (classLoader == null) {
-                return;
-            }
+                FileCollector.report(argument, "java.io.File");
 
-            try {
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.FileCollector");
-
-                // Run report with "argument"
-                for (Method method2 : clazz.getMethods()) {
-                    if (method2.getName().equals("report")) {
-                        method2.invoke(null, argument, "java.io.File");
-                        break;
-                    }
-                }
-                classLoader.close(); // Close the class loader
-            } catch (InvocationTargetException invocationTargetException) {
-                if (invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    throw invocationTargetException.getCause();
-                }
-                // Ignore non-aikido throwables.
-            } catch (Throwable e) {
-            }
+            } catch (AikidoException e) {
+                throw e;
+            } catch (Throwable ignored) {}
         }
     }
 }

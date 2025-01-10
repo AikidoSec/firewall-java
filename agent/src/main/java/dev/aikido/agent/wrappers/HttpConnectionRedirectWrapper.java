@@ -1,17 +1,13 @@
 package dev.aikido.agent.wrappers;
 
+import dev.aikido.agent_api.collectors.RedirectCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.*;
-import java.net.http.HttpClient;
-import java.util.List;
-import java.util.Map;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
@@ -44,26 +40,7 @@ public class HttpConnectionRedirectWrapper implements Wrapper {
             if (origin == null || destUrl == null) {
                 return;
             }
-            String jarFilePath = System.getProperty("AIK_agent_api_jar");
-            URLClassLoader classLoader = null;
-            try {
-                URL[] urls = { new URL(jarFilePath) };
-                classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
-            if (classLoader == null) {
-                return;
-            }
-            // Load the class from the JAR
-            Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
-
-            // Run report with "argument"
-            for (Method method2: clazz.getMethods()) {
-                if(method2.getName().equals("report")) {
-                    method2.invoke(null, origin, destUrl);
-                    break;
-                }
-            }
-            classLoader.close(); // Close the class loader
+            RedirectCollector.report(origin, destUrl);
         }
     }
 }

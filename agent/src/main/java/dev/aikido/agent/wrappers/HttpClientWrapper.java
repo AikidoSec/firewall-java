@@ -1,16 +1,11 @@
 package dev.aikido.agent.wrappers;
 
+import dev.aikido.agent_api.collectors.RedirectCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -18,8 +13,6 @@ import java.net.http.HttpRequest;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
 public class HttpClientWrapper implements Wrapper {
-    private static final Logger log = LogManager.getLogger(HttpClientWrapper.class);
-
     public String getName() {
         // Wrap getResponseCode function which executes HTTP requests
         // https://docs.oracle.com/javase/8/docs/api/java/net/HttpURLConnection.html#getResponseCode--
@@ -45,24 +38,9 @@ public class HttpClientWrapper implements Wrapper {
         ) throws Exception {
             URI uri = (URI) uriObject;
             HttpRequest httpRequest = (HttpRequest) httpRequestObject;
+            URL originUrl = httpRequest.uri().toURL();
 
-            // Call to collector :
-            String jarFilePath = System.getProperty("AIK_agent_api_jar");
-            URL[] urls = { new URL(jarFilePath) };
-            URLClassLoader classLoader = new URLClassLoader(urls);
-
-            // Load the class from the JAR
-            Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.RedirectCollector");
-
-            // Run report func with its arguments
-            for (Method method2: clazz.getMethods()) {
-                if(method2.getName().equals("report")) {
-                    URL originUrl = httpRequest.uri().toURL();
-                    method2.invoke(null, originUrl, uri.toURL());
-                    break;
-                }
-            }
-            classLoader.close(); // Close the class loader
+            RedirectCollector.report(originUrl, uri.toURL());
         }
     }
 }

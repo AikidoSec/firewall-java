@@ -1,11 +1,11 @@
 package dev.aikido.agent.wrappers;
+import dev.aikido.agent_api.collectors.URLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.lang.reflect.Method;
 import java.net.*;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
@@ -42,30 +42,9 @@ public class URLConnectionWrapper implements Wrapper {
         public static void before(
                 @Advice.This(typing = DYNAMIC) Object target
         ) throws Exception {
-            String jarFilePath = System.getProperty("AIK_agent_api_jar");
-            URLClassLoader classLoader = null;
-            try {
-                URL[] urls = { new URL(jarFilePath) };
-                classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
-            if (classLoader == null) {
-                return;
+            if (target instanceof HttpURLConnection httpURLConnection) {
+                URLCollector.report(httpURLConnection.getURL());
             }
-            URL url = ((HttpURLConnection) target).getURL();
-            if (target == null || url == null) {
-                return;
-            }
-            // Load the class from the JAR
-            Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.URLCollector");
-
-            // Run report with "argument"
-            for (Method method2: clazz.getMethods()) {
-                if(method2.getName().equals("report")) {
-                    method2.invoke(null, url);
-                    break;
-                }
-            }
-            classLoader.close(); // Close the class loader
         }
     }
 }

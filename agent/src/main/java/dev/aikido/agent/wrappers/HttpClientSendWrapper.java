@@ -1,20 +1,14 @@
 package dev.aikido.agent.wrappers;
 
+import dev.aikido.agent_api.collectors.URLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
 public class HttpClientSendWrapper implements Wrapper {
     public String getName() {
@@ -39,30 +33,11 @@ public class HttpClientSendWrapper implements Wrapper {
         public static void before(
                 @Advice.Argument(0) HttpRequest httpRequest
         ) throws Exception {
+            System.err.println(httpRequest);
             if (httpRequest == null || httpRequest.uri() == null) {
                 return;
             }
-            String jarFilePath = System.getProperty("AIK_agent_api_jar");
-            URLClassLoader classLoader = null;
-            try {
-                URL[] urls = { new URL(jarFilePath) };
-                classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
-            if (classLoader == null) {
-                return;
-            }
-
-            // Load the class from the JAR
-            Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.URLCollector");
-
-            // Run report with "argument"
-            for (Method method2: clazz.getMethods()) {
-                if(method2.getName().equals("report")) {
-                    method2.invoke(null, httpRequest.uri().toURL());
-                    break;
-                }
-            }
-            classLoader.close(); // Close the class loader
+            URLCollector.report(httpRequest.uri().toURL());
         }
     }
 }
