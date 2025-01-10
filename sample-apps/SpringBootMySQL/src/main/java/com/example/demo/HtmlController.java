@@ -40,4 +40,10 @@ public class HtmlController {
     public String pet_page(@PathVariable("id") Integer id) {
         return "pet_page";
     }
+
+    @GetMapping("/test_ratelimiting_1")
+    public String test_ratelimiting_1() {
+        // This route is used in end2end tests
+        return "index";
+    }
 }

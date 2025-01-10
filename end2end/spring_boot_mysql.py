@@ -1,43 +1,30 @@
-import requests
-import json
+from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads
+from spring_boot_mysql.test_two_sql_attacks import test_two_sql_attacks
+from spring_boot_mysql.test_ip_blocking import test_ip_blocking
+from spring_boot_mysql.test_bot_blocking import test_bot_blocking
+from spring_boot_mysql.test_ratelimiting import test_ratelimiting_per_user, test_ratelimiting
+from utils.EventHandler import EventHandler
 
-# Define the data to be sent in the POST request
-safe_payload = {
-    "name": "Bobby"
+payloads = {
+    "safe": { "name": "Bobby" },
+    "unsafe": { "name": 'Malicious Pet", "Gru from the Minions") -- ' }
 }
-unsafe_payload = {
-    "name": 'Malicious Pet", "Gru from the Minions") -- '
+urls = {
+    "disabled": "http://localhost:8083/api/pets/create",
+    "enabled": "http://localhost:8082/api/pets/create"
 }
 
-# Define the URLs for both applications
-url_with_zen = "http://localhost:8082/api/pets/create"
-url_without_zen = "http://localhost:8083/api/pets/create"
+event_handler = EventHandler()
+event_handler.reset()
+test_safe_vs_unsafe_payloads(payloads, urls) # Test MySQL driver
+test_safe_vs_unsafe_payloads(payloads, urls, "/mariadb") # Also test MariaDB driver
 
-# Function to make a POST request
-def make_post_request(url, data, status_code):
-    response = requests.post(url, json=data)
+# Test blocklists :
+test_ip_blocking("http://localhost:8082/")
+test_bot_blocking("http://localhost:8082/")
 
-    # Assert that the status code is 200
-    assert response.status_code == status_code, f"Expected status code {status_code} but got {response.status_code}"
+# Test ratelimiting (we can use a header to set user) :
+test_ratelimiting("http://localhost:8082/test_ratelimiting_1")
+test_ratelimiting_per_user("http://localhost:8082/test_ratelimiting_1")
 
-    # If you want to check the response content, you can do so here
-    print(f"Success: {response.json()}")
-# MySQL driver :
-print("Making safe request to app with Zen...")
-make_post_request(url_with_zen, safe_payload, status_code=200)
-print("Making safe request to app without Zen...")
-make_post_request(url_without_zen, safe_payload, status_code=200)
-print("Making unsafe request to app with Zen...")
-make_post_request(url_with_zen, unsafe_payload, status_code=500)
-print("Making unsafe request to app without Zen...")
-make_post_request(url_without_zen, unsafe_payload, status_code=200)
-
-# MariaDB driver :
-print("Making safe request to app with Zen...")
-make_post_request(url_with_zen  + "/mariadb", safe_payload, status_code=200)
-print("Making safe request to app without Zen...")
-make_post_request(url_without_zen + "/mariadb", safe_payload, status_code=200)
-print("Making unsafe request to app with Zen...")
-make_post_request(url_with_zen + "/mariadb", unsafe_payload, status_code=500)
-print("Making unsafe request to app without Zen...")
-make_post_request(url_without_zen + "/mariadb", unsafe_payload, status_code=200)
+test_two_sql_attacks(event_handler)
