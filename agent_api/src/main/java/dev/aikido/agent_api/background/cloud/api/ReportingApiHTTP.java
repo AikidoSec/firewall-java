@@ -7,16 +7,13 @@ import dev.aikido.agent_api.storage.routes.RouteEntry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
@@ -28,34 +25,54 @@ public class ReportingApiHTTP extends ReportingApi {
         // Reporting URL should end with trailing slash for now.
         this.reportingUrl = reportingUrl;
     }
+
     public Optional<APIResponse> fetchNewConfig(String token, int timeoutInSec) {
+        HttpURLConnection connection = null;
         try {
-            HttpClient httpClient = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(timeoutInSec))
-                    .build();
             URI uri = URI.create(reportingUrl + "api/runtime/config");
-            HttpRequest request = createHttpRequest(Optional.empty(), token, uri);
+            connection = createHttpRequest(Optional.empty(), token, uri);
+            connection.setConnectTimeout(timeoutInSec * 1000);
+            connection.setReadTimeout(timeoutInSec * 1000);
+
             // Send the request and get the response
-            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return Optional.of(toApiResponse(httpResponse));
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Handle response...
+            } else {
+                logger.debug("Error while fetching new config from cloud: HTTP response code {}", responseCode);
+            }
         } catch (Exception e) {
             logger.debug("Error while fetching new config from cloud: {}", e.getMessage());
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
         return Optional.empty();
     }
+
     @Override
     public Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec) {
+        HttpURLConnection connection = null;
         try {
-            HttpClient httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(timeoutInSec))
-                .build();
             URI uri = URI.create(reportingUrl + "api/runtime/events");
-            HttpRequest request = createHttpRequest(Optional.of(event), token, uri);
+            connection = createHttpRequest(Optional.of(event), token, uri);
+            connection.setConnectTimeout(timeoutInSec * 1000);
+            connection.setReadTimeout(timeoutInSec * 1000);
+
             // Send the request and get the response
-            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return Optional.of(toApiResponse(httpResponse));
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Handle response...
+            } else {
+                logger.debug("Error while communicating with cloud: HTTP response code {}", responseCode);
+            }
         } catch (Exception e) {
             logger.debug("Error while communicating with cloud: {}", e.getMessage());
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
         return Optional.empty();
     }
@@ -106,22 +123,30 @@ public class ReportingApiHTTP extends ReportingApi {
         }
         return getUnsuccessfulAPIResponse("unknown_error");
     }
-    private static HttpRequest createHttpRequest(Optional<APIEvent> event, String token, URI uri) {
-        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-            .uri(uri) // Change to your target URL
-            .header("Content-Type", "application/json") // Set Content-Type header
-            .header("Authorization", token); // Set Authorization header
+    private static HttpURLConnection createHttpRequest(Optional<APIEvent> event, String token, URI uri) throws Exception {
+        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+        connection.setRequestMethod(event.isPresent() ? "POST" : "GET");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Authorization", token);
+        connection.setDoOutput(event.isPresent()); // Enable output if there's a request body
+
         if (event.isPresent()) {
             Gson gson = new GsonBuilder()
-                    // Use a custom serializer because api spec is transient in RouteEntry :
+                    // Use a custom serializer because api spec is transient in RouteEntry:
                     .registerTypeAdapter(RouteEntry.class, new RouteEntry.RouteEntrySerializer())
                     .create();
             String requestPayload = gson.toJson(event.get());
-            return requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
-                .build();
+
+            // Write the request body
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = requestPayload.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
         }
-        return requestBuilder.build();
+
+        return connection;
     }
+
     private static APIResponse getUnsuccessfulAPIResponse(String error) {
         return new APIResponse(
                 false, // Success
