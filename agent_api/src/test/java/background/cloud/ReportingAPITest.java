@@ -30,7 +30,7 @@ public class ReportingAPITest {
     @Test
     @StdIo
     public void testFetchNewConfigInvalidEndpoint(StdOut out) {
-        api = new ReportingApiHTTP("http://localhost:9999/");
+        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/");
         Optional<APIResponse> res = api.fetchNewConfig("token", 2);
         assertEquals(Optional.empty(), res);
         assertTrue(
@@ -48,7 +48,7 @@ public class ReportingAPITest {
     @Test
     @StdIo
     public void testListsResponseWithWrongEndpoint(StdOut out) {
-        api = new ReportingApiHTTP("http://localhost:9999");
+        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/");
         Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");
         assertEquals(Optional.empty(), res);
         assertTrue(

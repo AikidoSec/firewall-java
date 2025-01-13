@@ -33,6 +33,7 @@ public class ReportingApiHTTP extends ReportingApi {
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
                     .build();
             URI uri = URI.create(reportingUrl + "api/runtime/config");
+            logger.info("URI: %s", uri);
             HttpRequest request = createHttpRequest(Optional.empty(), token, uri);
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
