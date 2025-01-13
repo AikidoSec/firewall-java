@@ -58,8 +58,6 @@ test {
         events "passed", "skipped", "failed"
         showStandardStreams = true
         exceptionFormat = 'full'
-        // Set the log level to DEBUG
-        setLogLevel(LogLevel.DEBUG)
     }
 }
 
