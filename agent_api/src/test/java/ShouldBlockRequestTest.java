@@ -7,11 +7,6 @@ import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,18 +41,8 @@ public class ShouldBlockRequestTest {
         Context.set(null);
         ThreadCache.set(null);
     };
-    TestAppender testAppender;
     @BeforeEach
     public void setUp() throws SQLException {
-        testAppender = new TestAppender("TestAppender");
-        testAppender.start();
-        LoggerContext context = (LoggerContext) LogManager.getContext(false);
-        Configuration config = context.getConfiguration();
-        config.addAppender(testAppender);
-        LoggerConfig loggerConfig = config.getLoggerConfig(SetUser.class.getName());
-        loggerConfig.addAppender(testAppender, Level.INFO, null);
-        loggerConfig.setLevel(Level.INFO);
-        context.updateLoggers();
         // Connect to the MySQL database
         ThreadCache.set(getEmptyThreadCacheObject());
     }
@@ -66,16 +51,6 @@ public class ShouldBlockRequestTest {
     public void tearDown() throws SQLException {
         Context.set(null);
         ThreadCache.set(null);
-        testAppender.clear();
-        LoggerContext context = (LoggerContext) LogManager.getContext(false);
-        Configuration config = context.getConfiguration();
-
-        // Remove the appender from the logger configuration
-        LoggerConfig loggerConfig = config.getLoggerConfig(SetUser.class.getName());
-        loggerConfig.removeAppender(testAppender.getName());
-
-        // Update the logger context
-        context.updateLoggers();
     }
 
     @Test
