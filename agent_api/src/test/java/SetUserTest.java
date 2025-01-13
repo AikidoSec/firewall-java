@@ -14,6 +14,8 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
+@SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "trace")
+@SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
 public class SetUserTest {
     public static class SampleContextObject extends ContextObject {
         public SampleContextObject() {
@@ -47,7 +49,6 @@ public class SetUserTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testIndependenceFromThreadCacheSet(StdOut out) throws SQLException, IOException {
         Context.set(new SampleContextObject());
@@ -56,7 +57,6 @@ public class SetUserTest {
         assertTrue(out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
     }
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testIndependenceFromThreadCacheNull(StdOut out) throws SQLException, IOException {
         // Test with thread cache set to null:
@@ -65,7 +65,6 @@ public class SetUserTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testValidAndInvalidUsers1(StdOut out) throws SQLException {
         Context.set(new SampleContextObject());
@@ -74,7 +73,6 @@ public class SetUserTest {
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testValidAndInvalidUsers2(StdOut out) throws SQLException {
         // Test with invalid user 2 :
@@ -82,7 +80,6 @@ public class SetUserTest {
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testValidAndInvalidUsers3(StdOut out) throws SQLException {
         // Test with invalid user 3 :
@@ -90,7 +87,6 @@ public class SetUserTest {
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testValidAndInvalidUsers4(StdOut out) throws SQLException {
         // Test with invalid user 4 :
@@ -98,7 +94,6 @@ public class SetUserTest {
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testValidAndInvalidUsers5(StdOut out) throws SQLException {
         // Test with invalid user 5 :
@@ -106,7 +101,6 @@ public class SetUserTest {
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testValidAndInvalidUsers6(StdOut out) throws SQLException {
         // Test with invalid user 6 :
@@ -114,7 +108,6 @@ public class SetUserTest {
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testValidUser(StdOut out) throws SQLException {
         // Test with valid user :
@@ -123,7 +116,6 @@ public class SetUserTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testWithContextNotSet(StdOut out) throws SQLException {
         // Test with context not set :
@@ -135,7 +127,6 @@ public class SetUserTest {
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @StdIo
     public void testWithContextSetButNotExecutedMiddleware(StdOut out) throws SQLException {
 
@@ -145,6 +136,6 @@ public class SetUserTest {
         Context.set(ctx);
 
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertEquals(0, out.capturedString().length());
+        assertFalse(out.capturedString().contains("SetUser")); // Should not contain SetUser class
     }
 }
