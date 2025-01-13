@@ -29,6 +29,7 @@ public class ReportingApiHTTP extends ReportingApi {
     }
     public Optional<APIResponse> fetchNewConfig(String token, int timeoutInSec) {
         try {
+            logger.info("Running with : %s and %s", token, reportingUrl);
             HttpClient httpClient = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
                     .build();
