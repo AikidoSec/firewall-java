@@ -30,10 +30,10 @@ public class ReportingAPITest {
     @Test
     @StdIo
     public void testFetchNewConfigInvalidEndpoint(StdOut out) {
-        api = new ReportingApiHTTP("http://localhost:9999");
+        api = new ReportingApiHTTP("http://localhost:9999/");
         Optional<APIResponse> res = api.fetchNewConfig("token", 2);
-        assertTrue(res.isEmpty());
-        assertTrue(out.capturedString().contains("TRACE dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Error while fetching new config from cloud"));
+        assertEquals(Optional.empty(), res);
+        assertTrue(out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Error while fetching new config from cloud"));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class ReportingAPITest {
         api = new ReportingApiHTTP("http://localhost:9999");
         Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");
         assertTrue(res.isEmpty());
-        assertTrue(out.capturedString().contains("TRACE dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Failed to fetch blocked lists"));
+        assertTrue(out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Failed to fetch blocked lists"));
     }
     @Test
     public void testListsResponse() {
