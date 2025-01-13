@@ -4,9 +4,10 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import org.junit.jupiter.api.*;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import org.junitpioneer.jupiter.StdIo;
+import org.junitpioneer.jupiter.StdOut;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
@@ -34,103 +35,116 @@ public class SetUserTest {
         Context.set(null);
         ThreadCache.set(null);
     };
-    ByteArrayOutputStream outputStream;
-    PrintStream originalOut;
     @BeforeEach
     public void setUp() throws SQLException {
-        // Connect to the MySQL database
         ThreadCache.set(getEmptyThreadCacheObject());
-        originalOut = System.out;
-
-        // Create a ByteArrayOutputStream to capture the output
-        outputStream = new ByteArrayOutputStream();
-        PrintStream printStream = new PrintStream(outputStream);
-
-        // Redirect System.out to the new PrintStream
-        System.setOut(printStream);
-
     }
 
     @AfterEach
     public void tearDown() throws SQLException {
         Context.set(null);
         ThreadCache.set(null);
-        System.setOut(originalOut);
     }
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    public void testIndependenceFromThreadCache() throws SQLException {
+    @StdIo
+    public void testIndependenceFromThreadCacheSet(StdOut out) throws SQLException, IOException {
         Context.set(new SampleContextObject());
         // Test with thread cache set :
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertEquals(outputStream.toString(), ("setUser(...) must be called before the Zen middleware is executed."));
-
-        outputStream.reset();
-
+        assertTrue(out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
+    }
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @StdIo
+    public void testIndependenceFromThreadCacheNull(StdOut out) throws SQLException, IOException {
         // Test with thread cache set to null:
-        ThreadCache.set(null);
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertEquals(outputStream.toString(), ("setUser(...) must be called before the Zen middleware is executed."));
+        assertFalse(out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
     }
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    public void testValidAndInvalidUsers() throws SQLException {
+    @StdIo
+    public void testValidAndInvalidUsers1(StdOut out) throws SQLException {
         Context.set(new SampleContextObject());
         // Test with invalid user 1 :
         SetUser.setUser(new SetUser.UserObject("", "Name"));
-        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
-
+        assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
+    }
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @StdIo
+    public void testValidAndInvalidUsers2(StdOut out) throws SQLException {
         // Test with invalid user 2 :
-        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", ""));
-        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
-
+        assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
+    }
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @StdIo
+    public void testValidAndInvalidUsers3(StdOut out) throws SQLException {
         // Test with invalid user 3 :
-        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("", ""));
-        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
-
+        assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
+    }
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @StdIo
+    public void testValidAndInvalidUsers4(StdOut out) throws SQLException {
         // Test with invalid user 4 :
-        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject(null, ""));
-        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
-
+        assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
+    }
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @StdIo
+    public void testValidAndInvalidUsers5(StdOut out) throws SQLException {
         // Test with invalid user 5 :
-        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject(null, null));
-        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
-
+        assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
+    }
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @StdIo
+    public void testValidAndInvalidUsers6(StdOut out) throws SQLException {
         // Test with invalid user 6 :
-        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", null));
-        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
+        assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
+    }
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @StdIo
+    public void testValidUser(StdOut out) throws SQLException {
         // Test with valid user :
-        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertTrue(outputStream.toString().contains("setUser(...) must be called before the Zen middleware is executed."));
+        assertFalse(out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
     }
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    public void testWithVaryingCOntext() throws SQLException {
+    @StdIo
+    public void testWithContextNotSet(StdOut out) throws SQLException {
         // Test with context not set :
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertEquals(0, outputStream.toString().length());
+        assertEquals(0, out.capturedString().length());
 
         // Test with context not set and user invalid :
-        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", null));
-        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
+        assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
+    }
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
+    @StdIo
+    public void testWithContextSetButNotExecutedMiddleware(StdOut out) throws SQLException {
 
         // Test with context set but executed middleware false:
         ContextObject ctx = new SampleContextObject();
         ctx.setExecutedMiddleware(false);
         Context.set(ctx);
 
-        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertEquals(0, outputStream.toString().length());
+        assertEquals(0, out.capturedString().length());
     }
 }
