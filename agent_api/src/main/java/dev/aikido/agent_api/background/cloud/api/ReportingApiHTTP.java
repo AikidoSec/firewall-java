@@ -3,11 +3,10 @@ package dev.aikido.agent_api.background.cloud.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -39,7 +38,7 @@ public class ReportingApiHTTP extends ReportingApi {
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return Optional.of(toApiResponse(httpResponse));
         } catch (Exception e) {
-            logger.debug("Error while fetching new config from cloud: {}", e.getMessage());
+            logger.debug("Error while fetching new config from cloud: %s", e.getMessage());
         }
         return Optional.empty();
     }
@@ -55,7 +54,7 @@ public class ReportingApiHTTP extends ReportingApi {
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return Optional.of(toApiResponse(httpResponse));
         } catch (Exception e) {
-            logger.debug("Error while communicating with cloud: {}", e.getMessage());
+            logger.debug("Error while communicating with cloud: %s", e.getMessage());
         }
         return Optional.empty();
     }
@@ -88,7 +87,7 @@ public class ReportingApiHTTP extends ReportingApi {
             APIListsResponse res = gson.fromJson(new InputStreamReader(inputStream), APIListsResponse.class);
             return Optional.of(res);
         } catch (Exception e) {
-            logger.debug("Failed to fetch blocked lists: {}", e);
+            logger.debug("Failed to fetch blocked lists: %s", e.getMessage());
         }
         return Optional.empty();
     }

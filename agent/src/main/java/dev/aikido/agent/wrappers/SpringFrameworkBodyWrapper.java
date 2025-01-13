@@ -1,22 +1,15 @@
 package dev.aikido.agent.wrappers;
 
 import dev.aikido.agent_api.collectors.RequestBodyCollector;
-import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
-import net.bytebuddy.matcher.ElementMatchers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.List;
+
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
@@ -26,8 +19,6 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * @RequestPart currently not supported.
  */
 public class SpringFrameworkBodyWrapper implements Wrapper {
-    public static final Logger log = LogManager.getLogger(SpringFrameworkBodyWrapper.class);
-
     @Override
     public String getName() {
         return SpringFrameworkBodyWrapperAdvice.class.getName();

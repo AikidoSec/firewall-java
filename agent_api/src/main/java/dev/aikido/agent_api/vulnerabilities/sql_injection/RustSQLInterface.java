@@ -2,15 +2,11 @@ package dev.aikido.agent_api.vulnerabilities.sql_injection;
 
 import jnr.ffi.LibraryLoader;
 import jnr.ffi.LibraryOption;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +34,7 @@ public final class RustSQLInterface {
     private static SqlLib loadLibrary() {
         String path = getPathForBinary();
         if (path == null || !Files.exists(Path.of(path))) {
-            logger.info("Could not load binaries for SQL Injection algorithm. Path: {}", path);
+            logger.info("Could not load binaries for SQL Injection algorithm. Path: %s", path);
             return null;
         }
         Map<LibraryOption, Object> libraryOptions = new HashMap<>();

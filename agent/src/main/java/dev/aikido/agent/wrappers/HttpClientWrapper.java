@@ -5,11 +5,7 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
 import java.net.http.HttpClient;
@@ -18,8 +14,6 @@ import java.net.http.HttpRequest;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 
 public class HttpClientWrapper implements Wrapper {
-    private static final Logger log = LogManager.getLogger(HttpClientWrapper.class);
-
     public String getName() {
         // Wrap getResponseCode function which executes HTTP requests
         // https://docs.oracle.com/javase/8/docs/api/java/net/HttpURLConnection.html#getResponseCode--

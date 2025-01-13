@@ -1,8 +1,7 @@
 package dev.aikido.agent_api.background.utilities;
 
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import org.newsclub.net.unix.AFUNIXSocket;
 import org.newsclub.net.unix.AFUNIXSocketAddress;
 
@@ -41,7 +40,7 @@ public class ThreadIPCClient {
                 return Optional.of(response);
             }
         } catch (IOException e) {
-            logger.debug("Something went wrong whilst sending data: {}", e.getMessage());
+            logger.debug("Something went wrong whilst sending data: %s", e.getMessage());
         } finally {
             // Make sure the socket is also closed in event of a crash :
             if (socket != null && !socket.isClosed()) {
