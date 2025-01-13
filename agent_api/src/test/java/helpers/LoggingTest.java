@@ -9,6 +9,8 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.junitpioneer.jupiter.StdIo;
 import org.junitpioneer.jupiter.StdOut;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LoggingTest {
@@ -113,6 +115,20 @@ public class LoggingTest {
         assertFalse(out.capturedString().contains("TEST3"));
         assertFalse(out.capturedString().contains("TEST4"));
         assertFalse(out.capturedString().contains("TEST6"));
+    }
+
+    @Test
+    @StdIo
+    public void testLoggerCanHandleArraysAndCollections(StdOut out) {
+        Logger logger = new Logger(FileCollector.class, LogLevel.DEBUG);
+        logger.info("Test %s %s", "String here", (new Integer[]{1, 6,2, 3}));
+        assertTrue(out.capturedString().contains("INFO dev.aikido.agent_api.collectors.FileCollector: Test String here [1, 6, 2, 3]"));
+
+        logger.info("Test %s %s", "String2", (new String[]{"Hello", "World"}));
+        assertTrue(out.capturedString().contains("INFO dev.aikido.agent_api.collectors.FileCollector: Test String2 [Hello, World]"));
+
+        logger.info("Test %s %s", "String2", List.of("Hiya", "2"));
+        assertTrue(out.capturedString().contains("INFO dev.aikido.agent_api.collectors.FileCollector: Test String2 [Hiya,2]"));
     }
 
 }
