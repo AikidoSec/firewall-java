@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
 public class ReportingApiHTTP extends ReportingApi {
-    private static final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
+    private final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
     private final String reportingUrl;
     private final Gson gson = new Gson();
     public ReportingApiHTTP(String reportingUrl) {
@@ -33,7 +33,6 @@ public class ReportingApiHTTP extends ReportingApi {
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
                     .build();
             URI uri = URI.create(reportingUrl + "api/runtime/config");
-            logger.info("URI: %s", uri);
             HttpRequest request = createHttpRequest(Optional.empty(), token, uri);
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
