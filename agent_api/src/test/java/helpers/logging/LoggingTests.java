@@ -19,6 +19,10 @@ public class LoggingTests {
         assertTrue(LogLevel.FATAL.getLevel() > LogLevel.ERROR.getLevel());
         assertTrue(LogLevel.TRACE.getLevel() < LogLevel.DEBUG.getLevel());
         assertTrue(LogLevel.INFO.getLevel() < LogLevel.WARN.getLevel());
+        assertEquals(0, LogLevel.TRACE.getLevel());
+        assertEquals("TRACE", LogLevel.TRACE.toString());
+        assertEquals(LogLevel.INFO, LogLevel.valueOf("INFO"));
+
     }
 
     // Test LogManager :
