@@ -1,4 +1,4 @@
-package helpers.logging;
+package helpers;
 
 import dev.aikido.agent_api.collectors.FileCollector;
 import dev.aikido.agent_api.helpers.logging.LogLevel;
@@ -11,7 +11,7 @@ import org.junitpioneer.jupiter.StdOut;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LoggingTests {
+public class LoggingTest {
     // Test logLevels :
     @Test
     public void testLogLevels() {
@@ -28,7 +28,7 @@ public class LoggingTests {
     // Test LogManager :
     @Test
     public void testLogManager() {
-        assertNotNull(LogManager.getLogger(LoggingTests.class));
+        assertNotNull(LogManager.getLogger(LoggingTest.class));
         assertNotNull(LogManager.getLogger(LogManager.class));
         assertNull(LogManager.getLogger(null));
 
