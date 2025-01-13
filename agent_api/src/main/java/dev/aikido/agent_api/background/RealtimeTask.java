@@ -4,8 +4,8 @@ import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.RealtimeAPI;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.util.Optional;
 import java.util.TimerTask;
@@ -26,7 +26,7 @@ public class RealtimeTask extends TimerTask {
     }
     @Override
     public void run() {
-        logger.debug("Running realtime task, config last updated at: {}", configLastUpdatedAt);
+        logger.debug("Running realtime task, config last updated at: %s", configLastUpdatedAt);
         Optional<RealtimeAPI.ConfigResponse> res = new RealtimeAPI().getConfig(connectionManager.getToken());
 
         if(res.isPresent()) {

@@ -2,8 +2,8 @@ package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.net.URL;
 
@@ -19,7 +19,7 @@ public final class URLCollector {
             if (!url.getProtocol().startsWith("http")) {
                 return; // Non-HTTP(S) URL 
             }
-            logger.trace("Adding a new URL to the cache: {}", url);
+            logger.trace("Adding a new URL to the cache: %s", url);
             int port = getPortFromURL(url);
             threadCache.getHostnames().add(url.getHost(), port);
             ThreadCache.set(threadCache);

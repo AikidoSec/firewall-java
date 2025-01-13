@@ -1,8 +1,8 @@
 package dev.aikido.agent_api.background.cloud;
 
 import com.google.gson.Gson;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -34,7 +34,7 @@ public class RealtimeAPI {
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return toConfigResponse(httpResponse);
         } catch (Exception e) {
-            logger.debug("Error while communicating with cloud: {}", e.getMessage());
+            logger.debug("Error while communicating with cloud: %s", e.getMessage());
         }
         return Optional.empty();
     }
@@ -42,7 +42,7 @@ public class RealtimeAPI {
     public Optional<ConfigResponse> toConfigResponse(HttpResponse<String> res) {
         int status = res.statusCode();
         if (status != 200) {
-            logger.debug("Error occurred whilst fetching realtime config: {}", res.body());
+            logger.debug("Error occurred whilst fetching realtime config: %s", res.body());
             return Optional.empty();
         }
         Gson gson = new Gson();

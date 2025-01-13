@@ -1,10 +1,9 @@
 package dev.aikido.agent_api.api_discovery;
 
 import dev.aikido.agent_api.context.ContextObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
-import java.util.List;
 import java.util.Map;
 
 import static dev.aikido.agent_api.api_discovery.DataSchemaGenerator.getDataSchema;

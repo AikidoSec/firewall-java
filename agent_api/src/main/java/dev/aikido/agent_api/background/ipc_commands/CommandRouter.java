@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.helpers.extraction.ByteArrayHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ public class CommandRouter {
                 return Optional.empty();
             }
         }
-        logger.debug("Command not found: {}", commandName);
+        logger.debug("Command not found: %s", commandName);
         return Optional.empty();
     }
 }

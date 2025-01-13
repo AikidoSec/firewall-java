@@ -1,8 +1,8 @@
 package dev.aikido.agent_api.vulnerabilities.sql_injection;
 
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.vulnerabilities.Detector;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.regex.Pattern;

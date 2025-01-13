@@ -1,7 +1,7 @@
 package dev.aikido.agent_api.thread_cache;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static dev.aikido.agent_api.thread_cache.ThreadCacheRenewal.renewThreadCache;

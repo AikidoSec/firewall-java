@@ -19,4 +19,17 @@ public class Attack {
         this.payload = payload;
         this.stack = stack;
     }
+
+    @Override
+    public String toString() {
+        return "Attack{" +
+                "operation='" + operation + '\'' +
+                ", kind='" + kind + '\'' +
+                ", source='" + source + '\'' +
+                ", pathToPayload='" + pathToPayload + '\'' +
+                ", metadata=" + metadata +
+                ", payload='" + payload + '\'' +
+                ", stack='" + stack + '\'' +
+                '}';
+    }
 }

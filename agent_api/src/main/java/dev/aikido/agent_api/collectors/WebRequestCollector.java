@@ -5,8 +5,6 @@ import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
@@ -16,7 +14,6 @@ import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoint
 public final class WebRequestCollector {
     private WebRequestCollector() {}
     public record Res(String msg, Integer status) {};
-    public static final Logger logger = LogManager.getLogger(WebRequestCollector.class);
 
     /**
      * This function gets called in the initial phases of a request.

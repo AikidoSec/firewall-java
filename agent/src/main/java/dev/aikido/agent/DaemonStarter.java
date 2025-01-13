@@ -2,8 +2,8 @@ package dev.aikido.agent;
 
 import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.helpers.env.Token;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
 

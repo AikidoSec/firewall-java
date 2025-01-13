@@ -8,8 +8,8 @@ import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -23,7 +23,9 @@ public final class HostnameCollector {
     private static final Logger logger = LogManager.getLogger(HostnameCollector.class);
     public static void report(String hostname, InetAddress[] inetAddresses) {
         try {
-            logger.trace("HostnameCollector called with {} & inet addresses: {}", hostname, inetAddresses);
+            logger.trace("HostnameCollector called with %s & inet addresses: %s", hostname, List.of(inetAddresses));
+
+
             // Convert inetAddresses array to a List of IP strings :
             List<String> ipAddresses = new ArrayList<>();
             for (InetAddress inetAddress : inetAddresses) {
@@ -38,7 +40,7 @@ public final class HostnameCollector {
                 if (!hostnameEntry.getHostname().equals(hostname)) {
                     continue;
                 }
-                logger.debug("Hostname: {}, Port: {}, IPs: {}", hostnameEntry.getHostname(), hostnameEntry.getPort(), ipAddresses);
+                logger.debug("Hostname: %s, Port: %s, IPs: %s", hostnameEntry.getHostname(), hostnameEntry.getPort(), ipAddresses);
 
                 Attack attack = new SSRFDetector().run(
                         hostname, hostnameEntry.getPort(), ipAddresses,
@@ -46,7 +48,7 @@ public final class HostnameCollector {
                 if (attack == null) {
                     continue;
                 }
-                logger.debug("SSRF Attack detected due to: {}:{}", hostname, hostnameEntry.getPort());
+                logger.debug("SSRF Attack detected due to: %s:%s", hostname, hostnameEntry.getPort());
 
                 ThreadIPCClient client = getDefaultThreadIPCClient();
                 AttackCommand.Req req = new AttackCommand.Req(attack, Context.get());

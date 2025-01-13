@@ -6,18 +6,12 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.http.HttpClient;
 
 public class OkHttpWrapper implements Wrapper {
-    public static final Logger logger = LogManager.getLogger(OkHttpWrapper.class);
-
     public String getName() {
         // Wrap newCall function which makes a HTTP Request
         // https://square.github.io/okhttp/5.x/okhttp/okhttp3/-ok-http-client/new-call.html
@@ -35,32 +29,28 @@ public class OkHttpWrapper implements Wrapper {
         @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
                 @Advice.Argument(0) Object request
-        ) {
+        ) throws Throwable {
             // This Object is an okhttp3.Request object, we will use reflection to access the URL:
             // We want to (safely) access request.url.toUrl()
             if (request == null) {
                 return;
             }
-            try {
-                Class<?> requestClass = request.getClass();
+            Class<?> requestClass = request.getClass();
 
-                // Fetch urlObject :
-                Field urlField = requestClass.getDeclaredField("url");
-                urlField.setAccessible(true);
-                Object urlObject = urlField.get(request);
+            // Fetch urlObject :
+            Field urlField = requestClass.getDeclaredField("url");
+            urlField.setAccessible(true);
+            Object urlObject = urlField.get(request);
 
-                if (urlObject == null || !urlObject.getClass().getName().equals("okhttp3.HttpUrl")) {
-                    return;
-                }
-                // Fetch URL object :
-                Method toUrlMethod = urlObject.getClass().getMethod("url");
-                URL url = (URL) toUrlMethod.invoke(urlObject);
-
-                // Report the URL
-                URLCollector.report(url);
-            } catch (Throwable e) {
-                logger.trace(e);
+            if (urlObject == null || !urlObject.getClass().getName().equals("okhttp3.HttpUrl")) {
+                return;
             }
+            // Fetch URL object :
+            Method toUrlMethod = urlObject.getClass().getMethod("url");
+            URL url = (URL) toUrlMethod.invoke(urlObject);
+
+            // Report the URL
+            URLCollector.report(url);
         }
     }
 }
