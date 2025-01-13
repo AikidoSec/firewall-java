@@ -64,14 +64,14 @@ public class SetUserTest {
         Context.set(new SampleContextObject());
         // Test with thread cache set :
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertTrue(outputStream.toString().contains("setUser(...) must be called before the Zen middleware is executed."));
+        assertEquals(outputStream.toString(), ("setUser(...) must be called before the Zen middleware is executed."));
 
         outputStream.reset();
 
         // Test with thread cache set to null:
         ThreadCache.set(null);
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertTrue(outputStream.toString().contains("setUser(...) must be called before the Zen middleware is executed."));
+        assertEquals(outputStream.toString(), ("setUser(...) must be called before the Zen middleware is executed."));
     }
 
     @Test
