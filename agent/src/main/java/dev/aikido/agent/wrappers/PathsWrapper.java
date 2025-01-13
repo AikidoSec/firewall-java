@@ -59,16 +59,12 @@ public class PathsWrapper implements Wrapper {
                 Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.FileCollector");
 
                 // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        if (argument1 != null) {
-                            method2.invoke(null, argument1, "java.nio.file.Paths.get");
-                        }
-                        if (argument2 != null) {
-                            method2.invoke(null, argument2, "java.nio.file.Paths.get");
-                        }
-                        break;
-                    }
+                Method reportMethod = clazz.getMethod("report", Object.class, String.class);
+                if (argument1 != null) {
+                    reportMethod.invoke(null, argument1, "java.nio.file.Paths.get");
+                }
+                if (argument2 != null) {
+                    reportMethod.invoke(null, argument2, "java.nio.file.Paths.get");
                 }
             } catch (InvocationTargetException invocationTargetException) {
                 if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
