@@ -19,6 +19,8 @@ public class Logger {
             this.logLevel = LogLevel.INFO; // Default loglevel
         }
         this.logClass = logClass;
+        System.err.println("Initialized logger: loglevel " + this.logLevel + ", class:" + this.logClass.getName());
+
     }
     public Logger(Class<?> logClass, LogLevel logLevel) {
         this.logLevel = logLevel;
