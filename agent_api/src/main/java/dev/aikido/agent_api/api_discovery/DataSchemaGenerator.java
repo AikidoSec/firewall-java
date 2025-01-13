@@ -66,7 +66,6 @@ public final class DataSchemaGenerator {
                     props.put((String) key, getDataSchema(map.get(key), depth + 1));
                 }
             } else {
-                /*
                 Field[] fields = data.getClass().getDeclaredFields();
                 for (Field field : fields) {
                     try {
@@ -75,8 +74,6 @@ public final class DataSchemaGenerator {
                     } catch (IllegalAccessException | RuntimeException ignored) {
                     }
                 }
-
-                 */
             }
         }
         return new DataSchemaItem(DataSchemaType.OBJECT, props);
