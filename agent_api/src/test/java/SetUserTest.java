@@ -1,24 +1,12 @@
 import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.AbstractAppender;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.sql.*;
 import java.util.*;
 
@@ -46,36 +34,28 @@ public class SetUserTest {
         Context.set(null);
         ThreadCache.set(null);
     };
-    TestAppender testAppender;
+    ByteArrayOutputStream outputStream;
+    PrintStream originalOut;
     @BeforeEach
     public void setUp() throws SQLException {
-        testAppender = new TestAppender("TestAppender");
-        testAppender.start();
-        LoggerContext context = (LoggerContext) LogManager.getContext(false);
-        Configuration config = context.getConfiguration();
-        config.addAppender(testAppender);
-        LoggerConfig loggerConfig = config.getLoggerConfig(SetUser.class.getName());
-        loggerConfig.addAppender(testAppender, org.apache.logging.log4j.Level.INFO, null);
-        loggerConfig.setLevel(org.apache.logging.log4j.Level.INFO);
-        context.updateLoggers();
         // Connect to the MySQL database
         ThreadCache.set(getEmptyThreadCacheObject());
+        originalOut = System.out;
+
+        // Create a ByteArrayOutputStream to capture the output
+        outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+
+        // Redirect System.out to the new PrintStream
+        System.setOut(printStream);
+
     }
 
     @AfterEach
     public void tearDown() throws SQLException {
         Context.set(null);
         ThreadCache.set(null);
-        testAppender.clear();
-        LoggerContext context = (LoggerContext) LogManager.getContext(false);
-        Configuration config = context.getConfiguration();
-
-        // Remove the appender from the logger configuration
-        LoggerConfig loggerConfig = config.getLoggerConfig(SetUser.class.getName());
-        loggerConfig.removeAppender(testAppender.getName());
-
-        // Update the logger context
-        context.updateLoggers();
+        System.setOut(originalOut);
     }
 
     @Test
@@ -84,14 +64,14 @@ public class SetUserTest {
         Context.set(new SampleContextObject());
         // Test with thread cache set :
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertTrue(testAppender.getLogMessages().contains("setUser(...) must be called before the Zen middleware is executed."));
+        assertTrue(outputStream.toString().contains("setUser(...) must be called before the Zen middleware is executed."));
 
-        testAppender.clear();
+        outputStream.reset();
 
         // Test with thread cache set to null:
         ThreadCache.set(null);
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertTrue(testAppender.getLogMessages().contains("setUser(...) must be called before the Zen middleware is executed."));
+        assertTrue(outputStream.toString().contains("setUser(...) must be called before the Zen middleware is executed."));
     }
 
     @Test
@@ -100,36 +80,36 @@ public class SetUserTest {
         Context.set(new SampleContextObject());
         // Test with invalid user 1 :
         SetUser.setUser(new SetUser.UserObject("", "Name"));
-        assertTrue(testAppender.getLogMessages().contains("User ID or name cannot be empty."));
+        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
 
         // Test with invalid user 2 :
-        testAppender.clear();
+        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", ""));
-        assertTrue(testAppender.getLogMessages().contains("User ID or name cannot be empty."));
+        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
 
         // Test with invalid user 3 :
-        testAppender.clear();
+        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("", ""));
-        assertTrue(testAppender.getLogMessages().contains("User ID or name cannot be empty."));
+        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
 
         // Test with invalid user 4 :
-        testAppender.clear();
+        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject(null, ""));
-        assertTrue(testAppender.getLogMessages().contains("User ID or name cannot be empty."));
+        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
 
         // Test with invalid user 5 :
-        testAppender.clear();
+        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject(null, null));
-        assertTrue(testAppender.getLogMessages().contains("User ID or name cannot be empty."));
+        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
 
         // Test with invalid user 6 :
-        testAppender.clear();
+        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", null));
-        assertTrue(testAppender.getLogMessages().contains("User ID or name cannot be empty."));
+        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
         // Test with valid user :
-        testAppender.clear();
+        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertTrue(testAppender.getLogMessages().contains("setUser(...) must be called before the Zen middleware is executed."));
+        assertTrue(outputStream.toString().contains("setUser(...) must be called before the Zen middleware is executed."));
     }
 
     @Test
@@ -137,21 +117,20 @@ public class SetUserTest {
     public void testWithVaryingCOntext() throws SQLException {
         // Test with context not set :
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertEquals(0, testAppender.getLogMessages().size());
+        assertEquals(0, outputStream.toString().length());
 
         // Test with context not set and user invalid :
-        testAppender.clear();
+        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", null));
-        assertTrue(testAppender.getLogMessages().contains("User ID or name cannot be empty."));
+        assertTrue(outputStream.toString().contains("User ID or name cannot be empty."));
 
         // Test with context set but executed middleware false:
         ContextObject ctx = new SampleContextObject();
         ctx.setExecutedMiddleware(false);
         Context.set(ctx);
 
-        testAppender.clear();
+        outputStream.reset();
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertEquals(0, testAppender.getLogMessages().size());
+        assertEquals(0, outputStream.toString().length());
     }
-
 }
