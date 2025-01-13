@@ -19,6 +19,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
+@SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "trace")
 public class PathsWrapperTest {
     public static class SampleContextObject extends ContextObject {
         public SampleContextObject(String argument) {
