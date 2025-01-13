@@ -37,7 +37,7 @@ public class Logger {
                 String threadName = Thread.currentThread().getName();
 
                 // Create prefix :
-                String prefix = "%s [%s] %s %s: ".formatted(formattedTimestamp, threadName, logLevel, logClass.getName());
+                String prefix = "%s [%s] %s %s: ".formatted(formattedTimestamp, threadName, level, logClass.getName());
 
                 // Print message :
                 if (message instanceof String messageStr) {
