@@ -68,6 +68,7 @@ public final class StringExtractor {
                 result.putAll(extractStringsRecursive(map.get(key), newPathToPayload));
             }
         } else if (!isPrimitiveType(obj)) { // Stop algorithm if it's a primitive type.
+            /*
             Field[] fields = obj.getClass().getDeclaredFields();
             for (Field field : fields) {
                 try {
@@ -79,6 +80,8 @@ public final class StringExtractor {
                 } catch (IllegalAccessException | RuntimeException ignored) {
                 }
             }
+
+                 */
         }
         return result;
     }
