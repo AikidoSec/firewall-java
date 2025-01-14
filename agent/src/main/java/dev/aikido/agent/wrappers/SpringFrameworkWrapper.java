@@ -4,6 +4,7 @@ import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.SpringContextObject;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
@@ -16,7 +17,10 @@ import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.lang.reflect.Executable;
-
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class SpringFrameworkWrapper implements Wrapper {
@@ -40,38 +44,58 @@ public class SpringFrameworkWrapper implements Wrapper {
         return nameContains("org.springframework.web.filter.RequestContextFilter");
     }
 
-    private static class SpringFrameworkAdvice {
+    public static class SpringFrameworkAdvice {
         // Wrapper to skip if it's inside this wrapper (i.e. our own response : )
         public record SkipOnWrapper(HttpServletResponse response) {};
         /**
          * @return the first value of Object is used as a boolean, if it's true code will
          * not execute (skip execution). The second value is the servlet request.
          */
-        @Advice.OnMethodEnter(skipOn = SkipOnWrapper.class, suppress = Throwable.class)
+        @Advice.OnMethodEnter//(skipOn = SkipOnWrapper.class, suppress = Throwable.class)
         public static Object interceptOnEnter(
                 @Advice.Origin Executable method,
-                @Advice.Argument(0) Object request,
-                @Advice.Argument(1) Object response) throws Throwable {
-            ContextObject contextObject = new SpringContextObject((HttpServletRequest) request);
+                @Advice.Argument(value = 0, typing = DYNAMIC, optional = true) HttpServletRequest request,
+                @Advice.Argument(value = 1, typing = DYNAMIC, optional = true) HttpServletResponse response) throws Throwable {
+            if (request == null) {
+                return response;
+            }
+            // extract headers :
+            HashMap<String, String> headersMap = new HashMap<>();
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while (headerNames != null && headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+                String headerValue = request.getHeader(headerName);
+                headersMap.put(headerName, headerValue);
+            }
+            // extract cookies :
+            HashMap<String, List<String>> cookiesMap = new HashMap<>();
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    cookiesMap.put(cookie.getName(), List.of(cookie.getValue()));
+                }
+            }
+
+            ContextObject contextObject = new SpringContextObject(
+                    request.getMethod(), request.getRequestURL(), request.getRemoteAddr(),
+                    request.getParameterMap(), cookiesMap, headersMap
+            );
+
             // Write a new response:
             WebRequestCollector.Res res = WebRequestCollector.report(contextObject);
             if (res != null) {
                 logger.trace("Writing a new response");
-                HttpServletResponse newResponse = (HttpServletResponse) response;
-                newResponse.setStatus(res.status());
-                newResponse.setContentType("text/plain");
-                newResponse.getWriter().write(res.msg());
-                return new SkipOnWrapper(newResponse);
+                response.setStatus(res.status());
+                response.setContentType("text/plain");
+                response.getWriter().write(res.msg());
+                return new SkipOnWrapper(response);
             }
             return response;
         }
 
         @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
         public static void interceptOnExit(@Advice.Enter Object response) {
-            if (response == null) {
-                return;
-            }
-            if (response instanceof HttpServletResponse httpServletResponse) {
+            if (response != null && response instanceof HttpServletResponse httpServletResponse) {
                 WebResponseCollector.report(httpServletResponse.getStatus()); // Report status code.
             }
         }
