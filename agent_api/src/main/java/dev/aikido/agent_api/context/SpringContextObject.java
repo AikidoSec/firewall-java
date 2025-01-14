@@ -1,8 +1,5 @@
 package dev.aikido.agent_api.context;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.*;
 
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
