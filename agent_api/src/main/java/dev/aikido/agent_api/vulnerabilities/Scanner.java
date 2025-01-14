@@ -20,21 +20,21 @@ public final class Scanner {
     private Scanner() {}
     private static final Logger logger = LogManager.getLogger(Scanner.class);
     public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
+        ContextObject ctx = Context.get();
+        // Test if this issue was already scanned :
+        String stringifiedScanParameters = operation + Arrays.toString(arguments) + vulnerability.getKind();
+        if (ctx != null && ctx.getAlreadyScanned().contains(stringifiedScanParameters.hashCode())) {
+            // We use .hashCode() to make sure we don't take up too much memory.
+            // The given hashCode was already scanned, moving on
+            return;
+        }
+
         Detector detector = vulnerability.getDetector();
         if (detector.returnEarly(arguments)) {
             return; // If input is in no way dangerous, do not loop oer user input
         }
-        ContextObject ctx = Context.get();
         if (shouldSkipVulnerabilityScan(ctx)) {
             return; // Bypassed IPs, protection forced off, ...
-        }
-
-        // Test if this issue was already scanned :
-        String stringifiedScanParameters = operation + Arrays.toString(arguments) + vulnerability.getKind();
-        if (ctx.getAlreadyScanned().contains(stringifiedScanParameters.hashCode())) {
-            // We use .hashCode() to make sure we don't take up too much memory.
-            // The given hashCode was already scanned, moving on
-            return;
         }
 
         Optional<AikidoException> exception = Optional.empty();
