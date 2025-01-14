@@ -95,6 +95,27 @@ class ScannerTest {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
+    // Disable IPC :
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @Test
+    void testItUsesHashCodes() {
+        // Safe :
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgresql"});
+        // Argument-mismatch, safe :
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM"});
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
+
+        // Unsafe :
+        assertThrows(SQLInjectionException.class, () -> {
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+        });
+        assertDoesNotThrow(() -> {
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+        });
+        assertTrue(Context.get().getAlreadyScanned().contains("operation[SELECT * FROM, 1, 2, 3]sql_injection".hashCode()));
+        assertTrue(Context.get().getAlreadyScanned().contains("operation[SELECT * FROM, postgresql]sql_injection".hashCode()));
+    }
 
     // Disable IPC :
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")

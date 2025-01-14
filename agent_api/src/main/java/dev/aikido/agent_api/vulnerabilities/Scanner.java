@@ -7,6 +7,7 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,6 +28,15 @@ public final class Scanner {
         if (shouldSkipVulnerabilityScan(ctx)) {
             return; // Bypassed IPs, protection forced off, ...
         }
+
+        // Test if this issue was already scanned :
+        String stringifiedScanParameters = operation + Arrays.toString(arguments) + vulnerability.getKind();
+        if (ctx.getAlreadyScanned().contains(stringifiedScanParameters.hashCode())) {
+            // We use .hashCode() to make sure we don't take up too much memory.
+            // The given hashCode was already scanned, moving on
+            return;
+        }
+
         Optional<AikidoException> exception = Optional.empty();
         try {
             Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(ctx).getAll();
@@ -52,6 +62,7 @@ public final class Scanner {
         } catch (Throwable e) {
             logger.debug(e);
         }
+        ctx.getAlreadyScanned().add(stringifiedScanParameters.hashCode());
         // Run throw code here so it does not get caught :
         if (exception.isPresent() && shouldBlock()) {
             throw exception.get();

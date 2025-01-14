@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.aikido.agent_api.storage.RedirectNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 
 public class ContextObject {
     protected String method;
@@ -25,6 +22,7 @@ public class ContextObject {
     protected boolean executedMiddleware;
     protected transient ArrayList<RedirectNode> redirectStartNodes;
     protected transient Map<String, Map<String, String>> cache = new HashMap<>();
+    protected transient Set<Integer> alreadyScanned = new HashSet<>();
 
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
@@ -69,6 +67,7 @@ public class ContextObject {
         return cookies;
     }
     public Map<String, Map<String, String>> getCache() { return cache; }
+    public Set<Integer> getAlreadyScanned() { return alreadyScanned; }
 
     public String toJson() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
