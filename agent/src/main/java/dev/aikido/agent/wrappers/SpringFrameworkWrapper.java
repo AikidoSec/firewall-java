@@ -51,7 +51,7 @@ public class SpringFrameworkWrapper implements Wrapper {
          * @return the first value of Object is used as a boolean, if it's true code will
          * not execute (skip execution). The second value is the servlet request.
          */
-        @Advice.OnMethodEnter//(skipOn = SkipOnWrapper.class, suppress = Throwable.class)
+        @Advice.OnMethodEnter(skipOn = SkipOnWrapper.class, suppress = Throwable.class)
         public static Object interceptOnEnter(
                 @Advice.Origin Executable method,
                 @Advice.Argument(value = 0, typing = DYNAMIC, optional = true) HttpServletRequest request,
