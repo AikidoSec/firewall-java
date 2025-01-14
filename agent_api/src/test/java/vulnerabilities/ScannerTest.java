@@ -118,6 +118,24 @@ class ScannerTest {
         assertFalse(Context.get().getAlreadyScanned().contains("operation[SELECT * FROM, postgresql]".hashCode()));
     }
 
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "false")
+    @Test
+    void testItUsesHashCodesBlockingDisabled() {
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
+
+        // Unsafe :
+        assertDoesNotThrow(() -> {
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+        });
+        assertDoesNotThrow(() -> {
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+        });
+        assertTrue(Context.get().getAlreadyScanned().contains("operation[SELECT * FROM, 1, 2, 3]".hashCode()));
+        assertFalse(Context.get().getAlreadyScanned().contains("operation[SELECT * FROM, postgresql]".hashCode()));
+    }
+
     // Disable IPC :
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
