@@ -49,7 +49,7 @@ public class Logger {
             }
         }
         catch (Throwable e) {
-            e.printStackTrace();
+            System.err.println("[AIKIDO LOGGER FAILURE] " + e.getMessage());
         }
     }
     public List<Object> parseArguments(Object[] args) {
