@@ -111,7 +111,7 @@ public class FileCollectorTest {
         isPathTraversalAttack(
             new Object[]{
                 new Object[]{
-                    new Object[]{"/etc/home/../../test.txt.js"}
+                    new Object[]{"/etc/home/../../test.txt.ts"}
                 }
             }
         ); // Depth of
@@ -119,7 +119,7 @@ public class FileCollectorTest {
             new Object[]{
                 new Object[]{
                     new Object[]{
-                        new Object[]{"/etc/home/../../test.txt.js"}
+                        new Object[]{"/etc/home/../../test.txt.css"}
                     }
                 }
             }
