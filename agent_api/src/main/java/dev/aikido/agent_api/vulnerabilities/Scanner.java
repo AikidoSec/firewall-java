@@ -22,7 +22,7 @@ public final class Scanner {
     public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
         ContextObject ctx = Context.get();
         // Test if this issue was already scanned :
-        String stringifiedScanParameters = operation + Arrays.toString(arguments) + vulnerability.getKind();
+        String stringifiedScanParameters = operation + Arrays.toString(arguments); // Don't need vuln, op is enough.
         if (ctx != null && ctx.getAlreadyScanned().contains(stringifiedScanParameters.hashCode())) {
             // We use .hashCode() to make sure we don't take up too much memory.
             // The given hashCode was already scanned, moving on
