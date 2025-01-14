@@ -156,7 +156,8 @@ public class LoggingTest {
     public void testParseArgumentsWithTab() {
         Object[] args = {"input_with_tab\tand_more"};
         List<Object> result = logger.parseArguments(args);
-        assertEquals(Arrays.asList("input_with_taband_more"), result, "Should remove tab characters.");
+        // Tab is allowed :
+        assertEquals(Arrays.asList("input_with_tab\tand_more"), result);
     }
 
     @Test
