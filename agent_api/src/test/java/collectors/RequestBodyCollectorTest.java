@@ -2,20 +2,22 @@ package collectors;
 
 import dev.aikido.agent_api.collectors.RequestBodyCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.context.SpringContextObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import utils.EmptySampleContextObject;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RequestBodyCollectorTest {
-    private ContextObject contextObject;
+    private SpringContextObject contextObject;
     @BeforeEach
     public void setup() {
-        contextObject = new EmptySampleContextObject();
+        contextObject = new SpringContextObject(
+                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
+        );
     }
 
     @Test
