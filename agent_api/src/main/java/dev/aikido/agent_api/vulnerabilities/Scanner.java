@@ -41,6 +41,9 @@ public final class Scanner {
         try {
             Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(ctx).getAll();
             for (Map.Entry<String, Map<String, String>> sourceEntry : stringsFromContext.entrySet()) {
+                if (exception.isPresent()) {
+                    break; // Make sure to break when an exception is already present.
+                }
                 String source = sourceEntry.getKey();
                 for (Map.Entry<String, String> entry : sourceEntry.getValue().entrySet()) {
                     // Extract values :
@@ -62,10 +65,12 @@ public final class Scanner {
         } catch (Throwable e) {
             logger.debug(e);
         }
-        ctx.getAlreadyScanned().add(stringifiedScanParameters.hashCode());
         // Run throw code here so it does not get caught :
         if (exception.isPresent() && shouldBlock()) {
             throw exception.get();
+        } else if (exception.isEmpty()) {
+            // Only add if it was not an attack (We still want to block attacks) :
+            ctx.getAlreadyScanned().add(stringifiedScanParameters.hashCode());
         }
     }
     public static void reportAttack(Attack attack, ContextObject ctx) {

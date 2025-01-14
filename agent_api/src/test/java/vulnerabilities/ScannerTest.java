@@ -105,16 +105,17 @@ class ScannerTest {
         // Argument-mismatch, safe :
         Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM"});
         Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
 
         // Unsafe :
         assertThrows(SQLInjectionException.class, () -> {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
-        assertDoesNotThrow(() -> {
+        assertThrows(SQLInjectionException.class, () -> {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
-        assertTrue(Context.get().getAlreadyScanned().contains("operation[SELECT * FROM, 1, 2, 3]sql_injection".hashCode()));
-        assertTrue(Context.get().getAlreadyScanned().contains("operation[SELECT * FROM, postgresql]sql_injection".hashCode()));
+        assertTrue(Context.get().getAlreadyScanned().contains("operation[SELECT * FROM, 1, 2, 3]".hashCode()));
+        assertFalse(Context.get().getAlreadyScanned().contains("operation[SELECT * FROM, postgresql]".hashCode()));
     }
 
     // Disable IPC :
