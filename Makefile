@@ -29,7 +29,7 @@ test:
 cov:
 	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test --rerun-tasks -PcoverageRun jacocoTestReport
 
-BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.34
+BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.35
 FILES = \
     libzen_internals_aarch64-apple-darwin.dylib \
     libzen_internals_aarch64-apple-darwin.dylib.sha256sum \
