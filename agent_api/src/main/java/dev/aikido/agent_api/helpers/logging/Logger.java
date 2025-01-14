@@ -69,6 +69,12 @@ public class Logger {
                 parsedArgs.add(arg);
             }
         }
+        for(int i = 0; i < parsedArgs.size(); i++) {
+            if (parsedArgs.get(i) instanceof String argString) {
+                // replace newline and carriage return to avoid log injection : 
+                parsedArgs.set(i, argString.replaceAll("[\\r\\n]+", ""));
+            }
+        }
         return parsedArgs;
     }
 

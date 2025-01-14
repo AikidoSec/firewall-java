@@ -4,16 +4,23 @@ import dev.aikido.agent_api.collectors.FileCollector;
 import dev.aikido.agent_api.helpers.logging.LogLevel;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.junitpioneer.jupiter.StdIo;
 import org.junitpioneer.jupiter.StdOut;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LoggingTest {
+    Logger logger;
+    @BeforeEach
+    public void setup() {
+        logger = new Logger(FileCollector.class, LogLevel.TRACE);
+    }
     // Test logLevels :
     @Test
     public void testLogLevels() {
@@ -129,6 +136,55 @@ public class LoggingTest {
 
         logger.info("Test %s %s", "String2", List.of("Hiya", "2"));
         assertTrue(out.capturedString().contains("INFO dev.aikido.agent_api.collectors.FileCollector: Test String2 [Hiya,2]"));
+    }
+
+    @Test
+    public void testParseArgumentsWithNewline() {
+        Object[] args = {"input_with_newline\nnext_line"};
+        List<Object> result = logger.parseArguments(args);
+        assertEquals(Arrays.asList("input_with_newlinenext_line"), result, "Should remove newline characters.");
+    }
+
+    @Test
+    public void testParseArgumentsWithCarriageReturn() {
+        Object[] args = {"input_with_carriage_return\rnext_line"};
+        List<Object> result = logger.parseArguments(args);
+        assertEquals(Arrays.asList("input_with_carriage_returnnext_line"), result, "Should remove carriage return characters.");
+    }
+
+    @Test
+    public void testParseArgumentsWithTab() {
+        Object[] args = {"input_with_tab\tand_more"};
+        List<Object> result = logger.parseArguments(args);
+        assertEquals(Arrays.asList("input_with_taband_more"), result, "Should remove tab characters.");
+    }
+
+    @Test
+    public void testParseArgumentsWithMultipleSpecialCharacters() {
+        Object[] args = {"Newline \n here", "carriage return \r here"};
+        List<Object> result = logger.parseArguments(args);
+        assertArrayEquals(new String[]{"Newline  here", "carriage return  here"}, result.toArray());
+    }
+
+    @Test
+    public void testParseArgumentsWithArrayContainingNewline() {
+        Object[] args = {new String[]{"value1", "value2\nvalue3"}};
+        List<Object> result = logger.parseArguments(args);
+        assertArrayEquals(new String[]{"[value1, value2value3]"}, result.toArray());
+    }
+
+    @Test
+    public void testParseArgumentsWithCollectionContainingCarriageReturn() {
+        Object[] args = {Arrays.asList("value1", "value2\rvalue3")};
+        List<Object> result = logger.parseArguments(args);
+        assertArrayEquals(new String[]{"[value1,value2value3]"}, result.toArray());
+    }
+
+    @Test
+    public void testParseArgumentsWithMixedInputIncludingSpecialChars() {
+        Object[] args = {"normal_input", "malicious_input; DROP TABLE users; --", "input_with_newline\nnext_line"};
+        List<Object> result = logger.parseArguments(args);
+        assertArrayEquals(new String[]{"normal_input", "malicious_input; DROP TABLE users; --", "input_with_newlinenext_line"}, result.toArray());
     }
 
 }
