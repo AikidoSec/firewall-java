@@ -1,20 +1,18 @@
 package collectors;
 
-import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.collectors.HostnameCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import org.junit.jupiter.api.*;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import utils.EmptySampleContextObject;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
+import java.util.List;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,30 +80,11 @@ public class HostnameCollectorTest {
         verify(myThreadCache, times(2)).getHostnames();
     }
 
-    public static class SampleContextObject extends ContextObject {
+    public static class SampleContextObject extends EmptySampleContextObject {
         public SampleContextObject() {
-            // Directly initializing fields
-            this.method = "GET";
-            this.source = "web";
-            this.url = "https://example.com/api/resource";
-            this.route = "/api/resource";
-            remoteAddress = "192.168.1.1";
-
-            // Initialize headers
-            this.headers = new HashMap<>();
-            this.headers.put("Authorization", "Bearer token");
-            this.headers.put("Content-Type", "application/json");
-
-            // Initialize query parameters
-            this.query = new HashMap<>();
-            this.query.put("search", new String[]{"example", "dev.aikido:80"});
-
-            // Initialize cookies
-            this.cookies = new HashMap<>();
-            this.cookies.put("sessionId", "dev.aikido");
-
-            // Set the body
-            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
+            super();
+            this.query.put("search", List.of("example", "dev.aikido:80"));
+            this.cookies.put("sessionId", List.of("dev.aikido"));
         }
     }
 

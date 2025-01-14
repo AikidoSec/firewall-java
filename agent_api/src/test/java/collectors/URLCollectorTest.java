@@ -2,48 +2,21 @@ package collectors;
 
 import dev.aikido.agent_api.collectors.URLCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.Hostnames;
-import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import utils.EmptySampleContextObject;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class URLCollectorTest {
-
-    public static class SampleContextObject extends ContextObject {
-        public SampleContextObject(String argument) {
-            this.method = "GET";
-            this.source = "web";
-            this.url = "https://example.com/api/resource";
-            this.route = "/api/resource";
-            this.remoteAddress = "192.168.1.1";
-            this.headers = new HashMap<>();
-
-            this.query = new HashMap<>();
-            this.query.put("search", new String[]{"example", "dev.aikido:80"});
-            this.query.put("sql1", new String[]{"SELECT * FRO"});
-            this.query.put("arg", new String[]{argument});
-
-            this.cookies = new HashMap<>();
-            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
-            this.redirectStartNodes = new ArrayList<>();
-        }
-    }
     @BeforeAll
     static void cleanup() {
         Context.set(null);
@@ -55,7 +28,7 @@ public class URLCollectorTest {
     }
 
     private void setContextAndLifecycle(String url) {
-        Context.set(new SampleContextObject(url));
+        Context.set(new EmptySampleContextObject(url));
         ThreadCache.set(getEmptyThreadCacheObject());
     }
 

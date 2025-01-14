@@ -3,16 +3,14 @@ package vulnerabilities.ssrf;
 import dev.aikido.agent_api.collectors.RedirectCollector;
 import dev.aikido.agent_api.collectors.URLCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import utils.EmptySampleContextObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,25 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class SSRFDetectorTest {
-    public static class SampleContextObject extends ContextObject {
-        public SampleContextObject(String argument) {
-            this.redirectStartNodes = new ArrayList<>();
-            this.method = "GET";
-            this.source = "web";
-            this.url = "https://example.com/api/resource";
-            this.route = "/api/resource";
-            this.remoteAddress = "192.168.1.1";
-            this.headers = new HashMap<>();
-
-            this.query = new HashMap<>();
-            this.query.put("search", new String[]{"example", "dev.aikido:80"});
-            this.query.put("sql1", new String[]{"SELECT * FRO"});
-            this.query.put("arg", new String[]{argument});
-
-            this.cookies = new HashMap<>();
-            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
-        }
-    }
     @BeforeAll
     static void cleanup() {
         Context.set(null);
@@ -53,7 +32,7 @@ public class SSRFDetectorTest {
     }
 
     private void setContextAndLifecycle(String url) {
-        Context.set(new SampleContextObject(url));
+        Context.set(new EmptySampleContextObject(url));
         ThreadCache.set(getEmptyThreadCacheObject());
     }
 
