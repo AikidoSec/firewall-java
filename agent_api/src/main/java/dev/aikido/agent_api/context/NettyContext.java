@@ -1,11 +1,6 @@
-package dev.aikido.agent.contexts;
+package dev.aikido.agent_api.context;
 
-import dev.aikido.agent_api.context.ContextObject;
-import reactor.netty.http.server.HttpServerRequest;
-
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

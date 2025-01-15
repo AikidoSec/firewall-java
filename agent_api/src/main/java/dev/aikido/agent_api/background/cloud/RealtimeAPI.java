@@ -42,7 +42,7 @@ public class RealtimeAPI {
     public Optional<ConfigResponse> toConfigResponse(HttpResponse<String> res) {
         int status = res.statusCode();
         if (status != 200) {
-            logger.debug("Error occurred whilst fetching realtime config: %s", res.body());
+            logger.debug("Error occurred whilst fetching realtime config: Status code %s", status);
             return Optional.empty();
         }
         Gson gson = new Gson();

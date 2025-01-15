@@ -1,15 +1,16 @@
 package dev.aikido.agent_api.helpers.logging;
 
-    import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-    import java.util.ArrayList;
-    import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 public class Logger {
     private final LogLevel logLevel;
     private final Class<?> logClass;
+    private static final int MAX_ARGUMENT_LENGTH = 300;
 
     public Logger(Class<?> logClass) {
         String logLevelString = System.getenv("AIKIDO_LOG_LEVEL");
@@ -49,7 +50,7 @@ public class Logger {
             }
         }
         catch (Throwable e) {
-            e.printStackTrace();
+            System.err.println("[AIKIDO LOGGER FAILURE] " + e.getMessage());
         }
     }
     public List<Object> parseArguments(Object[] args) {
@@ -67,6 +68,16 @@ public class Logger {
                 parsedArgs.add(String.valueOf(stringChars));
             } else {
                 parsedArgs.add(arg);
+            }
+        }
+        for(int i = 0; i < parsedArgs.size(); i++) {
+            if (parsedArgs.get(i) instanceof String argString) {
+                // replace newline and carriage return to avoid log injection :
+                argString = argString.replaceAll("[\\r\\n]+", "");
+                if (argString.length() > MAX_ARGUMENT_LENGTH) {
+                    argString = argString.substring(0, MAX_ARGUMENT_LENGTH);
+                }
+                parsedArgs.set(i, argString);
             }
         }
         return parsedArgs;

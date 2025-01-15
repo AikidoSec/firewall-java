@@ -1,6 +1,6 @@
 package dev.aikido.agent.wrappers;
 
-import dev.aikido.agent.contexts.NettyContext;
+import dev.aikido.agent_api.context.NettyContext;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.ContextObject;
