@@ -41,9 +41,6 @@ public class FileWrapper implements Wrapper {
         public static void before(
                 @Advice.Argument(0) Object argument
         ) throws Throwable {
-            if (argument.toString().endsWith(".jar")) {
-                return;
-            }
             try {
                 String prop = System.getProperty("AIK_INTERNAL_coverage_run");
                 if (prop != null && prop.equals("1")) {
