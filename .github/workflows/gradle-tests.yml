@@ -32,6 +32,7 @@ jobs:
           name: pkg-build
           path: ./
   test-and-coverage:
+    needs: build
     runs-on: ubuntu-latest
 
     continue-on-error: true
