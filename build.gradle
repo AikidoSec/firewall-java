@@ -1,6 +1,6 @@
 allprojects {
     group = 'dev.aikido'
-    version = '1.0.0'
+    version = '1.0-REPLACE-VERSION'
 
     repositories {
         mavenCentral()
