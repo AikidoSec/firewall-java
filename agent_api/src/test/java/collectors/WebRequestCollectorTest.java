@@ -5,17 +5,20 @@ import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.context.SpringContextObject;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-import utils.EmptySampleContextObject;
+import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Vector;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -28,9 +31,16 @@ class WebRequestCollectorTest {
 
     @BeforeEach
     void setUp() {
-        contextObject = new EmptySampleContextObject();
-        contextObject.getHeaders().put("content-type", "application/json");
-        contextObject.getHeaders().put("user-agent", "Mozilla/5.0 (compatible) AI2Bot (+https://www.allenai.org/crawler)");
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/test"));
+        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
+        Vector<String> headerVector = new Vector<>(List.of("content-type", "user-agent"));
+        when(request.getHeaderNames()).thenReturn(headerVector.elements());
+        when(request.getHeader("content-type")).thenReturn("application/json");
+        when(request.getHeader("user-agent")).thenReturn("Mozilla/5.0 (compatible) AI2Bot (+https://www.allenai.org/crawler)");
+
+        contextObject = new SpringContextObject(request);
         threadCacheObject = mock(ThreadCacheObject.class);
     }
 
@@ -52,7 +62,7 @@ class WebRequestCollectorTest {
     void testReport_ipNotAllowed() {
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
-                "GET", "/api/resource", 100, 100,
+                "GET", "/test", 100, 100,
                 List.of("192.168.0.1"), false, false, false
         )), Set.of(), Set.of(), new Routes(), Optional.empty());
         ThreadCache.set(threadCacheObject);
@@ -70,7 +80,7 @@ class WebRequestCollectorTest {
     void testReport_endpointAndIpAllowed() {
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
-                "GET", "/api/resource", 100, 100,
+                "GET", "/test", 100, 100,
                 List.of("192.168.1.1"), false, false, false
         )), Set.of(), Set.of(), new Routes(), Optional.empty());
         ThreadCache.set(threadCacheObject);
@@ -102,7 +112,7 @@ class WebRequestCollectorTest {
         ), "");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
-                "GET", "/api/resource", 100, 100,
+                "GET", "/test", 100, 100,
                 List.of("192.168.0.1"), false, false, false
         )), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
         ThreadCache.set(threadCacheObject);

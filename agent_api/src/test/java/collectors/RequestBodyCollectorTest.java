@@ -3,26 +3,30 @@ package collectors;
 import dev.aikido.agent_api.collectors.RequestBodyCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.SpringContextObject;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 public class RequestBodyCollectorTest {
-    private SpringContextObject contextObject;
+    private SpringContextObject springContextObject1;
     @BeforeEach
     public void setup() {
-        contextObject = new SpringContextObject(
-                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
-        );
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/test"));
+        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
+        springContextObject1 = new SpringContextObject(request);
     }
 
     @Test
     public void testWithSpringContext() {
-        Context.set(contextObject);
+        Context.set(springContextObject1);
 
         RequestBodyCollector.report("Hello World");
         assertEquals("Hello World", Context.get().getBody());
@@ -34,7 +38,7 @@ public class RequestBodyCollectorTest {
 
     @Test
     public void testWithSpringContext2() {
-        Context.set(contextObject);
+        Context.set(springContextObject1);
 
         RequestBodyCollector.report("data1", Map.of("1", "2"));
         RequestBodyCollector.report("data2", Map.of("3", "4"));
