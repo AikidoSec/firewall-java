@@ -69,7 +69,6 @@ jobs:
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/${{ matrix.app.name }}
         run: |
-          make clean
           AIKIDO_TMP_DIR="/opt/aikido" make run
           make runWithoutZen
 
