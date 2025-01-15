@@ -67,7 +67,7 @@ jobs:
           docker compose up --build -d
       - name: Cleanup application
         working-directory: ./sample-apps/${{ matrix.app.name }}
-        run: make clean
+        run: chmod +x ./gradlew && make clean
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/${{ matrix.app.name }}
         run: |
