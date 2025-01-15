@@ -20,7 +20,7 @@ Zen will autonomously protect your Python applications from the inside against:
 * 🛡️ [NoSQL injection attacks](https://www.aikido.dev/blog/web-application-security-vulnerabilities)
 * 🛡️ [SQL injection attacks](https://www.aikido.dev/blog/the-state-of-sql-injections)
 * 🛡️ [Command injection attacks](https://www.aikido.dev/blog/command-injection-in-2024-unpacked)
-* 🛡️ [Path traversal attacks](https://owasp.org/www-community/attacks/Path_Traversal)
+* 🛡️ [Path traversal attacks](https://owasp.org/www-community/attacks/Path_Traversal) *This support is currently limited to Path/Paths and new File(String)*
 * 🛡️ [Server-side request forgery (SSRF)](./docs/ssrf.md)
 
 Zen operates autonomously on the same server as your Java app to:
@@ -46,7 +46,6 @@ Zen operates autonomously on the same server as your Java app to:
 * ✅ [`Apache HttpClient`](https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient) (*no SSRF redirect coverage*)
 
 ## Installation
-> 🚧 This area is under construction
 
 Download the zip file [here](https://github.com/AikidoSec/firewall-java/releases/latest) and unzip it to a directory (e.g. `/opt/zen`).
 Please ensure you do not alter the structure of this folder and that the process can read & write to it.
@@ -64,8 +63,7 @@ dependencies {
     # ...
 }
 ```
-
-We will add a maven repository soon.
+For further setup continue to your Web Framework of choice ([Click here for Spring](./docs/spring.md))
 
 ## Reporting to your Aikido Security dashboard
 
