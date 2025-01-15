@@ -13,6 +13,8 @@ Zen is an embedded Web Application Firewall that autonomously protects your Java
 
 Zen protects your Java apps by preventing user input containing dangerous strings, which allow SQL injections. It runs on the same server as your Python app for easy installation and zero maintenance.
 
+Zen for Java currently supports Java 8, Java 11 and onwards of Java 14. The latest tested version is Java 21.
+
 ## Features
 
 Zen will autonomously protect your Python applications from the inside against:
