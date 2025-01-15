@@ -23,7 +23,7 @@ public final class HostnameCollector {
     private static final Logger logger = LogManager.getLogger(HostnameCollector.class);
     public static void report(String hostname, InetAddress[] inetAddresses) {
         try {
-            logger.info("HostnameCollector called with %s & inet addresses: %s", hostname, List.of(inetAddresses));
+            logger.trace("HostnameCollector called with %s & inet addresses: %s", hostname, List.of(inetAddresses));
 
 
             // Convert inetAddresses array to a List of IP strings :

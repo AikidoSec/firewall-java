@@ -49,7 +49,6 @@ public class CommandRouter {
     }
 
     public Optional<byte[]> switchCommands(String commandName, byte[] data) {
-        logger.info("Command received : %s", commandName);
         for (Command command: commands) {
             if (command.matchesName(commandName)) {
                 try {

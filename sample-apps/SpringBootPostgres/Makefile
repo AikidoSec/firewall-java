@@ -18,12 +18,12 @@ build:
 .PHONY: run
 run: build
 	@echo "Running SpringBootPostgres with Zen & ENV (http://localhost:8080)"
-	AIKIDO_LOG_LEVEL="info" \
+	AIKIDO_LOG_LEVEL="error" \
 	AIKIDO_TOKEN="token" \
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCKING=1 \
-	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8080 > SpringBootPostgres1.log &
+	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8080 &
 
 # Run the application without Zen
 .PHONY: runWithoutZen

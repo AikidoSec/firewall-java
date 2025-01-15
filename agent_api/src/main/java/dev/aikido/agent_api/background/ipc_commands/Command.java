@@ -32,7 +32,6 @@ public abstract class Command<I, O> {
 
     public Optional<O> send(ThreadIPCClient threadClient, I input) {
         try {
-            logger.info("Command sent : %s", getName());
             // Convert input data from thread to a byte[] JSON :
             Gson gson = new Gson();
             byte[] inputAsBytes = gson.toJson(input).getBytes(StandardCharsets.UTF_8);

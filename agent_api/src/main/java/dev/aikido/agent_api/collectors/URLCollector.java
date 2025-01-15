@@ -14,7 +14,6 @@ public final class URLCollector {
 
     private URLCollector() {}
     public static void report(URL url) {
-        logger.info("URL : %s", url);
         ThreadCacheObject threadCache = ThreadCache.get();
         if(threadCache != null && url != null) {
             if (!url.getProtocol().startsWith("http")) {
