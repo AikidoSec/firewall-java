@@ -3,29 +3,20 @@ package vulnerabilities.ssrf;
 import dev.aikido.agent_api.collectors.RedirectCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.context.SpringContextObject;
-import dev.aikido.agent_api.vulnerabilities.ssrf.RedirectOriginFinder;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import utils.EmptySampleContextObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import static dev.aikido.agent_api.vulnerabilities.ssrf.RedirectOriginFinder.getRedirectOrigin;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 public class RedirectOriginFinderTest {
     @BeforeEach
     public void setup() {
-        // Create a new context :
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        when(request.getMethod()).thenReturn("GET");
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/test"));
-        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
-        ContextObject context = new SpringContextObject(request);
+        ContextObject context = new EmptySampleContextObject();
         Context.set(context);
     }
 

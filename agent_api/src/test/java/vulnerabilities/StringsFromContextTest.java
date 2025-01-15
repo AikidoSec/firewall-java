@@ -2,59 +2,28 @@ package vulnerabilities;
 
 import dev.aikido.agent_api.context.SpringContextObject;
 import dev.aikido.agent_api.vulnerabilities.StringsFromContext;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 public class StringsFromContextTest {
-    private HttpServletRequest request;
     private SpringContextObject springContextObject;
 
     @BeforeEach
     void setUp() {
-
-        request = Mockito.mock(HttpServletRequest.class);
-        // Arrange
-        when(request.getMethod()).thenReturn("GET");
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/test"));
-        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
-        when(request.getHeaderNames()).thenReturn(
-                new Enumeration<String>() {
-                    private final String[] headers = {"Content-Type", "Authorization"};
-                    private int index = 0;
-
-                    @Override
-                    public boolean hasMoreElements() {
-                        return index < headers.length;
-                    }
-
-                    @Override
-                    public String nextElement() {
-                        return headers[index++];
-                    }
-                }
+        springContextObject = new SpringContextObject(
+                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1",
+                /* query: */ Map.of("param1", new String[]{"value1"}, "param2",  new String[]{"value2"}),
+                /* cookies: */ new HashMap<>(Map.of(
+                        "sessionId", List.of("abc123"),
+                        "userId", List.of("user1"))),
+                /* headers: */ new HashMap<>(Map.of(
+                        "content-type", "application/json",
+                        "authorization", "Bearer token"))
         );
-        when(request.getHeader("Content-Type")).thenReturn("application/json");
-        when(request.getHeader("Authorization")).thenReturn("Bearer token");
-        when(request.getParameterMap()).thenReturn(new HashMap<String, String[]>() {{
-            put("param1", new String[]{"value1"});
-            put("param2", new String[]{"value2"});
-        }});
-        Cookie[] cookies = new Cookie[]{
-                new Cookie("sessionId", "abc123"),
-                new Cookie("userId", "user1")
-        };
-        when(request.getCookies()).thenReturn(cookies);
-
-        // Act
-        springContextObject = new SpringContextObject(request);
     }
 
     @Test
@@ -63,10 +32,10 @@ public class StringsFromContextTest {
         assertEquals(Map.of(
                 "body", Map.of(),
                 "headers", Map.of(
-                        "Content-Type", ".",
-                        "Authorization", ".",
-                        "application/json", ".Content-Type",
-                        "Bearer token", ".Authorization"),
+                        "content-type", ".",
+                        "authorization", ".",
+                        "application/json", ".content-type",
+                        "Bearer token", ".authorization"),
                 "cookies", Map.of(
                         "user1", ".userId.[0]",
                         "abc123", ".sessionId.[0]",
@@ -87,10 +56,10 @@ public class StringsFromContextTest {
         assertEquals(Map.of(
                 "body", Map.of("1", ".[0]", "2", ".[2]", "20",".[1]"),
                 "headers", Map.of(
-                        "Content-Type", ".",
-                        "Authorization", ".",
-                        "application/json", ".Content-Type",
-                        "Bearer token", ".Authorization"),
+                        "content-type", ".",
+                        "authorization", ".",
+                        "application/json", ".content-type",
+                        "Bearer token", ".authorization"),
                 "cookies", Map.of(
                         "user1", ".userId.[0]",
                         "abc123", ".sessionId.[0]",
@@ -110,10 +79,10 @@ public class StringsFromContextTest {
         assertEquals(Map.of(
                 "body", Map.of(),
                 "headers", Map.of(
-                        "Content-Type", ".",
-                        "Authorization", ".",
-                        "application/json", ".Content-Type",
-                        "Bearer token", ".Authorization"),
+                        "content-type", ".",
+                        "authorization", ".",
+                        "application/json", ".content-type",
+                        "Bearer token", ".authorization"),
                 "cookies", Map.of(
                         "user1", ".userId.[0]",
                         "abc123", ".sessionId.[0]",
