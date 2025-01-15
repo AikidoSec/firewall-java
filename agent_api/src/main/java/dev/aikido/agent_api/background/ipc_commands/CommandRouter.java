@@ -67,7 +67,7 @@ public class CommandRouter {
                 return Optional.empty();
             }
         }
-        logger.debug("Command not found: %s", commandName);
+        logger.debug("Command not found: %s", new Gson().toJson(commandName));
         return Optional.empty();
     }
 }
