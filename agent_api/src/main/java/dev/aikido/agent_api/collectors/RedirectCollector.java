@@ -15,7 +15,7 @@ public final class RedirectCollector {
 
     private RedirectCollector() {}
     public static void report(URL origin, URL dest) {
-        logger.trace("Redirect detected: [Origin]<%s> -> [Destination]<%s>", origin, dest);
+        logger.info("Redirect detected: [Origin]<%s> -> [Destination]<%s>", origin, dest);
         ContextObject context = Context.get();
         // Report destination URL :
         URLCollector.report(dest);

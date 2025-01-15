@@ -10,7 +10,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 public final class ByteBuddyInitializer {
 
     public static AgentBuilder createAgentBuilder() {
-        return createAgentBuilder(false); // Set debug mode to false by default
+        return createAgentBuilder(true); // Set debug mode to false by default
     }
 
     public static AgentBuilder createAgentBuilder(boolean debugMode) {

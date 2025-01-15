@@ -1,5 +1,7 @@
 package dev.aikido.agent_api.collectors;
 
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.vulnerabilities.Scanner;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
 
@@ -9,8 +11,10 @@ import java.nio.file.Path;
 public final class FileCollector {
     private FileCollector() {}
     private static final int MAX_RECURSION_DEPTH = 3;
+    private static final Logger logger = LogManager.getLogger(FileCollector.class);
 
     public static void report(Object filePath, String operation) {
+        logger.info("Operation %s with %s", operation, filePath);
         report(filePath, operation, 0); // Start with depth of zero
     }
     public static void report(Object filePath, String operation, int depth) {
