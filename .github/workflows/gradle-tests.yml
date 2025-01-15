@@ -7,17 +7,43 @@ on:
   pull_request:
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'adopt'
+
+      - name: Build with Gradle
+        working-directory: ./
+        run: |
+          chmod +x gradlew
+          make binaries
+          make build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkg-build
+          path: ./
   test-and-coverage:
     runs-on: ubuntu-latest
 
     continue-on-error: true
     strategy:
       matrix:
-        java-version: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+        java-version: [14, 15, 16, 17, 18, 19, 20, 21]
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pkg-build
 
       - name: Set up JDK
         uses: actions/setup-java@v2
@@ -28,10 +54,6 @@ jobs:
       - name: Add local.aikido.io to /etc/hosts
         run: |
           echo "127.0.0.1 local.aikido.io" | sudo tee -a /etc/hosts
-
-      - name: Download binaries & Build with Gradle
-        working-directory: ./
-        run: chmod +x gradlew && make binaries && make build
 
       - name: Start databases
         working-directory: ./sample-apps/databases
