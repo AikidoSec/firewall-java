@@ -44,16 +44,16 @@ Zen operates autonomously on the same server as your Java app to:
 ### API Tools
 * ✅ [`OkHttp`](https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp) (*no SSRF redirect coverage*)
 * ✅ [`Apache HttpClient`](https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient) (*no SSRF redirect coverage*)
-
+## Version support
 ## Installation
-
-Download the zip file [here](https://github.com/AikidoSec/firewall-java/releases/latest) and unzip it to a directory (e.g. `/opt/zen`).
+You can install Zen by downloading the zip file [here](https://github.com/AikidoSec/firewall-java/releases/latest) and unzipping it to your directory of choice,
+we picked `/opt/zen` here for our Linux system as an example. We also have support for Windows and Mac OS X.
 Please ensure you do not alter the structure of this folder and that the process can read & write to it.
-To activate the zen agent you then just have to add the following argument to your Java command :
+To activate Zen you then just have to add the following argument to your Java command :
 ```
 -javaagent:/opt/zen/agent.jar
 ```
-Replace `/opt/zen` with your chosen directory.
+Replace `/opt/zen` with your directory of choice.
 
 To use user-blocking and/or rate-limiting features, you will have to include the following Jarfile into your repository, for gradle :
 ```gradle
