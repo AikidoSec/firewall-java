@@ -2,7 +2,7 @@
 
 
 # Zen, in-app firewall for Java | by Aikido
-[![Codecov](https://img.shields.io/codecov/c/github/AikidoSec/firewall-java?style=flat-square&token=AJK9LU35GY)](https://app.codecov.io/gh/aikidosec/firewall-java) 
+[![Codecov](https://img.shields.io/codecov/c/github/AikidoSec/firewall-java?style=flat-square&token=AJK9LU35GY)](https://app.codecov.io/gh/aikidosec/firewall-java)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![Unit tests](https://github.com/AikidoSec/firewall-java/actions/workflows/gradle-tests.yml/badge.svg)](https://github.com/AikidoSec/firewall-java/actions/workflows/gradle-tests.yml)
 [![End to end tests](https://github.com/AikidoSec/firewall-java/actions/workflows/end2end.yml/badge.svg)](https://github.com/AikidoSec/firewall-java/actions/workflows/end2end.yml)
@@ -95,6 +95,10 @@ By default, Zen will only detect and report attacks to Aikido.
 To block requests, set the `AIKIDO_BLOCK` environment variable to `true`.
 
 See [Reporting to Aikido](#reporting-to-your-aikido-security-dashboard) to learn how to send events to Aikido.
+
+## Additional configuration
+
+[Configure Zen using environment variables for authentication, mode settings, debugging, and more.](https://help.aikido.dev/doc/configuration-via-env-vars/docrSItUkeR9)
 
 ## License
 
