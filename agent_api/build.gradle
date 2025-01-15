@@ -44,6 +44,7 @@ test {
     jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
     jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
     jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
+    jvmArgs '-Dnet.bytebuddy.experimental=true' // Mockito support.
 
     systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
     if (project.hasProperty('coverageRun')) {
