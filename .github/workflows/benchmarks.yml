@@ -50,11 +50,12 @@ jobs:
       - name: Start databases
         working-directory: ./sample-apps/databases
         run: docker compose up --build -d
-
+      - name: Setup IPC Folder
+        run: mkdir /opt/aikido && chmod a+rw /opt/aikido
       - name: Start SpringBootPostgres (with and without Zen)
         working-directory: ./sample-apps/SpringBootPostgres
         run: |
-          make run
+          AIKIDO_TMP_DIR="/opt/aikido" make run
           make runWithoutZen
 
       - name: Install Python dependencies
