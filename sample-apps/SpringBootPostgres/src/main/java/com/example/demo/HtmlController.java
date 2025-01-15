@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class HtmlController {
@@ -38,8 +39,9 @@ public class HtmlController {
     }
 
     @GetMapping("/benchmark_1ms")
+    @ResponseBody
     public String benchmark_route() throws InterruptedException {
-        Thread.sleep(1); // Sleep 1 millisecond
+        //Thread.sleep(1); // Sleep 1 millisecond
         return "OK";
     }
 }

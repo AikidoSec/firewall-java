@@ -23,7 +23,7 @@ run: build
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCKING=1 \
-	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8080 &
+	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8080 > SpringBootPostgres1.log &
 
 # Run the application without Zen
 .PHONY: runWithoutZen
