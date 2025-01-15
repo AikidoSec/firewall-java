@@ -44,7 +44,7 @@ Zen operates autonomously on the same server as your Java app to:
 ### API Tools
 * ✅ [`OkHttp`](https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp) (*no SSRF redirect coverage*)
 * ✅ [`Apache HttpClient`](https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient) (*no SSRF redirect coverage*)
-## Version support
+
 ## Installation
 You can install Zen by downloading the zip file [here](https://github.com/AikidoSec/firewall-java/releases/latest) and unzipping it to your directory of choice,
 we picked `/opt/zen` here for our Linux system as an example. We also have support for Windows and Mac OS X.
