@@ -38,7 +38,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        java-version: [8, 11, 14, 15, 16, 17, 18, 19, 20, 21]
+        java-version: [17, 18, 19, 20, 21]
 
     steps:
       - name: Download build artifacts
