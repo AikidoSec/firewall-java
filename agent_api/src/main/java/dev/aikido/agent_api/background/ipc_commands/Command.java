@@ -3,8 +3,8 @@ package dev.aikido.agent_api.background.ipc_commands;
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;

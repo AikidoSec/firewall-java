@@ -1,8 +1,6 @@
 package dev.aikido.agent_api.background;
 
 import dev.aikido.agent_api.background.ipc_commands.CommandRouter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.newsclub.net.unix.AFUNIXServerSocket;
 import org.newsclub.net.unix.AFUNIXSocket;
 import org.newsclub.net.unix.AFUNIXSocketAddress;
@@ -15,7 +13,6 @@ import static dev.aikido.agent_api.background.utilities.IPCFacilitator.readFromS
 import static dev.aikido.agent_api.background.utilities.IPCFacilitator.writeToSocket;
 
 public class BackgroundReceiver {
-    public static final Logger logger = LogManager.getLogger(BackgroundReceiver.class);
     private final AFUNIXServerSocket socket;
     private final CommandRouter commandRouter;
 

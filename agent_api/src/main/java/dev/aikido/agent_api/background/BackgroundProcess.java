@@ -5,8 +5,8 @@ import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.utilities.UDSPath;
 import dev.aikido.agent_api.helpers.env.BlockingEnv;
 import dev.aikido.agent_api.helpers.env.Token;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,6 @@ public class BackgroundProcess extends Thread {
         if (!Thread.currentThread().isDaemon() && token == null) {
             return; // Can only run if thread is daemon and token needs to be defined.
         }
-        logger.debug("Background Process started");
         // Create a cloud-connection manager:
         this.connectionManager = new CloudConnectionManager(new BlockingEnv().getValue(), token, null);
         // Create a queue and a thread to handle attacks that need reporting in the background:
@@ -61,7 +60,7 @@ public class BackgroundProcess extends Thread {
         try {
             File queueDir = UDSPath.getUDSPath(token);
             if (!queueDir.getParentFile().canWrite()) {
-                logger.error("AIKIDO: Cannot write to socket {}, please verify access", queueDir.getPath());
+                logger.error("AIKIDO: Cannot write to socket %s, please verify access", queueDir.getPath());
             }
             BackgroundReceiver server = new BackgroundReceiver(queueDir, this);
         } catch (IOException | InterruptedException e) {

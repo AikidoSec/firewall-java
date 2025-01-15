@@ -69,12 +69,8 @@ public class FileWrapper implements Wrapper {
                 Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.FileCollector");
 
                 // Run report with "argument"
-                for (Method method2 : clazz.getMethods()) {
-                    if (method2.getName().equals("report")) {
-                        method2.invoke(null, argument, "java.io.File");
-                        break;
-                    }
-                }
+                Method reportMethod = clazz.getMethod("report", Object.class, String.class);
+                reportMethod.invoke(null, argument, "java.io.File");
                 classLoader.close(); // Close the class loader
             } catch (InvocationTargetException invocationTargetException) {
                 if (invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {

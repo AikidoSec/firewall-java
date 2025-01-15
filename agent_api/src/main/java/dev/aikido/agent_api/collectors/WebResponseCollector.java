@@ -11,16 +11,12 @@ import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.agent_api.api_discovery.GetApiInfo.getApiInfo;
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public final class WebResponseCollector {
-    private static final Logger logger = LogManager.getLogger(WebResponseCollector.class);
-
     private WebResponseCollector() {}
     // Only do API Discovery on first 20 requests:
     private static final int ANALYSIS_ON_FIRST_X_REQUESTS = 20;

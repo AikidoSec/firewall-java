@@ -14,6 +14,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
+import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.of;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
@@ -62,19 +63,16 @@ public class PathWrapper implements Wrapper {
                 Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.FileCollector");
 
                 // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
-                        String op = "java.nio.file.Path." + method.getName();
-                        method2.invoke(null, argument, op);
-                        break;
-                    }
-                }
+                Method reportMethod = clazz.getMethod("report", Object.class, String.class);
+                String op = "java.nio.file.Path." + method.getName();
+                reportMethod.invoke(null, argument, op);
             } catch (InvocationTargetException invocationTargetException) {
                 if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
                     throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            } catch(Throwable e) {}
+            } catch(Throwable e) {
+            }
             classLoader.close(); // Close the class loader
         }
     }

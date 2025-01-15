@@ -12,10 +12,9 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
-import java.io.IOException;
 import java.lang.reflect.Executable;
 
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
@@ -57,7 +56,7 @@ public class SpringFrameworkWrapper implements Wrapper {
             // Write a new response:
             WebRequestCollector.Res res = WebRequestCollector.report(contextObject);
             if (res != null) {
-                logger.debug("Writing a new response");
+                logger.trace("Writing a new response");
                 HttpServletResponse newResponse = (HttpServletResponse) response;
                 newResponse.setStatus(res.status());
                 newResponse.setContentType("text/plain");

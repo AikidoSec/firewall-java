@@ -4,12 +4,11 @@ import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.util.Map;
 import java.util.Optional;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
@@ -59,6 +58,7 @@ public final class Scanner {
         }
     }
     public static void reportAttack(Attack attack, ContextObject ctx) {
+        logger.debug("Attack detected: %s", attack);
         ThreadIPCClient client = getDefaultThreadIPCClient();
         if (client != null) {
             AttackCommand.sendAttack(client, new AttackCommand.Req(attack, ctx));
