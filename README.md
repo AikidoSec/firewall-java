@@ -33,8 +33,8 @@ Zen operates autonomously on the same server as your Java app to:
 * ✅ Auto-generate API specifications
 ## Supported libraries and frameworks
 ### Web frameworks
-* ✅ [`Spring Framework`](docs/spring.md)
-* ✅ [`Spring Boot`](docs/spring.md)
+* ✅ [`Spring Framework`](docs/spring.md) 3.x
+* ✅ [`Spring Boot`](docs/spring.md) 3.x
 * 🚧 [`Javalin`](docs/javalin.md)
 
 ### Database drivers
