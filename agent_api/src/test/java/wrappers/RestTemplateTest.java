@@ -1,45 +1,20 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import utils.EmptySampleContextObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class RestTemplateTest {
-
-    public static class SampleContextObject extends ContextObject {
-        public SampleContextObject(String argument) {
-            this.method = "GET";
-            this.source = "web";
-            this.url = "https://example.com/api/resource";
-            this.route = "/api/resource";
-            this.remoteAddress = "192.168.1.1";
-            this.headers = new HashMap<>();
-
-            this.query = new HashMap<>();
-            this.query.put("search", new String[]{"example", "dev.aikido:80"});
-            this.query.put("sql1", new String[]{"SELECT * FRO"});
-            this.query.put("arg", new String[]{argument});
-
-            this.cookies = new HashMap<>();
-            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
-        }
-    }
 
     @AfterEach
     void cleanup() {
@@ -53,7 +28,7 @@ public class RestTemplateTest {
     }
 
     private void setContextAndLifecycle(String url) {
-        Context.set(new SampleContextObject(url));
+        Context.set(new EmptySampleContextObject(url));
         ThreadCache.set(getEmptyThreadCacheObject());
     }
 

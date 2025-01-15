@@ -3,10 +3,7 @@ package dev.aikido.agent_api.context;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
@@ -59,16 +56,23 @@ public class SpringContextObject extends ContextObject {
 
         return headersMap;
     }
-    private static HashMap<String, String[]> extractQueryParameters(HttpServletRequest request) {
-        return new HashMap<>(request.getParameterMap());
+    private static HashMap<String, List<String>> extractQueryParameters(HttpServletRequest request) {
+        HashMap<String, List<String>> query = new HashMap<>();
+
+        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+            // Convert String[] to List<String>
+            List<String> list = Arrays.asList(entry.getValue());
+            query.put(entry.getKey(), list);
+        }
+        return query;
     }
-    private static HashMap<String, String> extractCookies(HttpServletRequest request) {
-        HashMap<String, String> cookiesMap = new HashMap<>();
+    private static HashMap<String, List<String>> extractCookies(HttpServletRequest request) {
+        HashMap<String, List<String>> cookiesMap = new HashMap<>();
         Cookie[] cookies = request.getCookies();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                cookiesMap.put(cookie.getName(), cookie.getValue());
+                cookiesMap.put(cookie.getName(), List.of(cookie.getValue()));
             }
         }
 

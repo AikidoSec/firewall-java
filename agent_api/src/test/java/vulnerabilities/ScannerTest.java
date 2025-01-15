@@ -2,7 +2,6 @@ package vulnerabilities;
 
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import utils.EmptySampleContextObject;
 
 import java.util.*;
 
@@ -21,33 +21,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ScannerTest {
-
-    public static class SampleContextObject extends ContextObject {
-        public SampleContextObject() {
-            this.method = "GET";
-            this.source = "web";
-            this.url = "https://example.com/api/resource";
-            this.route = "/api/resource";
-            this.remoteAddress = "192.168.1.1";
-            this.headers = new HashMap<>();
-
-            this.query = new HashMap<>();
-            this.query.put("search", new String[]{"example", "dev.aikido:80"});
-            this.query.put("sql1", new String[]{"SELECT * FRO"});
-
-            this.cookies = new HashMap<>();
-            this.body = "{\"key\":\"value\"}"; // Body as a JSON string
-        }
-    }
-    public static class SampleContextObject2 extends SampleContextObject {
+    public static class SampleContextObject2 extends EmptySampleContextObject {
         public SampleContextObject2(String ip) {
-            super();
+            super("SELECT * FRO");
             this.remoteAddress = ip;
         }
     }
-    public static class SampleContextObject3 extends SampleContextObject {
+    public static class SampleContextObject3 extends EmptySampleContextObject {
         public SampleContextObject3(String route) {
-            super();
+            super("SELECT * FRO");
             this.route = route;
             this.url = "http://localhost:5050" + route;
         }
@@ -75,7 +57,7 @@ class ScannerTest {
             new Routes(),
             Optional.empty()
         );
-        Context.set(new SampleContextObject());
+        Context.set(new EmptySampleContextObject("SELECT * FRO"));
         ThreadCache.set(threadCacheObject);
     }
     @AfterEach

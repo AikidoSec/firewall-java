@@ -61,8 +61,8 @@ public class GetApiInfoTest {
                 "email", "john.doe@example.com"
         ));
 
-        HashMap<String, String[]> query = new HashMap<>();
-        query.put("user2", List.of("a", "b").toArray(new String[0]));
+        HashMap<String, List<String>> query = new HashMap<>();
+        query.put("user2", List.of("a", "b"));
 
         Mockito.when(context.getMethod()).thenReturn("GET");
         Mockito.when(context.getUrl()).thenReturn("/api/resource1");
@@ -84,8 +84,8 @@ public class GetApiInfoTest {
 
     @Test
     public void testGetApiInfoWithEmptyBody() {
-        HashMap<String, String[]> query = new HashMap<>();
-        query.put("user2", List.of("a", "b").toArray(new String[0]));
+        HashMap<String, List<String>> query = new HashMap<>();
+        query.put("user2", List.of("a", "b"));
 
         Mockito.when(context.getMethod()).thenReturn("GET");
         Mockito.when(context.getUrl()).thenReturn("/api/resource1");
@@ -104,7 +104,7 @@ public class GetApiInfoTest {
 
     @Test
     public void testGetApiInfoWithEmptyQueryAndBody() {
-        HashMap<String, String[]> query = new HashMap<>();
+        HashMap<String, List<String>> query = new HashMap<>();
 
         Mockito.when(context.getMethod()).thenReturn("GET");
         Mockito.when(context.getUrl()).thenReturn("/api/resource1");

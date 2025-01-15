@@ -4,6 +4,7 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 import static dev.aikido.agent_api.api_discovery.DataSchemaGenerator.getDataSchema;
@@ -41,7 +42,7 @@ public final class GetApiInfo {
         return null;
     }
     private static DataSchemaItem getQueryInfo(ContextObject context) {
-        Map<String, String[]> query =  context.getQuery();
+        Map<String, List<String>> query =  context.getQuery();
         if(query != null && !query.isEmpty()) {
             return getDataSchema(query);
         }

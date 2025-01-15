@@ -1,6 +1,5 @@
 package context;
 
-import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.SpringContextObject;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -86,10 +85,10 @@ class SpringContextObjectTest {
         springContextObject = new SpringContextObject(request);
 
         // Assert
-        Map<String, String[]> queryParams = springContextObject.getQuery();
+        Map<String, List<String>> queryParams = springContextObject.getQuery();
         assertEquals(2, queryParams.size());
-        assertArrayEquals(new String[]{"value1"}, queryParams.get("param1"));
-        assertArrayEquals(new String[]{"value2"}, queryParams.get("param2"));
+        assertArrayEquals(new String[]{"value1"}, queryParams.get("param1").toArray());
+        assertArrayEquals(new String[]{"value2"}, queryParams.get("param2").toArray());
     }
 
     @Test
@@ -105,10 +104,10 @@ class SpringContextObjectTest {
         springContextObject = new SpringContextObject(request);
 
         // Assert
-        Map<String, String> cookiesMap = springContextObject.getCookies();
+        Map<String, List<String>> cookiesMap = springContextObject.getCookies();
         assertEquals(2, cookiesMap.size());
-        assertEquals("abc123", cookiesMap.get("sessionId"));
-        assertEquals("user1", cookiesMap.get("userId"));
+        assertArrayEquals(new String[]{"abc123"}, cookiesMap.get("sessionId").toArray());
+        assertArrayEquals(new String[]{"user1"}, cookiesMap.get("userId").toArray());
     }
     @Test
     void testGetRouteWithSlashTest() {

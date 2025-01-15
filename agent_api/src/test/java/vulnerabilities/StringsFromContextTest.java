@@ -68,8 +68,8 @@ public class StringsFromContextTest {
                         "application/json", ".Content-Type",
                         "Bearer token", ".Authorization"),
                 "cookies", Map.of(
-                        "user1", ".userId",
-                        "abc123", ".sessionId",
+                        "user1", ".userId.[0]",
+                        "abc123", ".sessionId.[0]",
                         "sessionId", ".", "userId", "."),
                 "routeParams", Map.of(),
                 "query", Map.of(
@@ -92,8 +92,8 @@ public class StringsFromContextTest {
                         "application/json", ".Content-Type",
                         "Bearer token", ".Authorization"),
                 "cookies", Map.of(
-                        "user1", ".userId",
-                        "abc123", ".sessionId",
+                        "user1", ".userId.[0]",
+                        "abc123", ".sessionId.[0]",
                         "sessionId", ".", "userId", "."),
                 "routeParams", Map.of(),
                 "query", Map.of(
@@ -115,8 +115,8 @@ public class StringsFromContextTest {
                         "application/json", ".Content-Type",
                         "Bearer token", ".Authorization"),
                 "cookies", Map.of(
-                        "user1", ".userId",
-                        "abc123", ".sessionId",
+                        "user1", ".userId.[0]",
+                        "abc123", ".sessionId.[0]",
                         "sessionId", ".", "userId", "."),
                 "routeParams", Map.of("1", ".[0]", "2", ".[2]", "20",".[1]"),
                 "query", Map.of(

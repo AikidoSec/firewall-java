@@ -2,11 +2,11 @@ package collectors;
 
 import dev.aikido.agent_api.collectors.FileCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import utils.EmptySampleContextObject;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -14,7 +14,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,24 +24,9 @@ public class FileCollectorTest {
     public static Path filePath3 = Paths.get("/../../test3.txt");
     public static Path filePath4 = Paths.get("/test.txt");
 
-    public static class SampleContextObject extends ContextObject {
-        public SampleContextObject() {
-            this.method = "GET";
-            this.source = "web";
-            this.url = "https://example.com/api/resource";
-            this.route = "/api/resource";
-            this.remoteAddress = "192.168.1.1";
-            this.headers = new HashMap<>();
-
-            this.query = new HashMap<>();
-            this.query.put("myfile", new String[]{"/../../test.txt"});
-
-            this.cookies = new HashMap<>();
-        }
-    }
     @BeforeEach
     public void setup() {
-        Context.set(new SampleContextObject());
+        Context.set(new EmptySampleContextObject("/../../test.txt"));
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
@@ -102,7 +86,7 @@ public class FileCollectorTest {
         isNotPathTraversalAttack(null);
         isNotPathTraversalAttack(Optional.empty());
         isNotPathTraversalAttack(new URL("https://aikido.dev"));
-        isNotPathTraversalAttack(new SampleContextObject());
+        isNotPathTraversalAttack(new EmptySampleContextObject("/../../test.txt"));
     }
 
 
