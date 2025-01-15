@@ -39,6 +39,7 @@ jobs:
           - { name: SpringBootMySQL, test_file: end2end/spring_boot_mysql.py }
           - { name: SpringBootMSSQL, test_file: end2end/spring_boot_mssql.py }
           - { name: SpringWebfluxSampleApp, test_file: end2end/spring_webflux_postgres.py }
+        java-version: [8, 17, 21]
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -48,7 +49,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: "21"
+          java-version: ${{ matrix.java-version }}
           distribution: 'adopt'
 
       - name: Start mock server
