@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        java-version: [8, 11, 17, 21]
+        java-version: [6, 7, 8, 9, 11, 15, 17, 19, 20, 21]
 
     steps:
       - name: Check out code
