@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pet Details</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .pet-detail {
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+    }
+
+    .pet-id {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .pet-info {
+        margin-top: 10px;
+        font-size: 1.2em;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #007bff;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Pet Details</h1>
+  <div class="pet-detail">
+    <div class="pet-id">Pet ID: <span id="petId"></span></div>
+    <div class="pet-info">Name: <span id="petName"></span></div>
+    <div class="pet-info">Owner: <span id="petOwner"></span></div>
+  </div>
+  <a class="back-link" onclick="goBack()">Back to Pets Overview</a>
+</div>
+
+<script>
+  // Function to extract the pet ID from the URL
+  function getPetIdFromUrl() {
+      const pathParts = window.location.pathname.split('/');
+      return pathParts[pathParts.length - 1]; // Get the last part of the URL
+  }
+
+  // Fetch pet details based on the pet ID
+  function fetchPetDetails(petId) {
+      fetch(`/api/pets/${petId}`)
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(pet => {
+              // Populate the pet details on the page
+              document.getElementById('petId').textContent = pet.petId;
+              document.getElementById('petName').textContent = pet.name;
+              document.getElementById('petOwner').textContent = pet.owner;
+          })
+          .catch(error => {
+              console.error('Error fetching pet details:', error);
+              document.querySelector('.pet-detail').innerHTML = '<p>Error fetching pet details. Please try again later.</p>';
+          });
+  }
+
+  // Get the pet ID from the URL and fetch the details
+  const petId = getPetIdFromUrl();
+  fetchPetDetails(petId);
+function goBack() {
+// Logic to go back to the previous page or pets overview
+window.history.back(); // This will take the user back to the previous page
+}
+</script>
+</body>
+</html>
