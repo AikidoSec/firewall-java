@@ -59,12 +59,11 @@ object DatabaseHelper {
     }
 
     fun createPetByName(petName: String): Int {
-        val sql = "INSERT INTO pets (pet_name, owner) VALUES (?, 'Aikido Security')"
+        val sql = "INSERT INTO pets (pet_name, owner) VALUES ('$petName', 'Aikido Security')"
         val db = createDataSource()
         return try {
             db.connection.use { conn ->
                 val insertStmt: PreparedStatement = conn.prepareStatement(sql)
-                insertStmt.setString(1, petName)
                 insertStmt.executeUpdate()
             }
         } catch (ignored: SQLException) {

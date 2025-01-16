@@ -12,7 +12,7 @@ class FilesController {
     @PostMapping(
         path = ["/read"],
         consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE],
-        produces = [MediaType.APPLICATION_JSON_VALUE]
+        produces = [MediaType.TEXT_PLAIN_VALUE]
     )
     fun read(@RequestParam fileName: String): String {
         println("Reading file: $fileName")

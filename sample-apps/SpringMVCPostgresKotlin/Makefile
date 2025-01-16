@@ -1,6 +1,6 @@
 # Define variables
 GRADLEW = ./gradlew
-JAR_FILE = build/libs/demo-0.0.1-SNAPSHOT-plain.jar
+JAR_FILE = build/libs/demo-0.0.1-SNAPSHOT.war
 JAVA_AGENT = ../../dist/agent.jar
 
 # Default target

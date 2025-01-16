@@ -76,8 +76,8 @@
             pets.forEach(pet => {
                 const li = document.createElement('li');
                 li.innerHTML = `
-                    <a href="/pet_page/${pet.pet_id}">
-                    <span class="pet-id">${pet.pet_id}</span>
+                    <a href="/pet_page/${pet.petId}">
+                    <span class="pet-id">${pet.petId}</span>
                     <span class="pet-info">${pet.name}</span>
                     <span class="pet-owner">Owned by: ${pet.owner}</span>
                     </a>
