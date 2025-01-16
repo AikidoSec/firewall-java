@@ -2,6 +2,7 @@ package dev.aikido.agent_api.helpers.patterns;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.*;
 
 public final class PrimitiveType {
     private PrimitiveType() {}
@@ -17,6 +18,12 @@ public final class PrimitiveType {
         WRAPPER_TYPE_MAP.put(Long.class, long.class);
         WRAPPER_TYPE_MAP.put(Short.class, short.class);
         WRAPPER_TYPE_MAP.put(String.class, String.class); // Yes also see Strings as primitive.
+        // Also mark the atomic ones as primitive :
+        WRAPPER_TYPE_MAP.put(AtomicInteger.class, AtomicInteger.class);
+        WRAPPER_TYPE_MAP.put(AtomicBoolean.class, AtomicBoolean.class);
+        WRAPPER_TYPE_MAP.put(AtomicLong.class, AtomicLong.class);
+        WRAPPER_TYPE_MAP.put(AtomicIntegerArray.class, AtomicIntegerArray.class);
+        WRAPPER_TYPE_MAP.put(AtomicLongArray.class, AtomicLongArray.class);
     }
     public static boolean isPrimitiveType(Object source) {
         return WRAPPER_TYPE_MAP.containsKey(source.getClass());
