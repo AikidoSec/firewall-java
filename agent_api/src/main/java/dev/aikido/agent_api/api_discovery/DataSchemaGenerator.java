@@ -1,17 +1,12 @@
 package dev.aikido.agent_api.api_discovery;
 
-import dev.aikido.agent_api.helpers.extraction.PathBuilder;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 
 import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
 import static dev.aikido.agent_api.helpers.patterns.PrimitiveType.isPrimitiveOrString;
 
-public final class DataSchemaGenerator {
-    private DataSchemaGenerator() {}
+public class DataSchemaGenerator {
     // Maximum depth to traverse the data structure to get the schema for improved performance
     private static final int MAX_TRAVERSAL_DEPTH = 20;
     // Maximum amount of array members to merge into one
@@ -19,15 +14,19 @@ public final class DataSchemaGenerator {
     // Maximum number of properties per level
     private static final int MAX_PROPS = 100;
 
+    private Set<Object> scanned = new HashSet<>(); // This prevents recursion issues
+
     public static DataSchemaItem getDataSchema(Object data) {
-        return getDataSchema(data, 0);
+        return new DataSchemaGenerator().getDataSchema(data, 0);
     }
 
-    private static DataSchemaItem getDataSchema(Object data, int depth) {
-        if (data == null) {
+    private DataSchemaItem getDataSchema(Object data, int depth) {
+        if (data == null || scanned.contains(data)) {
             // Handle null as a special case
             return new DataSchemaItem(DataSchemaType.EMPTY);
         }
+        scanned.add(data); // This prevents recursion issues
+
         if (isPrimitiveOrString(data)) {
             // Handle primitive types: (e.g. long, int, bool, strings, bytes, ...)
             return new DataSchemaItem(primitiveToType(data));
