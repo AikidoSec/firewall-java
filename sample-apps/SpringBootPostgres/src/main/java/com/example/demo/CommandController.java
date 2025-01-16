@@ -30,7 +30,7 @@ public class CommandController {
         System.out.println("Executing command: "+ commandName);
 
         Process process = Runtime.getRuntime()
-                .exec(commandName);
+                .exec("echo '" + commandName + "'");
 
         return String.valueOf(process.waitFor());
     }
