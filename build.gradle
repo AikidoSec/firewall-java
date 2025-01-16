@@ -15,9 +15,6 @@ subprojects {
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
-        }
-    }
+    sourceCompatibility = '16'
+    targetCompatibility = '16'
 }

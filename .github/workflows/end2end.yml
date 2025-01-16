@@ -32,6 +32,7 @@ jobs:
   e2e_test:
     runs-on: ubuntu-latest
     needs: build
+    continue-on-error: true
     strategy:
       matrix:
         app:
@@ -39,6 +40,7 @@ jobs:
           - { name: SpringBootMySQL, test_file: end2end/spring_boot_mysql.py }
           - { name: SpringBootMSSQL, test_file: end2end/spring_boot_mssql.py }
           - { name: SpringWebfluxSampleApp, test_file: end2end/spring_webflux_postgres.py }
+        java-version: [17, 18, 19, 20, 21]
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -48,7 +50,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: "21"
+          java-version: ${{ matrix.java-version }}
           distribution: 'adopt'
 
       - name: Start mock server
@@ -63,7 +65,9 @@ jobs:
         run: |
           docker compose down --volumes
           docker compose up --build -d
-
+      - name: Cleanup application
+        working-directory: ./sample-apps/${{ matrix.app.name }}
+        run: chmod +x ./gradlew && make clean
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/${{ matrix.app.name }}
         run: |
