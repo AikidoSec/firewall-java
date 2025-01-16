@@ -16,7 +16,10 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-
+      - name: Set the version for this release
+        run: |
+          TAG_NAME=${GITHUB_REF##*/}
+          make replace_version version=${TAG_NAME#v}
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:

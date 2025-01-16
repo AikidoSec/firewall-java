@@ -49,3 +49,17 @@ binaries_make_dir:
 .cache/binaries/%:
 	@echo "Downloading $*..."
 	curl -L -o $@ $(BASE_URL)/$*
+
+
+VERSION_FILES = ./build.gradle ./agent_api/src/main/java/dev/aikido/agent_api/Config.java
+replace_version:
+	@if [ -z "$(version)" ]; then \
+		echo "Error: No version specified. Use 'make replace-version version=<new_version>'."; \
+		exit 1; \
+	fi;
+
+	@for file in $(VERSION_FILES); do \
+		echo "Updating $$file with version $(version)"; \
+		sed -i.bak "s/1.0-REPLACE-VERSION/$$version/g" $$file; \
+		rm $$file.bak; \
+	done;
