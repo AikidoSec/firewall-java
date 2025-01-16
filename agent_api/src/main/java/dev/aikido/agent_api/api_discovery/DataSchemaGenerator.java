@@ -4,6 +4,7 @@ import dev.aikido.agent_api.helpers.extraction.PathBuilder;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
@@ -69,6 +70,9 @@ public final class DataSchemaGenerator {
                 Field[] fields = data.getClass().getDeclaredFields();
                 for (Field field : fields) {
                     try {
+                        if (Modifier.isTransient(field.getModifiers())) {
+                            continue; // Do not scan transient fields.
+                        }
                         field.setAccessible(true); // Allow access to private fields
                         props.put(field.getName(), getDataSchema(field.get(data), depth + 1));
                     } catch (IllegalAccessException | RuntimeException ignored) {
