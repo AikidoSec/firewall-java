@@ -23,14 +23,14 @@ run: build
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCKING=1 \
 	AIKIDO_LOG_LEVEL="debug" \
-	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8082 > SpringBootMysql1.log &
+	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8082 > output1.log &
 
 # Run the application without Zen
 .PHONY: runWithoutZen
 runWithoutZen: build
 	@echo "Running SpringBootMySQL without Zen & ENV (http://localhost:8083)"
 	AIKIDO_TOKEN="random-invalid-token" \
-	nohup java -jar $(JAR_FILE) --server.port=8083 > SpringBootMysql2.log &
+	nohup java -jar $(JAR_FILE) --server.port=8083 > output2.log &
 
 # Clean the project
 .PHONY: clean

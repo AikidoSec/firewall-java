@@ -22,14 +22,14 @@ run: build
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCKING=1 \
-	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8086 &
+	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8086 > output1.log &
 
 # Run the application without Zen
 .PHONY: runWithoutZen
 runWithoutZen: build
 	@echo "Running SpringBootMSSQL without Zen & ENV (http://localhost:8087)"
 	AIKIDO_TOKEN="random-invalid-token" \
-	nohup java -jar $(JAR_FILE) --server.port=8087 &
+	nohup java -jar $(JAR_FILE) --server.port=8087 > output2.log &
 
 # Clean the project
 .PHONY: clean
