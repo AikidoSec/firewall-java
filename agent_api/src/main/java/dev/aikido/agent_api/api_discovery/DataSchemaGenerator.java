@@ -62,6 +62,8 @@ public class DataSchemaGenerator {
                     }
                     props.put((String) key, getDataSchema(map.get(key), depth + 1));
                 }
+            } else if (data.getClass().toString().startsWith("class org.codehaus.groovy")) {
+                // pass through, we do not want to check org.codehaus.groovy
             } else {
                 Field[] fields = data.getClass().getDeclaredFields();
                 for (Field field : fields) {
