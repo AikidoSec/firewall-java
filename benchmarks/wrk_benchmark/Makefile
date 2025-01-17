@@ -14,3 +14,8 @@ benchmark_SpringBootPostgres: check_wrk
 	@echo "Running Python benchmarks for SpringBootPostgres"
 	python spring_boot_postgres.py
 
+.PHONY: benchmark_SpringWebfluxSampleApp
+benchmark_SpringBootPostgres: check_wrk
+	@echo "Running Python benchmarks for SpringWebfluxSampleApp"
+	python spring_webflux_postgres.py
+
