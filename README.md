@@ -13,7 +13,7 @@ Zen is an embedded Web Application Firewall that autonomously protects your Java
 
 Zen protects your Java apps by preventing user input containing dangerous strings, which allow SQL injections. It runs on the same server as your Java app for easy installation and zero maintenance.
 
-Zen for Java currently supports onwards of Java 17. The latest tested version is Java 21.
+Zen for Java currently supports onwards of Java 17. The latest tested version is Java 21. We offer support for Java, Kotlin and Groovy.
 
 ## Features
 
