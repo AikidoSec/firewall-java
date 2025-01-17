@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -28,6 +29,7 @@ public class HtmlController {
     }
 
     @GetMapping("/benchmark_empty_route")
+    @ResponseBody
     public Mono<String> benchmark_route() {
         return Mono.just("OK");
     }

@@ -18,7 +18,7 @@ build:
 .PHONY: run
 run: build
 	@echo "Running SpringMVCPostgresKotlin with Zen & ENV (http://localhost:8092)"
-	AIKIDO_LOG_LEVEL="error" \
+	AIKIDO_LOG_LEVEL="trace" \
 	AIKIDO_TOKEN="token" \
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
