@@ -1,16 +1,12 @@
 package dev.aikido.agent_api.api_discovery;
 
-import dev.aikido.agent_api.helpers.extraction.PathBuilder;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.util.*;
 
 import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
 import static dev.aikido.agent_api.helpers.patterns.PrimitiveType.isPrimitiveOrString;
 
-public final class DataSchemaGenerator {
-    private DataSchemaGenerator() {}
+public class DataSchemaGenerator {
     // Maximum depth to traverse the data structure to get the schema for improved performance
     private static final int MAX_TRAVERSAL_DEPTH = 20;
     // Maximum amount of array members to merge into one
@@ -19,14 +15,15 @@ public final class DataSchemaGenerator {
     private static final int MAX_PROPS = 100;
 
     public static DataSchemaItem getDataSchema(Object data) {
-        return getDataSchema(data, 0);
+        return new DataSchemaGenerator().getDataSchema(data, 0);
     }
 
-    private static DataSchemaItem getDataSchema(Object data, int depth) {
+    private DataSchemaItem getDataSchema(Object data, int depth) {
         if (data == null) {
             // Handle null as a special case
             return new DataSchemaItem(DataSchemaType.EMPTY);
         }
+
         if (isPrimitiveOrString(data)) {
             // Handle primitive types: (e.g. long, int, bool, strings, bytes, ...)
             return new DataSchemaItem(primitiveToType(data));
@@ -65,11 +62,20 @@ public final class DataSchemaGenerator {
                     }
                     props.put((String) key, getDataSchema(map.get(key), depth + 1));
                 }
+            } else if (data.getClass().toString().startsWith("class org.codehaus.groovy")) {
+                // pass through, we do not want to check org.codehaus.groovy
             } else {
                 Field[] fields = data.getClass().getDeclaredFields();
                 for (Field field : fields) {
                     try {
+                        if (Modifier.isTransient(field.getModifiers())) {
+                            continue; // Do not scan transient fields.
+                        }
                         field.setAccessible(true); // Allow access to private fields
+                        if (props.size() >= MAX_PROPS) {
+                            // We cannot allow more properties than MAX_PROPS, breaking for loop.
+                            break;
+                        }
                         props.put(field.getName(), getDataSchema(field.get(data), depth + 1));
                     } catch (IllegalAccessException | RuntimeException ignored) {
                     }

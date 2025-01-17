@@ -59,6 +59,7 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.BOOL, schema.properties().get("arr").items().properties().get("sub").type());
         assertEquals(DataSchemaType.EMPTY, schema.properties().get("x").type());
     }
+
     private record MyRecord(String a, Number abc, List<String> stringslist) {}
     @Test
     public void testExtractsFromClasses() {
@@ -73,6 +74,46 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.EMPTY, props.get("abc").type());
         assertEquals(DataSchemaType.ARRAY, props.get("stringslist").type());
         assertEquals(DataSchemaType.STRING, props.get("stringslist").items().type());
+    }
+
+    private static class MyClass2 {
+        transient String a = "Hello World";
+        transient Number abc = null;
+        List<String> stringslist = List.of("Abc", "def", "ghi");
+    }
+    @Test
+    public void testTransientFields() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("record", new MyClass2());
+        DataSchemaItem schema = DataSchemaGenerator.getDataSchema(input);
+        assertEquals(DataSchemaType.OBJECT, schema.type());
+        assertEquals(DataSchemaType.OBJECT, schema.properties().get("record").type());
+        Map<String, DataSchemaItem> props = schema.properties().get("record").properties();
+        assertNull(props.get("a"));
+        assertNull(props.get("abc"));
+        assertEquals(DataSchemaType.ARRAY, props.get("stringslist").type());
+        assertEquals(DataSchemaType.STRING, props.get("stringslist").items().type());
+    }
+
+    private static class MyClass3 {
+        boolean a = true;
+        boolean b = true;
+        transient boolean abc = false;
+        List<Boolean> stringslist = List.of(true, false, true);
+    }
+    @Test
+    public void testBooleanField() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("record", new MyClass3());
+        DataSchemaItem schema = DataSchemaGenerator.getDataSchema(input);
+        assertEquals(DataSchemaType.OBJECT, schema.type());
+        assertEquals(DataSchemaType.OBJECT, schema.properties().get("record").type());
+        Map<String, DataSchemaItem> props = schema.properties().get("record").properties();
+        assertEquals(DataSchemaType.BOOL, props.get("a").type());
+        assertEquals(DataSchemaType.BOOL, props.get("b").type());
+        assertNull(props.get("abc"));
+        assertEquals(DataSchemaType.ARRAY, props.get("stringslist").type());
+        assertEquals(DataSchemaType.BOOL, props.get("stringslist").items().type());
     }
 
     @Test

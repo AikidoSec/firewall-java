@@ -45,11 +45,52 @@ public class GetApiInfoTest {
         Mockito.when(context.getHeaders()).thenReturn(headers);
         APISpec apiInfo = GetApiInfo.getApiInfo(context);
         assertNotNull(apiInfo);
-        assertNotNull(apiInfo.body());
-        Gson gson = new Gson();
-        assertEquals(
-                "{\"type\":\"object\",\"properties\":{\"data1\":{\"type\":\"object\",\"properties\":{\"identifier\":{\"type\":\"string\",\"optional\":false},\"data2\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"location\":{\"type\":\"string\",\"optional\":true},\"Help\":{\"type\":\"boolean\",\"optional\":false}},\"optional\":false},\"optional\":false},\"active\":{\"type\":\"boolean\",\"optional\":false}},\"optional\":false},\"user\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"optional\":false},\"email\":{\"type\":\"string\",\"optional\":false}},\"optional\":false}},\"optional\":false}",
-                gson.toJson(apiInfo.body().schema()));
+        assertNotNull(apiInfo.body().schema());
+        DataSchemaItem schema = apiInfo.body().schema();
+        assertEquals(DataSchemaType.OBJECT, schema.type());
+
+        // Check properties of the schema
+        Map<String, DataSchemaItem> properties = schema.properties();
+        assertNotNull(properties);
+        assertEquals(2, properties.size()); // Assuming there are 2 properties: data1 and user
+
+        // Check the 'data1' property
+        assertEquals(DataSchemaType.OBJECT, properties.get("data1").type());
+        Map<String, DataSchemaItem> data1Properties = properties.get("data1").properties();
+        assertEquals(3, data1Properties.size()); // Assuming there are 3 properties: identifier, data2, active
+        assertEquals(DataSchemaType.STRING, data1Properties.get("identifier").type());
+        assertFalse(data1Properties.get("identifier").optional()); // Assuming optional is a method that returns boolean
+
+        // Check 'data2' property
+        DataSchemaItem data2 = data1Properties.get("data2");
+        assertEquals(DataSchemaType.ARRAY, data2.type());
+        assertFalse(data2.optional());
+        assertNotNull(data2.items());
+
+        assertEquals(DataSchemaType.OBJECT, data2.items().type());
+        Map<String, DataSchemaItem> data2ItemProperties = data2.items().properties();
+        assertEquals(2, data2ItemProperties.size()); // Assuming there are 2 properties: location, Help
+
+        assertEquals(DataSchemaType.STRING, data2ItemProperties.get("location").type());
+        assertTrue(data2ItemProperties.get("location").optional());
+        assertEquals(DataSchemaType.BOOL, data2ItemProperties.get("Help").type());
+        assertFalse(data2ItemProperties.get("Help").optional());
+
+        // Check 'active' property
+        assertEquals(DataSchemaType.BOOL, data1Properties.get("active").type());
+        assertFalse(data1Properties.get("active").optional());
+
+        // Check the 'user' property
+        DataSchemaItem user = properties.get("user");
+        assertEquals(DataSchemaType.OBJECT, user.type());
+        Map<String, DataSchemaItem> userProperties = user.properties();
+        assertEquals(2, userProperties.size()); // Assuming there are 2 properties: name, email
+
+        assertEquals(DataSchemaType.STRING, userProperties.get("name").type());
+        assertFalse(userProperties.get("name").optional());
+        assertEquals(DataSchemaType.STRING, userProperties.get("email").type());
+        assertFalse(userProperties.get("email").optional());
+
         assertEquals("form-urlencoded", apiInfo.body().type());
     }
 
