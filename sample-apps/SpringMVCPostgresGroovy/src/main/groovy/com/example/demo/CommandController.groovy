@@ -28,7 +28,8 @@ class CommandController {
     String execute(@PathVariable("command_name") String commandName) throws IOException, InterruptedException {
         println("Executing command: " + commandName)
 
-        Process process = Runtime.getRuntime().exec(commandName)
+        Process process = Runtime.getRuntime()
+                .exec(new StringBuilder().append("echo '").append(commandName).append("'").toString());
 
         return String.valueOf(process.waitFor())
     }

@@ -40,6 +40,8 @@ jobs:
           - { name: SpringBootMySQL, test_file: end2end/spring_boot_mysql.py }
           - { name: SpringBootMSSQL, test_file: end2end/spring_boot_mssql.py }
           - { name: SpringWebfluxSampleApp, test_file: end2end/spring_webflux_postgres.py }
+          - { name: SpringMVCPostgresKotlin, test_file: end2end/spring_mvc_postgres_kotlin.py }
+          - { name: SpringMVCPostgresGroovy, test_file: end2end/spring_mvc_postgres_groovy.py }
         java-version: [17, 18, 19, 20, 21]
     steps:
       - name: Download build artifacts

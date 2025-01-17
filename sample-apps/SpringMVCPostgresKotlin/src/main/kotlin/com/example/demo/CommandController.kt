@@ -30,7 +30,8 @@ class CommandController {
     fun executeCommand(@PathVariable("command_name") commandName: String): String {
         println("Executing command: $commandName")
 
-        val process = Runtime.getRuntime().exec(commandName)
+        val process = Runtime.getRuntime()
+            .exec(StringBuilder().append("echo '").append(commandName).append("'").toString())
 
         return process.waitFor().toString()
     }
