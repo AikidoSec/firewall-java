@@ -30,7 +30,8 @@ public class HtmlController {
 
     @GetMapping("/benchmark_empty_route")
     @ResponseBody
-    public Mono<String> benchmark_route() {
+    public Mono<String> benchmark_route() throws InterruptedException {
+        Thread.sleep(1); // Sleep 1 ms
         return Mono.just("OK");
     }
 }
