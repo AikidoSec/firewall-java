@@ -7,8 +7,7 @@ import dev.aikido.agent_api.api_discovery.DataSchemaType;
 import org.junit.jupiter.api.Test;
 
 import static dev.aikido.agent_api.helpers.extraction.StringExtractor.extractStringsFromObject;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
@@ -343,5 +342,91 @@ public class StringExtractorTest {
         Map<String, String> expectedOutput = new HashMap<>();
         expectedOutput.put("my_string", ".");
         assertEquals(expectedOutput, extractStringsFromObject("my_string"));
+    }
+
+    private static class MyClass {
+        transient String a = "Hello World";
+        Number abc = 2;
+        List<String> stringsList = List.of("Abc", "def", "ghi");
+    }
+    @Test
+    public void testItDoesNotScanTransientProperties() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("important_record", new MyClass());
+
+        Map<String, String> result = extractStringsFromObject(input);
+
+        assertEquals(4, result.size());
+        assertEquals(".important_record.stringsList.[0]", result.get("Abc"));
+        assertEquals(".important_record.stringsList.[1]", result.get("def"));
+        assertEquals(".important_record.stringsList.[2]", result.get("ghi"));
+        assertEquals(".", result.get("important_record"));
+        assertNull(result.get("Hello World")); // Transient record does not get included
+    }
+
+    private static class MyClass2 {
+        String a = "Hello World";
+        Number abc = 2;
+        transient List<String> stringsList = List.of("Abc", "def", "ghi");
+    }
+    @Test
+    public void testItDoesNotScanTransientProperties2() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("important_record", new MyClass2());
+
+        Map<String, String> result = extractStringsFromObject(input);
+
+        assertEquals(2, result.size());
+        assertEquals(".", result.get("important_record"));
+        assertEquals(".important_record.a", result.get("Hello World"));
+        // stringsList is transient, size is 2.
+    }
+
+    private static class MyClass3 {
+        MyClass3 class3 = null;
+        String a = "Hello World";
+        Number abc = 2;
+        List<String> stringsList = List.of("Abc", "def", "ghi");
+        public void setClass3(MyClass3 myClass) {
+            class3 = myClass; // Allow referencing yourself
+        }
+    }
+    @Test
+    public void testItChecksScannedClasses() {
+        Map<String, Object> input = new HashMap<>();
+        MyClass3 myClass = new MyClass3();
+        myClass.setClass3(myClass); // Add infinite recursion.
+        input.put("important_record", new MyClass3());
+
+        Map<String, String> result = extractStringsFromObject(input);
+        assertEquals(5, result.size());
+        assertEquals(".important_record.stringsList.[0]", result.get("Abc"));
+        assertEquals(".important_record.stringsList.[1]", result.get("def"));
+        assertEquals(".important_record.stringsList.[2]", result.get("ghi"));
+        assertEquals(".", result.get("important_record"));
+        assertEquals(".important_record.a", result.get("Hello World"));
+    }
+
+    @Test
+    public void testItChecksScannedObjects() {
+        Map<String, Object> input = new HashMap<>();
+        MyClass3 myClass = new MyClass3();
+        input.put("important_record", new MyClass3());
+        input.put("important_record_2", myClass.stringsList);
+        input.put("important_record_3", myClass.stringsList);
+        input.put("important_record_4", myClass.stringsList);
+
+
+        Map<String, String> result = extractStringsFromObject(input);
+        assertEquals(8, result.size());
+        // These strings
+        assertEquals(".important_record.stringsList.[0]", result.get("Abc"));
+        assertEquals(".important_record.stringsList.[1]", result.get("def"));
+        assertEquals(".important_record.stringsList.[2]", result.get("ghi"));
+        assertEquals(".", result.get("important_record"));
+        assertEquals(".", result.get("important_record_2"));
+        assertEquals(".", result.get("important_record_3"));
+        assertEquals(".", result.get("important_record_4"));
+        assertEquals(".important_record.a", result.get("Hello World"));
     }
 }
