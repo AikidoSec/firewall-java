@@ -19,3 +19,13 @@ benchmark_SpringBootPostgres: check_wrk
 	@echo "Running Python benchmarks for SpringWebfluxSampleApp"
 	python spring_webflux_postgres.py
 
+.PHONY: benchmark_SpringMVCPostgresKotlin
+benchmark_SpringBootPostgres: check_wrk
+	@echo "Running Python benchmarks for SpringMVCPostgresKotlin"
+	python spring_mvc_postgres_kotlin.py
+
+.PHONY: benchmark_SpringMVCPostgresGroovy
+benchmark_SpringBootPostgres: check_wrk
+	@echo "Running Python benchmarks for SpringMVCPostgresGroovy"
+	python spring_mvc_postgres_groovy.py
+
