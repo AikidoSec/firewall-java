@@ -27,9 +27,8 @@ public class HtmlController {
         return Mono.just("pet_page"); // This will resolve to src/main/resources/templates/pet_page.html
     }
 
-    @GetMapping("/benchmark_1ms")
+    @GetMapping("/benchmark_empty_route")
     public Mono<String> benchmark_route() {
-        return Mono.delay(Duration.ofMillis(1)) // Sleep 1 millisecond in a non-blocking way
-                .then(Mono.just("OK"));
+        return Mono.just("OK");
     }
 }

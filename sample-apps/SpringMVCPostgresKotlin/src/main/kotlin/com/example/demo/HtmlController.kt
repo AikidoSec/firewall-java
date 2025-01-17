@@ -40,10 +40,9 @@ class HtmlController {
         return "pet_page"
     }
 
-    @GetMapping("/benchmark_1ms")
+    @GetMapping("/benchmark_empty_route")
     @ResponseBody
     fun benchmarkRoute(): String {
-        // Thread.sleep(1) // Sleep 1 millisecond
         return "OK"
     }
 }
