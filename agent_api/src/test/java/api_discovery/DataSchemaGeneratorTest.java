@@ -95,6 +95,25 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.STRING, props.get("stringslist").items().type());
     }
 
+    private static class MyClass3 {
+        boolean a = true;
+        transient boolean abc = false;
+        List<Boolean> stringslist = List.of(true, false, true);
+    }
+    @Test
+    public void testBooleanField() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("record", new MyClass3());
+        DataSchemaItem schema = DataSchemaGenerator.getDataSchema(input);
+        assertEquals(DataSchemaType.OBJECT, schema.type());
+        assertEquals(DataSchemaType.OBJECT, schema.properties().get("record").type());
+        Map<String, DataSchemaItem> props = schema.properties().get("record").properties();
+        assertEquals(DataSchemaType.BOOL, props.get("a").type());
+        assertNull(props.get("abc"));
+        assertEquals(DataSchemaType.ARRAY, props.get("stringslist").type());
+        assertEquals(DataSchemaType.BOOL, props.get("stringslist").items().type());
+    }
+
     @Test
     void testUndefinedPrimitives() {
         Map<String, Object> input = new HashMap<>();
