@@ -25,6 +25,17 @@ run: build
 	AIKIDO_BLOCKING=1 \
 	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8080 > output1.log &
 
+.PHONY: runWithDdTrace
+runWithDdTrace: build
+	@echo "Running SpringBootPostgres with Zen, ddtrace & ENV (http://localhost:8080)"
+	wget -O dd-java-agent.jar 'https://dtdg.co/latest-java-tracer'
+	AIKIDO_LOG_LEVEL="error" \
+	AIKIDO_TOKEN="token" \
+	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
+	AIKIDO_ENDPOINT="http://localhost:5000" \
+	AIKIDO_BLOCKING=1 \
+	nohup java -javaagent:dd-java-agent.jar -Ddd.profiling.enabled=true -Ddd.logs.injection=true -Ddd.service=my-app -Ddd.env=staging -Ddd.version=1.0 -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8080 > output1.log &
+
 # Run the application without Zen
 .PHONY: runWithoutZen
 runWithoutZen: build
