@@ -1,5 +1,5 @@
 plugins {
-	id 'org.jetbrains.kotlin.jvm' version '2.0.20'
+	id 'org.jetbrains.kotlin.jvm' version '2.1.0'
 	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
 	id 'war'
 	id 'org.springframework.boot' version '3.4.1'
@@ -10,14 +10,9 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
 kotlin {
-	jvmToolchain(21)
 	compilerOptions {
 		freeCompilerArgs.addAll '-Xjsr305=strict'
 	}
-}
-java {
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
