@@ -97,6 +97,7 @@ public class DataSchemaGeneratorTest {
 
     private static class MyClass3 {
         boolean a = true;
+        boolean b = true;
         transient boolean abc = false;
         List<Boolean> stringslist = List.of(true, false, true);
     }
@@ -109,6 +110,7 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.OBJECT, schema.properties().get("record").type());
         Map<String, DataSchemaItem> props = schema.properties().get("record").properties();
         assertEquals(DataSchemaType.BOOL, props.get("a").type());
+        assertEquals(DataSchemaType.BOOL, props.get("b").type());
         assertNull(props.get("abc"));
         assertEquals(DataSchemaType.ARRAY, props.get("stringslist").type());
         assertEquals(DataSchemaType.BOOL, props.get("stringslist").items().type());

@@ -14,18 +14,15 @@ public class DataSchemaGenerator {
     // Maximum number of properties per level
     private static final int MAX_PROPS = 100;
 
-    private Set<Object> scanned = new HashSet<>(); // This prevents recursion issues
-
     public static DataSchemaItem getDataSchema(Object data) {
         return new DataSchemaGenerator().getDataSchema(data, 0);
     }
 
     private DataSchemaItem getDataSchema(Object data, int depth) {
-        if (data == null || scanned.contains(data)) {
+        if (data == null) {
             // Handle null as a special case
             return new DataSchemaItem(DataSchemaType.EMPTY);
         }
-        scanned.add(data); // This prevents recursion issues
 
         if (isPrimitiveOrString(data)) {
             // Handle primitive types: (e.g. long, int, bool, strings, bytes, ...)
@@ -73,6 +70,10 @@ public class DataSchemaGenerator {
                             continue; // Do not scan transient fields.
                         }
                         field.setAccessible(true); // Allow access to private fields
+                        if (props.size() >= MAX_PROPS) {
+                            // We cannot allow more properties than MAX_PROPS, breaking for loop.
+                            break;
+                        }
                         props.put(field.getName(), getDataSchema(field.get(data), depth + 1));
                     } catch (IllegalAccessException | RuntimeException ignored) {
                     }
