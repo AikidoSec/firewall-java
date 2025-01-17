@@ -9,8 +9,8 @@ payloads_exec = {
     "unsafe": "'; sleep 2; # "
 }
 urls = {
-    "disabled": "http://localhost:8092",
-    "enabled":  "http://localhost:8093"
+    "disabled": "http://localhost:8093",
+    "enabled":  "http://localhost:8092"
 }
 
 test_safe_vs_unsafe_payloads(payloads, urls, route="/api/pets/create") # This makes 4 requests and asserts their status codes
