@@ -33,9 +33,17 @@ Zen operates autonomously on the same server as your Java app to:
 * ✅ Auto-generate API specifications
 ## Supported libraries and frameworks
 ### Web frameworks
-* ✅ [`Spring Framework`](docs/spring.md) 3.x
-* ✅ [`Spring Boot`](docs/spring.md) 3.x
-* 🚧 [`Javalin`](docs/javalin.md)
+#### Java
+* ✅ [`Spring MVC`](docs/spring.md) 3.x
+* ✅ [`Spring Webflux`](docs/spring.md) 3.x
+
+#### Kotlin
+* ✅ [`Spring MVC`](docs/spring.md) 3.x
+* ✅ [`Spring Webflux`](docs/spring.md) 3.x
+
+#### Groovy
+* ✅ [`Spring MVC`](docs/spring.md) 3.x
+* ✅ [`Spring Webflux`](docs/spring.md) 3.x
 
 ### Database drivers
 * ✅ [`MariaDB Java Client`](https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client)
