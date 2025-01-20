@@ -27,10 +27,9 @@ public class StringExtractor {
             result.putAll(extractStringsFromArray(target, pathToPayload));
         } else if (target instanceof Map<?, ?> targetMap) {
             result.putAll(extractStringsFromMap(targetMap, pathToPayload));
+        } else if (!isPrimitiveType(target)) { // Stop algorithm if it's a primitive type.
+            result.putAll(extractStringsFromStructure(target, pathToPayload));
         }
-        //else if (!isPrimitiveType(target)) { // Stop algorithm if it's a primitive type.
-        //    result.putAll(extractStringsFromStructure(target, pathToPayload));
-        //}
         return result;
     }
 
