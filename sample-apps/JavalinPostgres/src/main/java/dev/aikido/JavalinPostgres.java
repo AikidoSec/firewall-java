@@ -1,5 +1,7 @@
 package dev.aikido;
 
+import dev.aikido.handlers.RateLimitingHandler;
+import dev.aikido.handlers.SetUserHandler;
 import io.javalin.Javalin;
 
 import java.io.BufferedReader;
@@ -17,7 +19,10 @@ public class JavalinPostgres {
 
     public static void main(String[] args) {
         Javalin app = Javalin.create().start(Integer.valueOf(System.getProperty("portNumber", "8088")));
-        // Serve the HTML pages
+        // Add our middleware :
+        app.before(new SetUserHandler());
+        app.before(new RateLimitingHandler());
+
         app.get("/", ctx -> {
             ctx.html(loadHtmlFromFile("src/main/resources/index.html"));
         });
@@ -32,6 +37,19 @@ public class JavalinPostgres {
         });
         app.get("/pages/read", ctx -> {
             ctx.html(loadHtmlFromFile("src/main/resources/read_file.html"));
+        });
+
+        // Test rate-limiting :
+        app.get("/test_ratelimiting_1", ctx -> {
+            ctx.result("OK");
+        });
+
+        // Path parameters :
+        app.get("/hello/{name}", ctx -> { // the {} syntax does not allow slashes ('/') as part of the parameter
+            ctx.result("Hello: " + ctx.pathParam("name"));
+        });
+        app.get("/hello/<name>", ctx -> { // the <> syntax allows slashes ('/') as part of the parameter
+            ctx.result("Hello: " + ctx.pathParam("name"));
         });
 
         // Serve API :
@@ -49,6 +67,11 @@ public class JavalinPostgres {
 
         app.post("/api/execute", ctx -> {
             String userCommand = ctx.bodyAsClass(CommandRequest.class).userCommand;
+            String result = executeShellCommand(userCommand);
+            ctx.result(result);
+        });
+        app.get("/api/execute/<command>", ctx -> {
+            String userCommand = ctx.pathParam("command");
             String result = executeShellCommand(userCommand);
             ctx.result(result);
         });
