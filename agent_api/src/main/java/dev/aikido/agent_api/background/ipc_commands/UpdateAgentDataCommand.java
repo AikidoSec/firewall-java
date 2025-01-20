@@ -40,7 +40,7 @@ public class UpdateAgentDataCommand extends Command<UpdateAgentDataCommand.Res, 
         if (data.routeHitDeltas != null) {
             connectionManager.getRoutes().importFromDeltaMap(data.routeHitDeltas);
         }
-        connectionManager.getRoutes().incrementTotalHits(data.hitsDelta);
+        connectionManager.getStats().incrementTotalHits(data.hitsDelta);
 
         return Optional.empty();
     }

@@ -171,13 +171,4 @@ public class RoutesTest {
         Map<String, Integer> deltaMap = routes.getDeltaMap();
         assertEquals(0, deltaMap.size());
     }
-
-    @Test
-    public void testTotalHits() {
-        assertEquals(routes.getTotalHits(), 0);
-        routes.incrementTotalHits(20);
-        assertEquals(routes.getTotalHits(), 20);
-        routes.incrementTotalHits(1);
-        assertEquals(routes.getTotalHits(), 21);
-    }
 }
