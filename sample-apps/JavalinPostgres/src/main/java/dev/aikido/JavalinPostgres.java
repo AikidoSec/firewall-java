@@ -18,6 +18,15 @@ public class JavalinPostgres {
     public static void main(String[] args) {
         Javalin app = Javalin.create().start(Integer.valueOf(System.getProperty("portNumber", "8088")));
         // Serve the HTML pages
+
+        app.before(ctx -> {
+            // runs before all requests
+            System.err.println("[before-all] Context: " + ctx.url());
+        });
+        app.before("/", ctx -> {
+            System.err.println("[before-slash] Context: " + ctx.url());
+        });
+
         app.get("/", ctx -> {
             ctx.html(loadHtmlFromFile("src/main/resources/index.html"));
         });
@@ -32,6 +41,14 @@ public class JavalinPostgres {
         });
         app.get("/pages/read", ctx -> {
             ctx.html(loadHtmlFromFile("src/main/resources/read_file.html"));
+        });
+
+        // Path parameters :
+        app.get("/hello/{name}", ctx -> { // the {} syntax does not allow slashes ('/') as part of the parameter
+            ctx.result("Hello: " + ctx.pathParam("name"));
+        });
+        app.get("/hello/<name>", ctx -> { // the <> syntax allows slashes ('/') as part of the parameter
+            ctx.result("Hello: " + ctx.pathParam("name"));
         });
 
         // Serve API :
