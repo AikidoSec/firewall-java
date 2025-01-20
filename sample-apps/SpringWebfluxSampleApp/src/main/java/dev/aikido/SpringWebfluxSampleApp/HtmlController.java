@@ -28,7 +28,7 @@ public class HtmlController {
         return Mono.just("pet_page"); // This will resolve to src/main/resources/templates/pet_page.html
     }
 
-    @GetMapping("/benchmark_empty_route")
+    @GetMapping("/benchmark")
     @ResponseBody
     public Mono<String> benchmark_route() throws InterruptedException {
         Thread.sleep(1); // Sleep 1 ms

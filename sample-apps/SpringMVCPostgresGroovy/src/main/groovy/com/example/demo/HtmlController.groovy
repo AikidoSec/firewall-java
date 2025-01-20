@@ -39,9 +39,10 @@ class HtmlController {
         return "pet_page"
     }
 
-    @GetMapping("/benchmark_empty_route")
+    @GetMapping("/benchmark")
     @ResponseBody
     String benchmark_route() throws InterruptedException {
+        Thread.sleep(1);
         return "OK"
     }
 }
