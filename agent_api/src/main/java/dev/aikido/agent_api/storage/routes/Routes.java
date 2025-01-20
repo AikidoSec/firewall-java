@@ -10,14 +10,16 @@ import static dev.aikido.agent_api.storage.routes.RouteToKeyHelper.routeToKey;
 public class Routes {
     private final int maxSize;
     private final Map<String, RouteEntry> routes;
+    private int totalHits;
 
-    public Routes(int maxSize) {
+    public Routes(int maxSize, int totalHits) {
         this.maxSize = maxSize;
         this.routes = new LinkedHashMap<>();
+        this.totalHits = 0;
     }
-
+    public Routes(int maxSize) { this(maxSize, 0); }
     public Routes() {
-        this(1000); // Default max size
+        this(1000, 0); // Default max size
     }
 
     public void initializeRoute(RouteMetadata routeMetadata) {
@@ -27,6 +29,9 @@ public class Routes {
             return;
         }
         routes.put(key, new RouteEntry(routeMetadata));
+    }
+    public void incrementTotalHits(int count) {
+        totalHits += count;
     }
 
     public void incrementRoute(RouteMetadata routeMetadata) {
@@ -71,6 +76,7 @@ public class Routes {
     public int size() {
         return routes.size();
     }
+    public int getTotalHits() { return totalHits; }
 
     // Delta maps represent new hits added to routes, and are primarily used to sync data between threads.
     public Map<String, Integer> getDeltaMap() {
