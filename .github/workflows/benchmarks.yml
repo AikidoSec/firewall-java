@@ -35,7 +35,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        app: [SpringBootPostgres, SpringWebfluxSampleApp, SpringMVCPostgresKotlin, SpringMVCPostgresGroovy]
+        app: [SpringBootPostgres, SpringWebfluxSampleApp]
         java-version: [ 17, 18, 19, 20, 21 ]
     steps:
       - name: Download build artifacts

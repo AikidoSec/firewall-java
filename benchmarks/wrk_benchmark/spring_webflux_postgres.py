@@ -6,5 +6,5 @@ run_benchmark(
     "http://localhost:8090/benchmark_empty_route", # Application with Zen
     "http://localhost:8091/benchmark_empty_route", # Application without Zen
     "An empty route",
-    percentage_limit=50, ms_limit=500
+    percentage_limit=20, ms_limit=100
 )
