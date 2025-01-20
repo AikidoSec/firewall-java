@@ -125,8 +125,10 @@ address: support@aikido.dev or create an account at https://app.aikido.dev.
 We perform a couple of benchmarks (which get run as Github workflows) which you can find [here](./benchmarks/wrk_benchmark). Here are the results : 
 | App | Typical overhead |
 | --- | -------  |
-| Spring app (6 threads) | +5% |
+| Spring MVC app (6 threads) | +2% |
 | Webflux app | +11% |
+| Spring MVC app Kotlin | +10% |
+| Spring MVC app Groovy | +9% |
 
 ## Code of Conduct
 
