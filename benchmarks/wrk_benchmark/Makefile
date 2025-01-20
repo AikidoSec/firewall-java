@@ -1,5 +1,3 @@
-PYTHON_SCRIPT_SB_POSTGRES = spring_boot_postgres.py
-
 WRK_CHECK = wrk --version
 WRK_INSTALL = sudo apt-get install -y wrk
 
@@ -11,9 +9,23 @@ check_wrk:
 		$(WRK_INSTALL); \
 	}
 
-# Target to run the Python benchmark script
-.PHONY: sb_postgres
-sb_postgres: check_wrk
-	@echo "Running the Python benchmark script..."
-	python $(PYTHON_SCRIPT_SB_POSTGRES)
+.PHONY: benchmark_SpringBootPostgres
+benchmark_SpringBootPostgres: check_wrk
+	@echo "Running Python benchmarks for SpringBootPostgres"
+	python spring_boot_postgres.py
+
+.PHONY: benchmark_SpringWebfluxSampleApp
+benchmark_SpringWebfluxSampleApp: check_wrk
+	@echo "Running Python benchmarks for SpringWebfluxSampleApp"
+	python spring_webflux_postgres.py
+
+.PHONY: benchmark_SpringMVCPostgresKotlin
+benchmark_SpringMVCPostgresKotlin: check_wrk
+	@echo "Running Python benchmarks for SpringMVCPostgresKotlin"
+	python spring_mvc_postgres_kotlin.py
+
+.PHONY: benchmark_SpringMVCPostgresGroovy
+benchmark_SpringMVCPostgresGroovy: check_wrk
+	@echo "Running Python benchmarks for SpringMVCPostgresGroovy"
+	python spring_mvc_postgres_groovy.py
 

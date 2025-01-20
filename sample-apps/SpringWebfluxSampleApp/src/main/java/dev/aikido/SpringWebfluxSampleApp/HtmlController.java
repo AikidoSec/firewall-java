@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -27,9 +28,10 @@ public class HtmlController {
         return Mono.just("pet_page"); // This will resolve to src/main/resources/templates/pet_page.html
     }
 
-    @GetMapping("/benchmark_1ms")
-    public Mono<String> benchmark_route() {
-        return Mono.delay(Duration.ofMillis(1)) // Sleep 1 millisecond in a non-blocking way
-                .then(Mono.just("OK"));
+    @GetMapping("/benchmark")
+    @ResponseBody
+    public Mono<String> benchmark_route() throws InterruptedException {
+        Thread.sleep(1); // Sleep 1 ms
+        return Mono.just("OK");
     }
 }

@@ -38,10 +38,9 @@ public class HtmlController {
         return "pet_page";
     }
 
-    @GetMapping("/benchmark_1ms")
+    @GetMapping("/benchmark")
     @ResponseBody
     public String benchmark_route() throws InterruptedException {
-        //Thread.sleep(1); // Sleep 1 millisecond
         return "OK";
     }
 }
