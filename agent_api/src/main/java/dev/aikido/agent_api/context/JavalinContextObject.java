@@ -18,10 +18,10 @@ public class JavalinContextObject extends ContextObject {
         }
         this.query = new HashMap<>(queryParams);
         this.cookies = extractCookies(cookies);
-        this.headers = new HashMap<>(headers);
+        this.headers = extractHeaders(headers);
         this.route = buildRouteFromUrl(this.url);
         this.remoteAddress = getIpFromRequest(rawIp, this.headers);
-        this.source = "SpringFramework";
+        this.source = "Javalin";
         this.redirectStartNodes = new ArrayList<>();
 
         // We don't have access yet to the route parameters, will add once we have access.
@@ -39,5 +39,13 @@ public class JavalinContextObject extends ContextObject {
             cookies.put(entry.getKey(), List.of(entry.getValue()));
         }
         return cookies;
+    }
+    private static HashMap<String, String> extractHeaders(Map<String, String> rawHeaders) {
+        HashMap<String, String> headers = new HashMap<>();
+        for (Map.Entry<String, String> entry: rawHeaders.entrySet()) {
+            // Lower-case keys :
+            headers.put(entry.getKey().toLowerCase(), entry.getValue());
+        }
+        return headers;
     }
 }
