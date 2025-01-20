@@ -13,7 +13,7 @@ Zen is an embedded Web Application Firewall that autonomously protects your Java
 
 Zen protects your Java apps by preventing user input containing dangerous strings, which allow SQL injections. It runs on the same server as your Java app for easy installation and zero maintenance.
 
-Zen for Java currently supports onwards of Java 17. The latest tested version is Java 21.
+Zen for Java currently supports onwards of Java 17. The latest tested version is Java 21. We offer support for Java, Kotlin and Groovy.
 
 ## Features
 
@@ -33,9 +33,17 @@ Zen operates autonomously on the same server as your Java app to:
 * ✅ Auto-generate API specifications
 ## Supported libraries and frameworks
 ### Web frameworks
-* ✅ [`Spring Framework`](docs/spring.md) 3.x
-* ✅ [`Spring Boot`](docs/spring.md) 3.x
-* 🚧 [`Javalin`](docs/javalin.md)
+#### Java
+* ✅ [`Spring MVC`](docs/spring.md) 3.x
+* ✅ [`Spring Webflux`](docs/spring.md) 3.x
+
+#### Kotlin
+* ✅ [`Spring MVC`](docs/spring.md) 3.x
+* ✅ [`Spring Webflux`](docs/spring.md) 3.x
+
+#### Groovy
+* ✅ [`Spring MVC`](docs/spring.md) 3.x
+* ✅ [`Spring Webflux`](docs/spring.md) 3.x
 
 ### Database drivers
 * ✅ [`MariaDB Java Client`](https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client)
@@ -113,8 +121,6 @@ disclosing the source code of your own applications.
 For more information, please contact Aikido Security at this
 address: support@aikido.dev or create an account at https://app.aikido.dev.
 
-## Performance
-> 🚧 This area is under construction
 
 ## Code of Conduct
 
