@@ -122,7 +122,11 @@ For more information, please contact Aikido Security at this
 address: support@aikido.dev or create an account at https://app.aikido.dev.
 
 ## Performance
-> 🚧 This area is under construction
+We perform a couple of benchmarks (which get run as Github workflows) which you can find [here](./benchmarks/wrk_benchmark). Here are the results : 
+| App | Typical overhead |
+| --- | -------  |
+| Spring app (6 threads) | +5% |
+| Webflux app | +11% |
 
 ## Code of Conduct
 
