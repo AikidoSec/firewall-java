@@ -31,7 +31,6 @@ public abstract class Command<I, O> {
     public abstract Optional<O> execute(I data, CloudConnectionManager connectionManager);
 
     public Optional<O> send(ThreadIPCClient threadClient, I input) {
-        logger.trace("Sending: %s", getName());
         try {
             // Convert input data from thread to a byte[] JSON :
             Gson gson = new Gson();
@@ -43,13 +42,11 @@ public abstract class Command<I, O> {
             if(!response.isEmpty()) {
                 // Convert background process' response from byte[] JSON to the output object :
                 O data = gson.fromJson(new String(response.get(), StandardCharsets.UTF_8), getOutputClass());
-                logger.trace("Response is %", data);
                 return Optional.of(data);
             }
         } catch (Exception e) {
             logger.trace(e);
         }
-        logger.trace("Response is empty.");
         return Optional.empty();
     };
 }
