@@ -17,6 +17,9 @@ public class RouteEntry {
     // We created a RouteEntrySerializer so we can still send it over HTTP
     public transient APISpec apispec;
 
+    // deltaHits field is transient because it's only meant to be local.
+    private transient int deltaHits = 0;
+
     public RouteEntry(String method, String path) {
         this.method = method;
         this.path = path;
@@ -29,6 +32,10 @@ public class RouteEntry {
 
     public void incrementHits() {
         hits++;
+        deltaHits++; // Also increment delta.
+    }
+    public void incrementHits(int count) {
+        hits += count;
     }
 
     public int getHits() {
@@ -38,6 +45,11 @@ public class RouteEntry {
     public void updateApiSpec(APISpec newApiSpec) {
         this.apispec = mergeAPISpecs(newApiSpec, this.apispec);
     }
+
+    public int getDeltaHits() {
+        return deltaHits;
+    }
+
     public static class RouteEntrySerializer implements JsonSerializer<RouteEntry> {
         @Override
         public JsonElement serialize(RouteEntry route, Type typeOfSrc, JsonSerializationContext context) {
