@@ -32,6 +32,7 @@ public class CommandRouter {
         commands.add(new RegisterUserCommand());
         commands.add(new AttackCommand(queue));
         commands.add(new ApiDiscoveryCommand());
+        commands.add(new UpdateAgentDataCommand());
     }
 
     /**
