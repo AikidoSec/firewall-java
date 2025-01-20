@@ -18,8 +18,9 @@ public final class Heartbeat {
             Object stats,
             String[] hostnames,
             RouteEntry[] routes,
-            List<User> users
-    ) implements APIEvent {};
+            List<User> users,
+            boolean middlewareInstalled
+    ) implements APIEvent {}
     
     public static HeartbeatEvent get(
             CloudConnectionManager connectionManager,
@@ -27,6 +28,7 @@ public final class Heartbeat {
     ) {
         long time = getUnixTimeMS(); // Get current time
         GetManagerInfo.ManagerInfo agent = connectionManager.getManagerInfo();
-        return new HeartbeatEvent("heartbeat", agent, time, stats, hostnames, routes, users);
+        boolean middlewareInstalled = connectionManager.getConfig().isMiddlewareInstalled();
+        return new HeartbeatEvent("heartbeat", agent, time, stats, hostnames, routes, users, middlewareInstalled);
     }
 }
