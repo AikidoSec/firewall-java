@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    implementation files('../../dist/agent_api.jar')
     implementation 'io.javalin:javalin:6.3.0'
     implementation 'com.squareup.okhttp3:okhttp:4.9.3'
     implementation 'org.slf4j:slf4j-simple:2.0.16'

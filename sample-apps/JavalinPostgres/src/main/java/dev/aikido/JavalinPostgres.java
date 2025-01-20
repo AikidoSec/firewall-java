@@ -1,5 +1,7 @@
 package dev.aikido;
 
+import dev.aikido.handlers.RateLimitingHandler;
+import dev.aikido.handlers.SetUserHandler;
 import io.javalin.Javalin;
 
 import java.io.BufferedReader;
@@ -17,15 +19,9 @@ public class JavalinPostgres {
 
     public static void main(String[] args) {
         Javalin app = Javalin.create().start(Integer.valueOf(System.getProperty("portNumber", "8088")));
-        // Serve the HTML pages
-
-        app.before(ctx -> {
-            // runs before all requests
-            System.err.println("[before-all] Context: " + ctx.url());
-        });
-        app.before("/", ctx -> {
-            System.err.println("[before-slash] Context: " + ctx.url());
-        });
+        // Add our middleware :
+        app.before(new SetUserHandler());
+        app.before(new RateLimitingHandler());
 
         app.get("/", ctx -> {
             ctx.html(loadHtmlFromFile("src/main/resources/index.html"));
@@ -41,6 +37,11 @@ public class JavalinPostgres {
         });
         app.get("/pages/read", ctx -> {
             ctx.html(loadHtmlFromFile("src/main/resources/read_file.html"));
+        });
+
+        // Test rate-limiting :
+        app.get("/test_ratelimiting_1", ctx -> {
+            ctx.result("OK");
         });
 
         // Path parameters :
@@ -66,6 +67,11 @@ public class JavalinPostgres {
 
         app.post("/api/execute", ctx -> {
             String userCommand = ctx.bodyAsClass(CommandRequest.class).userCommand;
+            String result = executeShellCommand(userCommand);
+            ctx.result(result);
+        });
+        app.get("/api/execute/<command>", ctx -> {
+            String userCommand = ctx.pathParam("command");
             String result = executeShellCommand(userCommand);
             ctx.result(result);
         });
