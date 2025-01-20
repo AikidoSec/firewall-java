@@ -1,6 +1,7 @@
 package dev.aikido.agent;
 
 import dev.aikido.agent.wrappers.*;
+import dev.aikido.agent.wrappers.javalin.JavalinDataWrapper;
 import dev.aikido.agent.wrappers.javalin.JavalinWrapper;
 import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
 import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
@@ -32,6 +33,7 @@ public final class Wrappers {
             new PathWrapper(),
             new PathsWrapper(),
             new NettyWrapper(),
-            new JavalinWrapper()
+            new JavalinWrapper(),
+            new JavalinDataWrapper()
     );
 }

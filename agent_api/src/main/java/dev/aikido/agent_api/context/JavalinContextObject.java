@@ -27,10 +27,6 @@ public class JavalinContextObject extends ContextObject {
         // We don't have access yet to the route parameters, will add once we have access.
         this.params = null;
     }
-    @Override
-    public Object getBody() {
-        return null; // IMPLEMENT
-    }
     public void setParams(Object params) {
         this.params = params;
         this.cache.remove("routeParams"); // Reset cache
