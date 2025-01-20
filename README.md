@@ -47,7 +47,7 @@ Zen operates autonomously on the same server as your Java app to:
 * ✅ [`Spring MVC`](docs/spring.md) 3.x
 * ✅ [`Spring Webflux`](docs/spring.md) 3.x
 
-#### 🚧 Sala
+#### 🚧 Scala
 * 🚧 `Akka`
 
 ### Database drivers
