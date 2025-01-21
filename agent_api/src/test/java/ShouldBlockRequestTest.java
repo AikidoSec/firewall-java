@@ -69,6 +69,12 @@ public class ShouldBlockRequestTest {
         var res2 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(Context.get().middlewareExecuted());
         assertFalse(res2.block());
+
+        Context.reset();
+        // Test with context not set :
+        var res3 = ShouldBlockRequest.shouldBlockRequest();
+        assertFalse(Context.get().middlewareExecuted());
+        assertFalse(ThreadCache.get().isMiddlewareInstalled());
     }
 
     @Test
@@ -91,12 +97,14 @@ public class ShouldBlockRequestTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     public void testUserSet() throws SQLException {
         ContextObject ctx = new SampleContextObject();
+
         ctx.setUser(new User("ID1", "John Doe", "127.0.0.1", 100));
         Context.set(ctx);
         // Test with user set but not blocked :
         var res1 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(res1.block());
         assertTrue(Context.get().middlewareExecuted());
+        assertTrue(ThreadCache.get().isMiddlewareInstalled());
 
         // Test with user set and blocked :
         ctx = new SampleContextObject();
@@ -107,6 +115,7 @@ public class ShouldBlockRequestTest {
         var res2 = ShouldBlockRequest.shouldBlockRequest();
         assertTrue(res2.block());
         assertTrue(Context.get().middlewareExecuted());
+        assertTrue(ThreadCache.get().isMiddlewareInstalled());
         assertEquals("user", res2.data().trigger());
         assertEquals("blocked", res2.data().type());
         assertEquals("192.168.1.1", res2.data().ip());
@@ -118,6 +127,7 @@ public class ShouldBlockRequestTest {
         var res3 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(res3.block());
         assertTrue(Context.get().middlewareExecuted());
+        assertTrue(ThreadCache.get().isMiddlewareInstalled());
 
         // Test users blocked but user not blocked :
         ctx = new SampleContextObject();
@@ -126,6 +136,7 @@ public class ShouldBlockRequestTest {
         var res4 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(res4.block());
         assertTrue(Context.get().middlewareExecuted());
+        assertTrue(ThreadCache.get().isMiddlewareInstalled());
     }
 
     @Test

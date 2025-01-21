@@ -27,6 +27,7 @@ public final class ShouldBlockRequest {
             return new ShouldBlockRequestResult(false, null); // Blocking false
         }
         context.setExecutedMiddleware(true); // Mark middleware as executed.
+        threadCache.setMiddlewareInstalled();
         Context.set(context);
         if (context.getUser() != null) {
             if (threadCache.isBlockedUserID(context.getUser().id())) {
