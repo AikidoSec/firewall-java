@@ -19,10 +19,11 @@ public final class ThreadCacheRenewal {
         if (client == null || isBackgroundProcess()) {
             return null;
         }
-        // First we want to send our data we currently have: hit counts, middleware data, ... :
+        // Let's get our previous cache object and if necessary sync data :
         // shouldFetch is set as false to ensure we do not enter into infinite recursion.
         ThreadCacheObject cache = ThreadCache.get(/*shouldFetch*/ false);
         if (cache != null) {
+            // Send stored data from thread cache to background process: hit counts, middleware data, ... :
             var updateRes = new UpdateAgentDataCommand.Res(
                     /* routeHitDeltas */ cache.getRoutes().getDeltaMap(),
                     /* hitsDelta */ cache.getTotalHits(),
@@ -31,7 +32,7 @@ public final class ThreadCacheRenewal {
             new UpdateAgentDataCommand().send(client, updateRes);
         }
 
-        // Next we want to fetch the new available data :
+        // Fetch new data from background process : 
         Optional<SyncDataCommand.Res> result = new SyncDataCommand().send(client, new Command.EmptyResult());
         if(result.isPresent()) {
             SyncDataCommand.Res res = result.get();
