@@ -20,7 +20,8 @@ public final class ThreadCacheRenewal {
             return null;
         }
         // First we want to send our data we currently have: hit counts, middleware data, ... :
-        ThreadCacheObject cache = ThreadCache.get();
+        // shouldFetch is set as false to ensure we do not enter into infinite recursion.
+        ThreadCacheObject cache = ThreadCache.get(/*shouldFetch*/ false);
         if (cache != null) {
             var updateRes = new UpdateAgentDataCommand.Res(
                     /* routeHitDeltas */ cache.getRoutes().getDeltaMap(),
