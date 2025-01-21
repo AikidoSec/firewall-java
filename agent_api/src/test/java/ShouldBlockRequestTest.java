@@ -71,9 +71,9 @@ public class ShouldBlockRequestTest {
         assertFalse(res2.block());
 
         Context.reset();
-        // Test with context not set :
+        ThreadCache.set(getEmptyThreadCacheObject());
+        // Test with context not set, but thread cache set :
         var res3 = ShouldBlockRequest.shouldBlockRequest();
-        assertFalse(Context.get().middlewareExecuted());
         assertFalse(ThreadCache.get().isMiddlewareInstalled());
     }
 
