@@ -40,11 +40,17 @@ class WebRequestCollectorTest {
         // Mock ThreadCache
         threadCacheObject = getEmptyThreadCacheObject();
         ThreadCache.set(threadCacheObject);
+        assertEquals(0, threadCacheObject.getTotalHits());
 
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
 
         assertNull(response);
         assertEquals(Context.get(), contextObject);
+        assertEquals(1, threadCacheObject.getTotalHits());
+        // Increment total hits with same context object :
+        WebRequestCollector.report(contextObject);
+        assertEquals(2, threadCacheObject.getTotalHits());
+
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")

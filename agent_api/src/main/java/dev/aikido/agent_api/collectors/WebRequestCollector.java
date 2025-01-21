@@ -27,6 +27,10 @@ public final class WebRequestCollector {
         if (threadCache == null) {
             return null;
         }
+
+        // Increment total hits :
+        threadCache.incrementTotalHits();
+
         // Blocked IP lists (e.g. Geo restrictions)
         ThreadCacheObject.BlockedResult ipBlocked = threadCache.isIpBlocked(newContext.getRemoteAddress());
         if (ipBlocked.blocked()) {
