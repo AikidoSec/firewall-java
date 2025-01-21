@@ -1,10 +1,10 @@
-package dev.aikido.handlers;
+package dev.aikido.agent_api.middleware;
 
 import dev.aikido.agent_api.ShouldBlockRequest;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 
-public class RateLimitingHandler implements Handler {
+public class AikidoJavalinMiddleware implements Handler {
     @Override
     public void handle(Context ctx) throws Exception {
         ShouldBlockRequest.ShouldBlockRequestResult shouldBlockRequestResult = ShouldBlockRequest.shouldBlockRequest();
@@ -22,8 +22,6 @@ public class RateLimitingHandler implements Handler {
     }
 
     private void setResponse(Context ctx, String text, int statusCode) {
-        System.err.println("Setting response: " + text);
-        System.err.println("Status code: " + statusCode);
         ctx.status(statusCode);
         ctx.contentType("text/plain");
         ctx.result(text);
