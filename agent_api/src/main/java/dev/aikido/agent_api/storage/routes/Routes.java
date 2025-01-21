@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.storage.routes;
 import dev.aikido.agent_api.context.RouteMetadata;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -14,7 +15,6 @@ public class Routes {
         this.maxSize = maxSize;
         this.routes = new LinkedHashMap<>();
     }
-
     public Routes() {
         this(1000); // Default max size
     }
@@ -69,5 +69,22 @@ public class Routes {
 
     public int size() {
         return routes.size();
+    }
+
+    // Delta maps represent new hits added to routes, and are primarily used to sync data between threads.
+    public Map<String, Integer> getDeltaMap() {
+        HashMap<String, Integer> deltaMap = new HashMap<>();
+        for (var entry: routes.entrySet()) {
+            deltaMap.put(entry.getKey(), entry.getValue().getDeltaHits());
+        }
+        return deltaMap;
+    }
+    public void importFromDeltaMap(Map<String, Integer> deltaMap) {
+        for (var entry: deltaMap.entrySet()) {
+            RouteEntry routeEntry = routes.get(entry.getKey());
+            if (routeEntry != null) {
+                routeEntry.incrementHits(entry.getValue());
+            }
+        }
     }
 }

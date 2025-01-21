@@ -1,6 +1,7 @@
 package background.cloud.api;
 
 
+import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class HeartbeatEventTest {
@@ -49,6 +51,9 @@ public class HeartbeatEventTest {
         List<User> users = Collections.emptyList(); // Replace with actual User list if needed
 
         when(connectionManager.getManagerInfo()).thenReturn(managerInfo);
+        var serviceConfigMock = mock(ServiceConfiguration.class);
+        when(serviceConfigMock.isMiddlewareInstalled()).thenReturn(false);
+        when(connectionManager.getConfig()).thenReturn(serviceConfigMock);
 
         // Act
         Heartbeat.HeartbeatEvent event = Heartbeat.get(connectionManager, stats, hostnames, routes, users);
@@ -60,5 +65,14 @@ public class HeartbeatEventTest {
         assertEquals(hostnames, event.hostnames());
         assertEquals(routes, event.routes());
         assertEquals(users, event.users());
+        assertEquals(false, event.middlewareInstalled());
+
+        // Test middleware installed as well :
+        when(serviceConfigMock.isMiddlewareInstalled()).thenReturn(true);
+        when(connectionManager.getConfig()).thenReturn(serviceConfigMock);
+        Heartbeat.HeartbeatEvent event2 = Heartbeat.get(connectionManager, stats, hostnames, routes, users);
+        assertEquals(true, event2.middlewareInstalled());
+
+
     }
 }

@@ -53,6 +53,13 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
         DetectedAttack.DetectedAttackEvent detectedAttack = DetectedAttack.createAPIEvent(
                 data.attack, data.context, connectionManager
         );
+
+        // Increment statistics :
+        connectionManager.getStats().incrementAttacksDetected();
+        if (connectionManager.shouldBlock()) {
+            connectionManager.getStats().incrementAttacksBlocked(); // Also increment blocked attacks.
+        }
+
         queue.add(detectedAttack); // Add to attack queue, so attack is reported in background
         return Optional.empty();
     }

@@ -16,6 +16,7 @@ public class ServiceConfiguration {
     private final String serverless;
     private boolean blockingEnabled;
     private boolean receivedAnyStats;
+    private boolean middlewareInstalled;
     private HashSet<String> bypassedIPs =  new HashSet<>();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
@@ -28,6 +29,7 @@ public class ServiceConfiguration {
         this.serverless = serverless;
         // This is true by default, awaiting the startup event, if the startup event is unsuccessfull this will remain true.
         this.receivedAnyStats = true;
+        this.middlewareInstalled = false;
     }
     public void updateConfig(APIResponse apiResponse) {
         if (apiResponse == null || !apiResponse.success()) {
@@ -51,6 +53,7 @@ public class ServiceConfiguration {
         return blockingEnabled;
     }
     public boolean hasReceivedAnyStats() {return receivedAnyStats; }
+    public boolean isMiddlewareInstalled() { return middlewareInstalled; }
     public HashSet<String> getBypassedIPs() {
         return bypassedIPs;
     }
@@ -64,5 +67,8 @@ public class ServiceConfiguration {
         if (apiListsResponse.isPresent()) {
             this.blockedListsRes = apiListsResponse.get();
         }
+    }
+    public void setMiddlewareInstalled() {
+        this.middlewareInstalled = true;
     }
 }

@@ -22,11 +22,15 @@ public class ThreadCacheObject {
     private final long lastRenewedAtMS;
     private final Hostnames hostnames;
     private final Routes routes;
+
     // IP Blocking (e.g. Geo-IP Restrictions) :
     public record BlockedIpEntry(BlockList blocklist, String description) {}
     private List<BlockedIpEntry> blockedIps = new ArrayList<>();
     // User-Agent Blocking (e.g. bot blocking) :
     private Pattern blockedUserAgentRegex;
+
+    private int totalHits = 0;
+    private boolean middlewareInstalled = false;
     public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedListsRes) {
         this.lastRenewedAtMS = getUnixTimeMS();
         // Set endpoints :
@@ -104,5 +108,14 @@ public class ThreadCacheObject {
             return blockedUserAgentRegex.matcher(userAgent).find();
         }
         return false;
+    }
+
+    public int getTotalHits() { return totalHits; }
+    public void incrementTotalHits() {
+        this.totalHits += 1;
+    }
+    public boolean isMiddlewareInstalled() { return middlewareInstalled; }
+    public void setMiddlewareInstalled() {
+        middlewareInstalled = true;
     }
 }

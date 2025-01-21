@@ -110,4 +110,13 @@ public class ServiceConfigurationTest {
 
         assertNotNull(serviceConfiguration.blockedListsRes);
     }
+
+    @Test
+    void testMiddlewareInstalled() {
+        assertFalse(serviceConfiguration.isMiddlewareInstalled());
+        serviceConfiguration.setMiddlewareInstalled();
+        assertTrue(serviceConfiguration.isMiddlewareInstalled());
+        serviceConfiguration.setMiddlewareInstalled();
+        assertTrue(serviceConfiguration.isMiddlewareInstalled());
+    }
 }

@@ -4,11 +4,13 @@ import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import org.junit.jupiter.api.Test;
+import utils.EmtpyThreadCacheObject;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class ThreadCacheObjectTest {
     @Test
@@ -109,5 +111,29 @@ public class ThreadCacheObjectTest {
         assertFalse(tCache.isBlockedUserAgent("TEst and ONE"));
         assertFalse(tCache.isBlockedUserAgent("Est|On"));
         assertTrue(tCache.isBlockedUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"));
+    }
+
+    @Test
+    public void testThreadCacheHits() {
+        ThreadCacheObject threadCacheObject = getEmptyThreadCacheObject();
+        assertEquals(0, threadCacheObject.getTotalHits());
+        assertEquals(0, threadCacheObject.getTotalHits());
+        threadCacheObject.incrementTotalHits();
+        threadCacheObject.incrementTotalHits();
+        assertEquals(2, threadCacheObject.getTotalHits());
+        assertEquals(2, threadCacheObject.getTotalHits());
+        threadCacheObject.incrementTotalHits();
+        assertEquals(3, threadCacheObject.getTotalHits());
+    }
+
+    @Test
+    public void testIsMiddlewareInstalled() {
+        ThreadCacheObject threadCacheObject = getEmptyThreadCacheObject();
+        assertFalse(threadCacheObject.isMiddlewareInstalled());
+        assertFalse(threadCacheObject.isMiddlewareInstalled());
+        threadCacheObject.setMiddlewareInstalled();
+        assertTrue(threadCacheObject.isMiddlewareInstalled());
+        threadCacheObject.setMiddlewareInstalled();
+        assertTrue(threadCacheObject.isMiddlewareInstalled());
     }
 }
