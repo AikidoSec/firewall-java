@@ -1,6 +1,6 @@
 package dev.aikido;
 
-import dev.aikido.handlers.RateLimitingHandler;
+import dev.aikido.agent_api.middleware.AikidoJavalinMiddleware;
 import dev.aikido.handlers.SetUserHandler;
 import io.javalin.Javalin;
 
@@ -21,7 +21,7 @@ public class JavalinPostgres {
         Javalin app = Javalin.create().start(Integer.valueOf(System.getProperty("portNumber", "8088")));
         // Add our middleware :
         app.before(new SetUserHandler());
-        app.before(new RateLimitingHandler());
+        app.before(new AikidoJavalinMiddleware());
 
         app.get("/", ctx -> {
             ctx.html(loadHtmlFromFile("src/main/resources/index.html"));

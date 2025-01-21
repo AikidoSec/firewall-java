@@ -19,6 +19,9 @@ dependencies {
     // Subnets :
     implementation 'com.github.seancfoley:ipaddress:5.3.3'
 
+    // For middleware :
+    compileOnly 'io.javalin:javalin:6.3.0'
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.mockito:mockito-core:5.0.0'
