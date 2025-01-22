@@ -10,6 +10,8 @@ import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.background.users.Users;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.ratelimiting.RateLimiter;
+import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.Routes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -115,6 +117,25 @@ class CloudConnectionManagerTest {
         // Assert
         assertNotNull(users);
     }
+
+    @Test
+    void testGetStatsReturnsNotNull() {
+        // Act
+        Statistics stats = cloudConnectionManager.getStats();
+
+        // Assert
+        assertNotNull(stats);
+    }
+
+    @Test
+    void testGetHostnamesReturnsNotNull() {
+        // Act
+        Hostnames hostnames = cloudConnectionManager.getHostnames();
+
+        // Assert
+        assertNotNull(hostnames);
+    }
+
 
     @Test
     void testGetApi() {

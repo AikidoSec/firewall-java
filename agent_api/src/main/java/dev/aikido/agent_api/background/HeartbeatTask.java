@@ -4,6 +4,8 @@ import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.context.User;
 
@@ -33,13 +35,15 @@ public class HeartbeatTask extends TimerTask {
         logger.debug("Sending out a heartbeat");
 
         // Get data :
-        Object stats = null;
-        String[] hostnames = null;
+        Statistics.StatsRecord stats = connectionManager.getStats().getRecord();
+        Hostnames.HostnameEntry[] hostnames = connectionManager.getHostnames().asArray();
         RouteEntry[] routes = connectionManager.getRoutes().asList();
         List<User> users = connectionManager.getUsers().asList();
         // Clear data :
         connectionManager.getRoutes().clear();
         connectionManager.getUsers().clear();
+        connectionManager.getStats().clear();
+        connectionManager.getHostnames().clear();
 
         // Create and send event :
         Heartbeat.HeartbeatEvent event = Heartbeat.get(connectionManager, stats, hostnames, routes, users);

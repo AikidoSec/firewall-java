@@ -2,6 +2,8 @@ package dev.aikido.agent_api.background.cloud.api.events;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
+import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.context.User;
 
@@ -15,8 +17,8 @@ public final class Heartbeat {
             String type,
             GetManagerInfo.ManagerInfo agent,
             long time,
-            Object stats,
-            String[] hostnames,
+            Statistics.StatsRecord stats,
+            Hostnames.HostnameEntry[] hostnames,
             RouteEntry[] routes,
             List<User> users,
             boolean middlewareInstalled
@@ -24,7 +26,7 @@ public final class Heartbeat {
     
     public static HeartbeatEvent get(
             CloudConnectionManager connectionManager,
-            Object stats, String[] hostnames, RouteEntry[] routes, List<User> users
+            Statistics.StatsRecord stats, Hostnames.HostnameEntry[] hostnames, RouteEntry[] routes, List<User> users
     ) {
         long time = getUnixTimeMS(); // Get current time
         GetManagerInfo.ManagerInfo agent = connectionManager.getManagerInfo();

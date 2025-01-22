@@ -18,25 +18,32 @@ public final class ThreadCache {
     }
     public static ThreadCacheObject get(boolean shouldFetch) {
         ThreadCacheObject currentThreadCache = threadCache.get();
+        // If the cache does not yet exist :
+        if (currentThreadCache == null && shouldFetch) {
+            // Renew/fetch the cache :
+            ThreadCacheObject fetchedCache = renewThreadCache();
+            set(fetchedCache);
+            return fetchedCache;
+        }
 
-        // Check TTL :
+        // The cache exists already, but we now want to check if TTL is in order :
         if (currentThreadCache != null) {
             long timeElapsedSinceLastSync = getUnixTimeMS() - currentThreadCache.getLastRenewedAtMS();
-            if (timeElapsedSinceLastSync > timeToLiveMS) {
-                // TTL exceeded, reset the cache.
-                logger.debug("TTL exceeded on a Thread Cache, renewing...");
-                reset();
-                currentThreadCache = null;
+            if (timeElapsedSinceLastSync <= timeToLiveMS) {
+                // TTL is fine, return current thread cache
+                return currentThreadCache;
+            }
+            // TTL exceeded, reset the cache.
+            logger.debug("TTL exceeded on a Thread Cache, renewing...");
+            if (shouldFetch) {
+                ThreadCacheObject fetchedCache = renewThreadCache(currentThreadCache);
+                set(fetchedCache);
+                return fetchedCache;
+            } else {
+                reset(); // If the TTL is expired but we're not allowed to fetch new cache we reset.
             }
         }
 
-        // If the cache did not exist or a reset happened, the cache could be null now.
-        if (currentThreadCache == null && shouldFetch) {
-            // Renew/fetch the cache :
-            currentThreadCache = renewThreadCache();
-            set(currentThreadCache);
-        }
-        
         return currentThreadCache;
     }
     public static void set(ThreadCacheObject threadCacheObject) {
