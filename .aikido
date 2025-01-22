@@ -1,0 +1,5 @@
+exclude:
+  paths:
+    - sample-apps/
+    - benchmarks/
+    - end2end/
