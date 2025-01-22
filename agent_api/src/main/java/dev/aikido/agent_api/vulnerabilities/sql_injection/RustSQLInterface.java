@@ -31,15 +31,19 @@ public final class RustSQLInterface {
         }
         return false;
     }
-    private static SqlLib loadLibrary() {
+    public static SqlLib loadLibrary() {
         String path = getPathForBinary();
         if (path == null || !Files.exists(Path.of(path))) {
-            logger.info("Could not load binaries for SQL Injection algorithm. Path: %s", path);
+            logger.error("Could not load zen binaries used for SQL Injection algorithm. Path: %s", path);
             return null;
         }
         Map<LibraryOption, Object> libraryOptions = new HashMap<>();
         libraryOptions.put(LibraryOption.LoadNow, true); // load immediately instead of lazily (ie on first use)
         libraryOptions.put(LibraryOption.IgnoreError, true); // calls shouldn't save last errno after call
-        return LibraryLoader.loadLibrary(SqlLib.class, libraryOptions, path);
+        SqlLib library = LibraryLoader.loadLibrary(SqlLib.class, libraryOptions, path);
+        if (library == null) {
+            logger.error("Failed to load zen binaries.");
+        }
+        return library;
     }
 }
