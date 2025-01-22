@@ -22,7 +22,11 @@ public class Hostnames {
         }
         map.get(key).incrementHits();
     }
-
+    public void addArray(HostnameEntry[] hostnameEntries) {
+        for (HostnameEntry entry: hostnameEntries) {
+            add(entry.getHostname(), entry.getPort());
+        }
+    }
     public HostnameEntry[] asArray() {
         return map.values().toArray(new HostnameEntry[0]);
     }

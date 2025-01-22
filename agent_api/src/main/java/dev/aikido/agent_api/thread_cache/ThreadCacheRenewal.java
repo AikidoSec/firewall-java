@@ -27,7 +27,8 @@ public final class ThreadCacheRenewal {
             var updateRes = new UpdateAgentDataCommand.Res(
                     /* routeHitDeltas */ currentThreadCache.getRoutes().getDeltaMap(),
                     /* hitsDelta */ currentThreadCache.getTotalHits(),
-                    /* middlewareInstalled */ currentThreadCache.isMiddlewareInstalled()
+                    /* middlewareInstalled */ currentThreadCache.isMiddlewareInstalled(),
+                    /* hostnames */ currentThreadCache.getHostnames().asArray()
             );
             new UpdateAgentDataCommand().send(client, updateRes);
         }

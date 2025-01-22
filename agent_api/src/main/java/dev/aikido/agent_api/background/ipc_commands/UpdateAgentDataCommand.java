@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.background.ipc_commands;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
+import dev.aikido.agent_api.storage.Hostnames;
 
 import java.util.Map;
 import java.util.Optional;
@@ -9,7 +10,7 @@ import java.util.Optional;
  * This command UPDATE_AGENT_DATA is responsible for updating route hits, total hits and executed middleware status.
  */
 public class UpdateAgentDataCommand extends Command<UpdateAgentDataCommand.Res, Command.EmptyResult> {
-    public record Res(Map<String, Integer> routeHitDeltas, int hitsDelta, boolean middlewareInstalled) {};
+    public record Res(Map<String, Integer> routeHitDeltas, int hitsDelta, boolean middlewareInstalled, Hostnames.HostnameEntry[] hostnames) {};
 
     @Override
     public boolean returnsData() {
@@ -39,6 +40,9 @@ public class UpdateAgentDataCommand extends Command<UpdateAgentDataCommand.Res, 
         }
         if (data.routeHitDeltas != null) {
             connectionManager.getRoutes().importFromDeltaMap(data.routeHitDeltas);
+        }
+        if (data.hostnames != null) {
+            connectionManager.getHostnames().addArray(data.hostnames);
         }
         connectionManager.getStats().incrementTotalHits(data.hitsDelta);
 
