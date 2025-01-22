@@ -41,7 +41,7 @@ runWithOpentel: build
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCKING=1 \
 	AIKIDO_LOG_LEVEL="trace" \
-	nohup java -javaagent:opentelemetry-javaagent.jar -Dotel.service.name=service -javaagent:$(JAVA_AGENT) -DportNumber=8088 -jar $(JAR_FILE) > output1.log &
+	nohup java -javaagent:$(JAVA_AGENT) -javaagent:opentelemetry-javaagent.jar -Dotel.service.name=service -DportNumber=8088 -jar $(JAR_FILE) > output1.log &
 
 # Clean the project
 .PHONY: clean
