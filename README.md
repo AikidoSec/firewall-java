@@ -35,8 +35,8 @@ Zen operates autonomously on the same server as your Java app to:
 ### Web frameworks
 #### Java
 * ✅ [`Spring MVC`](docs/spring.md) 3.x
-* ✅ [`Spring Webflux`](docs/spring.md) 3.x
 * ✅ [`Javalin`](docs/javalin.md) 6.x
+* 🚧 [`Spring Webflux`](docs/spring.md) 3.x
 
 #### Kotlin
 * ✅ [`Spring MVC`](docs/spring.md) 3.x
