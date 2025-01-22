@@ -26,7 +26,7 @@ public class Agent {
         logger.info("Aikido Java Agent loaded.");
         setAikidoSysProperties();
 
-        // Test loading of zen binaries : 
+        // Test loading of zen binaries :
         loadLibrary();
 
         ElementMatcher.Junction wrapperTypeDescriptors = ElementMatchers.none();
