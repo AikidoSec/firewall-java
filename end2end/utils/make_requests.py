@@ -2,8 +2,11 @@ import requests
 import urllib.parse
 
 # Function to make a POST request
-def make_post_request(url, data, status_code):
-    response = requests.post(url, json=data)
+def make_post_request(url, data, status_code, user_id=None):
+    headers = {}
+    if user_id is not None:
+        headers['user'] = user_id
+    response = requests.post(url, json=data, headers=headers)
 
     # Assert that the status code is 200
     assert response.status_code == status_code, f"Expected status code {status_code} but got {response.status_code}"
