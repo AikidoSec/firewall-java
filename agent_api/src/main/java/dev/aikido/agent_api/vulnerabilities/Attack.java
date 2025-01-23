@@ -1,5 +1,7 @@
 package dev.aikido.agent_api.vulnerabilities;
 
+import dev.aikido.agent_api.context.User;
+
 import java.util.Map;
 
 public class Attack {
@@ -10,7 +12,8 @@ public class Attack {
     public final Map<String, String> metadata;
     public final String payload;
     public final String stack;
-    public Attack(String op, Vulnerabilities.Vulnerability vulnerability, String source, String pathToPayload, Map<String, String> metadata, String payload, String stack) {
+    public final User user;
+    public Attack(String op, Vulnerabilities.Vulnerability vulnerability, String source, String pathToPayload, Map<String, String> metadata, String payload, String stack, User user) {
         this.operation = op;
         this.kind = vulnerability.getKind();
         this.source = source;
@@ -18,6 +21,7 @@ public class Attack {
         this.metadata = metadata;
         this.payload = payload;
         this.stack = stack;
+        this.user = user;
     }
 
     @Override
@@ -30,6 +34,6 @@ public class Attack {
                 ", metadata=" + metadata +
                 ", payload='" + payload + '\'' +
                 ", stack='" + stack + '\'' +
-                '}';
+                ", user=" + user.id() + '}';
     }
 }

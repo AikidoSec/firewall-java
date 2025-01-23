@@ -44,7 +44,10 @@ public final class Scanner {
                     exception = Optional.of(detectorResult.getException());
                     // Report attack :
                     reportAttack(
-                        new Attack(operation, vulnerability, source, path, detectorResult.getMetadata(), userInput, getCurrentStackTrace()), ctx
+                        new Attack(
+                                operation, vulnerability, source,
+                                path, detectorResult.getMetadata(), userInput,
+                                getCurrentStackTrace(), ctx.getUser()), ctx
                     );
                     break;
                 }

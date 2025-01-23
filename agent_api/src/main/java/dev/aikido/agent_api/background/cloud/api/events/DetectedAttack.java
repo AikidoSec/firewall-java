@@ -3,6 +3,7 @@ package dev.aikido.agent_api.background.cloud.api.events;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 
 import java.util.Map;
@@ -40,7 +41,8 @@ public final class DetectedAttack {
             // Auxiliary attack data :
             String module,
             boolean blocked,
-            String stack
+            String stack,
+            User user
     ) {};
 
     public static DetectedAttackEvent createAPIEvent(Attack attack, ContextObject context, CloudConnectionManager connectionManager) {
@@ -56,7 +58,7 @@ public final class DetectedAttack {
         );
         AttackData attackData = new AttackData(
             attack.kind, attack.operation, attack.source, attack.pathToPayload, attack.payload, attack.metadata,
-            "MODULE?", connectionManager.shouldBlock(), attack.stack
+            "module", connectionManager.shouldBlock(), attack.stack, attack.user
         );
         return new DetectedAttackEvent(
         "detected_attack", // type

@@ -54,7 +54,8 @@ public class SSRFDetector {
                         "port", String.valueOf(port)
                     ),
                     attackFindings.payload(),
-                    getCurrentStackTrace()
+                    getCurrentStackTrace(),
+                    context.getUser()
             );
         }
         

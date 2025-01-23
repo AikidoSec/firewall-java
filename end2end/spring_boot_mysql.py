@@ -16,8 +16,8 @@ urls = {
 
 event_handler = EventHandler()
 event_handler.reset()
-test_safe_vs_unsafe_payloads(payloads, urls) # Test MySQL driver
-test_safe_vs_unsafe_payloads(payloads, urls, "/mariadb") # Also test MariaDB driver
+test_safe_vs_unsafe_payloads(payloads, urls, user_id="123") # Test MySQL driver
+test_safe_vs_unsafe_payloads(payloads, urls, "/mariadb", user_id="456") # Also test MariaDB driver
 
 # Test blocklists :
 test_ip_blocking("http://localhost:8082/")
