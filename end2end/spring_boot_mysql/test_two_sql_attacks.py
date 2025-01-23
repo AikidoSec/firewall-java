@@ -20,4 +20,5 @@ def test_two_sql_attacks(event_handler):
     # Different :
     assert_eq(attack1["operation"], equals="(MySQL Connector/J) java.sql.Connection.prepareStatement")
     assert_eq(attack2["operation"], equals="(MariaDB Connector/J) java.sql.Connection.prepareStatement")
-    assert_eq(attack1["user"]["id"], attack2["user"]["id"], "123")
+    assert_eq(attack1["user"]["id"], equals="123")
+    assert_eq(attack2["user"]["id"], equals="456")
