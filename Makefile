@@ -2,7 +2,7 @@ clean:
 	rm -rf dist/
 	./gradlew clean
 
-build: clean
+build: clean check_binaries
 	mkdir -p dist/
 
 	@echo "Copying binaries from .cache folder"
@@ -23,11 +23,14 @@ mock_restart:
 mock_stop:
 	docker kill mock_core && docker rm mock_core
 
-test:
+test: check_binaries
 	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test
 
-cov:
+cov: check_binaries
 	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test --rerun-tasks -PcoverageRun jacocoTestReport
+
+
+# Binaries :
 
 BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.35
 FILES = \
@@ -49,7 +52,17 @@ binaries_make_dir:
 .cache/binaries/%:
 	@echo "Downloading $*..."
 	curl -L -o $@ $(BASE_URL)/$*
+.PHONY: check_binaries
+check_binaries:
+	@if [ -d ".cache/binaries" ]; then \
+  		echo "Cache directory exists."; \
+	else \
+		echo "Cache directory is empty. Running 'make binaries'..."; \
+		$(MAKE) binaries; \
+	fi
 
+
+# Automatic versioning for releases :
 
 VERSION_FILES = ./build.gradle ./agent_api/src/main/java/dev/aikido/agent_api/Config.java
 replace_version:
@@ -63,3 +76,4 @@ replace_version:
 		sed -i.bak "s/1.0-REPLACE-VERSION/$$version/g" $$file; \
 		rm $$file.bak; \
 	done;
+

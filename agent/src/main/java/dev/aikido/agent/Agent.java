@@ -14,6 +14,7 @@ import java.lang.instrument.Instrumentation;
 import static dev.aikido.agent.ByteBuddyInitializer.createAgentBuilder;
 import static dev.aikido.agent.DaemonStarter.startDaemon;
 import static dev.aikido.agent.Wrappers.WRAPPERS;
+import static dev.aikido.agent_api.vulnerabilities.sql_injection.RustSQLInterface.loadLibrary;
 
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
@@ -24,6 +25,9 @@ public class Agent {
         }
         logger.info("Aikido Java Agent loaded.");
         setAikidoSysProperties();
+
+        // Test loading of zen binaries :
+        loadLibrary();
 
         ElementMatcher.Junction wrapperTypeDescriptors = ElementMatchers.none();
         for(Wrapper wrapper: WRAPPERS) {
