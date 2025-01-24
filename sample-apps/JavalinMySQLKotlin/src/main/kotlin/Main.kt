@@ -1,7 +1,7 @@
 import DatabaseHelper.allPets
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import dev.aikido.agent_api.middleware.AikidoJavalinMiddleware
+import dev.aikido.agent_api.ShouldBlockRequest
 import handlers.SetUserHandler
 import io.javalin.Javalin
 import io.javalin.http.Context
@@ -12,7 +12,21 @@ fun main() {
 
     // Handlers :
     app.before(SetUserHandler())
-    app.before(AikidoJavalinMiddleware())
+    app.before { ctx: Context ->
+        val shouldBlockRequestResult = ShouldBlockRequest.shouldBlockRequest()
+        if (shouldBlockRequestResult.block()) {
+            if (shouldBlockRequestResult.data().type() == "ratelimited") {
+                var message = "You are rate limited by Zen."
+                if (shouldBlockRequestResult.data().trigger() == "ip") {
+                    message = message + " (Your IP: " + shouldBlockRequestResult.data().ip() + ")"
+                }
+
+                setResponse(ctx, message, 429)
+            } else if (shouldBlockRequestResult.data().type() == "blocked") {
+                setResponse(ctx, "You are blocked by Zen.", 403)
+            }
+        }
+    }
 
     // Static content :
     app.get("/") { ctx: Context ->
@@ -81,3 +95,10 @@ data class RequestRequest @JsonCreator constructor(
 data class CreateRequest @JsonCreator constructor(
     @JsonProperty("name") val name: String
 )
+
+fun setResponse(ctx: Context, text: String, statusCode: Int) {
+    ctx.status(statusCode)
+    ctx.contentType("text/plain")
+    ctx.result(text)
+    ctx.skipRemainingHandlers()
+}
