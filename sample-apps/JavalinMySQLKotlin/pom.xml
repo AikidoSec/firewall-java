@@ -27,6 +27,11 @@
             <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin</artifactId>
+            <version>6.4.0</version>
+        </dependency>
     </dependencies>
 
     <build>
