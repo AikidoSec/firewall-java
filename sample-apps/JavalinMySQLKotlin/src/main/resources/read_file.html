@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read file</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: linear-gradient(to bottom, #A68BF7, #D1C6F9);
+            margin: 0;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #24104F;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #6551F3;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 5px  ;
+        }
+
+        button:hover {
+            background-color: #24104F;
+        }
+        code {
+            display: block;
+            width: auto;
+            background-color: #6551F3;
+            color: whitesmoke;
+            padding: 5px;
+            margin: 2.5px 0px;
+            border-radius: 5px;
+            font-weight: 700;
+        }
+        details {
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            padding: 0.5em 0.5em 0;
+            margin-bottom: 5px;
+        }
+
+        summary {
+            font-weight: bold;
+            margin: -0.5em -0.5em 0;
+            padding: 0.5em;
+        }
+
+        details[open] {
+            padding: 0.5em;
+        }
+    </style>
+</head>
+<body>
+<form class="container" action="/api/read">
+    <h1>Read File: </h1>
+    <details>
+        <summary>Examples</summary>
+        <code>home.txt</code>
+        <code>2023/day2.txt</code>
+        <code>../secrets/key.txt</code>
+    </details>
+    <div id="readForm">
+        <label for="path"><b>Path :</b></label>
+        <input type="text" id="path" name="path" required>
+        <button type="submit">Read file</button>
+    </div>
+</form>
+</body>
+</html>
