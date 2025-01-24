@@ -3,7 +3,7 @@ import io.javalin.http.Context
 
 fun main() {
     val app = Javalin.create().start(7070)
-    
+
     // Static content :
     app.get("/") { ctx: Context ->
         ctx.html(loadHtmlFromFile("src/main/resources/index.html"))
