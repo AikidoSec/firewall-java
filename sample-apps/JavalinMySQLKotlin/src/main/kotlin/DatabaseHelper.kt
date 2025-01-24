@@ -2,9 +2,9 @@ import Pet
 import java.sql.*
 
 object DatabaseHelper {
-    private fun getDBConnection(driver: String): Connection? {
+    private fun getDBConnection(): Connection? {
         // The url specifies the address of our database along with username and password credentials
-        val url = "jdbc:$driver://localhost:3306/db"
+        val url = "jdbc:mysql://localhost:3306/db"
         val user = "user" // replace with your MySQL username
         val password = "password" // replace with your MySQL password
         try {
@@ -18,7 +18,7 @@ object DatabaseHelper {
     val allPets: ArrayList<Any>
         get() {
             val pets = ArrayList<Any>()
-            val conn = getDBConnection("mysql") ?: return pets
+            val conn = getDBConnection() ?: return pets
             try {
                 val stmt = conn.prepareStatement("SELECT * FROM pets")
                 val rs = stmt.executeQuery()
@@ -36,7 +36,7 @@ object DatabaseHelper {
 
     fun getPetById(id: Int): Pet? {
         val pets = ArrayList<Any>()
-        val conn = getDBConnection("mysql") ?: return null
+        val conn = getDBConnection() ?: return null
         try {
             val stmt = conn.prepareStatement("SELECT * FROM pets WHERE pet_id=?")
             stmt.setInt(1, id)
@@ -53,9 +53,9 @@ object DatabaseHelper {
         return Pet(0, "Unknown", "Unknown")
     }
 
-    fun createPetByName(pet_name: String, driver: String): Int {
+    fun createPetByName(pet_name: String): Int {
         val sql = "INSERT INTO pets (pet_name, owner) VALUES (\"$pet_name\", \"Aikido Security\")"
-        val conn = getDBConnection(driver) ?: return 0
+        val conn = getDBConnection() ?: return 0
         try {
             val insertStmt = conn.prepareStatement(sql)
             return insertStmt.executeUpdate()
