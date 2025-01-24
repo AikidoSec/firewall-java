@@ -1,5 +1,5 @@
 from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads, test_payloads_path_variables
-from javalin_postgres.test_sql_attacks import test_sql_attack
+from javalin_mysql_kotlin.test_sql_attacks import test_sql_attack
 from javalin_postgres.test_ip_blocking import test_ip_blocking
 from javalin_postgres.test_bot_blocking import test_bot_blocking
 from javalin_postgres.test_ratelimiting import test_ratelimiting_per_user, test_ratelimiting
