@@ -5,6 +5,7 @@ JAVA_AGENT = ../../dist/agent.jar
 .PHONY: build
 build:
 	@echo "Building the project..."
+	mvn install:install-file -Dfile=../../dist/agent_api.jar -DgroupId=dev.aikido -DartifactId=agent_api -Dversion=1.0 -Dpackaging=jar
 	mvn clean compile
 
 # Run the application with the Java agent
