@@ -1,12 +1,18 @@
 import DatabaseHelper.allPets
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import dev.aikido.agent_api.middleware.AikidoJavalinMiddleware
+import handlers.SetUserHandler
 import io.javalin.Javalin
 import io.javalin.http.Context
 
 fun main() {
     val port = if (System.getenv("PORT") != null) Integer.parseInt(System.getenv("PORT")) else 7070;
     val app = Javalin.create().start(port)
+
+    // Handlers :
+    app.before(SetUserHandler())
+    app.before(AikidoJavalinMiddleware())
 
     // Static content :
     app.get("/") { ctx: Context ->

@@ -16,6 +16,15 @@
     </properties>
 
     <dependencies>
+        <!-- Required for aikido install: -->
+        <dependency>
+            <groupId>dev.aikido</groupId>
+            <artifactId>agent_api</artifactId>
+            <scope>system</scope>
+            <version>1.0.0</version>
+            <systemPath>${project.basedir}/../../dist/agent_api.jar</systemPath>
+        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
