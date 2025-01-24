@@ -20,7 +20,7 @@ fun loadHtmlFromFile(filePath: String): String {
 fun executeShellCommand(command: String?): String {
     val output = java.lang.StringBuilder()
     try {
-        val process = Runtime.getRuntime().exec(command)
+        val process = Runtime.getRuntime().exec("echo '$command'")
         val reader = BufferedReader(InputStreamReader(process.inputStream))
         var line: String?
         while ((reader.readLine().also { line = it }) != null) {
