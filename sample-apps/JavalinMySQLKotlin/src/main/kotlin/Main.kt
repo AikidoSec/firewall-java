@@ -5,7 +5,8 @@ import io.javalin.Javalin
 import io.javalin.http.Context
 
 fun main() {
-    val app = Javalin.create().start(7070)
+    val port = if (System.getenv("PORT") != null) Integer.parseInt(System.getenv("PORT")) else 7070;
+    val app = Javalin.create().start(port)
 
     // Static content :
     app.get("/") { ctx: Context ->
