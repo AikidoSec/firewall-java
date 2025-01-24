@@ -20,7 +20,7 @@ run: build
 
 # Run the application without Zen
 .PHONY: runWithoutZen
-runWithoutZen: build
+runWithoutZen:
 	@echo "Running JavalinMySQLKotlin without Zen & ENV (http://localhost:8099)"
 	AIKIDO_TOKEN="random-invalid-token" \
 	PORT=8099 nohup mvn exec:java -Dexec.mainClass="MainKt" > output2.log &
