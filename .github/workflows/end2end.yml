@@ -71,9 +71,6 @@ jobs:
           docker compose up --build -d
       - name: Install Python dependencies
         run: python -m pip install -r end2end/requirements.txt
-      - name: Cleanup application
-        working-directory: ./sample-apps/${{ matrix.app.name }}
-        run: chmod +x ./gradlew && make clean
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/${{ matrix.app.name }}
         run: |
