@@ -1,3 +1,6 @@
+import DatabaseHelper.allPets
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.javalin.Javalin
 import io.javalin.http.Context
 
@@ -20,4 +23,54 @@ fun main() {
     app.get("/pages/read") { ctx: Context ->
         ctx.html(loadHtmlFromFile("src/main/resources/read_file.html"))
     }
+
+    // Test rate-limiting :
+    app.get("/test_ratelimiting_1") { ctx: Context ->
+        ctx.result("OK")
+    }
+
+
+    // Serve API :
+    app.get("/api/pets") { ctx: Context ->
+        ctx.json(allPets)
+    }
+
+    app.post("/api/create") { ctx: Context ->
+        val petName: String = ctx.bodyAsClass(CreateRequest::class.java).name
+        ctx.result(petName)
+        val rowsCreated = DatabaseHelper.createPetByName(petName)
+        ctx.result(rowsCreated.toString())
+    }
+
+    app.post("/api/execute") { ctx: Context ->
+        val userCommand: String = ctx.bodyAsClass(CommandRequest::class.java).userCommand
+        val result = executeShellCommand(userCommand)
+        ctx.result(result)
+    }
+    app.get("/api/execute/<command>") { ctx: Context ->
+        val userCommand = ctx.pathParam("command")
+        val result = executeShellCommand(userCommand)
+        ctx.result(result)
+    }
+
+    app.post("/api/request") { ctx: Context ->
+        val url: String = ctx.bodyAsClass(RequestRequest::class.java).url
+        val response = makeHttpRequest(url)
+        ctx.result(response)
+    }
+    app.get("/api/read") { ctx: Context ->
+        val filePath = ctx.queryParam("path")
+        val content: String = readFile(filePath)
+        ctx.result(content)
+    }
 }
+
+data class CommandRequest @JsonCreator constructor(
+    @JsonProperty("userCommand") val userCommand: String
+)
+data class RequestRequest @JsonCreator constructor(
+    @JsonProperty("url") val url: String
+)
+data class CreateRequest @JsonCreator constructor(
+    @JsonProperty("name") val name: String
+)
