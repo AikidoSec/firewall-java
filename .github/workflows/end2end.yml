@@ -73,9 +73,7 @@ jobs:
         run: python -m pip install -r end2end/requirements.txt
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/${{ matrix.app.name }}
-        run: |
-          AIKIDO_TMP_DIR="/opt/aikido" make run
-          make runWithoutZen
+        run: AIKIDO_TMP_DIR="/opt/aikido" make run && make runWithoutZen
 
       - name: Run End-to-End tests
         working-directory: ./
