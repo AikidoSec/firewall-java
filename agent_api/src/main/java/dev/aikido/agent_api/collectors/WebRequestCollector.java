@@ -30,6 +30,11 @@ public final class WebRequestCollector {
 
         // Increment total hits :
         threadCache.incrementTotalHits();
+        
+        // add check for bypassed ips :
+        if (threadCache.isBypassedIP(newContext.getRemoteAddress())) {
+            return null;
+        }
 
         // Blocked IP lists (e.g. Geo restrictions)
         ThreadCacheObject.BlockedResult ipBlocked = threadCache.isIpBlocked(newContext.getRemoteAddress());
