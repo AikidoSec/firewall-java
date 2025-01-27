@@ -9,11 +9,16 @@ public class SpringContextObject extends ContextObject {
 
     // We don't have access yet to the route parameters: doFilter() is called before the Controller
     // So the parameters will be set later.
-    protected transient Map<String, Object> params = new HashMap<>();
+    protected transient Map<String, String> params = new HashMap<>();
 
     public void setParameter(String key, String value) {
         this.params.put(key, value);
         this.cache.remove("routeParams"); // Reset cache
+    }
+
+    @Override
+    public Map<String, String> getParams() {
+        return params;
     }
 
     public void setBodyElement(String key, Object value) {
