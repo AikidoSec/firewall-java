@@ -23,8 +23,8 @@ import java.util.List;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
-public class SpringFrameworkWrapper implements Wrapper {
-    public static final Logger logger = LogManager.getLogger(SpringFrameworkWrapper.class);
+public class SpringMVCWrapper implements Wrapper {
+    public static final Logger logger = LogManager.getLogger(SpringMVCWrapper.class);
 
     @Override
     public String getName() {
@@ -32,7 +32,7 @@ public class SpringFrameworkWrapper implements Wrapper {
         // HttpServletRequest request, HttpServletResponse response
         // And is part of org.springframework.web.filter.RequestContextFilter
         // See: https://github.com/spring-projects/spring-framework/blob/4749d810db0261ce16ae5f32da6d375bb8087430/spring-web/src/main/java/org/springframework/web/filter/RequestContextFilter.java#L92
-        return SpringFrameworkAdvice.class.getName();
+        return SpringMVCAdvice.class.getName();
     }
     @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
@@ -44,7 +44,7 @@ public class SpringFrameworkWrapper implements Wrapper {
         return nameContains("org.springframework.web.filter.RequestContextFilter");
     }
 
-    public static class SpringFrameworkAdvice {
+    public static class SpringMVCAdvice {
         // Wrapper to skip if it's inside this wrapper (i.e. our own response : )
         public record SkipOnWrapper(HttpServletResponse response) {};
         /**
