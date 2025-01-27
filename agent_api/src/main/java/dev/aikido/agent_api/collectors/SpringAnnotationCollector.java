@@ -25,7 +25,7 @@ public final class SpringAnnotationCollector {
             // This exception gets caught by Byte Buddy.
             throw new Exception("Length of parameters and values should match!");
         }
-        for (int i = 0; i <= parameters.length; i++) {
+        for (int i = 0; i < parameters.length; i++) {
             report(parameters[i], values[i]);
         }
     }
@@ -37,18 +37,18 @@ public final class SpringAnnotationCollector {
         }
 
         for (Annotation annotation: parameter.getDeclaredAnnotations()) {
-            String annotStr = annotation.toString();
-            if (annotation.toString().contains(REQUEST_BODY)) {
+            String annotStr = annotation.getClass().toString();
+            if (annotStr.contains(REQUEST_BODY)) {
                 // RequestBody includes all data so we report everything as one block:
                 // Also important for API Discovery that we get the exact overview
                 context.setBody(value);
                 break;
-            } else if (annotation.toString().contains(REQUEST_PARAM) || annotation.toString().contains(REQUEST_PART)) {
+            } else if (annotStr.contains(REQUEST_PARAM) || annotStr.contains(REQUEST_PART)) {
                 // RequestPart and RequestParam both contain partial data.
                 String identifier = parameter.getName();
                 context.setBodyElement(identifier, value);
                 break;
-            } else if(annotation.toString().contains(PATH_VARIABLE)) {
+            } else if(annotStr.contains(PATH_VARIABLE)) {
                 String identifier = parameter.getName();
                 if (value instanceof Map<?, ?> paramsMap) {
                     for (Map.Entry<?, ?> entry: paramsMap.entrySet()) {
