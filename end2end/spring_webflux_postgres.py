@@ -31,5 +31,5 @@ test_ratelimiting_per_user("http://localhost:8090/test_ratelimiting_1")
 print("✅ Tested rate-limiting per user")
 
 # Test path variables : (WIP -> Path Variable support)
-#test_payloads_path_variables(payloads_exec, urls, route="/api/commands/execute/")
-#print("✅ Tested attack using path variables.")
+test_payloads_path_variables(payloads_exec, urls, route="/api/commands/execute/")
+print("✅ Tested attack using path variables.")

@@ -32,6 +32,6 @@ public class CommandController {
             // Wait for the process to complete and return the output
             process.waitFor();
             return output.toString();
-        }).onErrorReturn("Error executing command");
+        });
     }
 }
