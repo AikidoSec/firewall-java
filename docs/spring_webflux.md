@@ -1,6 +1,9 @@
-# Setting up Spring
-To setup with Spring you just have to follow the normal installation instructions for the Java Agent.
+# Setting up Spring Webflux
+
+To setup with Spring Webflux you just have to follow the normal installation instructions for the Java Agent.
+
 ## Rate-limiting
+
 Adding rate-limiting and user blocking capabilities to your Spring app requires you to run `ShouldBlockRequest.shouldBlockRequest()`.
 
 To do this using a filter we have provided an example of what that might look like : 
@@ -10,10 +13,15 @@ public class RatelimitingFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange,
                              WebFilterChain webFilterChain) {
+
+        // Check with Aikido if this request needs to be blocked
         ShouldBlockRequest.ShouldBlockRequestResult shouldBlockRequestResult = ShouldBlockRequest.shouldBlockRequest();
         if (shouldBlockRequestResult.block()) {
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             byte[] response = null;
+
+            // Aikido Zen returns the specific reason why a request was blocked
+            // Use this to show meaningful error messages to your users
             if (shouldBlockRequestResult.data().type().equals("ratelimited")) {
                 String message = "You are rate limited by Zen.";
                 if (shouldBlockRequestResult.data().trigger().equals("ip")) {
@@ -25,15 +33,17 @@ public class RatelimitingFilter implements WebFilter {
                 exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN); // 403
                 response = "You are blocked by Zen.".getBytes(StandardCharsets.UTF_8);
             }
+
             DataBufferFactory dataBufferFactory = exchange.getResponse().bufferFactory();
             DataBuffer dataBuffer = dataBufferFactory.wrap(response);
             return exchange.getResponse().writeWith(Mono.just(dataBuffer));
         }
+
         return webFilterChain.filter(exchange);
     }
 }
 ```
-We are planning on providing such a filter ourselves for easy plug & play use, once we release our maven package.
+
 
 ## Setting a user (optional)
 If you want support for user-blocking or rate-limiting per user you will have to set your user. Do make sure that you run your SetUser filter before you run your rate-limiting filter.
