@@ -30,7 +30,7 @@ public final class WebRequestCollector {
 
         // Increment total hits :
         threadCache.incrementTotalHits();
-        
+
         // add check for bypassed ips :
         if (threadCache.isBypassedIP(newContext.getRemoteAddress())) {
             return null;
