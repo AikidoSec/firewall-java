@@ -16,7 +16,6 @@ public final class Wrappers {
             new PostgresWrapper(),
             new SpringFrameworkWrapper(),
             new SpringControllerWrapper(),
-            new SpringFrameworkInvokeWrapper(),
             new FileWrapper(),
             new URLConnectionWrapper(),
             new InetAddressWrapper(),
