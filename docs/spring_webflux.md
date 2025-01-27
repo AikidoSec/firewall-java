@@ -1,6 +1,4 @@
 # Setting up Spring
-> If you are looking for **Spring Webflux** [click here](./spring_webflux.md)
-
 To setup with Spring you just have to follow the normal installation instructions for the Java Agent.
 ## Rate-limiting
 Adding rate-limiting and user blocking capabilities to your Spring app requires you to run `ShouldBlockRequest.shouldBlockRequest()`.
@@ -8,42 +6,36 @@ Adding rate-limiting and user blocking capabilities to your Spring app requires 
 To do this using a filter we have provided an example of what that might look like : 
 ```java
 @Component
-@Order(2)
-public class RateLimitingFilter implements Filter {
-
+public class RatelimitingFilter implements WebFilter {
     @Override
-    public void doFilter(
-            ServletRequest request,
-            ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public Mono<Void> filter(ServerWebExchange exchange,
+                             WebFilterChain webFilterChain) {
         ShouldBlockRequest.ShouldBlockRequestResult shouldBlockRequestResult = ShouldBlockRequest.shouldBlockRequest();
         if (shouldBlockRequestResult.block()) {
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            byte[] response = null;
             if (shouldBlockRequestResult.data().type().equals("ratelimited")) {
                 String message = "You are rate limited by Zen.";
                 if (shouldBlockRequestResult.data().trigger().equals("ip")) {
                     message = message + " (Your IP: " + shouldBlockRequestResult.data().ip() + ")";
                 }
-                setResponse(response, message, 429);
+                exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS); // 429
+                response = message.getBytes(StandardCharsets.UTF_8);
             } else if (shouldBlockRequestResult.data().type().equals("blocked")) {
-                setResponse(response, "You are blocked by Zen.", 403);
+                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN); // 403
+                response = "You are blocked by Zen.".getBytes(StandardCharsets.UTF_8);
             }
-            return;
+            DataBufferFactory dataBufferFactory = exchange.getResponse().bufferFactory();
+            DataBuffer dataBuffer = dataBufferFactory.wrap(response);
+            return exchange.getResponse().writeWith(Mono.just(dataBuffer));
         }
-        chain.doFilter(request, response);
-    }
-    private static void setResponse(ServletResponse response, String text, int statusCode) throws IOException {
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        httpResponse.setStatus(statusCode);
-        httpResponse.setContentType("text/plain");
-        PrintWriter writer = httpResponse.getWriter();
-        writer.write(text);
-        writer.flush();
+        return webFilterChain.filter(exchange);
     }
 }
 ```
 We are planning on providing such a filter ourselves for easy plug & play use, once we release our maven package.
 
-## Setting a user
+## Setting a user (optional)
 If you want support for user-blocking or rate-limiting per user you will have to set your user. Do make sure that you run your SetUser filter before you run your rate-limiting filter.
 
 To set the current user, you can use the `setUser` function. Here's an example :
@@ -51,19 +43,18 @@ To set the current user, you can use the `setUser` function. Here's an example :
 import dev.aikido.agent_api.SetUser;
 // ...
 
+
 @Component
-@Order(0) // Depends on your setup
-public class SetUserFilter implements Filter {
+@Order(1) // Make sure it's before the ratelimiting filter
+public class SetUserFilter implements WebFilter {
     @Override
-    public void doFilter(
-            ServletRequest request,
-            ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public Mono<Void> filter(ServerWebExchange serverWebExchange,
+                             WebFilterChain webFilterChain) {
         SetUser.setUser(
                 // Replace "123" with your own ID
                 new SetUser.UserObject("123", "John Doe")
         );
-        chain.doFilter(request, response);
+        return webFilterChain.filter(serverWebExchange);
     }
 }
 ```
