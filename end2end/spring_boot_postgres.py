@@ -28,7 +28,7 @@ test_payloads_path_variables(payloads_exec, urls, route="/api/commands/execute/"
 print("✅ Path variables and Command Injection Tested")
 
 # Test SSRF :
-test_safe_vs_unsafe_payloads(payloads_ssrf, urls, route="/api/requests") # This makes 4 requests and asserts their status codes
+test_safe_vs_unsafe_payloads(payloads_ssrf, urls, route="/api/requests/get") # This makes 4 requests and asserts their status codes
 print("✅ SSRF Tested")
 
 # Test path traversal :
