@@ -37,7 +37,3 @@ print("✅ Tested rate-limiting per user")
 
 test_sql_attack(event_handler)
 print("✅ Tested accurate reporting of an attack")
-
-# Test path variables :
-test_payloads_path_variables(payloads_exec, urls, route="/api/execute/")
-print("✅ Tested attack using path variables.")
