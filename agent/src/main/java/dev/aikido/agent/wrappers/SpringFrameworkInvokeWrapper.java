@@ -1,7 +1,7 @@
 package dev.aikido.agent.wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.SpringContextObject;
+import dev.aikido.agent_api.context.SpringMVCContextObject;
 import jakarta.servlet.http.HttpServletRequest;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
@@ -42,7 +42,7 @@ public class SpringFrameworkInvokeWrapper implements Wrapper {
             }
             Object pathVariables = httpServletRequest.getAttribute("org.springframework.web.servlet.HandlerMapping.uriTemplateVariables");
             if (pathVariables != null) {
-                if (Context.get() instanceof SpringContextObject springContextObject) {
+                if (Context.get() instanceof SpringMVCContextObject springContextObject) {
                     // Set path variables in context object :
                     springContextObject.setParams(pathVariables);
                     Context.set(springContextObject);

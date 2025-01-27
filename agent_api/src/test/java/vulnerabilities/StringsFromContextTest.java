@@ -1,6 +1,6 @@
 package vulnerabilities;
 
-import dev.aikido.agent_api.context.SpringContextObject;
+import dev.aikido.agent_api.context.SpringMVCContextObject;
 import dev.aikido.agent_api.vulnerabilities.StringsFromContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,11 +10,11 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StringsFromContextTest {
-    private SpringContextObject springContextObject;
+    private SpringMVCContextObject springContextObject;
 
     @BeforeEach
     void setUp() {
-        springContextObject = new SpringContextObject(
+        springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/test"), "192.168.1.1",
                 /* query: */ Map.of("param1", new String[]{"value1"}, "param2",  new String[]{"value2"}),
                 /* cookies: */ new HashMap<>(Map.of(

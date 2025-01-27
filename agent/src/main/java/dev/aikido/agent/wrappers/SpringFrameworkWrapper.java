@@ -3,7 +3,7 @@ package dev.aikido.agent.wrappers;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.context.SpringContextObject;
+import dev.aikido.agent_api.context.SpringMVCContextObject;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import net.bytebuddy.asm.Advice;
@@ -76,7 +76,7 @@ public class SpringFrameworkWrapper implements Wrapper {
                 }
             }
 
-            ContextObject contextObject = new SpringContextObject(
+            ContextObject contextObject = new SpringMVCContextObject(
                     request.getMethod(), request.getRequestURL(), request.getRemoteAddr(),
                     request.getParameterMap(), cookiesMap, headersMap
             );
