@@ -16,12 +16,10 @@ payloads_exec = {
 payloads_ssrf = {
     "safe": { "url": "https://aikido.dev/" },
     "unsafe": { "url": "http://localhost:5000" },
-    "json": False,
 }
 payloads_path_traversal = {
     "safe": { "fileName": "README.md" },
     "unsafe": { "fileName": "./../databases/docker-compose.yml" },
-    "json": False,
 }
 urls = {
     "disabled": "http://localhost:8099",
