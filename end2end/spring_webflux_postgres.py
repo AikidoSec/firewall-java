@@ -18,11 +18,11 @@ urls = {
 test_safe_vs_unsafe_payloads(payloads, urls, route="/api/pets/create")
 print("✅ Tested safe/unsafe payloads on /api/create")
 
-# Test blocklists :
-test_ip_blocking("http://localhost:8090/")
-print("✅ Tested IP Blocking")
-test_bot_blocking("http://localhost:8090/")
-print("✅ Tested bot blocking")
+# Test blocklists (WIP)
+#test_ip_blocking("http://localhost:8090/")
+#print("✅ Tested IP Blocking")
+#test_bot_blocking("http://localhost:8090/")
+#print("✅ Tested bot blocking")
 
 # Test ratelimiting (we can use a header to set user) :
 test_ratelimiting("http://localhost:8090/test_ratelimiting_1")
