@@ -45,8 +45,8 @@ class SpringMVCContextObjectTest {
 
     @Test
     void testSetParams() {
-        springContextObject.setParams("12345");
-        assertEquals("12345", springContextObject.getParams());
+        springContextObject.setParameter("123", "345");
+        assertEquals("345", springContextObject.getParams().get("123"));
     }
 
     @Test

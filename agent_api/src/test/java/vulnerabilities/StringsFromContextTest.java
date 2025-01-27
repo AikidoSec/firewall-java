@@ -74,7 +74,9 @@ public class StringsFromContextTest {
     }
     @Test
     public void testExtractsFromRequestAndRouteParams() {
-        springContextObject.setParams(List.of("1", "20", "2"));
+        springContextObject.setParameter("1", "one");
+        springContextObject.setParameter("2", "two");
+        springContextObject.setParameter("20", "twenty");
         Map<String, Map<String, String>> strings = new StringsFromContext(springContextObject).getAll();
         assertEquals(Map.of(
                 "body", Map.of(),
@@ -87,7 +89,7 @@ public class StringsFromContextTest {
                         "user1", ".userId.[0]",
                         "abc123", ".sessionId.[0]",
                         "sessionId", ".", "userId", "."),
-                "routeParams", Map.of("1", ".[0]", "2", ".[2]", "20",".[1]"),
+                "routeParams", Map.of("1", ".", "2", ".", "two", ".2", "20", ".", "one", ".1", "twenty",".20"),
                 "query", Map.of(
                         "value2", ".param2.[0]",
                         "value1", ".param1.[0]",
