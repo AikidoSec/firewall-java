@@ -10,11 +10,13 @@ payloads_exec = {
 }
 payloads_ssrf = {
     "safe": { "url": "https://aikido.dev/" },
-    "unsafe": { "url": "http://localhost:5000" }
+    "unsafe": { "url": "http://localhost:5000" },
+    "json": False,
 }
 payloads_path_traversal = {
     "safe": { "fileName": "HtmlController.java" },
-    "unsafe": { "fileName": "./../../admin.txt" }
+    "unsafe": { "fileName": "./../../admin.txt" },
+    "json": False,
 }
 urls = {
     "disabled": "http://localhost:8095",

@@ -14,8 +14,9 @@ payloads_ssrf = {
     "json": False,
 }
 payloads_path_traversal = {
-    "safe": { "fileName": ".gitignore" },
-    "unsafe": { "fileName": "./../databases/docker-compose.yml" }
+    "safe": { "fileName": "HtmlController.java" },
+    "unsafe": { "fileName": "./../../admin.txt" },
+    "json": False,
 }
 urls = {
     "disabled": "http://localhost:8081",
