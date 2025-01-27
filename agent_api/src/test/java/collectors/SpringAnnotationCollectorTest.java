@@ -26,6 +26,55 @@ import static org.mockito.Mockito.*;
 public class SpringAnnotationCollectorTest {
 
     private SpringContextObject mockContext;
+    private static final Annotation requestBodyAnnotation = new RequestBody() {
+        @Override
+        public boolean required() {
+            return false;
+        }
+
+        public Class<? extends Annotation> annotationType() {
+            return RequestBody.class;
+        }
+    };
+    private static final Annotation requestParamAnnotation = new RequestParam() {
+        @Override
+        public String value() {
+            return "";
+        }
+        @Override
+        public String name() {
+            return "";
+        }
+        @Override
+        public boolean required() {
+            return false;
+        }
+        @Override
+        public String defaultValue() {
+            return "";
+        }
+        public Class<? extends Annotation> annotationType() {
+            return RequestParam.class;
+        }
+    };
+    private static final Annotation pathVariableAnnotation = new PathVariable() {
+        @Override
+        public String value() {
+            return "";
+        }
+        @Override
+        public String name() {
+            return "";
+        }
+        @Override
+        public boolean required() {
+            return false;
+        }
+        public Class<? extends Annotation> annotationType() {
+            return PathVariable.class;
+        }
+    };
+
 
     @BeforeEach
     public void setUp() {
@@ -37,7 +86,7 @@ public class SpringAnnotationCollectorTest {
 
     @Test
     public void testReportWithRequestBody() throws Exception {
-        Parameter parameter = createMockParameter(RequestBody.class, "Requestbody");
+        Parameter parameter = createMockParameter(requestBodyAnnotation, "Requestbody");
         Object value = "test body";
 
         SpringAnnotationCollector.report(new Parameter[]{parameter}, new Object[]{value});
@@ -47,7 +96,7 @@ public class SpringAnnotationCollectorTest {
 
     @Test
     public void testReportWithRequestParam() throws Exception {
-        Parameter parameter = createMockParameter(RequestParam.class, "param");
+        Parameter parameter = createMockParameter(requestParamAnnotation, "param");
         Object value = "test param";
 
         SpringAnnotationCollector.report(new Parameter[]{parameter}, new Object[]{value});
@@ -57,8 +106,8 @@ public class SpringAnnotationCollectorTest {
 
     @Test
     public void testReportWithRequestParamMultiple() throws Exception {
-        Parameter parameter1 = createMockParameter(RequestParam.class, "param1");
-        Parameter parameter2 = createMockParameter(RequestParam.class, "param2");
+        Parameter parameter1 = createMockParameter(requestParamAnnotation, "param1");
+        Parameter parameter2 = createMockParameter(requestParamAnnotation, "param2");
 
         SpringAnnotationCollector.report(new Parameter[]{parameter1, parameter2}, new Object[]{"value 1", "value 2"});
 
@@ -67,7 +116,7 @@ public class SpringAnnotationCollectorTest {
 
     @Test
     public void testReportWithPathVariable() throws Exception {
-        Parameter parameter = createMockParameter(PathVariable.class, "myPathVar");
+        Parameter parameter = createMockParameter(pathVariableAnnotation, "myPathVar");
         String value = "testPath";
 
         SpringAnnotationCollector.report(new Parameter[]{parameter}, new Object[]{value});
@@ -80,12 +129,12 @@ public class SpringAnnotationCollectorTest {
 
     @Test
     public void testReportWithMapPathVariable() throws Exception {
-        Parameter parameter = createMockParameter(PathVariable.class, "pathVar");
+        Parameter parameter = createMockParameter(pathVariableAnnotation, "pathVar");
         Map<String, String> value = Map.of("key1", "value1", "key2", "value2");
 
         SpringAnnotationCollector.report(new Parameter[]{parameter}, new Object[]{value});
 
-        Parameter parameter2 = createMockParameter(PathVariable.class, "key3");
+        Parameter parameter2 = createMockParameter(pathVariableAnnotation, "key3");
         SpringAnnotationCollector.report(new Parameter[]{parameter2}, new Object[]{"value3"});
 
         assertEquals(
@@ -95,7 +144,7 @@ public class SpringAnnotationCollectorTest {
 
     @Test
     public void testReportWithOptionalPathVariable() throws Exception {
-        Parameter parameter = createMockParameter(PathVariable.class, "pathVar");
+        Parameter parameter = createMockParameter(pathVariableAnnotation, "pathVar");
         Optional<String> value = Optional.of("optionalValue");
 
         SpringAnnotationCollector.report(new Parameter[]{parameter}, new Object[]{value});
@@ -105,7 +154,7 @@ public class SpringAnnotationCollectorTest {
 
     @Test
     public void testReportWithDifferentLengthParametersAndValues() {
-        Parameter parameter = createMockParameter(RequestBody.class, "paramName");
+        Parameter parameter = createMockParameter(requestBodyAnnotation, "paramName");
         Object value = "test body";
 
         Exception exception = assertThrows(Exception.class, () -> {
@@ -115,11 +164,10 @@ public class SpringAnnotationCollectorTest {
         assertEquals("Length of parameters and values should match!", exception.getMessage());
     }
 
-    private Parameter createMockParameter(Class<? extends Annotation> annotationClass, String name) {
-        Annotation mockAnnotation = mock(annotationClass);
+    private Parameter createMockParameter(Annotation annotation, String name) {
         return Mockito.mock(Parameter.class, invocation -> {
             if (invocation.getMethod().getName().equals("getDeclaredAnnotations")) {
-                return new Annotation[]{mockAnnotation};
+                return new Annotation[]{annotation};
             } else if (invocation.getMethod().getName().equals("getName")) {
                 return name;
             }

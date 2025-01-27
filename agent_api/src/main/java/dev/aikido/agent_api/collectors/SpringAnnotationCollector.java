@@ -37,18 +37,18 @@ public final class SpringAnnotationCollector {
         }
 
         for (Annotation annotation: parameter.getDeclaredAnnotations()) {
-            String annotStr = annotation.getClass().toString();
+            String annotStr = annotation.annotationType().getName();
             if (annotStr.contains(REQUEST_BODY)) {
                 // RequestBody includes all data so we report everything as one block:
                 // Also important for API Discovery that we get the exact overview
                 context.setBody(value);
                 break;
-            } else if (annotStr.contains(REQUEST_PARAM) || annotStr.contains(REQUEST_PART)) {
+            } else if (annotStr.equals(REQUEST_PARAM) || annotStr.equals(REQUEST_PART)) {
                 // RequestPart and RequestParam both contain partial data.
                 String identifier = parameter.getName();
                 context.setBodyElement(identifier, value);
                 break;
-            } else if(annotStr.contains(PATH_VARIABLE)) {
+            } else if(annotStr.equals(PATH_VARIABLE)) {
                 String identifier = parameter.getName();
                 if (value instanceof Map<?, ?> paramsMap) {
                     for (Map.Entry<?, ?> entry: paramsMap.entrySet()) {
