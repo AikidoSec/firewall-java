@@ -14,7 +14,7 @@ payloads_ssrf = {
     "json": False,
 }
 payloads_path_traversal = {
-    "safe": { "fileName": ".gitignore" },
+    "safe": { "fileName": "README.md" },
     "unsafe": { "fileName": "./../databases/docker-compose.yml" },
     "json": False,
 }
