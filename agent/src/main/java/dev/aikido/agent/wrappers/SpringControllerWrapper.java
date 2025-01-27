@@ -15,8 +15,7 @@ import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAM
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /* We wrap the controller functions annotated with an @RequestMapping
- * We check the input for @RequestBody and @RequestParam
- * @RequestPart currently not supported.
+ * We check the input for @RequestBody, @RequestParam, @PathVariable, ...
  */
 public class SpringControllerWrapper implements Wrapper {
     @Override
