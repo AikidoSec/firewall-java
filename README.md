@@ -70,7 +70,9 @@ To activate Zen you then just have to add the following argument to your Java co
 ```
 Replace `/opt/zen` with your directory of choice.
 
-To use user-blocking and/or rate-limiting features, you will have to include the following Jarfile into your repository, for gradle :
+To use user-blocking and/or rate-limiting features, you will have to include the following Jarfile into your repository
+### Gradle
+Add the following code to your `build.gradle` file.
 ```gradle
 dependencies {
     # ...
@@ -78,6 +80,18 @@ dependencies {
     # ...
 }
 ```
+### Maven
+Add the following code to your `pom.xml` file.
+```xml
+<dependency>
+    <groupId>dev.aikido</groupId>
+    <artifactId>agent_api</artifactId>
+    <version>1.0</version>
+    <systemPath>/opt/zen/agent_api.jar</systemPath>
+</dependency>
+```
+
+
 For further setup continue to your Web Framework of choice ([Click here for Spring](./docs/spring.md))
 
 ## Reporting to your Aikido Security dashboard
