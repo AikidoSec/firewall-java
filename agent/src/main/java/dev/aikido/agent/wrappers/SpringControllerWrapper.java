@@ -51,27 +51,9 @@ public class SpringControllerWrapper implements Wrapper {
         public static void before(
                 @Advice.Origin Executable method,
                 @Advice.AllArguments(readOnly = false, typing = DYNAMIC) Object[] args
-        ) {
+        ) throws Exception {
             Parameter[] parameters = method.getParameters();
-            for (int i = 0; i < parameters.length; i++) {
-                Parameter parameter = parameters[i];
-                for (Annotation annotation: parameter.getDeclaredAnnotations()) {
-                    String annotStr = annotation.toString();
-                    if (annotStr.contains("org.springframework.web.bind.annotation.RequestBody")) {
-                        // RequestBody includes all data so we report everything as one block:
-                        // Also important for API Discovery that we get the exact overview
-                        SpringAnnotationCollector.report(args[i]);
-                        return; // You can safely return here without missing more data
-                    }
-                    if (annotStr.contains("org.springframework.web.bind.annotation.RequestParam") ||
-                            annotStr.contains("org.springframework.web.bind.annotation.RequestPart")) {
-                        // RequestPart and RequestParam both contain partial data.
-                        String identifier = parameter.getName();
-                        SpringAnnotationCollector.report(identifier, args[i]);
-                        break; // You can safely exit for-loop, but we still want to scan other arguments.
-                    }
-                }
-            }
+            SpringAnnotationCollector.report(parameters, args);
         }
     }
 }
