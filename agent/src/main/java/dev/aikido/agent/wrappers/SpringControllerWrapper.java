@@ -1,6 +1,6 @@
 package dev.aikido.agent.wrappers;
 
-import dev.aikido.agent_api.collectors.RequestBodyCollector;
+import dev.aikido.agent_api.collectors.SpringAnnotationCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -18,10 +18,10 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * We check the input for @RequestBody and @RequestParam
  * @RequestPart currently not supported.
  */
-public class SpringFrameworkBodyWrapper implements Wrapper {
+public class SpringControllerWrapper implements Wrapper {
     @Override
     public String getName() {
-        return SpringFrameworkBodyWrapperAdvice.class.getName();
+        return SpringAnnotationWrapperAdvice.class.getName();
     }
 
     @Override
@@ -43,9 +43,9 @@ public class SpringFrameworkBodyWrapper implements Wrapper {
         return hasSuperType(declaresMethod(getMatcher()));
     }
 
-    private static class SpringFrameworkBodyWrapperAdvice {
+    private static class SpringAnnotationWrapperAdvice {
         /* We intercept the call to the controller, arguments given to it contain user input
-         * We check if it's annotated by @RequestBody, ... and add it as a key to our body.
+         * We check if it's annotated by @RequestBody, @PathVariable, ... and add it as a key to our body.
          */
         @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
@@ -60,14 +60,14 @@ public class SpringFrameworkBodyWrapper implements Wrapper {
                     if (annotStr.contains("org.springframework.web.bind.annotation.RequestBody")) {
                         // RequestBody includes all data so we report everything as one block:
                         // Also important for API Discovery that we get the exact overview
-                        RequestBodyCollector.report(args[i]);
+                        SpringAnnotationCollector.report(args[i]);
                         return; // You can safely return here without missing more data
                     }
                     if (annotStr.contains("org.springframework.web.bind.annotation.RequestParam") ||
                             annotStr.contains("org.springframework.web.bind.annotation.RequestPart")) {
                         // RequestPart and RequestParam both contain partial data.
                         String identifier = parameter.getName();
-                        RequestBodyCollector.report(identifier, args[i]);
+                        SpringAnnotationCollector.report(identifier, args[i]);
                         break; // You can safely exit for-loop, but we still want to scan other arguments.
                     }
                 }

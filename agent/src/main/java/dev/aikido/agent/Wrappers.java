@@ -15,7 +15,7 @@ public final class Wrappers {
     public static final List<Wrapper> WRAPPERS = Arrays.asList(
             new PostgresWrapper(),
             new SpringFrameworkWrapper(),
-            new SpringFrameworkBodyWrapper(),
+            new SpringControllerWrapper(),
             new SpringFrameworkInvokeWrapper(),
             new FileWrapper(),
             new URLConnectionWrapper(),

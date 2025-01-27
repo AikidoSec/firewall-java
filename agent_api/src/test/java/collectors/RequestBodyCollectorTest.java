@@ -24,10 +24,10 @@ public class RequestBodyCollectorTest {
     public void testWithSpringContext() {
         Context.set(contextObject);
 
-        RequestBodyCollector.report("Hello World");
+        SpringAnnotationCollector.report("Hello World");
         assertEquals("Hello World", Context.get().getBody());
 
-        RequestBodyCollector.report("data1", "data2");
+        SpringAnnotationCollector.report("data1", "data2");
         // Make sure that full body gets prioritized:
         assertEquals("Hello World", Context.get().getBody());
     }
@@ -36,8 +36,8 @@ public class RequestBodyCollectorTest {
     public void testWithSpringContext2() {
         Context.set(contextObject);
 
-        RequestBodyCollector.report("data1", Map.of("1", "2"));
-        RequestBodyCollector.report("data2", Map.of("3", "4"));
+        SpringAnnotationCollector.report("data1", Map.of("1", "2"));
+        SpringAnnotationCollector.report("data2", Map.of("3", "4"));
 
         // Make sure that full body gets prioritized:
         Map<?, ?> currentBody = (Map<?, ?>) Context.get().getBody();
