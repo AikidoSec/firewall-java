@@ -34,4 +34,9 @@ public class HtmlController {
         Thread.sleep(1); // Sleep 1 ms
         return Mono.just("OK");
     }
+    @GetMapping("/test_ratelimiting_1")
+    @ResponseBody
+    public Mono<String> test_ratelimiting_1_route() {
+        return Mono.just("OK");
+    }
 }

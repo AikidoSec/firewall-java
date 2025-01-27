@@ -25,7 +25,7 @@ responses = {
                 "graphql": False,
             }
         ],
-        "blockedUserIds": [],
+        "blockedUserIds": ["12345"],
         "block": True,
     },
     "lists": {
