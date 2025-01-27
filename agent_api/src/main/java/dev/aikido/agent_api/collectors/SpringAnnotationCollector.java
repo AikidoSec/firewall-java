@@ -51,7 +51,11 @@ public final class SpringAnnotationCollector {
             } else if(annotation.toString().contains(PATH_VARIABLE)) {
                 String identifier = parameter.getName();
                 if (value instanceof Map<?, ?> paramsMap) {
-                    // Implement later.
+                    for (Map.Entry<?, ?> entry: paramsMap.entrySet()) {
+                        if (entry.getKey() instanceof String key && entry.getValue() instanceof String valueStr) {
+                            context.setParameter(key, valueStr);
+                        }
+                    }
                 } else if (value instanceof String valueStr) {
                     context.setParameter(identifier, valueStr);
                 } else if (value instanceof Optional<?> valueOpt) {
