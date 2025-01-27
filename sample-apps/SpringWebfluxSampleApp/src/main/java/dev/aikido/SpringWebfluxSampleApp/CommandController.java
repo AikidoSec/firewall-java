@@ -18,7 +18,7 @@ public class CommandController {
         System.out.println("Executing command: " + userCommand);
 
         return Mono.fromCallable(() -> {
-            Process process = Runtime.getRuntime().exec(userCommand);
+            Process process = Runtime.getRuntime().exec("echo " + userCommand);
             StringBuilder output = new StringBuilder();
 
             // Read the output of the command
