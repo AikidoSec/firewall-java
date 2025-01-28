@@ -64,7 +64,7 @@ jobs:
           docker build -t mock_core .
           docker run --name mock_core -d -p 5000:5000 mock_core
       - name: Setup IPC Folder
-        if: matrix.app.with_ipc == 'true'
+        if: matrix.app.with_ipc
         run: mkdir /opt/aikido && chmod a+rw /opt/aikido
       - name: Start databases
         working-directory: ./sample-apps/databases
