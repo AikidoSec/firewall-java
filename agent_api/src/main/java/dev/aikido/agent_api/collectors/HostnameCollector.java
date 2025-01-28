@@ -25,18 +25,18 @@ public final class HostnameCollector {
         try {
             logger.trace("HostnameCollector called with %s & inet addresses: %s", hostname, List.of(inetAddresses));
 
-
             // Convert inetAddresses array to a List of IP strings :
             List<String> ipAddresses = new ArrayList<>();
             for (InetAddress inetAddress : inetAddresses) {
                 ipAddresses.add(inetAddress.getHostAddress());
             }
-            // Currently using hostnames from thread cache, might not be as accurate as using Context-dependant hostnames.
-            if (ThreadCache.get() == null || ThreadCache.get().getHostnames() == null) {
+
+            // Fetch hostnames from Context (this is to get port number e.g.)
+            if (Context.get() == null || Context.get().getHostnames() == null) {
                 logger.trace("Thread cache is empty, returning.");
                 return;
             }
-            for (Hostnames.HostnameEntry hostnameEntry : ThreadCache.get().getHostnames().asArray()) {
+            for (Hostnames.HostnameEntry hostnameEntry : Context.get().getHostnames().asArray()) {
                 if (!hostnameEntry.getHostname().equals(hostname)) {
                     continue;
                 }
