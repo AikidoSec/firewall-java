@@ -39,7 +39,7 @@ public class ApacheHttpClientTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFLocalhostValid() throws Exception {
         setContextAndLifecycle("http://localhost:5000");
@@ -67,7 +67,7 @@ public class ApacheHttpClientTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithoutPort() throws Exception {
         setContextAndLifecycle("http://localhost:80");
@@ -78,7 +78,7 @@ public class ApacheHttpClientTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithoutPortAndWithoutContext() throws Exception {
         setContextAndLifecycle("http://localhost:80");
@@ -89,7 +89,7 @@ public class ApacheHttpClientTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithoutPortAndWithoutThreadCache() throws Exception {
         setContextAndLifecycle("http://localhost:80");
