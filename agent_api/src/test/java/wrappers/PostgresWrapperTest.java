@@ -41,7 +41,7 @@ public class PostgresWrapperTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testSelectSqlWithPrepareStatement() throws SQLException {
         ThreadCache.set(null);
 
@@ -60,7 +60,7 @@ public class PostgresWrapperTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSelectSqlSafeWithPrepareStatement() throws SQLException {
         ThreadCache.set(null);
@@ -81,7 +81,7 @@ public class PostgresWrapperTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testSelectSqlWithPreparedStatementWithoutExecute() throws SQLException {
         ThreadCache.set(null);
 
@@ -99,7 +99,7 @@ public class PostgresWrapperTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecute() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("SELECT * FROM notpets;"));
@@ -119,7 +119,7 @@ public class PostgresWrapperTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testAddBatch() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("Fluffy"));
@@ -141,7 +141,7 @@ public class PostgresWrapperTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecuteLargeUpdate() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("Buddy"));
@@ -161,7 +161,7 @@ public class PostgresWrapperTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecuteQuery() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("* FROM pets"));
@@ -180,7 +180,7 @@ public class PostgresWrapperTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecuteUpdate() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("SELECT * FROM notpets;"));

@@ -1,5 +1,5 @@
 # Setting up Spring
-> Currently we only offer support for **Spring MVC**, support for Spring Webflux is in the pipeline.
+> If you are looking for **Spring Webflux** [click here](./spring_webflux.md)
 
 To setup with Spring you just have to follow the normal installation instructions for the Java Agent.
 ## Rate-limiting
