@@ -30,7 +30,7 @@ public class PathWrapperTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInResolve() throws Exception {
         setContextAndLifecycle("../opt/");
@@ -45,7 +45,7 @@ public class PathWrapperTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInResolveWithPath() throws Exception {
         Path maliciousPath = Paths.get("/../opt/test.txt");
@@ -63,7 +63,7 @@ public class PathWrapperTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInResolveSibling() throws Exception {
         setContextAndLifecycle("../opt/");
@@ -78,7 +78,7 @@ public class PathWrapperTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInResolveSiblingWithPath() throws Exception {
         Path basePath = Paths.get("/var/");
@@ -96,7 +96,7 @@ public class PathWrapperTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInRelativize() throws Exception {
         Path basePath = Paths.get("/var/opt/");
