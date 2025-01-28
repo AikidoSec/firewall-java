@@ -81,7 +81,7 @@ class ScannerTest {
 
     // Disable IPC :
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     void testScanSafeSQLCode() {
         // Safe :
@@ -98,7 +98,7 @@ class ScannerTest {
 
     // Disable IPC :
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     void testBypassedIPs() {
         // Thread cache does not force any protection off :
@@ -131,7 +131,7 @@ class ScannerTest {
 
     // Disable IPC :
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     void testForceProtectionOff() {
         // Thread cache does not force any protection off :
@@ -156,7 +156,7 @@ class ScannerTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     void testDoesNotRunWithContextNull() {
         Context.set(null);
@@ -166,7 +166,7 @@ class ScannerTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     void TestStillThrowsWithThreadCacheUndefined() {
         ThreadCache.set(null);

@@ -21,7 +21,7 @@ run: build
 	AIKIDO_TOKEN="token" \
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
-	AIKIDO_BLOCK=1 \
+	AIKIDO_BLOCKING=1 \
 	nohup java  -javaagent:$(JAVA_AGENT) -DportNumber=8088 -jar $(JAR_FILE) > output1.log &
 
 # Run the application without Zen
@@ -39,7 +39,7 @@ runWithOpentel: build
 	AIKIDO_TOKEN="token" \
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
-	AIKIDO_BLOCK=1 \
+	AIKIDO_BLOCKING=1 \
 	AIKIDO_LOG_LEVEL="trace" \
 	nohup java -javaagent:$(JAVA_AGENT) -javaagent:opentelemetry-javaagent.jar -Dotel.service.name=service -DportNumber=8088 -jar $(JAR_FILE) > output1.log &
 

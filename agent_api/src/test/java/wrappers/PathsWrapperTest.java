@@ -29,7 +29,7 @@ public class PathsWrapperTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testPathTraversalWithSinglePath() throws Exception {
         setContextAndLifecycle("../opt/");
@@ -43,7 +43,7 @@ public class PathsWrapperTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testPathTraversalWithMultiplePaths() throws Exception {
         setContextAndLifecycle("../opt/");

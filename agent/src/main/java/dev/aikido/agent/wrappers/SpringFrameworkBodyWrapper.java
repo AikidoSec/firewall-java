@@ -1,6 +1,6 @@
 package dev.aikido.agent.wrappers;
 
-import dev.aikido.agent_api.collectors.SpringAnnotationCollector;
+import dev.aikido.agent_api.collectors.RequestBodyCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -15,12 +15,13 @@ import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAM
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /* We wrap the controller functions annotated with an @RequestMapping
- * We check the input for @RequestBody, @RequestParam, @PathVariable, ...
+ * We check the input for @RequestBody and @RequestParam
+ * @RequestPart currently not supported.
  */
-public class SpringControllerWrapper implements Wrapper {
+public class SpringFrameworkBodyWrapper implements Wrapper {
     @Override
     public String getName() {
-        return SpringAnnotationWrapperAdvice.class.getName();
+        return SpringFrameworkBodyWrapperAdvice.class.getName();
     }
 
     @Override
@@ -42,17 +43,35 @@ public class SpringControllerWrapper implements Wrapper {
         return hasSuperType(declaresMethod(getMatcher()));
     }
 
-    private static class SpringAnnotationWrapperAdvice {
+    private static class SpringFrameworkBodyWrapperAdvice {
         /* We intercept the call to the controller, arguments given to it contain user input
-         * We check if it's annotated by @RequestBody, @PathVariable, ... and add it as a key to our body.
+         * We check if it's annotated by @RequestBody, ... and add it as a key to our body.
          */
         @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
                 @Advice.Origin Executable method,
                 @Advice.AllArguments(readOnly = false, typing = DYNAMIC) Object[] args
-        ) throws Exception {
+        ) {
             Parameter[] parameters = method.getParameters();
-            SpringAnnotationCollector.report(parameters, args);
+            for (int i = 0; i < parameters.length; i++) {
+                Parameter parameter = parameters[i];
+                for (Annotation annotation: parameter.getDeclaredAnnotations()) {
+                    String annotStr = annotation.toString();
+                    if (annotStr.contains("org.springframework.web.bind.annotation.RequestBody")) {
+                        // RequestBody includes all data so we report everything as one block:
+                        // Also important for API Discovery that we get the exact overview
+                        RequestBodyCollector.report(args[i]);
+                        return; // You can safely return here without missing more data
+                    }
+                    if (annotStr.contains("org.springframework.web.bind.annotation.RequestParam") ||
+                            annotStr.contains("org.springframework.web.bind.annotation.RequestPart")) {
+                        // RequestPart and RequestParam both contain partial data.
+                        String identifier = parameter.getName();
+                        RequestBodyCollector.report(identifier, args[i]);
+                        break; // You can safely exit for-loop, but we still want to scan other arguments.
+                    }
+                }
+            }
         }
     }
 }

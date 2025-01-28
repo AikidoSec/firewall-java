@@ -40,7 +40,7 @@ public class HttpURLConnectionRedirectTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testSrrfTest() {
         setContextAndLifecycle(SSRF_TEST);
@@ -60,7 +60,7 @@ public class HttpURLConnectionRedirectTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testSrrfTestTwice() {
         setContextAndLifecycle(SSRF_TEST_TWICE);
@@ -79,7 +79,7 @@ public class HttpURLConnectionRedirectTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testSrrfTestDomain() {
         setContextAndLifecycle(SSRF_TEST_DOMAIN);
@@ -98,7 +98,7 @@ public class HttpURLConnectionRedirectTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testSrrfTestDomainTwice() {
         setContextAndLifecycle(SSRF_TEST_DOMAIN_TWICE);
@@ -117,7 +117,7 @@ public class HttpURLConnectionRedirectTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testSsrfCrossDomain() {
         setContextAndLifecycle(CROSS_DOMAIN_TEST);
@@ -136,7 +136,7 @@ public class HttpURLConnectionRedirectTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testSsrfCrossDomainTwice() {
         setContextAndLifecycle(CROSS_DOMAIN_TEST_DOMAIN_TWICE);

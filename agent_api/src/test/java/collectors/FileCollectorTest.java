@@ -30,7 +30,7 @@ public class FileCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testStrings() {
         isPathTraversalAttack("/etc/home/../../test.txt.js");
@@ -42,7 +42,7 @@ public class FileCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testPaths() {
         isPathTraversalAttack(filePath1);
@@ -53,7 +53,7 @@ public class FileCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testStringArrays() {
         isPathTraversalAttack(new String[]{"/etc/home/../../test.txt.js"});
@@ -65,7 +65,7 @@ public class FileCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testFileURIs() throws URISyntaxException {
         isPathTraversalAttack(new URI("file:///etc/home/../../test.txt.js"));
@@ -79,7 +79,7 @@ public class FileCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testNotRecognizedObjects() throws MalformedURLException {
         isNotPathTraversalAttack(true);
@@ -104,7 +104,7 @@ public class FileCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testMaxRecursion() {
         isPathTraversalAttack(new Object[]{new Object[]{"/etc/home/../../test.txt.js"}}); // Depth of 1

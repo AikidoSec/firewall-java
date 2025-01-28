@@ -34,7 +34,7 @@ public class FileReaderWriterTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testFileReader() throws Exception {
         setContextAndLifecycle("../file.txt");
@@ -57,7 +57,7 @@ public class FileReaderWriterTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testFileWriter() throws Exception {
         setContextAndLifecycle("../file.txt");

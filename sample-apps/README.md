@@ -27,5 +27,4 @@ Here is an overview of all of our sample apps together with their port numbers.
 
 #### Other frameworks
 - [Javalin App with Postgres](./JavalinPostgres) on port [`8088`](http://localhost:8088/)
-- [Javalin App with MySQL (Kotlin)](./JavalinMySQLKotlin/) on port [`8098`](http://localhost:8098)
 - [Ktor app with Postgres (Netty)](./KtorPostgresNetty) on port [`8096`](http://localhost:8096)

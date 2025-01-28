@@ -33,7 +33,7 @@ public class FileWrapperTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testPathTraversalString() throws Exception {
         setContextAndLifecycle("../file.txt");

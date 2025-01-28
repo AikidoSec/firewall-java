@@ -9,7 +9,7 @@ import java.util.Map;
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
-public class NettyContext extends SpringContextObject {
+public class NettyContext extends ContextObject {
     public NettyContext(
             String method, String uri, InetSocketAddress rawIp,
             HashMap<String, List<String>> cookies,
@@ -27,6 +27,9 @@ public class NettyContext extends SpringContextObject {
         this.remoteAddress = getIpFromRequest(rawIp.getAddress().getHostAddress(), this.headers);
         this.source = "ReactorNetty";
         this.redirectStartNodes = new ArrayList<>();
+
+        // We don't have access yet to the route parameters.
+        this.params = null;
     }
 
     private static HashMap<String, String> extractHeaders(List<Map.Entry<String, String>> entries) {

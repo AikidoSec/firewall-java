@@ -33,7 +33,7 @@ public class URLCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testNewUrlConnectionWithPort() throws IOException {
         setContextAndLifecycle("");
@@ -46,7 +46,7 @@ public class URLCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testNewUrlConnectionWithHttp() throws IOException {
         setContextAndLifecycle("");
@@ -58,7 +58,7 @@ public class URLCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testNewUrlConnectionHttps() throws IOException {
         setContextAndLifecycle("");
@@ -70,7 +70,7 @@ public class URLCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
     @Test
     public void testNewUrlConnectionFaultyProtocol() throws IOException {
         setContextAndLifecycle("");

@@ -21,7 +21,7 @@ run: build
 	AIKIDO_TOKEN="token" \
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
-	AIKIDO_BLOCK=1 \
+	AIKIDO_BLOCKING=1 \
 	AIKIDO_LOG_LEVEL="debug" \
 	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8082 > output1.log &
 

@@ -47,7 +47,7 @@ class NettyContextTest {
         assertEquals("JUnit Test", context.getHeaders().get("user-agent"));
         assertEquals("192.168.1.1", context.getRemoteAddress());
         assertEquals("ReactorNetty", context.getSource());
-        assertEquals(Map.of(), context.getParams());
+        assertNull(context.getParams());
         assertNotNull(context.getRedirectStartNodes());
         assertTrue(context.getRedirectStartNodes().isEmpty());
     }

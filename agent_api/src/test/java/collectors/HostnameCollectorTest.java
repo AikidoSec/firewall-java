@@ -89,7 +89,7 @@ public class HostnameCollectorTest {
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "1")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "1")
     @Test
     public void testHostnameSameWithContextAsAttack() {
         ThreadCacheObject myThreadCache = mock(ThreadCacheObject.class);
