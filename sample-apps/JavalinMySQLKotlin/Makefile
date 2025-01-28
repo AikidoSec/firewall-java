@@ -16,7 +16,7 @@ run: build
 	AIKIDO_TOKEN="token" \
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
-	AIKIDO_BLOCKING=1 \
+	AIKIDO_BLOCK=1 \
 	PORT=8098 nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) > output1.log &
 
 # Run the application without Zen

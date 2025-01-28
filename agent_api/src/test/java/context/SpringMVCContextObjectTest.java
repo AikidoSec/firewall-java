@@ -1,6 +1,6 @@
 package context;
 
-import dev.aikido.agent_api.context.SpringContextObject;
+import dev.aikido.agent_api.context.SpringMVCContextObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -9,13 +9,13 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SpringContextObjectTest {
+class SpringMVCContextObjectTest {
 
-    private SpringContextObject springContextObject;
+    private SpringMVCContextObject springContextObject;
 
     @BeforeEach
     void setUp() {
-        springContextObject = new SpringContextObject(
+        springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
         );
     }
@@ -23,7 +23,7 @@ class SpringContextObjectTest {
     @Test
     void testGetRouteWithSlashTest() {
         // Act
-        springContextObject = new SpringContextObject(
+        springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
         );
 
@@ -34,7 +34,7 @@ class SpringContextObjectTest {
     @Test
     void testGetRouteWithNumbers() {
         // Act
-        springContextObject = new SpringContextObject(
+        springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
         );
 
@@ -45,15 +45,15 @@ class SpringContextObjectTest {
 
     @Test
     void testSetParams() {
-        springContextObject.setParams("12345");
-        assertEquals("12345", springContextObject.getParams());
+        springContextObject.setParameter("123", "345");
+        assertEquals("345", springContextObject.getParams().get("123"));
     }
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
     void testIpRequestFeature() {
         HashMap<String, String> headers = new HashMap<>(Map.of("x-forwarded-for", "invalid.ip, in.va.li.d, 1.2.3.4"));
-        springContextObject = new SpringContextObject(
+        springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
         );
         assertEquals(1, springContextObject.getHeaders().size());
@@ -64,7 +64,7 @@ class SpringContextObjectTest {
     @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
     void testIpRequestFeature_InvalidHeader() {
         HashMap<String, String> headers = new HashMap<>(Map.of("x-forwarded-for", "invalid.ip, in.va.li.d"));
-        springContextObject = new SpringContextObject(
+        springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
         );
         assertEquals(1, springContextObject.getHeaders().size());
@@ -75,7 +75,7 @@ class SpringContextObjectTest {
     @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "0")
     void testIpRequestFeature_TrustProxyOff() {
         HashMap<String, String> headers = new HashMap<>(Map.of("x-forwarded-for", "invalid.ip, in.va.li.d, 1.2.3.4"));
-        springContextObject = new SpringContextObject(
+        springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
         );
         assertEquals(1, springContextObject.getHeaders().size());
