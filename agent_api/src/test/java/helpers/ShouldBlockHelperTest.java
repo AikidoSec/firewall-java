@@ -11,14 +11,14 @@ public class ShouldBlockHelperTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "true")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testWithInvalidAikidoTokenTrue() {
         assertTrue(ShouldBlockHelper.shouldBlock());
     }
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCKING", value = "false")
+    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "false")
     public void testWithInvalidAikidoTokenFalse() {
         assertFalse(ShouldBlockHelper.shouldBlock());
     }
