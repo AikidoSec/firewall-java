@@ -1,13 +1,13 @@
-from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads, test_payloads_path_variables
-from javalin_postgres.test_sql_attacks import test_sql_attack
-from javalin_postgres.test_ip_blocking import test_ip_blocking
 from javalin_postgres.test_bot_blocking import test_bot_blocking
+from javalin_postgres.test_ip_blocking import test_ip_blocking
 from javalin_postgres.test_ratelimiting import test_ratelimiting_per_user, test_ratelimiting
+from javalin_postgres.test_sql_attacks import test_sql_attack
 from utils.EventHandler import EventHandler
+from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads, test_payloads_path_variables
 
 payloads = {
-    "safe": { "name": "Bobby" },
-    "unsafe": { "name": "Malicious Pet', 'Gru from the Minions') -- " }
+    "safe": {"name": "Bobby"},
+    "unsafe": {"name": "Malicious Pet', 'Gru from the Minions') -- "}
 }
 payloads_exec = {
     "safe": "Johhny",
@@ -20,7 +20,7 @@ urls = {
 
 event_handler = EventHandler()
 event_handler.reset()
-test_safe_vs_unsafe_payloads(payloads, urls, route="/api/create") # Test Postgres+Javalin compat
+test_safe_vs_unsafe_payloads(payloads, urls, route="/api/create")  # Test Postgres+Javalin compat
 print("✅ Tested safe/unsafe payloads on /api/create")
 
 # Test blocklists :

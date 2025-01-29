@@ -1,6 +1,7 @@
 import requests
 from utils.assert_equals import assert_eq
 
+
 def test_ip_blocking(url):
     # Allowed IP :
     res = requests.get(url, headers={

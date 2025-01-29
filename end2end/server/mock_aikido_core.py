@@ -1,10 +1,9 @@
 import gzip
-
-from flask import Flask, request, jsonify, Response
-import sys
-import os
 import json
+import os
+import sys
 import time
+from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 
@@ -44,14 +43,17 @@ responses = {
 
 events = []
 
+
 # Realtime
 @app.route('/realtime/config', methods=["GET"])
 def get_realtime_config():
     return jsonify({"configUpdatedAt": responses["configUpdatedAt"]})
 
+
 @app.route('/api/runtime/config', methods=['GET'])
 def get_runtime_config():
     return jsonify(responses["config"])
+
 
 @app.route('/api/runtime/firewall/lists', methods=['GET'])
 def get_fw_lists():
@@ -61,6 +63,7 @@ def get_fw_lists():
     response = Response(compressed_data, content_type='application/json')
     response.headers['Content-Encoding'] = 'gzip'
     return response
+
 
 @app.route('/api/runtime/events', methods=['POST'])
 def post_events():
@@ -75,7 +78,7 @@ def mock_set_config():
     configUpdatedAt = int(time.time())
     responses["config"] = request.get_json()
     responses["config"]["configUpdatedAt"] = configUpdatedAt
-    responses["configUpdatedAt"] = { "serviceId": 1, "configUpdatedAt": configUpdatedAt }
+    responses["configUpdatedAt"] = {"serviceId": 1, "configUpdatedAt": configUpdatedAt}
     return jsonify({})
 
 
@@ -83,11 +86,13 @@ def mock_set_config():
 def mock_get_events():
     return jsonify(events)
 
+
 @app.route('/mock/reset', methods=['GET'])
 def mock_reset():
     global events
-    events = [] # Reset events
+    events = []  # Reset events
     return jsonify({})
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2 or len(sys.argv) > 3:
@@ -104,7 +109,7 @@ if __name__ == '__main__':
                     configUpdatedAt = int(time.time())
                     responses["config"] = json.load(file)
                     responses["config"]["configUpdatedAt"] = configUpdatedAt
-                    responses["configUpdatedAt"] = { "serviceId": 1, "configUpdatedAt": configUpdatedAt }
+                    responses["configUpdatedAt"] = {"serviceId": 1, "configUpdatedAt": configUpdatedAt}
                     print(f"Loaded runtime config from {config_file}")
             except json.JSONDecodeError:
                 print(f"Error: Could not decode JSON from {config_file}")
@@ -112,5 +117,5 @@ if __name__ == '__main__':
         else:
             print(f"Error: File {config_file} not found")
             sys.exit(1)
-    
+
     app.run(host='0.0.0.0', port=port)

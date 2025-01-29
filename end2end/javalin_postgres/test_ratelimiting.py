@@ -1,6 +1,7 @@
-import time
 import requests
+import time
 from utils.assert_equals import assert_eq
+
 
 def test_ratelimiting(url):
     # Test route (First req & 2nd Req) :

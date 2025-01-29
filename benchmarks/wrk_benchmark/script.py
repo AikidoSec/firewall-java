@@ -3,9 +3,11 @@ import subprocess
 import sys
 import time
 
+
 def generate_wrk_command_for_url(url):
     # Define the command with awk included
     return "wrk -t12 -c400 -d15s " + url
+
 
 def cold_start(url):
     for i in range(10):
@@ -15,6 +17,7 @@ def cold_start(url):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
+
 
 def extract_requests_and_latency_tuple(output):
     if output.returncode == 0:
@@ -30,6 +33,7 @@ def extract_requests_and_latency_tuple(output):
         print("Error occured running benchmark command:")
         print(output.stderr.strip())
         sys.exit(1)
+
 
 def run_benchmark(route1, route2, descriptor, percentage_limit, ms_limit):
     # Cold start :
@@ -53,7 +57,6 @@ def run_benchmark(route1, route2, descriptor, percentage_limit, ms_limit):
     )
     result_nofw = extract_requests_and_latency_tuple(output_nofw)
     result_fw = extract_requests_and_latency_tuple(output_fw)
-
 
     # Check if the command was successful
     if result_nofw and result_fw:

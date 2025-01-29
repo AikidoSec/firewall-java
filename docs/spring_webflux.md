@@ -4,9 +4,11 @@ To setup with Spring Webflux you just have to follow the normal installation ins
 
 ## Rate-limiting
 
-Adding rate-limiting and user blocking capabilities to your Spring app requires you to run `ShouldBlockRequest.shouldBlockRequest()`.
+Adding rate-limiting and user blocking capabilities to your Spring app requires you to run
+`ShouldBlockRequest.shouldBlockRequest()`.
 
-To do this using a filter we have provided an example of what that might look like : 
+To do this using a filter we have provided an example of what that might look like :
+
 ```java
 @Component
 public class RatelimitingFilter implements WebFilter {
@@ -44,11 +46,13 @@ public class RatelimitingFilter implements WebFilter {
 }
 ```
 
-
 ## Setting a user (optional)
-If you want support for user-blocking or rate-limiting per user you will have to set your user. Do make sure that you run your SetUser filter before you run your rate-limiting filter.
+
+If you want support for user-blocking or rate-limiting per user you will have to set your user. Do make sure that you
+run your SetUser filter before you run your rate-limiting filter.
 
 To set the current user, you can use the `setUser` function. Here's an example :
+
 ```java
 import dev.aikido.agent_api.SetUser;
 // ...
@@ -74,4 +78,5 @@ Using `setUser` has the following benefits:
 - The user ID is used for more accurate rate limiting (you can change IP addresses, but you can't change your user ID).
 - Whenever attacks are detected, the user will be included in the report to Aikido.
 - The dashboard will show all your users, where you can also block them.
-- Passing the user's name is optional, but it can help you identify the user in the dashboard. You will be required to list Aikido Security as a subprocessor if you choose to share personal identifiable information (PII).
+- Passing the user's name is optional, but it can help you identify the user in the dashboard. You will be required to
+  list Aikido Security as a subprocessor if you choose to share personal identifiable information (PII).
