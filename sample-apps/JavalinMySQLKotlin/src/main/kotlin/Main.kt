@@ -84,6 +84,11 @@ fun main() {
         val content: String = readFile(filePath)
         ctx.result(content)
     }
+    app.post("/api/read") { ctx: Context ->
+        val filePath = ctx.bodyAsClass(FileRequest::class.java).fileName
+        val content: String = readFile(filePath)
+        ctx.result(content)
+    }
 }
 
 data class CommandRequest @JsonCreator constructor(
@@ -91,6 +96,9 @@ data class CommandRequest @JsonCreator constructor(
 )
 data class RequestRequest @JsonCreator constructor(
     @JsonProperty("url") val url: String
+)
+data class FileRequest @JsonCreator constructor(
+    @JsonProperty("fileName") val fileName: String
 )
 data class CreateRequest @JsonCreator constructor(
     @JsonProperty("name") val name: String
