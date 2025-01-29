@@ -1,20 +1,20 @@
 package dev.aikido.agent.wrappers.jdbc;
 
+import static net.bytebuddy.matcher.ElementMatchers.isSubTypeOf;
+import static net.bytebuddy.matcher.ElementMatchers.nameContains;
+
 import dev.aikido.agent.wrappers.Wrapper;
+import java.sql.Connection;
+import java.sql.Statement;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
-
-import java.sql.Connection;
-import java.sql.Statement;
-
-import static net.bytebuddy.matcher.ElementMatchers.isSubTypeOf;
-import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class MSSQLWrapper implements Wrapper {
     public String getName() {
         return JDBCConnectionAdvice.class.getName();
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return JDBCConnectionAdvice.getMatcher("com.microsoft.sqlserver.jdbc");
     }

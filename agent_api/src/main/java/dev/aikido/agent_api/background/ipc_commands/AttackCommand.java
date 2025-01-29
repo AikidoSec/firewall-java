@@ -8,7 +8,6 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.vulnerabilities.Attack;
-
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
@@ -21,6 +20,7 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
     public AttackCommand(BlockingQueue<APIEvent> queue) {
         this.queue = queue;
     }
+
     public static void sendAttack(ThreadIPCClient client, Req req) {
         new AttackCommand(null).send(client, req);
     }
@@ -31,7 +31,9 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
     }
 
     @Override
-    public String getName() { return "ATTACK"; }
+    public String getName() {
+        return "ATTACK";
+    }
 
     @Override
     public Class<Req> getInputClass() {
@@ -50,9 +52,8 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
             return Optional.empty();
         }
         // Generate an attack event :
-        DetectedAttack.DetectedAttackEvent detectedAttack = DetectedAttack.createAPIEvent(
-                data.attack, data.context, connectionManager
-        );
+        DetectedAttack.DetectedAttackEvent detectedAttack =
+                DetectedAttack.createAPIEvent(data.attack, data.context, connectionManager);
 
         // Increment statistics :
         connectionManager.getStats().incrementAttacksDetected();

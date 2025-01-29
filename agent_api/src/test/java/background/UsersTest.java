@@ -1,13 +1,12 @@
 package background;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.background.users.Users;
 import dev.aikido.agent_api.context.User;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class UsersTest {
     private Users users;
@@ -102,12 +101,15 @@ class UsersTest {
     @Test
     void testEmptyConstructor() {
         users = new Users(); // Set max entries to default (1000)
-        User user1 = new User("2000", "User One", "192.168.1.1", System.currentTimeMillis(), System.currentTimeMillis());
-        User user2 = new User("2200", "User Two", "192.168.1.2", System.currentTimeMillis(), System.currentTimeMillis());
+        User user1 =
+                new User("2000", "User One", "192.168.1.1", System.currentTimeMillis(), System.currentTimeMillis());
+        User user2 =
+                new User("2200", "User Two", "192.168.1.2", System.currentTimeMillis(), System.currentTimeMillis());
         users.addUser(user1);
         users.addUser(user2);
         for (int i = 0; i < (1000 - 1); i++) {
-            User userI = new User(String.valueOf(i), "User", "192.168.1.2", System.currentTimeMillis(), System.currentTimeMillis());
+            User userI = new User(
+                    String.valueOf(i), "User", "192.168.1.2", System.currentTimeMillis(), System.currentTimeMillis());
             users.addUser(userI);
         }
 

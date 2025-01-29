@@ -1,18 +1,22 @@
 package dev.aikido.agent_api.helpers.patterns;
 
+import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrlPath;
+
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.RouteMetadata;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrlPath;
-
 public final class MatchEndpoints {
     private MatchEndpoints() {}
+
     public static List<Endpoint> matchEndpoints(RouteMetadata routeMetadata, List<Endpoint> endpoints) {
-        if (routeMetadata == null || routeMetadata.method() == null || routeMetadata.url() == null || routeMetadata.route() == null || endpoints == null) {
+        if (routeMetadata == null
+                || routeMetadata.method() == null
+                || routeMetadata.url() == null
+                || routeMetadata.route() == null
+                || endpoints == null) {
             return null;
         }
 
@@ -53,7 +57,8 @@ public final class MatchEndpoints {
             }
         }
 
-        wildcards.sort((e1, e2) -> Integer.compare(e2.getRoute().split("\\*").length - 1, e1.getRoute().split("\\*").length - 1));
+        wildcards.sort((e1, e2) -> Integer.compare(
+                e2.getRoute().split("\\*").length - 1, e1.getRoute().split("\\*").length - 1));
 
         for (Endpoint wildcard : wildcards) {
             String route = wildcard.getRoute();

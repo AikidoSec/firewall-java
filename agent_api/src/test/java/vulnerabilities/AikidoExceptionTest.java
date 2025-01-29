@@ -1,10 +1,9 @@
 package vulnerabilities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import dev.aikido.agent_api.vulnerabilities.AikidoException;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AikidoExceptionTest {
 

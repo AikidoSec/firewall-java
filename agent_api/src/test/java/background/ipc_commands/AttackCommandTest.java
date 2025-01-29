@@ -1,5 +1,7 @@
 package background.ipc_commands;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
@@ -9,16 +11,12 @@ import dev.aikido.agent_api.background.ipc_commands.Command;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.vulnerabilities.Attack;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import utils.EmptySampleContextObject;
-
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import utils.EmptySampleContextObject;
 
 class AttackCommandTest {
     private BlockingQueue<APIEvent> queue;
@@ -28,7 +26,7 @@ class AttackCommandTest {
     @BeforeEach
     void setUp() {
         queue = new LinkedBlockingQueue<APIEvent>();
-        connectionManager = new CloudConnectionManager(true,new Token("xyz"),null,null);
+        connectionManager = new CloudConnectionManager(true, new Token("xyz"), null, null);
         attackCommand = new AttackCommand(queue);
     }
 
@@ -60,7 +58,7 @@ class AttackCommandTest {
         assertEquals(2, connectionManager.getStats().getAttacksDetected());
 
         // Now increment count [blocking disabled] :
-        connectionManager = new CloudConnectionManager(false,new Token("xyz"),null,null);
+        connectionManager = new CloudConnectionManager(false, new Token("xyz"), null, null);
         attackCommand.execute(commandData, connectionManager);
         assertEquals(2, queue.size());
         assertEquals(0, connectionManager.getStats().getAttacksBlocked());

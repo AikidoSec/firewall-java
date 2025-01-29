@@ -7,7 +7,8 @@ public final class IsUsefulRoute {
     private IsUsefulRoute() {}
 
     private static final List<String> EXCLUDED_METHODS = Arrays.asList("OPTIONS", "HEAD");
-    private static final List<String> IGNORE_EXTENSIONS = Arrays.asList("properties", "php", "asp", "aspx", "jsp", "config");
+    private static final List<String> IGNORE_EXTENSIONS =
+            Arrays.asList("properties", "php", "asp", "aspx", "jsp", "config");
     private static final List<String> IGNORE_STRINGS = List.of("cgi-bin");
 
     public static boolean isUsefulRoute(int statusCode, String route, String method) {

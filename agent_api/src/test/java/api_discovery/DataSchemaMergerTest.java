@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import dev.aikido.agent_api.api_discovery.DataSchemaItem;
 import dev.aikido.agent_api.api_discovery.DataSchemaType;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.util.Map;
 
 public class DataSchemaMergerTest {
 
@@ -20,21 +20,22 @@ public class DataSchemaMergerTest {
 
     @BeforeEach
     public void setUp() {
-        schemaA = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "name", new DataSchemaItem(DataSchemaType.STRING),
-                "age", new DataSchemaItem(DataSchemaType.NUMBER)
-        ));
+        schemaA = new DataSchemaItem(
+                DataSchemaType.OBJECT,
+                Map.of(
+                        "name", new DataSchemaItem(DataSchemaType.STRING),
+                        "age", new DataSchemaItem(DataSchemaType.NUMBER)));
 
-        schemaB = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "age", new DataSchemaItem(DataSchemaType.NUMBER),
-                "email", new DataSchemaItem(DataSchemaType.STRING)
-        ));
+        schemaB = new DataSchemaItem(
+                DataSchemaType.OBJECT,
+                Map.of(
+                        "age", new DataSchemaItem(DataSchemaType.NUMBER),
+                        "email", new DataSchemaItem(DataSchemaType.STRING)));
 
         schemaC = new DataSchemaItem(DataSchemaType.EMPTY);
 
-        schemaD = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "address", new DataSchemaItem(DataSchemaType.STRING)
-        ));
+        schemaD =
+                new DataSchemaItem(DataSchemaType.OBJECT, Map.of("address", new DataSchemaItem(DataSchemaType.STRING)));
 
         schemaE = new DataSchemaItem(DataSchemaType.ARRAY, new DataSchemaItem(DataSchemaType.STRING));
 
@@ -87,17 +88,19 @@ public class DataSchemaMergerTest {
 
     @Test
     public void testMergeWithNestedSchemas() {
-        DataSchemaItem nestedSchemaA = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "details", schemaA
-        ));
-        DataSchemaItem nestedSchemaB = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "details", schemaB
-        ));
+        DataSchemaItem nestedSchemaA = new DataSchemaItem(DataSchemaType.OBJECT, Map.of("details", schemaA));
+        DataSchemaItem nestedSchemaB = new DataSchemaItem(DataSchemaType.OBJECT, Map.of("details", schemaB));
         DataSchemaItem merged = mergeDataSchemas(nestedSchemaA, nestedSchemaB);
         assertTrue(merged.properties().containsKey("details"));
-        assertEquals(DataSchemaType.STRING, merged.properties().get("details").properties().get("name").type());
-        assertEquals(DataSchemaType.STRING, merged.properties().get("details").properties().get("email").type());
-        assertEquals(DataSchemaType.NUMBER, merged.properties().get("details").properties().get("age").type());
+        assertEquals(
+                DataSchemaType.STRING,
+                merged.properties().get("details").properties().get("name").type());
+        assertEquals(
+                DataSchemaType.STRING,
+                merged.properties().get("details").properties().get("email").type());
+        assertEquals(
+                DataSchemaType.NUMBER,
+                merged.properties().get("details").properties().get("age").type());
     }
 
     @Test

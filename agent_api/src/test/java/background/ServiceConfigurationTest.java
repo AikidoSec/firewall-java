@@ -1,15 +1,14 @@
 package background;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class ServiceConfigurationTest {
 
@@ -64,19 +63,20 @@ public class ServiceConfigurationTest {
         serviceConfiguration.updateConfig(apiResponse);
         assertFalse(serviceConfiguration.isBlockingEnabled());
         assertFalse(serviceConfiguration.hasReceivedAnyStats());
-
     }
 
     @Test
     void updateConfig_ShouldUpdateBypassedIPs_WhenApiResponseHasAllowedIPs() {
-        APIResponse apiResponse = new APIResponse(true, null, 0, null, null, Arrays.asList("192.168.1.1", "192.168.1.2"), false, false);
+        APIResponse apiResponse =
+                new APIResponse(true, null, 0, null, null, Arrays.asList("192.168.1.1", "192.168.1.2"), false, false);
         serviceConfiguration.updateConfig(apiResponse);
         assertEquals(new HashSet<>(Arrays.asList("192.168.1.1", "192.168.1.2")), serviceConfiguration.getBypassedIPs());
     }
 
     @Test
     void updateConfig_ShouldUpdateBlockedUserIDs_WhenApiResponseHasBlockedUserIds() {
-        APIResponse apiResponse = new APIResponse(true, null, 0, null, Arrays.asList("user1", "user2"), null, false, false);
+        APIResponse apiResponse =
+                new APIResponse(true, null, 0, null, Arrays.asList("user1", "user2"), null, false, false);
         serviceConfiguration.updateConfig(apiResponse);
         assertEquals(new HashSet<>(Arrays.asList("user1", "user2")), serviceConfiguration.getBlockedUserIDs());
     }
@@ -85,7 +85,8 @@ public class ServiceConfigurationTest {
     void updateConfig_ShouldUpdateEndpoints_WhenApiResponseHasEndpoints() {
         Endpoint endpoint1 = new Endpoint("GET", "/api/test1", 0, 0, List.of(), false, false, false);
         Endpoint endpoint2 = new Endpoint("POST", "/api/test2", 0, 0, List.of(), false, false, false);
-        APIResponse apiResponse = new APIResponse(true, null, 0, Arrays.asList(endpoint1, endpoint2), null, null, false, false);
+        APIResponse apiResponse =
+                new APIResponse(true, null, 0, Arrays.asList(endpoint1, endpoint2), null, null, false, false);
         serviceConfiguration.updateConfig(apiResponse);
         assertEquals(Arrays.asList(endpoint1, endpoint2), serviceConfiguration.getEndpoints());
     }
@@ -93,7 +94,15 @@ public class ServiceConfigurationTest {
     @Test
     void updateConfig_ShouldHandleAllUpdates_WhenApiResponseIsComplete() {
         Endpoint endpoint1 = new Endpoint("GET", "/api/test1", 0, 0, List.of(), false, false, false);
-        APIResponse apiResponse = new APIResponse(true, null, 0, Arrays.asList(endpoint1), Arrays.asList("user1"), Arrays.asList("192.168.1.1"), false, true);
+        APIResponse apiResponse = new APIResponse(
+                true,
+                null,
+                0,
+                Arrays.asList(endpoint1),
+                Arrays.asList("user1"),
+                Arrays.asList("192.168.1.1"),
+                false,
+                true);
         serviceConfiguration.updateConfig(apiResponse);
         assertTrue(serviceConfiguration.isBlockingEnabled());
         assertEquals(new HashSet<>(Arrays.asList("user1")), serviceConfiguration.getBlockedUserIDs());

@@ -4,6 +4,7 @@ import java.util.List;
 
 public final class PathBuilder {
     private PathBuilder() {}
+
     public static String buildPathToPayload(List<PathPart> pathToPayload) {
         if (pathToPayload.isEmpty()) {
             return ".";
@@ -22,10 +23,11 @@ public final class PathBuilder {
 
         return result.toString();
     }
+
     public static class PathPart {
         private final String type;
         private String key; // Only used if type is "object"
-        private int index;  // Only used if type is "array"
+        private int index; // Only used if type is "array"
 
         // Constructor for object type
         public PathPart(String type, String key) {

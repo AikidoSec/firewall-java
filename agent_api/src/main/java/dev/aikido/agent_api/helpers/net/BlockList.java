@@ -2,15 +2,15 @@ package dev.aikido.agent_api.helpers.net;
 
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BlockList {
-    //private HashSet<String> blockedAddresses; // Both IPv4 and IPv6
+    // private HashSet<String> blockedAddresses; // Both IPv4 and IPv6
     private List<IPAddress> blockedList;
 
     public BlockList() {
-        //this.blockedAddresses = new HashSet<>();
+        // this.blockedAddresses = new HashSet<>();
         this.blockedList = new ArrayList<>();
     }
 

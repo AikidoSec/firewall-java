@@ -1,13 +1,12 @@
 package api_discovery;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static dev.aikido.agent_api.api_discovery.GetBodyDataType.getBodyDataType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 public class GetBodyDataTypeTest {
 

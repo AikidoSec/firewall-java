@@ -1,34 +1,37 @@
 package wrappers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
-
 public class HttpURLConnectionRedirectTest {
 
     private static final String SSRF_TEST = "http://ssrf-redirects.testssandbox.com/ssrf-test";
     private static final String SSRF_TEST_DOMAIN = "http://ssrf-redirects.testssandbox.com/ssrf-test-domain";
     private static final String SSRF_TEST_TWICE = "http://ssrf-redirects.testssandbox.com/ssrf-test-twice";
-    private static final String SSRF_TEST_DOMAIN_TWICE = "http://ssrf-redirects.testssandbox.com/ssrf-test-domain-twice";
-    private static final String CROSS_DOMAIN_TEST = "http://firewallssrfredirects-env-2.eba-7ifve22q.eu-north-1.elasticbeanstalk.com/ssrf-test";
-    private static final String CROSS_DOMAIN_TEST_DOMAIN_TWICE = "http://firewallssrfredirects-env-2.eba-7ifve22q.eu-north-1.elasticbeanstalk.com/ssrf-test-domain-twice";
+    private static final String SSRF_TEST_DOMAIN_TWICE =
+            "http://ssrf-redirects.testssandbox.com/ssrf-test-domain-twice";
+    private static final String CROSS_DOMAIN_TEST =
+            "http://firewallssrfredirects-env-2.eba-7ifve22q.eu-north-1.elasticbeanstalk.com/ssrf-test";
+    private static final String CROSS_DOMAIN_TEST_DOMAIN_TWICE =
+            "http://firewallssrfredirects-env-2.eba-7ifve22q.eu-north-1.elasticbeanstalk.com/ssrf-test-domain-twice";
 
     @BeforeAll
     static void cleanup() {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @AfterAll
     static void afterAll() {
         cleanup();

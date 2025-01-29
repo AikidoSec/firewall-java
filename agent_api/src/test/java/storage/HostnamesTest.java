@@ -1,10 +1,10 @@
 package storage;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.storage.Hostnames;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class HostnamesTest {
     private Hostnames hostnames;
@@ -44,11 +44,11 @@ public class HostnamesTest {
     @Test
     public void testAddDuplicateHostname() {
         hostnames.add("example.com", 80);
-        hostnames.add("example.com", 80);  // Should not change the port
+        hostnames.add("example.com", 80); // Should not change the port
 
         Hostnames.HostnameEntry[] entries = hostnames.asArray();
         assertEquals(1, entries.length);
-        assertEquals(2, entries[0].getHits());  // Hits should increment
+        assertEquals(2, entries[0].getHits()); // Hits should increment
     }
 
     @Test
@@ -56,7 +56,7 @@ public class HostnamesTest {
         hostnames.add("example.com", 80);
         hostnames.add("test.com", 443);
         hostnames.add("localhost", 3000);
-        hostnames.add("newsite.com", 8080);  // This should remove "example.com"
+        hostnames.add("newsite.com", 8080); // This should remove "example.com"
 
         Hostnames.HostnameEntry[] entries = hostnames.asArray();
         assertEquals(3, entries.length);
@@ -83,7 +83,7 @@ public class HostnamesTest {
 
     @Test
     public void testAddNonePort() {
-        hostnames.add("example.com", 0);  // Using 0 to represent None
+        hostnames.add("example.com", 0); // Using 0 to represent None
         Hostnames.HostnameEntry[] entries = hostnames.asArray();
         assertEquals(1, entries.length);
         assertEquals("example.com", entries[0].getHostname());
@@ -96,7 +96,7 @@ public class HostnamesTest {
         hostnames.add("example.com", 80);
         hostnames.add("example.com", 443);
         hostnames.add("test.com", 8080);
-        hostnames.add("newsite.com", 3000);  // This should remove "example.com:80"
+        hostnames.add("newsite.com", 3000); // This should remove "example.com:80"
 
         Hostnames.HostnameEntry[] entries = hostnames.asArray();
         assertEquals(3, entries.length);

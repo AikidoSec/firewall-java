@@ -1,5 +1,9 @@
 package background.cloud;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
@@ -13,15 +17,10 @@ import dev.aikido.agent_api.ratelimiting.RateLimiter;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.Routes;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 class CloudConnectionManagerTest {
 
@@ -37,7 +36,8 @@ class CloudConnectionManagerTest {
     @Test
     void testOnStartReportsEvent() {
         // Arrange
-        when(mockApi.report(anyString(), any(APIEvent.class), anyInt())).thenReturn(Optional.of(mock(APIResponse.class)));
+        when(mockApi.report(anyString(), any(APIEvent.class), anyInt()))
+                .thenReturn(Optional.of(mock(APIResponse.class)));
 
         // Act
         cloudConnectionManager.onStart();
@@ -135,7 +135,6 @@ class CloudConnectionManagerTest {
         // Assert
         assertNotNull(hostnames);
     }
-
 
     @Test
     void testGetApi() {

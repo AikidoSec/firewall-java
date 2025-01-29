@@ -1,20 +1,20 @@
 package background.cloud;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.junitpioneer.jupiter.StdIo;
 import org.junitpioneer.jupiter.StdOut;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "trace")
 public class ReportingAPITest {
     ReportingApiHTTP api;
+
     @BeforeEach
     public void setup() {
         api = new ReportingApiHTTP("http://localhost:5000/");
@@ -27,6 +27,7 @@ public class ReportingAPITest {
         assertTrue(res.get().block());
         assertEquals(1, res.get().endpoints().size());
     }
+
     @Test
     @StdIo
     public void testFetchNewConfigInvalidEndpoint(StdOut out) {
@@ -34,9 +35,10 @@ public class ReportingAPITest {
         Optional<APIResponse> res = api.fetchNewConfig("token", 2);
         assertEquals(Optional.empty(), res);
         assertTrue(
-                out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Error while fetching new config from cloud"),
-                "Failed, string not in " + out.capturedString()
-        );
+                out.capturedString()
+                        .contains(
+                                "DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Error while fetching new config from cloud"),
+                "Failed, string not in " + out.capturedString());
     }
 
     @Test
@@ -52,10 +54,12 @@ public class ReportingAPITest {
         Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");
         assertEquals(Optional.empty(), res);
         assertTrue(
-                out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Failed to fetch blocked lists"),
-                "Failed, string not in " + out.capturedString()
-        );
+                out.capturedString()
+                        .contains(
+                                "DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Failed to fetch blocked lists"),
+                "Failed, string not in " + out.capturedString());
     }
+
     @Test
     public void testListsResponse() {
         Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");
@@ -66,5 +70,4 @@ public class ReportingAPITest {
         assertEquals("1.2.3.4", res.get().blockedIPAddresses().get(0).ips().get(0));
         assertEquals("AI2Bot|Bytespider", res.get().blockedUserAgents());
     }
-
 }

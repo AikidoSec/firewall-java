@@ -4,7 +4,6 @@ import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
-
 import java.util.Optional;
 
 public class ApiDiscoveryCommand extends Command<ApiDiscoveryCommand.Req, Command.EmptyResult> {
@@ -16,7 +15,9 @@ public class ApiDiscoveryCommand extends Command<ApiDiscoveryCommand.Req, Comman
     }
 
     @Override
-    public String getName() { return "API_DISCOVERY"; }
+    public String getName() {
+        return "API_DISCOVERY";
+    }
 
     @Override
     public Class<Req> getInputClass() {

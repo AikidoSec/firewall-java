@@ -1,7 +1,6 @@
 package dev.aikido.agent_api.background.cloud.api;
 
 import dev.aikido.agent_api.background.Endpoint;
-
 import java.util.List;
 
 public record APIResponse(
@@ -12,6 +11,4 @@ public record APIResponse(
         List<String> blockedUserIds,
         List<String> allowedIPAddresses,
         boolean receivedAnyStats,
-        boolean block
-) {
-}
+        boolean block) {}

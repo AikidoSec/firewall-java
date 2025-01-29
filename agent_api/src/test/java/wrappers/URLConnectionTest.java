@@ -1,21 +1,20 @@
 package wrappers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class URLConnectionTest {
     @BeforeAll
@@ -23,6 +22,7 @@ public class URLConnectionTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @AfterAll
     static void afterAll() {
         cleanup();
@@ -40,7 +40,8 @@ public class URLConnectionTest {
         setContextAndLifecycle("");
 
         URLConnection urlConnection = new URL("http://localhost:8080").openConnection();
-        Hostnames.HostnameEntry[] hostnameArray = ThreadCache.get().getHostnames().asArray();
+        Hostnames.HostnameEntry[] hostnameArray =
+                ThreadCache.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);
         assertEquals(8080, hostnameArray[0].getPort());
         assertEquals("localhost", hostnameArray[0].getHostname());
@@ -53,7 +54,8 @@ public class URLConnectionTest {
         setContextAndLifecycle("");
 
         URLConnection urlConnection = new URL("http://app.local.aikido.io").openConnection();
-        Hostnames.HostnameEntry[] hostnameArray = ThreadCache.get().getHostnames().asArray();
+        Hostnames.HostnameEntry[] hostnameArray =
+                ThreadCache.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);
         assertEquals(80, hostnameArray[0].getPort());
         assertEquals("app.local.aikido.io", hostnameArray[0].getHostname());
@@ -64,7 +66,8 @@ public class URLConnectionTest {
     @Test
     public void testNewUrlConnectionWithHttpAsHttp() throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://app.local.aikido.io").openConnection();
-        Hostnames.HostnameEntry[] hostnameArray = ThreadCache.get().getHostnames().asArray();
+        Hostnames.HostnameEntry[] hostnameArray =
+                ThreadCache.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);
         assertEquals(80, hostnameArray[0].getPort());
         assertEquals("app.local.aikido.io", hostnameArray[0].getHostname());
@@ -77,7 +80,8 @@ public class URLConnectionTest {
         setContextAndLifecycle("");
 
         URLConnection urlConnection = new URL("https://aikido.dev").openConnection();
-        Hostnames.HostnameEntry[] hostnameArray = ThreadCache.get().getHostnames().asArray();
+        Hostnames.HostnameEntry[] hostnameArray =
+                ThreadCache.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);
         assertEquals(443, hostnameArray[0].getPort());
         assertEquals("aikido.dev", hostnameArray[0].getHostname());
@@ -90,7 +94,8 @@ public class URLConnectionTest {
         setContextAndLifecycle("");
 
         URLConnection urlConnection = new URL("ftp://localhost:8080").openConnection();
-        Hostnames.HostnameEntry[] hostnameArray = ThreadCache.get().getHostnames().asArray();
+        Hostnames.HostnameEntry[] hostnameArray =
+                ThreadCache.get().getHostnames().asArray();
         assertEquals(0, hostnameArray.length);
     }
 }

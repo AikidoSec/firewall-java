@@ -1,12 +1,11 @@
 package vulnerabilities.ssrf;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dev.aikido.agent_api.vulnerabilities.ssrf.imds.BlockList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BlockListTest {
 
@@ -27,9 +26,11 @@ class BlockListTest {
     @Test
     void testAddIPv6Address() {
         blockList.addAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "ipv6");
-        assertTrue(blockList.check("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "ipv6"), "IPv6 address should be blocked");
-        assertTrue(blockList.check("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "unknown"), "IPv6 address should be blocked");
-
+        assertTrue(
+                blockList.check("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "ipv6"), "IPv6 address should be blocked");
+        assertTrue(
+                blockList.check("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "unknown"),
+                "IPv6 address should be blocked");
     }
 
     @Test
@@ -61,7 +62,9 @@ class BlockListTest {
     @Test
     void testCheckUnblockedIPv6Address() {
         blockList.addAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "ipv6");
-        assertFalse(blockList.check("2001:0db8:85a3:0000:0000:8a2e:0370:7335", "ipv6"), "IPv6 address should not be blocked");
+        assertFalse(
+                blockList.check("2001:0db8:85a3:0000:0000:8a2e:0370:7335", "ipv6"),
+                "IPv6 address should not be blocked");
     }
 
     @Test
@@ -87,7 +90,9 @@ class BlockListTest {
     void testAddDuplicateIPv6Address() {
         blockList.addAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "ipv6");
         blockList.addAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "ipv6"); // Adding duplicate
-        assertTrue(blockList.check("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "ipv6"), "IPv6 address should still be blocked");
+        assertTrue(
+                blockList.check("2001:0db8:85a3:0000:0000:8a2e:0370:7334", "ipv6"),
+                "IPv6 address should still be blocked");
     }
 
     @Test

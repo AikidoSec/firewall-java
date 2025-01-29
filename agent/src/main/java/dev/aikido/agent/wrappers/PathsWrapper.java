@@ -1,8 +1,6 @@
 package dev.aikido.agent.wrappers;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.matcher.ElementMatcher;
+
+import static net.bytebuddy.matcher.ElementMatchers.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,8 +8,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
-
-import static net.bytebuddy.matcher.ElementMatchers.*;
+import net.bytebuddy.asm.Advice;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.matcher.ElementMatcher;
 
 /**
  * This class wraps the static get() function of Paths, this function is used
@@ -23,8 +23,11 @@ public class PathsWrapper implements Wrapper {
     public String getName() {
         return GetFunctionAdvice.class.getName();
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return isDeclaredBy(nameContains("java.nio.file.Paths")).and(named("get")).and(takesArgument(0, String.class));
+        return isDeclaredBy(nameContains("java.nio.file.Paths"))
+                .and(named("get"))
+                .and(takesArgument(0, String.class));
     }
 
     @Override
@@ -38,15 +41,15 @@ public class PathsWrapper implements Wrapper {
         // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodEnter
         public static void before(
-                @Advice.Argument(0) String argument1,
-                @Advice.Argument(value = 1, optional = true) String[] argument2
-            ) throws Throwable {
+                @Advice.Argument(0) String argument1, @Advice.Argument(value = 1, optional = true) String[] argument2)
+                throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
-                URL[] urls = { new URL(jarFilePath) };
+                URL[] urls = {new URL(jarFilePath)};
                 classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
+            } catch (MalformedURLException ignored) {
+            }
             if (classLoader == null) {
                 return;
             }
@@ -64,11 +67,15 @@ public class PathsWrapper implements Wrapper {
                     reportMethod.invoke(null, argument2, "java.nio.file.Paths.get");
                 }
             } catch (InvocationTargetException invocationTargetException) {
-                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                if (invocationTargetException
+                        .getCause()
+                        .toString()
+                        .startsWith("dev.aikido.agent_api.vulnerabilities")) {
                     throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            } catch(Throwable e) {}
+            } catch (Throwable e) {
+            }
             classLoader.close(); // Close the class loader
         }
     }

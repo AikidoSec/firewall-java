@@ -1,17 +1,15 @@
 package background;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.helpers.env.Token;
+import java.util.concurrent.BlockingQueue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.BlockingQueue;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class BackgroundProcessTest {
 

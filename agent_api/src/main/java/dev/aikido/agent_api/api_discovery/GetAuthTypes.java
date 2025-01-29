@@ -1,22 +1,20 @@
 package dev.aikido.agent_api.api_discovery;
 
-import dev.aikido.agent_api.context.ContextObject;
+import static dev.aikido.agent_api.helpers.patterns.HttpAuthScheme.isHttpAuthScheme;
 
+import dev.aikido.agent_api.context.ContextObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static dev.aikido.agent_api.helpers.patterns.HttpAuthScheme.isHttpAuthScheme;
-
 public final class GetAuthTypes {
     private GetAuthTypes() {}
-    private static final String[] COMMON_API_KEY_HEADER_NAMES = {
-            "x-api-key", "api-key", "apikey", "x-token", "token"
-    };
+
+    private static final String[] COMMON_API_KEY_HEADER_NAMES = {"x-api-key", "api-key", "apikey", "x-token", "token"};
     private static final String[] COMMON_AUTH_COOKIE_NAMES = {
-            "auth", "session", "jwt",
-            "token", "sid", "connect.sid",
-            "auth_token", "access_token", "refresh_token"
+        "auth", "session", "jwt",
+        "token", "sid", "connect.sid",
+        "auth_token", "access_token", "refresh_token"
     };
 
     public static List<Map<String, String>> getAuthTypes(ContextObject context) {
@@ -52,6 +50,7 @@ public final class GetAuthTypes {
         // Default to apiKey if the auth type is not recognized
         return Map.of("type", "apiKey", "in", "header", "name", "Authorization");
     }
+
     private static List<Map<String, String>> findApiKeys(ContextObject context) {
         List<Map<String, String>> result = new ArrayList<>();
 

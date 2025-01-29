@@ -1,13 +1,12 @@
 package context;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.context.JavalinContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class JavalinContextObjectTest {
 
@@ -42,18 +41,22 @@ class JavalinContextObjectTest {
 
     @Test
     void testSetParams() {
-        Object params = new HashMap<String, String>() {{
-            put("key", "value");
-        }};
+        Object params = new HashMap<String, String>() {
+            {
+                put("key", "value");
+            }
+        };
         contextObject.setParams(params);
         assertEquals(params, contextObject.getParams());
     }
 
     @Test
     void testSetBody() {
-        Object body = new HashMap<String, String>() {{
-            put("field", "data");
-        }};
+        Object body = new HashMap<String, String>() {
+            {
+                put("field", "data");
+            }
+        };
         contextObject.setBody(body);
         assertEquals(body, contextObject.getBody());
     }
@@ -103,7 +106,8 @@ class JavalinContextObjectTest {
         Map<String, String> cookies = new HashMap<>();
         cookies.put("sessionId", "abc123");
         cookies.put("userId", "user456");
-        contextObject = new JavalinContextObject("GET", "http://example.com", "192.168.1.1", new HashMap<>(), cookies, new HashMap<>());
+        contextObject = new JavalinContextObject(
+                "GET", "http://example.com", "192.168.1.1", new HashMap<>(), cookies, new HashMap<>());
 
         assertEquals("abc123", contextObject.getCookies().get("sessionId").get(0));
         assertEquals("user456", contextObject.getCookies().get("userId").get(0));

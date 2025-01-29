@@ -1,18 +1,18 @@
 package wrappers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 import utils.EmptySampleContextObject;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class RestTemplateTest {
 
@@ -41,23 +41,17 @@ public class RestTemplateTest {
         RuntimeException exception1 = assertThrows(RuntimeException.class, () -> {
             fetchResponse("http://localhost:5000/api/test");
         });
-        assertEquals(
-                "Aikido Zen has blocked a server-side request forgery",
-                exception1.getMessage());
+        assertEquals("Aikido Zen has blocked a server-side request forgery", exception1.getMessage());
 
         RuntimeException exception2 = assertThrows(RuntimeException.class, () -> {
             fetchResponse("http://localhost:5000");
         });
-        assertEquals(
-                "Aikido Zen has blocked a server-side request forgery",
-                exception2.getMessage());
+        assertEquals("Aikido Zen has blocked a server-side request forgery", exception2.getMessage());
 
         RuntimeException exception3 = assertThrows(RuntimeException.class, () -> {
             fetchResponse("https://localhost:5000/api/test");
         });
-        assertEquals(
-                "Aikido Zen has blocked a server-side request forgery",
-                exception3.getMessage());
+        assertEquals("Aikido Zen has blocked a server-side request forgery", exception3.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -96,6 +90,5 @@ public class RestTemplateTest {
     private void fetchResponse(String urlString) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getForObject(urlString, String.class);
-
     }
 }

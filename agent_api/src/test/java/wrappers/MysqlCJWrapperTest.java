@@ -1,19 +1,18 @@
 package wrappers;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
+import java.sql.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
-
-import java.sql.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class MysqlCJWrapperTest {
     private Connection connection;

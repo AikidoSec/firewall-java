@@ -5,10 +5,10 @@ import java.util.List;
 
 public final class DangerousShellChars {
     private DangerousShellChars() {}
+
     private static final List<String> DANGEROUS_CHARS = Arrays.asList(
-            "#", "!", "\"", "$", "&", "'", "(", ")", "*", ";", "<", "=", ">", "?",
-            "[", "\\", "]", "^", "`", "{", "|", "}", " ", "\n", "\t", "~"
-    );
+            "#", "!", "\"", "$", "&", "'", "(", ")", "*", ";", "<", "=", ">", "?", "[", "\\", "]", "^", "`", "{", "|",
+            "}", " ", "\n", "\t", "~");
 
     public static boolean containDangerousCharacter(String userInput) {
         return DANGEROUS_CHARS.stream().anyMatch(userInput::contains);

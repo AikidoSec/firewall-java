@@ -1,9 +1,6 @@
 package dev.aikido.agent.wrappers;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.matcher.ElementMatcher;
-import net.bytebuddy.matcher.ElementMatchers;
+
+import static net.bytebuddy.matcher.ElementMatchers.*;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -11,8 +8,11 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-
-import static net.bytebuddy.matcher.ElementMatchers.*;
+import net.bytebuddy.asm.Advice;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.matcher.ElementMatchers;
 
 public class FileWrapper implements Wrapper {
     public String getName() {
@@ -20,6 +20,7 @@ public class FileWrapper implements Wrapper {
         // https://docs.oracle.com/javase/8/docs/api/java/io/File.html
         return FileAdvice.class.getName();
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return isDeclaredBy(isSubTypeOf(File.class)).and(isConstructor()).and(takesArgument(0, String.class));
     }
@@ -34,15 +35,15 @@ public class FileWrapper implements Wrapper {
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodEnter
-        public static void before(
-                @Advice.Argument(0) Object argument
-        ) throws Throwable {
+        public static void before(@Advice.Argument(0) Object argument) throws Throwable {
             try {
                 String prop = System.getProperty("AIK_INTERNAL_coverage_run");
                 if (prop != null && prop.equals("1")) {
                     return;
                 }
-                if (Thread.currentThread().getClass().toString()
+                if (Thread.currentThread()
+                        .getClass()
+                        .toString()
                         .equals("class dev.aikido.agent_api.background.BackgroundProcess")) {
                     return; // Do not wrap File calls in background process.
                 }
@@ -69,7 +70,10 @@ public class FileWrapper implements Wrapper {
                 reportMethod.invoke(null, argument, "java.io.File");
                 classLoader.close(); // Close the class loader
             } catch (InvocationTargetException invocationTargetException) {
-                if (invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                if (invocationTargetException
+                        .getCause()
+                        .toString()
+                        .startsWith("dev.aikido.agent_api.vulnerabilities")) {
                     throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.

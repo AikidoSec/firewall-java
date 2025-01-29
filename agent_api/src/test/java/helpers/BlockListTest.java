@@ -1,10 +1,10 @@
 package helpers;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.helpers.net.BlockList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class BlockListTest {
     private BlockList blocklist;

@@ -1,14 +1,15 @@
 package dev.aikido.agent;
 
+import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
+
 import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
-import static dev.aikido.agent.helpers.AgentArgumentParser.parseAgentArgs;
-
 public final class DaemonStarter {
     private DaemonStarter() {}
+
     private static final Logger logger = LogManager.getLogger(DaemonStarter.class);
 
     public static void startDaemon(String agentArgs) {
@@ -30,6 +31,7 @@ public final class DaemonStarter {
         DAEMON_DISABLED,
         DAEMON_ENABLED
     }
+
     private static DAEMON_MODE getDaemonMode(String agentArgs) {
         if (parseAgentArgs(agentArgs).containsKey("mode")) {
             String mode = parseAgentArgs(agentArgs).get("mode");

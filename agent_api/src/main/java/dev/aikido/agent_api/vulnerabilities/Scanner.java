@@ -1,24 +1,26 @@
 package dev.aikido.agent_api.vulnerabilities;
 
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
+import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
+import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
+import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
+
 import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
-
 import java.util.Map;
 import java.util.Optional;
 
-import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
-import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
-import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
-import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
-
 public final class Scanner {
     private Scanner() {}
+
     private static final Logger logger = LogManager.getLogger(Scanner.class);
-    public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
+
+    public static void scanForGivenVulnerability(
+            Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
         Detector detector = vulnerability.getDetector();
         if (detector.returnEarly(arguments)) {
             return; // If input is in no way dangerous, do not loop oer user input
@@ -44,11 +46,16 @@ public final class Scanner {
                     exception = Optional.of(detectorResult.getException());
                     // Report attack :
                     reportAttack(
-                        new Attack(
-                                operation, vulnerability, source,
-                                path, detectorResult.getMetadata(), userInput,
-                                getCurrentStackTrace(), ctx.getUser()), ctx
-                    );
+                            new Attack(
+                                    operation,
+                                    vulnerability,
+                                    source,
+                                    path,
+                                    detectorResult.getMetadata(),
+                                    userInput,
+                                    getCurrentStackTrace(),
+                                    ctx.getUser()),
+                            ctx);
                     break;
                 }
             }
@@ -60,6 +67,7 @@ public final class Scanner {
             throw exception.get();
         }
     }
+
     public static void reportAttack(Attack attack, ContextObject ctx) {
         logger.debug("Attack detected: %s", attack);
         ThreadIPCClient client = getDefaultThreadIPCClient();

@@ -1,18 +1,17 @@
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
+import java.io.IOException;
+import java.sql.*;
+import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.junitpioneer.jupiter.StdIo;
 import org.junitpioneer.jupiter.StdOut;
-
-import java.io.IOException;
-import java.sql.*;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 @SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "trace")
 @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -36,7 +35,9 @@ public class SetUserTest {
     public static void clean() {
         Context.set(null);
         ThreadCache.set(null);
-    };
+    }
+    ;
+
     @BeforeEach
     public void setUp() throws SQLException {
         ThreadCache.set(getEmptyThreadCacheObject());
@@ -56,12 +57,14 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
         assertTrue(out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
     }
+
     @Test
     @StdIo
     public void testIndependenceFromThreadCacheNull(StdOut out) throws SQLException, IOException {
         // Test with thread cache set to null:
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertFalse(out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
+        assertFalse(
+                out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
     }
 
     @Test
@@ -72,6 +75,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("", "Name"));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers2(StdOut out) throws SQLException {
@@ -79,6 +83,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("ID", ""));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers3(StdOut out) throws SQLException {
@@ -86,6 +91,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("", ""));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers4(StdOut out) throws SQLException {
@@ -93,6 +99,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject(null, ""));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers5(StdOut out) throws SQLException {
@@ -100,6 +107,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject(null, null));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers6(StdOut out) throws SQLException {
@@ -107,12 +115,14 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("ID", null));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidUser(StdOut out) throws SQLException {
         // Test with valid user :
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
-        assertFalse(out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
+        assertFalse(
+                out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
     }
 
     @Test
@@ -126,6 +136,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("ID", null));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testWithContextSetButNotExecutedMiddleware(StdOut out) throws SQLException {

@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 
 public class ByteArrayHelper {
     private ByteArrayHelper() {}
+
     public record CommandData(String command, byte[] data) {}
 
     public static CommandData splitByteArray(byte[] byteArray, byte separator) {
@@ -29,6 +30,7 @@ public class ByteArrayHelper {
 
         return new CommandData(command, data);
     }
+
     public static byte[] joinByteArrays(byte[] array1, byte[] array2) {
         byte[] joinedArray = new byte[array1.length + array2.length];
 

@@ -1,27 +1,26 @@
 package dev.aikido.agent.wrappers;
 
+import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
+import static net.bytebuddy.matcher.ElementMatchers.nameContains;
+
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.SpringMVCContextObject;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.lang.reflect.Executable;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import jakarta.servlet.http.HttpServletRequest;
-import dev.aikido.agent_api.helpers.logging.LogManager;
-import dev.aikido.agent_api.helpers.logging.Logger;
-
-import java.lang.reflect.Executable;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
-import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class SpringMVCWrapper implements Wrapper {
     public static final Logger logger = LogManager.getLogger(SpringMVCWrapper.class);
@@ -31,9 +30,11 @@ public class SpringMVCWrapper implements Wrapper {
         // We wrap the function doFilterInternal which gets called with
         // HttpServletRequest request, HttpServletResponse response
         // And is part of org.springframework.web.filter.RequestContextFilter
-        // See: https://github.com/spring-projects/spring-framework/blob/4749d810db0261ce16ae5f32da6d375bb8087430/spring-web/src/main/java/org/springframework/web/filter/RequestContextFilter.java#L92
+        // See:
+        // https://github.com/spring-projects/spring-framework/blob/4749d810db0261ce16ae5f32da6d375bb8087430/spring-web/src/main/java/org/springframework/web/filter/RequestContextFilter.java#L92
         return SpringMVCAdvice.class.getName();
     }
+
     @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.nameContainsIgnoreCase("doFilterInternal");
@@ -46,7 +47,8 @@ public class SpringMVCWrapper implements Wrapper {
 
     public static class SpringMVCAdvice {
         // Wrapper to skip if it's inside this wrapper (i.e. our own response : )
-        public record SkipOnWrapper(HttpServletResponse response) {};
+        public record SkipOnWrapper(HttpServletResponse response) {}
+        ;
         /**
          * @return the first value of Object is used as a boolean, if it's true code will
          * not execute (skip execution). The second value is the servlet request.
@@ -55,7 +57,8 @@ public class SpringMVCWrapper implements Wrapper {
         public static Object interceptOnEnter(
                 @Advice.Origin Executable method,
                 @Advice.Argument(value = 0, typing = DYNAMIC, optional = true) HttpServletRequest request,
-                @Advice.Argument(value = 1, typing = DYNAMIC, optional = true) HttpServletResponse response) throws Throwable {
+                @Advice.Argument(value = 1, typing = DYNAMIC, optional = true) HttpServletResponse response)
+                throws Throwable {
             if (request == null) {
                 return response;
             }
@@ -77,9 +80,12 @@ public class SpringMVCWrapper implements Wrapper {
             }
 
             ContextObject contextObject = new SpringMVCContextObject(
-                    request.getMethod(), request.getRequestURL(), request.getRemoteAddr(),
-                    request.getParameterMap(), cookiesMap, headersMap
-            );
+                    request.getMethod(),
+                    request.getRequestURL(),
+                    request.getRemoteAddr(),
+                    request.getParameterMap(),
+                    cookiesMap,
+                    headersMap);
 
             // Write a new response:
             WebRequestCollector.Res res = WebRequestCollector.report(contextObject);

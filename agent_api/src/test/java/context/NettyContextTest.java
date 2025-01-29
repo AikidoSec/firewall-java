@@ -1,16 +1,15 @@
 package context;
 
-import dev.aikido.agent_api.context.NettyContext;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
+import dev.aikido.agent_api.context.NettyContext;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class NettyContextTest {
 
@@ -51,7 +50,6 @@ class NettyContextTest {
         assertNotNull(context.getRedirectStartNodes());
         assertTrue(context.getRedirectStartNodes().isEmpty());
     }
-
 
     @Test
     void testRemoteAddressExtraction() {

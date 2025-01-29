@@ -39,7 +39,8 @@ public final class IPAddress {
                     }
                 }
             }
-        } catch (SocketException ignored) {}
+        } catch (SocketException ignored) {
+        }
         return "0.0.0.0";
     }
 }

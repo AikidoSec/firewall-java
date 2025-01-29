@@ -1,13 +1,12 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
-import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
-
-import java.net.URL;
-
 import static dev.aikido.agent_api.helpers.url.PortParser.getPortFromURL;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.FindHostnameInContext.findHostnameInContext;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.RedirectOriginFinder.getRedirectOrigin;
+
+import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.context.ContextObject;
+import java.net.URL;
 
 public final class PrivateIPRedirectFinder {
     private PrivateIPRedirectFinder() {}

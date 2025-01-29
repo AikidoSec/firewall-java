@@ -1,11 +1,11 @@
 package api_discovery;
 
-import org.junit.jupiter.api.Test;
-import java.util.*;
-
 import static dev.aikido.agent_api.api_discovery.AuthTypeMerger.mergeAuthTypes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.*;
+import org.junit.jupiter.api.Test;
 
 public class AuthTypeMergerTest {
 

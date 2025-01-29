@@ -1,18 +1,17 @@
 package wrappers;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class PathWrapperTest {
     @AfterEach
@@ -20,11 +19,13 @@ public class PathWrapperTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @BeforeEach
     void clearThreadCache() {
         cleanup();
         ThreadCache.set(getEmptyThreadCacheObject());
     }
+
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
@@ -41,7 +42,7 @@ public class PathWrapperTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             myPath.resolve("../opt/");
         });
-        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+        assertEquals("Aikido Zen has blocked Path Traversal", exception.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -59,7 +60,7 @@ public class PathWrapperTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             basePath.resolve(maliciousPath);
         });
-        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+        assertEquals("Aikido Zen has blocked Path Traversal", exception.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -74,7 +75,7 @@ public class PathWrapperTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             myPath.resolveSibling("../opt/");
         });
-        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+        assertEquals("Aikido Zen has blocked Path Traversal", exception.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -92,7 +93,7 @@ public class PathWrapperTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             basePath.resolveSibling(maliciousPath);
         });
-        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+        assertEquals("Aikido Zen has blocked Path Traversal", exception.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -110,6 +111,6 @@ public class PathWrapperTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             basePath.relativize(maliciousPath);
         });
-        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+        assertEquals("Aikido Zen has blocked Path Traversal", exception.getMessage());
     }
 }

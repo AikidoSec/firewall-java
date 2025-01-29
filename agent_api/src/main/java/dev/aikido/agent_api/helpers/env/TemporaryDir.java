@@ -4,6 +4,7 @@ import java.nio.file.Path;
 
 public final class TemporaryDir {
     private TemporaryDir() {}
+
     public static String getTemporaryDir() {
         // Read out environment variable :
         String tempDirEnv = System.getenv("AIKIDO_TMP_DIR");
@@ -11,9 +12,6 @@ public final class TemporaryDir {
             return tempDirEnv;
         }
         // Default :
-        return Path
-            .of(System.getProperty("user.home"))
-            .resolve(".tmp")
-            .toString();
+        return Path.of(System.getProperty("user.home")).resolve(".tmp").toString();
     }
 }

@@ -1,13 +1,10 @@
 package collectors;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.collectors.FileCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.vulnerabilities.AikidoException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
-import utils.EmptySampleContextObject;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,8 +12,10 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import utils.EmptySampleContextObject;
 
 public class FileCollectorTest {
     public static Path filePath1 = Paths.get("/../../test.txt");
@@ -56,12 +55,12 @@ public class FileCollectorTest {
     @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testStringArrays() {
-        isPathTraversalAttack(new String[]{"/etc/home/../../test.txt.js"});
-        isNotPathTraversalAttack(new String[]{"/etc/home/./../test.txt.js", "test.txt.js", "/etc/home"});
-        isPathTraversalAttack(new String[]{"unrelated", "/etc/home/../../../test.txt.js", "nottest"});
-        isNotPathTraversalAttack(new String[]{"/etc/home/../../folder/../test.txt.js"});
-        isPathTraversalAttack(new String[]{"a", "b", "c", "d", "e", "/../../test.txt"});
-        isNotPathTraversalAttack(new String[]{"/test.txt"});
+        isPathTraversalAttack(new String[] {"/etc/home/../../test.txt.js"});
+        isNotPathTraversalAttack(new String[] {"/etc/home/./../test.txt.js", "test.txt.js", "/etc/home"});
+        isPathTraversalAttack(new String[] {"unrelated", "/etc/home/../../../test.txt.js", "nottest"});
+        isNotPathTraversalAttack(new String[] {"/etc/home/../../folder/../test.txt.js"});
+        isPathTraversalAttack(new String[] {"a", "b", "c", "d", "e", "/../../test.txt"});
+        isNotPathTraversalAttack(new String[] {"/test.txt"});
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
@@ -89,7 +88,6 @@ public class FileCollectorTest {
         isNotPathTraversalAttack(new EmptySampleContextObject("/../../test.txt"));
     }
 
-
     public void isPathTraversalAttack(Object filePath) {
         Exception exception = assertThrows(AikidoException.class, () -> {
             FileCollector.report(filePath, "testOp");
@@ -107,22 +105,10 @@ public class FileCollectorTest {
     @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testMaxRecursion() {
-        isPathTraversalAttack(new Object[]{new Object[]{"/etc/home/../../test.txt.js"}}); // Depth of 1
-        isPathTraversalAttack(
-            new Object[]{
-                new Object[]{
-                    new Object[]{"/etc/home/../../test.txt.js"}
-                }
-            }
-        ); // Depth of
+        isPathTraversalAttack(new Object[] {new Object[] {"/etc/home/../../test.txt.js"}}); // Depth of 1
+        isPathTraversalAttack(new Object[] {new Object[] {new Object[] {"/etc/home/../../test.txt.js"}}}); // Depth of
         isNotPathTraversalAttack(
-            new Object[]{
-                new Object[]{
-                    new Object[]{
-                        new Object[]{"/etc/home/../../test.txt.js"}
-                    }
-                }
-            }
-        ); // Depth of 3
+                new Object[] {new Object[] {new Object[] {new Object[] {"/etc/home/../../test.txt.js"}}}
+                }); // Depth of 3
     }
 }

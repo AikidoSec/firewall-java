@@ -1,14 +1,13 @@
 package vulnerabilities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
-import org.junit.jupiter.api.Test;
-
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class AttackTest {
 
@@ -39,8 +38,7 @@ public class AttackTest {
         assertEquals(user, attack.user);
         assertEquals(
                 "Attack{operation='SQL Injection', kind='sql_injection', source='User Input', pathToPayload='/api/vulnerable', metadata={userId=123}, payload='SELECT * FROM users WHERE id = 1', stack='Stack trace here', user=id}",
-                attack.toString()
-        );
+                attack.toString());
     }
 
     @Test
@@ -68,7 +66,6 @@ public class AttackTest {
         assertEquals(stack, attack.stack);
         assertEquals(
                 "Attack{operation='XSS Attack', kind='sql_injection', source='User Input', pathToPayload='/api/vulnerable', metadata={}, payload='<script>alert('XSS');</script>', stack='Stack trace here', user=123}",
-                attack.toString()
-        );
+                attack.toString());
     }
 }

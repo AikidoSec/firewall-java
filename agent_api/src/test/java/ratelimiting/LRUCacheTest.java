@@ -1,11 +1,10 @@
 package ratelimiting;
 
-import dev.aikido.agent_api.ratelimiting.LRUCache;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import dev.aikido.agent_api.ratelimiting.LRUCache;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class LRUCacheTest {
 
@@ -95,6 +94,6 @@ class LRUCacheTest {
 
         List<String> keys = cache.keys();
         assertEquals(3, keys.size());
-        assertArrayEquals(new String[]{"key1", "key2", "key3"}, keys.toArray(), "Keys should be retrieved correctly");
+        assertArrayEquals(new String[] {"key1", "key2", "key3"}, keys.toArray(), "Keys should be retrieved correctly");
     }
 }

@@ -6,12 +6,12 @@ import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
 import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
 import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
 import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
-
 import java.util.Arrays;
 import java.util.List;
 
 public final class Wrappers {
     private Wrappers() {}
+
     public static final List<Wrapper> WRAPPERS = Arrays.asList(
             new PostgresWrapper(),
             new SpringMVCWrapper(),
@@ -33,6 +33,5 @@ public final class Wrappers {
             new NettyWrapper(),
             new JavalinWrapper(),
             new JavalinDataWrapper(),
-            new JavalinContextClearWrapper()
-    );
+            new JavalinContextClearWrapper());
 }

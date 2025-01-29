@@ -1,12 +1,11 @@
 package helpers;
 
-import dev.aikido.agent_api.helpers.url.PortParser;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import dev.aikido.agent_api.helpers.url.PortParser;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class PortParserTest {
 

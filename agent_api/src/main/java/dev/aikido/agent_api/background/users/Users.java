@@ -1,11 +1,9 @@
 package dev.aikido.agent_api.background.users;
 
 import dev.aikido.agent_api.context.User;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * Class that holds users for the background process

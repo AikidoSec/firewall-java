@@ -1,15 +1,14 @@
 package dev.aikido.agent_api.background.ipc_commands;
 
+import static dev.aikido.agent_api.helpers.extraction.ByteArrayHelper.joinByteArrays;
+
 import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-
-import static dev.aikido.agent_api.helpers.extraction.ByteArrayHelper.joinByteArrays;
 
 /**
  * Command interface for IPC Commands
@@ -19,14 +18,19 @@ public abstract class Command<I, O> {
     private static final Logger logger = LogManager.getLogger(Command.class);
 
     public record EmptyResult() {}
+
     public abstract boolean returnsData();
+
     public abstract String getName();
+
     public abstract Class<I> getInputClass();
+
     public abstract Class<O> getOutputClass();
 
     public boolean matchesName(String command) {
         return this.getName().equalsIgnoreCase(command);
-    };
+    }
+    ;
 
     public abstract Optional<O> execute(I data, CloudConnectionManager connectionManager);
 
@@ -39,7 +43,7 @@ public abstract class Command<I, O> {
             byte[] identifier = (getName() + "$").getBytes(StandardCharsets.UTF_8);
             Optional<byte[]> response = threadClient.send(joinByteArrays(identifier, inputAsBytes), returnsData());
 
-            if(!response.isEmpty()) {
+            if (!response.isEmpty()) {
                 // Convert background process' response from byte[] JSON to the output object :
                 O data = gson.fromJson(new String(response.get(), StandardCharsets.UTF_8), getOutputClass());
                 return Optional.of(data);
@@ -48,5 +52,6 @@ public abstract class Command<I, O> {
             logger.trace(e);
         }
         return Optional.empty();
-    };
+    }
+    ;
 }

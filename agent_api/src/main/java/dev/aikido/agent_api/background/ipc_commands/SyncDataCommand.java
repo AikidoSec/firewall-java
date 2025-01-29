@@ -4,13 +4,18 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.storage.routes.Routes;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataCommand.Res> {
-    public record Res(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, ReportingApi.APIListsResponse blockedListsRes) {}
+    public record Res(
+            List<Endpoint> endpoints,
+            Set<String> blockedUserIDs,
+            Set<String> bypassedIPs,
+            Routes routes,
+            ReportingApi.APIListsResponse blockedListsRes) {}
+
     @Override
     public boolean returnsData() {
         // Returns JSON of SyncDataResult
@@ -18,7 +23,9 @@ public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataComman
     }
 
     @Override
-    public String getName() { return "SYNC_DATA"; }
+    public String getName() {
+        return "SYNC_DATA";
+    }
 
     @Override
     public Class<EmptyResult> getInputClass() {
@@ -39,7 +46,7 @@ public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataComman
     public Optional<Res> execute(EmptyResult data, CloudConnectionManager connectionManager) {
         List<Endpoint> endpoints = connectionManager.getConfig().getEndpoints();
         Set<String> blockedUserIDs = connectionManager.getConfig().getBlockedUserIDs();
-        Set <String> bypassedIPs = connectionManager.getConfig().getBypassedIPs();
+        Set<String> bypassedIPs = connectionManager.getConfig().getBypassedIPs();
         Routes routes = connectionManager.getRoutes();
         ReportingApi.APIListsResponse blockedListsRes = connectionManager.getConfig().blockedListsRes;
 

@@ -11,6 +11,7 @@ import static dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathPart
  */
 public final class PathTraversalEarlyReturn {
     private PathTraversalEarlyReturn() {}
+
     public static boolean shouldReturnEarly(String filePath) {
         if (containsUnsafePathParts(filePath)) {
             return false; // Should not return early: path contains dangerous parts, so inspect user input

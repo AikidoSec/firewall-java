@@ -20,8 +20,7 @@ public final class ByteBuddyInitializer {
                 new ByteBuddy()
                         .with(MethodGraph.Compiler.ForDeclaredMethods.INSTANCE)
                         .with(VisibilityBridgeStrategy.Default.NEVER)
-                        .with(InstrumentedType.Factory.Default.FROZEN)
-        );
+                        .with(InstrumentedType.Factory.Default.FROZEN));
 
         //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
         agentBuilder = agentBuilder.disableClassFormatChanges();
@@ -29,16 +28,14 @@ public final class ByteBuddyInitializer {
         // Disabling this would impair our ability to wrap Java's own classes :
         agentBuilder = agentBuilder.with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION);
         if (debugMode) {
-                agentBuilder = agentBuilder
+            agentBuilder = agentBuilder
                     .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
                     .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError());
         }
 
         // Ignore Byte Buddy and Aikido's internal code:
         agentBuilder = agentBuilder.ignore(
-                ElementMatchers.nameContains("bytebuddy")
-                .or(ElementMatchers.nameContains("dev.aikido.agent"))
-        );
+                ElementMatchers.nameContains("bytebuddy").or(ElementMatchers.nameContains("dev.aikido.agent")));
 
         agentBuilder = agentBuilder.with(AgentBuilder.TypeStrategy.Default.DECORATE);
 

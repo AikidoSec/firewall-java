@@ -1,19 +1,20 @@
 package dev.aikido.agent_api.collectors;
 
+import static dev.aikido.agent_api.helpers.IPAccessController.ipAllowedToAccessRoute;
+import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
+
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-
 import java.util.List;
-
-import static dev.aikido.agent_api.helpers.IPAccessController.ipAllowedToAccessRoute;
-import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
 
 public final class WebRequestCollector {
     private WebRequestCollector() {}
-    public record Res(String msg, Integer status) {};
+
+    public record Res(String msg, Integer status) {}
+    ;
 
     /**
      * This function gets called in the initial phases of a request.

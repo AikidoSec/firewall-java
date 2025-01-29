@@ -1,12 +1,11 @@
 package helpers;
 
-import dev.aikido.agent_api.helpers.patterns.LooksLikeJWT;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import dev.aikido.agent_api.helpers.patterns.LooksLikeJWT;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 public class LooksLikeJWTTest {
 
@@ -20,18 +19,20 @@ public class LooksLikeJWTTest {
         assertEquals(new LooksLikeJWT.Result(false, null), LooksLikeJWT.tryDecodeAsJwt("invalid"));
         assertEquals(new LooksLikeJWT.Result(false, null), LooksLikeJWT.tryDecodeAsJwt("invalid.invalid"));
         assertEquals(new LooksLikeJWT.Result(false, null), LooksLikeJWT.tryDecodeAsJwt("invalid.invalid.invalid"));
-        assertEquals(new LooksLikeJWT.Result(false, null), LooksLikeJWT.tryDecodeAsJwt("invalid.invalid.invalid.invalid"));
+        assertEquals(
+                new LooksLikeJWT.Result(false, null), LooksLikeJWT.tryDecodeAsJwt("invalid.invalid.invalid.invalid"));
     }
 
     @Test
     void testReturnsPayloadForInvalidJwt() {
         assertEquals(new LooksLikeJWT.Result(false, null), LooksLikeJWT.tryDecodeAsJwt("/;ping%20localhost;.e30=."));
-        assertEquals(new LooksLikeJWT.Result(false,  null), LooksLikeJWT.tryDecodeAsJwt("/;ping%20localhost;.W10=."));
+        assertEquals(new LooksLikeJWT.Result(false, null), LooksLikeJWT.tryDecodeAsJwt("/;ping%20localhost;.W10=."));
     }
 
     @Test
     void testReturnsDecodedJwtForValidJwt() {
-        String validJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcm5hbWUiOnsiJG5lIjpudWxsfSwiaWF0IjoxNTE2MjM5MDIyfQ._jhGJw9WzB6gHKPSozTFHDo9NOHs3CNOlvJ8rWy6VrQ";
+        String validJwt =
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcm5hbWUiOnsiJG5lIjpudWxsfSwiaWF0IjoxNTE2MjM5MDIyfQ._jhGJw9WzB6gHKPSozTFHDo9NOHs3CNOlvJ8rWy6VrQ";
         Map<String, Object> expectedPayload = new HashMap<>();
         expectedPayload.put("sub", "1234567890");
         Map<String, Object> usernameMap = new HashMap<>();
@@ -43,7 +44,8 @@ public class LooksLikeJWTTest {
 
     @Test
     void testReturnsDecodedJwtForValidJwtWithBearerPrefix() {
-        String validJwtWithBearer = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcm5hbWUiOnsiJG5lIjpudWxsfSwiaWF0IjoxNTE2MjM5MDIyfQ._jhGJw9WzB6gHKPSozTFHDo9NOHs3CNOlvJ8rWy6VrQ";
+        String validJwtWithBearer =
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcm5hbWUiOnsiJG5lIjpudWxsfSwiaWF0IjoxNTE2MjM5MDIyfQ._jhGJw9WzB6gHKPSozTFHDo9NOHs3CNOlvJ8rWy6VrQ";
         Map<String, Object> expectedPayload = new HashMap<>();
         expectedPayload.put("sub", "1234567890");
         Map<String, Object> usernameMap = new HashMap<>();

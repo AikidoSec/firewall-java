@@ -40,18 +40,26 @@ public class IPValidator {
     private static final Pattern IPv4AddressPattern = Pattern.compile(String.format("^%s$", IPv4AddressFormat));
 
     private static final String IPv6SegmentFormat = "(?:[0-9a-fA-F]{1,4})";
-    private static final Pattern IPv6AddressPattern = Pattern.compile(
-            "^(" +
-                    String.format("(?:(%s):){7}(?:(%s)|:)|", IPv6SegmentFormat, IPv6SegmentFormat) +
-                    String.format("(?:(%s):){6}(?:(%s)|(:%s)|:)|", IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat) +
-                    String.format("(?:(%s):){5}(?::%s|(:%s){1,2}|:)|", IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat) +
-                    String.format("(?:(%s):){4}(?:(:%s)?%s|(:%s){1,3}|:)|", IPv6SegmentFormat, IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat) +
-                    String.format("(?:(%s):){3}(?:(:%s){0,2}%s|(:%s){1,4}|:)|", IPv6SegmentFormat, IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat) +
-                    String.format("(?:(%s):){2}(?:(:%s){0,3}%s|(:%s){1,5}|:)|", IPv6SegmentFormat, IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat) +
-                    String.format("(?:(%s):){1}(?:(:%s){0,4}%s|(:%s){1,6}|:)|", IPv6SegmentFormat, IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat) +
-                    String.format("(?::((?::%s){0,5}:%s|(?::%s){1,7}|:))", IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat) +
-                    ")(%[0-9a-zA-Z-.:]{1,})?$"
-    );
+    private static final Pattern IPv6AddressPattern = Pattern.compile("^("
+            + String.format("(?:(%s):){7}(?:(%s)|:)|", IPv6SegmentFormat, IPv6SegmentFormat)
+            + String.format("(?:(%s):){6}(?:(%s)|(:%s)|:)|", IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat)
+            + String.format(
+                    "(?:(%s):){5}(?::%s|(:%s){1,2}|:)|", IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat)
+            + String.format(
+                    "(?:(%s):){4}(?:(:%s)?%s|(:%s){1,3}|:)|",
+                    IPv6SegmentFormat, IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat)
+            + String.format(
+                    "(?:(%s):){3}(?:(:%s){0,2}%s|(:%s){1,4}|:)|",
+                    IPv6SegmentFormat, IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat)
+            + String.format(
+                    "(?:(%s):){2}(?:(:%s){0,3}%s|(:%s){1,5}|:)|",
+                    IPv6SegmentFormat, IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat)
+            + String.format(
+                    "(?:(%s):){1}(?:(:%s){0,4}%s|(:%s){1,6}|:)|",
+                    IPv6SegmentFormat, IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat)
+            + String.format(
+                    "(?::((?::%s){0,5}:%s|(?::%s){1,7}|:))", IPv6SegmentFormat, IPv4AddressFormat, IPv6SegmentFormat)
+            + ")(%[0-9a-zA-Z-.:]{1,})?$");
 
     public static boolean isIP(String str, String version) {
         if (str == null || str.isEmpty()) {
@@ -68,6 +76,7 @@ public class IPValidator {
         }
         return false;
     }
+
     public static boolean isIP(String str) {
         return isIP(str, null);
     }

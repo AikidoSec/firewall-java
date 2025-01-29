@@ -1,12 +1,12 @@
 package vulnerabilities;
 
-import dev.aikido.agent_api.vulnerabilities.sql_injection.Dialect;
-import dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector;
-import org.junit.jupiter.api.Test;
-
 import static dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector.detectSqlInjection;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import dev.aikido.agent_api.vulnerabilities.sql_injection.Dialect;
+import dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector;
+import org.junit.jupiter.api.Test;
 
 public class SqlInjectionTest {
     private void isNotSqlInjection(String sql, String input, String dialect) {
@@ -20,6 +20,7 @@ public class SqlInjectionTest {
             assertFalse(result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
         }
     }
+
     private void isSqlInjection(String sql, String input, String dialect) {
         boolean result;
         if ("mysql".equals(dialect) || "all".equals(dialect)) {
@@ -32,85 +33,82 @@ public class SqlInjectionTest {
         }
     }
 
-
     /**
      * Removed tests :
      * -> `I'm writting you` : Invalid SQL
      * -> Moved a lot of the keywords/words together collection to BAD_SQL_COMMANDS.
      * -> Removed the following GOOD_SQL_COMMANDS : "abcdefghijklmnop@hotmail.com", "steve@yahoo.com"
      *     Reason : This should never occur unencapsulated in query, results in 5 tokens or so being morphed into one.
-      */
+     */
     private static final String[] BAD_SQL_COMMANDS = {
-            "Roses are red insErt are blue",
-            "Roses are red cREATE are blue",
-            "Roses are red drop are blue",
-            "Roses are red updatE are blue",
-            "Roses are red SELECT are blue",
-            "Roses are red dataBASE are blue",
-            "Roses are red alter are blue",
-            "Roses are red grant are blue",
-            "Roses are red savepoint are blue",
-            "Roses are red commit are blue",
-            "Roses are red or blue",
-            "Roses are red and lovely",
-            "This is a group_concat_test",
-            "Termin;ate",
-            "Roses <> violets",
-            "Roses < Violets",
-            "Roses > Violets",
-            "Roses != Violets",
-            "Roses asks red truncates asks blue",
-            "Roses asks reddelete asks blue",
-            "Roses asks red WHEREis blue",
-            "Roses asks red ORis isAND",
-            "I was benchmark ing",
-            "We were delay ed",
-            "I will waitfor you"
+        "Roses are red insErt are blue",
+        "Roses are red cREATE are blue",
+        "Roses are red drop are blue",
+        "Roses are red updatE are blue",
+        "Roses are red SELECT are blue",
+        "Roses are red dataBASE are blue",
+        "Roses are red alter are blue",
+        "Roses are red grant are blue",
+        "Roses are red savepoint are blue",
+        "Roses are red commit are blue",
+        "Roses are red or blue",
+        "Roses are red and lovely",
+        "This is a group_concat_test",
+        "Termin;ate",
+        "Roses <> violets",
+        "Roses < Violets",
+        "Roses > Violets",
+        "Roses != Violets",
+        "Roses asks red truncates asks blue",
+        "Roses asks reddelete asks blue",
+        "Roses asks red WHEREis blue",
+        "Roses asks red ORis isAND",
+        "I was benchmark ing",
+        "We were delay ed",
+        "I will waitfor you"
     };
 
     // List of good SQL commands that should not be flagged as SQL injection
-    private static final String[] GOOD_SQL_COMMANDS = {
-            "              ",
-            "#",
-            "'"
-    };
+    private static final String[] GOOD_SQL_COMMANDS = {"              ", "#", "'"};
 
     /*
     List of SQL commands that are not considered injections
     Moved ["'union'  is not UNION", "UNION"], to IS_NOT_INJECTION : This is in fact, not an injection.
      */
     private static final String[][] IS_NOT_INJECTION = {
-            {"'UNION 123' UNION \"UNION 123\"", "UNION 123"},
-            {"'union'  is not \"UNION\"", "UNION!"},
-            {"\"UNION;\"", "UNION;"},
-            {"SELECT * FROM table", "*"},
-            {"\"COPY/*\"", "COPY/*"},
-            {"'union'  is not \"UNION--\"", "UNION--"},
-            {"'union'  is not UNION", "UNION"}
+        {"'UNION 123' UNION \"UNION 123\"", "UNION 123"},
+        {"'union'  is not \"UNION\"", "UNION!"},
+        {"\"UNION;\"", "UNION;"},
+        {"SELECT * FROM table", "*"},
+        {"\"COPY/*\"", "COPY/*"},
+        {"'union'  is not \"UNION--\"", "UNION--"},
+        {"'union'  is not UNION", "UNION"}
     };
 
     // List of SQL commands that are considered injections
-    private static final String[][] IS_INJECTION = {
-            {"UNTER;", "UNTER;"}
-    };
+    private static final String[][] IS_INJECTION = {{"UNTER;", "UNTER;"}};
+
     @Test
     public void testBadSqlCommands() {
         for (String sql : BAD_SQL_COMMANDS) {
             isSqlInjection(sql, sql, "all");
         }
     }
+
     @Test
     public void testGoodSqlCommands() {
         for (String sql : GOOD_SQL_COMMANDS) {
             isNotSqlInjection(sql, sql, "all");
         }
     }
+
     @Test
     public void testIsInjection() {
         for (String[] sqlPair : IS_INJECTION) {
             isSqlInjection(sqlPair[0], sqlPair[1], "all");
         }
     }
+
     @Test
     public void testIsNotInjection() {
         for (String[] sqlPair : IS_NOT_INJECTION) {
@@ -198,40 +196,24 @@ public class SqlInjectionTest {
         // Invalid query that should be detected as SQL injection:
         isSqlInjection("SELECT * FROM users WHERE id IN (13, 14, 154) OR (1=1)", "13, 14, 154) OR (1=1", "all");
     }
+
     @Test
     public void testCheckStringSafelyEscaped() {
         // Invalid queries that should be detected as SQL injection:
-        isSqlInjection(
-                "SELECT * FROM comments WHERE comment = \"I\" \"m writing you\"",
-                "I\" \"m writing you", "all"
-        );
+        isSqlInjection("SELECT * FROM comments WHERE comment = \"I\" \"m writing you\"", "I\" \"m writing you", "all");
         isSqlInjection("SELECT * FROM `comm`ents``", "`comm`ents", "all");
 
         // Valid queries that should not be detected as SQL injection:
-        isNotSqlInjection(
-                "SELECT * FROM comments WHERE comment = \"I\\'m writing you\"", "I'm writing you", "all"
-        );
-        isNotSqlInjection(
-                "SELECT * FROM comments WHERE comment = 'I\"m writing you'", "I\"m writing you", "all"
-        );
-        isNotSqlInjection(
-                "SELECT * FROM comments WHERE comment = \"I\\`m writing you\"", "I`m writing you", "all"
-        );
+        isNotSqlInjection("SELECT * FROM comments WHERE comment = \"I\\'m writing you\"", "I'm writing you", "all");
+        isNotSqlInjection("SELECT * FROM comments WHERE comment = 'I\"m writing you'", "I\"m writing you", "all");
+        isNotSqlInjection("SELECT * FROM comments WHERE comment = \"I\\`m writing you\"", "I`m writing you", "all");
 
         // Invalid query (strings don't terminate)
-        isNotSqlInjection(
-                "SELECT * FROM comments WHERE comment = 'I'm writing you'", "I'm writing you", "all"
-        );
+        isNotSqlInjection("SELECT * FROM comments WHERE comment = 'I'm writing you'", "I'm writing you", "all");
 
         // Positive example of same query:
-        isSqlInjection(
-                "SELECT * FROM comments WHERE comment = 'I'm writing you--'",
-                "I'm writing you--", "all"
-        );
-        isSqlInjection(
-                "SELECT * FROM comments WHERE comment = 'I'm writing you''",
-                "I'm writing you'", "all"
-        );
+        isSqlInjection("SELECT * FROM comments WHERE comment = 'I'm writing you--'", "I'm writing you--", "all");
+        isSqlInjection("SELECT * FROM comments WHERE comment = 'I'm writing you''", "I'm writing you'", "all");
 
         // Invalid query in postgres, tests fallback:
         isSqlInjection("SELECT * FROM `comm` ents", "`comm` ents", "postgresql");
@@ -254,16 +236,12 @@ public class SqlInjectionTest {
     @Test
     public void testCommentSameAsUserInput() {
         isSqlInjection(
-                "SELECT * FROM hashtags WHERE name = '-- Query by name' -- Query by name",
-                "-- Query by name", "all"
-        );
+                "SELECT * FROM hashtags WHERE name = '-- Query by name' -- Query by name", "-- Query by name", "all");
     }
 
     @Test
     public void testInputOccursInComment() {
-        isNotSqlInjection(
-                "SELECT * FROM hashtags WHERE name = 'name' -- Query by name", "name", "all"
-        );
+        isNotSqlInjection("SELECT * FROM hashtags WHERE name = 'name' -- Query by name", "name", "all");
     }
 
     @Test
@@ -276,6 +254,7 @@ public class SqlInjectionTest {
     public void testUserInputIsLongerThanQuery() {
         isNotSqlInjection("SELECT * FROM users", "SELECT * FROM users WHERE id = 'a'", "all");
     }
+
     @Test
     public void testMultilineQueries() {
         isSqlInjection(
@@ -283,8 +262,8 @@ public class SqlInjectionTest {
                 SELECT * FROM `users`
                 WHERE id = 123
                 """,
-                "users`", "all"
-        );
+                "users`",
+                "all");
 
         isSqlInjection(
                 """
@@ -292,8 +271,8 @@ public class SqlInjectionTest {
                 FROM users
                 WHERE id = '1' OR 1=1
                 """,
-                "1' OR 1=1", "all"
-        );
+                "1' OR 1=1",
+                "all");
 
         isSqlInjection(
                 """
@@ -302,8 +281,8 @@ public class SqlInjectionTest {
                 WHERE id = '1' OR 1=1
                 AND is_escaped = '1'' OR 1=1'
                 """,
-                "1' OR 1=1", "all"
-        );
+                "1' OR 1=1",
+                "all");
 
         isSqlInjection(
                 """
@@ -312,40 +291,40 @@ public class SqlInjectionTest {
                 WHERE id = '1' OR 1=1
                 AND is_escaped = "1' OR 1=1"
                 """,
-                "1' OR 1=1", "all"
-        );
+                "1' OR 1=1",
+                "all");
 
         isNotSqlInjection(
                 """
                 SELECT * FROM `users`
                 WHERE id = 123
                 """,
-                "123", "all"
-        );
+                "123",
+                "all");
 
         isNotSqlInjection(
                 """
                 SELECT * FROM `us``ers`
                 WHERE id = 123
                 """,
-                "users", "all"
-        );
+                "users",
+                "all");
 
         isNotSqlInjection(
                 """
                 SELECT * FROM users
                 WHERE id = 123
                 """,
-                "123", "all"
-        );
+                "123",
+                "all");
 
         isNotSqlInjection(
                 """
                 SELECT * FROM users
                 WHERE id = '123'
                 """,
-                "123", "all"
-        );
+                "123",
+                "all");
 
         isNotSqlInjection(
                 """
@@ -353,12 +332,14 @@ public class SqlInjectionTest {
                 FROM users
                 WHERE is_escaped = "1' OR 1=1"
                 """,
-                "1' OR 1=1", "all"
-        );
+                "1' OR 1=1",
+                "all");
     }
+
     @Test
     public void testLowercasedInputSqlInjection() {
-        String sql = """
+        String sql =
+                """
         SELECT id,
                email,
                password_hash,
@@ -399,5 +380,4 @@ public class SqlInjectionTest {
         isSqlInjection("foobar      )", "foobar      )", "all");
         isSqlInjection("€foobar()", "€foobar()", "all");
     }
-
 }

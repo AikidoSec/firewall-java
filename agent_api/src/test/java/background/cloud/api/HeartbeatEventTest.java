@@ -1,25 +1,23 @@
 package background.cloud.api;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
+import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
-import dev.aikido.agent_api.context.User;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class HeartbeatEventTest {
 
@@ -42,7 +40,7 @@ public class HeartbeatEventTest {
                 false, // preventedPrototypePollution
                 "development", // nodeEnv
                 new GetManagerInfo.Platform("Java", "11") // platform
-        );
+                );
     }
 
     @Test
@@ -76,7 +74,5 @@ public class HeartbeatEventTest {
         when(connectionManager.getConfig()).thenReturn(serviceConfigMock);
         Heartbeat.HeartbeatEvent event2 = Heartbeat.get(connectionManager, stats, hostnames.asArray(), routes, users);
         assertEquals(true, event2.middlewareInstalled());
-
-
     }
 }

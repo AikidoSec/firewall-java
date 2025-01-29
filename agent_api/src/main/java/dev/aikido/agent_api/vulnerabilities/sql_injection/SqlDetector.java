@@ -3,7 +3,6 @@ package dev.aikido.agent_api.vulnerabilities.sql_injection;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.vulnerabilities.Detector;
-
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -28,6 +27,7 @@ public class SqlDetector implements Detector {
         }
         return new DetectorResult();
     }
+
     public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
         String queryLower = query.toLowerCase();
         String userInputLower = userInput.toLowerCase();

@@ -1,18 +1,20 @@
 package storage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import dev.aikido.agent_api.storage.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class StatisticsTest {
     private Statistics stats = null;
+
     @BeforeEach
     public void setup() {
         stats = new Statistics();
     }
+
     @Test
     public void testTotalHits() {
         assertEquals(0, stats.getTotalHits());
@@ -40,7 +42,6 @@ public class StatisticsTest {
         assertEquals(0, stats.getAttacksBlocked());
         assertEquals(0, stats.getAttacksDetected());
         assertEquals(0, stats.getTotalHits());
-
     }
 
     @Test
@@ -62,6 +63,5 @@ public class StatisticsTest {
         // Time :
         assertTrue(statsRecord.startedAt() > 0);
         assertTrue(statsRecord.endedAt() > 0);
-
     }
 }

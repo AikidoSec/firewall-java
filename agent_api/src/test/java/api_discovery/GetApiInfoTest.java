@@ -1,20 +1,19 @@
 package api_discovery;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.gson.Gson;
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.api_discovery.DataSchemaItem;
 import dev.aikido.agent_api.api_discovery.DataSchemaType;
 import dev.aikido.agent_api.api_discovery.GetApiInfo;
 import dev.aikido.agent_api.context.ContextObject;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 public class GetApiInfoTest {
 
@@ -28,15 +27,20 @@ public class GetApiInfoTest {
     @Test
     public void testGetApiInfoWithFormEncodedContext() {
         Map<String, Object> body = new HashMap<>();
-        body.put("data1", Map.of(
-                "data2", List.of(Map.of("Help", true), Map.of("Help", true, "location", "Sea")),
-                "identifier", "hsfkjewhfwehgkjwehgkj",
-                "active", true
-        ));
-        body.put("user", Map.of(
-                "name", "John Doe",
-                "email", "john.doe@example.com"
-        ));
+        body.put(
+                "data1",
+                Map.of(
+                        "data2",
+                        List.of(Map.of("Help", true), Map.of("Help", true, "location", "Sea")),
+                        "identifier",
+                        "hsfkjewhfwehgkjwehgkj",
+                        "active",
+                        true));
+        body.put(
+                "user",
+                Map.of(
+                        "name", "John Doe",
+                        "email", "john.doe@example.com"));
 
         Mockito.when(context.getMethod()).thenReturn("GET");
         Mockito.when(context.getUrl()).thenReturn("/api/resource1");
@@ -97,10 +101,11 @@ public class GetApiInfoTest {
     @Test
     public void testGetApiInfoWithJson() {
         Map<String, Object> body = new HashMap<>();
-        body.put("user", Map.of(
-                "name", "John Doe",
-                "email", "john.doe@example.com"
-        ));
+        body.put(
+                "user",
+                Map.of(
+                        "name", "John Doe",
+                        "email", "john.doe@example.com"));
 
         HashMap<String, List<String>> query = new HashMap<>();
         query.put("user2", List.of("a", "b"));
@@ -117,11 +122,14 @@ public class GetApiInfoTest {
         assertNotNull(apiInfo.query());
         Gson gson = new Gson();
         assertEquals("json", apiInfo.body().type());
-        assertEquals("{\"type\":\"object\",\"properties\":{\"user\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"optional\":false},\"email\":{\"type\":\"string\",\"optional\":false}},\"optional\":false}},\"optional\":false}", gson.toJson(apiInfo.body().schema()));
-        assertEquals("{\"type\":\"object\",\"properties\":{\"user2\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"optional\":false},\"optional\":false}},\"optional\":false}", gson.toJson(apiInfo.query()));
+        assertEquals(
+                "{\"type\":\"object\",\"properties\":{\"user\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"optional\":false},\"email\":{\"type\":\"string\",\"optional\":false}},\"optional\":false}},\"optional\":false}",
+                gson.toJson(apiInfo.body().schema()));
+        assertEquals(
+                "{\"type\":\"object\",\"properties\":{\"user2\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"optional\":false},\"optional\":false}},\"optional\":false}",
+                gson.toJson(apiInfo.query()));
         assertNull(apiInfo.auth());
     }
-
 
     @Test
     public void testGetApiInfoWithEmptyBody() {
@@ -139,7 +147,9 @@ public class GetApiInfoTest {
         assertNull(apiInfo.body());
         assertNotNull(apiInfo.query());
         Gson gson = new Gson();
-        assertEquals("{\"type\":\"object\",\"properties\":{\"user2\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"optional\":false},\"optional\":false}},\"optional\":false}", gson.toJson(apiInfo.query()));
+        assertEquals(
+                "{\"type\":\"object\",\"properties\":{\"user2\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"optional\":false},\"optional\":false}},\"optional\":false}",
+                gson.toJson(apiInfo.query()));
         assertNull(apiInfo.auth());
     }
 
@@ -159,6 +169,7 @@ public class GetApiInfoTest {
         assertNull(apiInfo.query());
         assertNull(apiInfo.auth());
     }
+
     @Test
     public void testGetApiInfoWithNullQueryAndBody() {
         Mockito.when(context.getMethod()).thenReturn("GET");
@@ -177,15 +188,20 @@ public class GetApiInfoTest {
     @Test
     public void testGetApiInfoWithInvalidHeader() {
         Map<String, Object> body = new HashMap<>();
-        body.put("data1", Map.of(
-                "data2", List.of(Map.of("Help", true), Map.of("Help", true, "location", "Sea")),
-                "identifier", "hsfkjewhfwehgkjwehgkj",
-                "active", true
-        ));
-        body.put("user", Map.of(
-                "name", "John Doe",
-                "email", "john.doe@example.com"
-        ));
+        body.put(
+                "data1",
+                Map.of(
+                        "data2",
+                        List.of(Map.of("Help", true), Map.of("Help", true, "location", "Sea")),
+                        "identifier",
+                        "hsfkjewhfwehgkjwehgkj",
+                        "active",
+                        true));
+        body.put(
+                "user",
+                Map.of(
+                        "name", "John Doe",
+                        "email", "john.doe@example.com"));
 
         Mockito.when(context.getMethod()).thenReturn("GET");
         Mockito.when(context.getUrl()).thenReturn("/api/resource1");
@@ -199,5 +215,4 @@ public class GetApiInfoTest {
         assertNull(apiInfo.query());
         assertNull(apiInfo.auth());
     }
-
 }

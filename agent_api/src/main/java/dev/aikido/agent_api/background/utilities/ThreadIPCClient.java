@@ -1,21 +1,21 @@
 package dev.aikido.agent_api.background.utilities;
 
+import static dev.aikido.agent_api.background.utilities.IPCFacilitator.readFromSocket;
+import static dev.aikido.agent_api.background.utilities.IPCFacilitator.writeToSocket;
+
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
-import org.newsclub.net.unix.AFUNIXSocket;
-import org.newsclub.net.unix.AFUNIXSocketAddress;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.Optional;
-
-import static dev.aikido.agent_api.background.utilities.IPCFacilitator.readFromSocket;
-import static dev.aikido.agent_api.background.utilities.IPCFacilitator.writeToSocket;
+import org.newsclub.net.unix.AFUNIXSocket;
+import org.newsclub.net.unix.AFUNIXSocketAddress;
 
 public class ThreadIPCClient {
     private static final Logger logger = LogManager.getLogger(ThreadIPCClient.class);
     private final AFUNIXSocketAddress socketAddress;
+
     public ThreadIPCClient(File socketFile) {
         try {
             this.socketAddress = AFUNIXSocketAddress.of(socketFile);
@@ -23,6 +23,7 @@ public class ThreadIPCClient {
             throw new RuntimeException(e);
         }
     }
+
     public Optional<byte[]> send(byte[] data, boolean receive) {
         AFUNIXSocket socket = null;
         try {

@@ -1,11 +1,10 @@
 package dev.aikido.agent_api.vulnerabilities.path_traversal;
 
-import dev.aikido.agent_api.vulnerabilities.Detector;
-
-import java.util.Map;
-
 import static dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathChecker.startsWithUnsafePath;
 import static dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathPartsChecker.containsUnsafePathParts;
+
+import dev.aikido.agent_api.vulnerabilities.Detector;
+import java.util.Map;
 
 public class PathTraversalDetector implements Detector {
     /**
@@ -40,7 +39,8 @@ public class PathTraversalDetector implements Detector {
         // Check for absolute path traversal
         if (startsWithUnsafePath(filePath, userInput)) {
             return new DetectorResult(true, Map.of("filename", filePath), PathTraversalException.get());
-        };
+        }
+        ;
         return new DetectorResult();
     }
 

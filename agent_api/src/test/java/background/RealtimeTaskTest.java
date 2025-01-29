@@ -1,19 +1,18 @@
 package background;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import dev.aikido.agent_api.background.RealtimeTask;
 import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.RealtimeAPI;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class RealtimeTaskTest {
     private CloudConnectionManager connectionManager;
@@ -34,7 +33,7 @@ class RealtimeTaskTest {
         realtimeTask = new RealtimeTask(connectionManager);
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localhost:5000/realtime")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "http://localhost:5000/realtime")
     @Test
     void testRunWithUpdatedConfig() {
         // Arrange
@@ -55,7 +54,7 @@ class RealtimeTaskTest {
         verify(serviceConfiguration).updateConfig(apiResponse);
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localhost:5000/realtime")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "http://localhost:5000/realtime")
     @Test
     void testRunWithNoConfigUpdate() {
         // Arrange

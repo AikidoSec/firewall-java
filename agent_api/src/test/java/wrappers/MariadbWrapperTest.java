@@ -1,22 +1,21 @@
 package wrappers;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class MariadbWrapperTest {
     private Connection connection;
@@ -30,7 +29,8 @@ public class MariadbWrapperTest {
     @BeforeEach
     public void setUp() throws SQLException {
         // Connect to the MySQL database
-        connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/db?allowPublicKeyRetrieval=true&useSSL=false", "user", "password");
+        connection = DriverManager.getConnection(
+                "jdbc:mariadb://localhost:3306/db?allowPublicKeyRetrieval=true&useSSL=false", "user", "password");
         ThreadCache.set(getEmptyThreadCacheObject());
     }
 

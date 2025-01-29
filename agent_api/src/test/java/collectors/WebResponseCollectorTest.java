@@ -1,27 +1,27 @@
 package collectors;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
-
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 public class WebResponseCollectorTest {
     public static class SampleContextObject extends ContextObject {
         public SampleContextObject() {
             this("GET");
         }
+
         public SampleContextObject(String method) {
             this.method = method;
             this.source = "web";
@@ -35,13 +35,17 @@ public class WebResponseCollectorTest {
             this.executedMiddleware = true; // Start with "executed middleware" as true
         }
     }
-    public static RouteMetadata routeMetadata1 = new RouteMetadata("/api/resource", "https://example.com/api/resource", "GET");
+
+    public static RouteMetadata routeMetadata1 =
+            new RouteMetadata("/api/resource", "https://example.com/api/resource", "GET");
 
     @BeforeAll
     public static void clean() {
         Context.set(null);
         ThreadCache.set(null);
-    };
+    }
+    ;
+
     @BeforeEach
     public void setUp() throws SQLException {
         // Connect to the MySQL database
@@ -82,7 +86,6 @@ public class WebResponseCollectorTest {
         assertEquals(2, ThreadCache.get().getRoutes().get(routeMetadata1).getHits());
     }
 
-
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     public void testResponseCollectorWithInvalidMethodOrStatusCode() throws SQLException {
@@ -100,6 +103,7 @@ public class WebResponseCollectorTest {
         WebResponseCollector.report(-200);
         assertEquals(0, ThreadCache.get().getRoutes().size());
     }
+
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     public void testNothingHappensWithEmptyThreadCache() throws SQLException {
@@ -118,6 +122,4 @@ public class WebResponseCollectorTest {
         WebResponseCollector.report(200);
         assertNull(ThreadCache.get().getRoutes());
     }
-
-
 }

@@ -1,10 +1,10 @@
 package dev.aikido.agent_api.helpers.url;
 
-import java.util.regex.Pattern;
-
 import static dev.aikido.agent_api.helpers.patterns.LooksLikeASecret.looksLikeASecret;
 import static dev.aikido.agent_api.helpers.patterns.LooksLikeValidIpAddress.isValidIpAddress;
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrlPath;
+
+import java.util.regex.Pattern;
 
 public final class BuildRouteFromUrl {
     private BuildRouteFromUrl() {}
@@ -16,7 +16,8 @@ public final class BuildRouteFromUrl {
     private static final Pattern DATE_REGEX = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}|\\d{2}-\\d{2}-\\d{4}$");
     private static final Pattern EMAIL_REGEX = Pattern.compile(
             "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
-    private static final Pattern HASH_REGEX = Pattern.compile("^(?:[a-f0-9]{32}|[a-f0-9]{40}|[a-f0-9]{64}|[a-f0-9]{128})$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern HASH_REGEX =
+            Pattern.compile("^(?:[a-f0-9]{32}|[a-f0-9]{40}|[a-f0-9]{64}|[a-f0-9]{128})$", Pattern.CASE_INSENSITIVE);
     private static final int[] HASH_LENGTHS = {32, 40, 64, 128};
 
     public static String buildRouteFromUrl(String url) {

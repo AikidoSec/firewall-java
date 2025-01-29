@@ -9,12 +9,15 @@ public enum LogLevel {
     FATAL(5);
 
     private final int level;
+
     LogLevel(int level) {
         this.level = level;
     }
+
     public int getLevel() {
         return this.level;
     }
+
     @Override
     public String toString() {
         return this.name();

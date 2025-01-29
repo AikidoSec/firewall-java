@@ -1,8 +1,9 @@
 package vulnerabilities.path_traversal;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathChecker;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class UnsafePathCheckerTest {
 
@@ -20,7 +21,6 @@ public class UnsafePathCheckerTest {
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/home/user/file.txt", "/HoMe"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/HOME/user/file.txt", "/home"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/bIn/bash", "/bin"));
-
     }
 
     @Test

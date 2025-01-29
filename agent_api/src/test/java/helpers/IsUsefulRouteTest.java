@@ -1,10 +1,10 @@
 package helpers;
 
-import dev.aikido.agent_api.helpers.url.IsUsefulRoute;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import dev.aikido.agent_api.helpers.url.IsUsefulRoute;
+import org.junit.jupiter.api.Test;
 
 public class IsUsefulRouteTest {
 

@@ -1,5 +1,8 @@
 package thread_cache;
 
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.background.BackgroundProcess;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.ipc_commands.InitRouteCommand;
@@ -9,9 +12,6 @@ import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import dev.aikido.agent_api.thread_cache.ThreadCacheRenewal;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-
-import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class ThreadCacheRenewalTest {
     @Test
@@ -25,10 +25,11 @@ public class ThreadCacheRenewalTest {
     // Set AIKIDO_TMP_DIR to /opt/aikido, this is what gets created for Github workflows
     @SetEnvironmentVariable(key = "AIKIDO_TMP_DIR", value = "/opt/aikido")
     public void renewWithEmptyBackgroundProcess() throws InterruptedException {
-        BackgroundProcess backgroundProcess = new BackgroundProcess("test-background-process", new Token("token-123456"));
+        BackgroundProcess backgroundProcess =
+                new BackgroundProcess("test-background-process", new Token("token-123456"));
         backgroundProcess.setDaemon(true);
         backgroundProcess.start();
-        Thread.sleep(8*1000); // Wait for bg process to initialize
+        Thread.sleep(8 * 1000); // Wait for bg process to initialize
 
         ThreadCacheObject threadCacheObject = ThreadCacheRenewal.renewThreadCache();
         assertNotNull(threadCacheObject);
@@ -53,10 +54,11 @@ public class ThreadCacheRenewalTest {
     @SetEnvironmentVariable(key = "AIKIDO_TMP_DIR", value = "/opt/aikido")
     @SetEnvironmentVariable(key = "AIKIDO_ENDPOINT", value = "http://localhost:5000")
     public void renewWithLinkedUpBackgroundProcess() throws InterruptedException {
-        BackgroundProcess backgroundProcess = new BackgroundProcess("test-background-process", new Token("token-1234567"));
+        BackgroundProcess backgroundProcess =
+                new BackgroundProcess("test-background-process", new Token("token-1234567"));
         backgroundProcess.setDaemon(true);
         backgroundProcess.start();
-        Thread.sleep(5*1000); // Wait for bg process to initialize
+        Thread.sleep(5 * 1000); // Wait for bg process to initialize
 
         ThreadCacheObject threadCacheObject = ThreadCacheRenewal.renewThreadCache();
         assertNotNull(threadCacheObject);
@@ -71,12 +73,12 @@ public class ThreadCacheRenewalTest {
 
         // Test the blocked IP lists :
         assertTrue(threadCacheObject.isIpBlocked("1.2.3.4").blocked());
-        assertEquals("geo restrictions", threadCacheObject.isIpBlocked("1.2.3.4").description());
+        assertEquals(
+                "geo restrictions", threadCacheObject.isIpBlocked("1.2.3.4").description());
 
         assertFalse(threadCacheObject.isIpBlocked("5.6.7.8").blocked());
         assertNull(threadCacheObject.isIpBlocked("5.6.7.8").description());
 
         backgroundProcess.interrupt();
     }
-
 }

@@ -1,9 +1,7 @@
 package dev.aikido.agent.wrappers;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.matcher.ElementMatcher;
-import net.bytebuddy.matcher.ElementMatchers;
+
+import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
+import static net.bytebuddy.matcher.ElementMatchers.is;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
@@ -11,9 +9,11 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
-import static net.bytebuddy.matcher.ElementMatchers.is;
+import net.bytebuddy.asm.Advice;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.matcher.ElementMatchers;
 
 public class RuntimeExecWrapper implements Wrapper {
     public String getName() {
@@ -21,9 +21,9 @@ public class RuntimeExecWrapper implements Wrapper {
         // https://docs.oracle.com/javase/8/docs/api/java/io/File.html
         return CommandExecAdvice.class.getName();
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.isDeclaredBy(Runtime.class)
-                .and(ElementMatchers.nameContainsIgnoreCase("exec"));
+        return ElementMatchers.isDeclaredBy(Runtime.class).and(ElementMatchers.nameContainsIgnoreCase("exec"));
     }
 
     @Override
@@ -39,17 +39,18 @@ public class RuntimeExecWrapper implements Wrapper {
         public static void before(
                 @Advice.This(typing = DYNAMIC, optional = true) Object target,
                 @Advice.Origin Executable method,
-                @Advice.Argument(0) Object argument
-        ) throws Throwable {
+                @Advice.Argument(0) Object argument)
+                throws Throwable {
             if (!(argument instanceof String)) {
                 return;
             }
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
             try {
-                URL[] urls = { new URL(jarFilePath) };
+                URL[] urls = {new URL(jarFilePath)};
                 classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
+            } catch (MalformedURLException ignored) {
+            }
             if (classLoader == null) {
                 return;
             }
@@ -59,19 +60,23 @@ public class RuntimeExecWrapper implements Wrapper {
                 Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.CommandCollector");
 
                 // Run report with "argument"
-                for (Method method2: clazz.getMethods()) {
-                    if(method2.getName().equals("report")) {
+                for (Method method2 : clazz.getMethods()) {
+                    if (method2.getName().equals("report")) {
                         method2.invoke(null, argument);
                         break;
                     }
                 }
                 classLoader.close(); // Close the class loader
             } catch (InvocationTargetException invocationTargetException) {
-                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
+                if (invocationTargetException
+                        .getCause()
+                        .toString()
+                        .startsWith("dev.aikido.agent_api.vulnerabilities")) {
                     throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            } catch(Throwable e) {}
+            } catch (Throwable e) {
+            }
         }
     }
 }

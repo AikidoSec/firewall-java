@@ -27,5 +27,4 @@ public final class UrlParser {
         }
         return parsed.getPath();
     }
-
 }

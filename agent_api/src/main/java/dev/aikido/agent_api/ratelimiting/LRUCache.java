@@ -1,10 +1,10 @@
 package dev.aikido.agent_api.ratelimiting;
 
+import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public class LRUCache<K, V> {
     private final int maxItems;

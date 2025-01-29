@@ -1,13 +1,12 @@
 package helpers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.extraction.UserAgentFromContext;
+import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.HashMap;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserAgentFromContextTest {
 

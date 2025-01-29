@@ -1,18 +1,17 @@
 package dev.aikido.agent_api.thread_cache;
 
+import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
+
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.net.BlockList;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.routes.Routes;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public class ThreadCacheObject {
     private final List<Endpoint> endpoints;
@@ -24,13 +23,20 @@ public class ThreadCacheObject {
 
     // IP Blocking (e.g. Geo-IP Restrictions) :
     public record BlockedIpEntry(BlockList blocklist, String description) {}
+
     private List<BlockedIpEntry> blockedIps = new ArrayList<>();
     // User-Agent Blocking (e.g. bot blocking) :
     private Pattern blockedUserAgentRegex;
 
     private int totalHits = 0;
     private boolean middlewareInstalled = false;
-    public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedListsRes) {
+
+    public ThreadCacheObject(
+            List<Endpoint> endpoints,
+            Set<String> blockedUserIDs,
+            Set<String> bypassedIPs,
+            Routes routes,
+            Optional<ReportingApi.APIListsResponse> blockedListsRes) {
         this.lastRenewedAtMS = getUnixTimeMS();
         // Set endpoints :
         this.endpoints = endpoints;
@@ -47,6 +53,7 @@ public class ThreadCacheObject {
         }
         return endpoints;
     }
+
     public boolean isBlockedUserID(String userID) {
         if (blockedUserIds == null) {
             return false;
@@ -57,12 +64,15 @@ public class ThreadCacheObject {
     public long getLastRenewedAtMS() {
         return lastRenewedAtMS;
     }
+
     public Hostnames getHostnames() {
         return hostnames;
     }
+
     public Routes getRoutes() {
         return routes;
     }
+
     public boolean isBypassedIP(String ip) {
         return bypassedIPs.contains(ip);
     }
@@ -71,14 +81,16 @@ public class ThreadCacheObject {
      * Check if the IP is blocked (e.g. Geo IP Restrictions)
      */
     public BlockedResult isIpBlocked(String ip) {
-        for (BlockedIpEntry entry: blockedIps) {
+        for (BlockedIpEntry entry : blockedIps) {
             if (entry.blocklist.isBlocked(ip)) {
                 return new BlockedResult(true, entry.description);
             }
         }
         return new BlockedResult(false, null);
     }
+
     public record BlockedResult(boolean blocked, String description) {}
+
     public void updateBlockedLists(Optional<ReportingApi.APIListsResponse> blockedListsRes) {
         if (!blockedListsRes.isEmpty()) {
             ReportingApi.APIListsResponse res = blockedListsRes.get();
@@ -109,11 +121,18 @@ public class ThreadCacheObject {
         return false;
     }
 
-    public int getTotalHits() { return totalHits; }
+    public int getTotalHits() {
+        return totalHits;
+    }
+
     public void incrementTotalHits() {
         this.totalHits += 1;
     }
-    public boolean isMiddlewareInstalled() { return middlewareInstalled; }
+
+    public boolean isMiddlewareInstalled() {
+        return middlewareInstalled;
+    }
+
     public void setMiddlewareInstalled() {
         middlewareInstalled = true;
     }

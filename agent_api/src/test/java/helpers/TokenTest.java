@@ -1,12 +1,12 @@
 package helpers;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.helpers.env.Token;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class TokenTest {
 

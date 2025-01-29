@@ -1,12 +1,12 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf.imds;
 
-
 import java.util.HashSet;
 import java.util.Set;
 
 public class BlockList {
     /** A list of IPs that shouldn't be accessed */
     private final Set<String> blockedIPv4Addresses;
+
     private final Set<String> blockedIPv6Addresses;
 
     public BlockList() {

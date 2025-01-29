@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class Token {
     private final String token;
+
     public Token(String token) {
         if (token == null) {
             throw new Error("Token cannot be null");
@@ -14,9 +15,11 @@ public class Token {
         }
         this.token = token;
     }
+
     public String get() {
         return token;
     }
+
     public static Token fromEnv() {
         String token = System.getenv("AIKIDO_TOKEN");
         if (token == null || token.isEmpty()) {

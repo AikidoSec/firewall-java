@@ -1,16 +1,17 @@
 package dev.aikido.agent_api.background.utilities;
 
-import org.newsclub.net.unix.AFUNIXSocket;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Optional;
+import org.newsclub.net.unix.AFUNIXSocket;
 
 public final class IPCFacilitator {
     private IPCFacilitator() {}
+
     private static final int BufferSize = 1024;
+
     public static Optional<byte[]> readFromSocket(AFUNIXSocket socket) {
         try {
             InputStream input = socket.getInputStream();
@@ -31,6 +32,7 @@ public final class IPCFacilitator {
         }
         return Optional.empty();
     }
+
     public static void writeToSocket(AFUNIXSocket socket, byte[] message) {
         try {
             OutputStream output = socket.getOutputStream();

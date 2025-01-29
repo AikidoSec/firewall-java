@@ -1,11 +1,10 @@
 package helpers;
 
-import dev.aikido.agent_api.helpers.extraction.PathBuilder;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import dev.aikido.agent_api.helpers.extraction.PathBuilder;
+import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 
 public class PathBuilderTest {
 
@@ -35,11 +34,11 @@ public class PathBuilderTest {
     @Test
     public void testBuildPathToPayloadMixedTypes() {
         PathBuilder.PathPart[] pathParts = {
-                new PathBuilder.PathPart("object", "user"),
-                new PathBuilder.PathPart("array", 2),
-                new PathBuilder.PathPart("jwt", null),
-                new PathBuilder.PathPart("object", "details"),
-                new PathBuilder.PathPart("array", 1)
+            new PathBuilder.PathPart("object", "user"),
+            new PathBuilder.PathPart("array", 2),
+            new PathBuilder.PathPart("jwt", null),
+            new PathBuilder.PathPart("object", "details"),
+            new PathBuilder.PathPart("array", 1)
         };
         assertEquals(".user.[2]<jwt>.details.[1]", PathBuilder.buildPathToPayload(Arrays.asList(pathParts)));
     }
@@ -47,9 +46,9 @@ public class PathBuilderTest {
     @Test
     public void testBuildPathToPayloadMultipleObjects() {
         PathBuilder.PathPart[] pathParts = {
-                new PathBuilder.PathPart("object", "user"),
-                new PathBuilder.PathPart("object", "details"),
-                new PathBuilder.PathPart("object", "address")
+            new PathBuilder.PathPart("object", "user"),
+            new PathBuilder.PathPart("object", "details"),
+            new PathBuilder.PathPart("object", "address")
         };
         assertEquals(".user.details.address", PathBuilder.buildPathToPayload(Arrays.asList(pathParts)));
     }

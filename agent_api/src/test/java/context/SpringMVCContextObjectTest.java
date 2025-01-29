@@ -1,13 +1,12 @@
 package context;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.context.SpringMVCContextObject;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class SpringMVCContextObjectTest {
 
@@ -16,27 +15,40 @@ class SpringMVCContextObjectTest {
     @BeforeEach
     void setUp() {
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
-        );
+                "GET",
+                new StringBuffer("http://localhost/test"),
+                "192.168.1.1",
+                Map.of(),
+                new HashMap<>(),
+                new HashMap<>());
     }
 
     @Test
     void testGetRouteWithSlashTest() {
         // Act
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
-        );
+                "GET",
+                new StringBuffer("http://localhost/test"),
+                "192.168.1.1",
+                Map.of(),
+                new HashMap<>(),
+                new HashMap<>());
 
         // Assert
         assertEquals("http://localhost/test", springContextObject.getUrl());
         assertEquals("/test", springContextObject.getRoute());
     }
+
     @Test
     void testGetRouteWithNumbers() {
         // Act
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
-        );
+                "GET",
+                new StringBuffer("http://localhost/api/dog/28632"),
+                "192.168.1.1",
+                Map.of(),
+                new HashMap<>(),
+                new HashMap<>());
 
         // Assert
         assertEquals("http://localhost/api/dog/28632", springContextObject.getUrl());
@@ -54,8 +66,12 @@ class SpringMVCContextObjectTest {
     void testIpRequestFeature() {
         HashMap<String, String> headers = new HashMap<>(Map.of("x-forwarded-for", "invalid.ip, in.va.li.d, 1.2.3.4"));
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
-        );
+                "GET",
+                new StringBuffer("http://localhost/api/dog/28632"),
+                "192.168.1.1",
+                Map.of(),
+                new HashMap<>(),
+                headers);
         assertEquals(1, springContextObject.getHeaders().size());
         assertEquals("1.2.3.4", springContextObject.getRemoteAddress());
     }
@@ -65,8 +81,12 @@ class SpringMVCContextObjectTest {
     void testIpRequestFeature_InvalidHeader() {
         HashMap<String, String> headers = new HashMap<>(Map.of("x-forwarded-for", "invalid.ip, in.va.li.d"));
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
-        );
+                "GET",
+                new StringBuffer("http://localhost/api/dog/28632"),
+                "192.168.1.1",
+                Map.of(),
+                new HashMap<>(),
+                headers);
         assertEquals(1, springContextObject.getHeaders().size());
         assertEquals("192.168.1.1", springContextObject.getRemoteAddress());
     }
@@ -76,8 +96,12 @@ class SpringMVCContextObjectTest {
     void testIpRequestFeature_TrustProxyOff() {
         HashMap<String, String> headers = new HashMap<>(Map.of("x-forwarded-for", "invalid.ip, in.va.li.d, 1.2.3.4"));
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
-        );
+                "GET",
+                new StringBuffer("http://localhost/api/dog/28632"),
+                "192.168.1.1",
+                Map.of(),
+                new HashMap<>(),
+                headers);
         assertEquals(1, springContextObject.getHeaders().size());
         assertEquals("192.168.1.1", springContextObject.getRemoteAddress());
     }

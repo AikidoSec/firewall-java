@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public final class CommandEncapsulationChecker {
     private CommandEncapsulationChecker() {}
+
     private static final List<Character> ESCAPE_CHARS = Arrays.asList('"', '\'');
     private static final List<Character> DANGEROUS_CHARS_INSIDE_DOUBLE_QUOTES = Arrays.asList('$', '`', '\\', '!');
 
@@ -17,7 +18,8 @@ public final class CommandEncapsulationChecker {
             String currentSegment = segments[i];
             String nextSegment = segments[i + 1];
 
-            Character charBeforeUserInput = currentSegment.isEmpty() ? null : currentSegment.charAt(currentSegment.length() - 1);
+            Character charBeforeUserInput =
+                    currentSegment.isEmpty() ? null : currentSegment.charAt(currentSegment.length() - 1);
             Character charAfterUserInput = nextSegment.isEmpty() ? null : nextSegment.charAt(0);
 
             boolean isEscapeChar = charBeforeUserInput != null && ESCAPE_CHARS.contains(charBeforeUserInput);

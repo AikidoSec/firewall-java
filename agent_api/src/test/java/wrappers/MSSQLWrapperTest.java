@@ -1,17 +1,12 @@
 package wrappers;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
-import utils.EmptySampleContextObject;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -19,8 +14,12 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import utils.EmptySampleContextObject;
 
 public class MSSQLWrapperTest {
     private Connection connection;

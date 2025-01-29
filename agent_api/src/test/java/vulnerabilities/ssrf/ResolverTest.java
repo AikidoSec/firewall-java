@@ -1,13 +1,12 @@
 package vulnerabilities.ssrf;
 
-import dev.aikido.agent_api.vulnerabilities.ssrf.imds.Resolver;
-import org.junit.jupiter.api.Test;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import dev.aikido.agent_api.vulnerabilities.ssrf.imds.Resolver;
+import java.util.HashSet;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
 
 public class ResolverTest {
     @Test

@@ -1,9 +1,9 @@
 package vulnerabilities.sql_injection;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import dev.aikido.agent_api.vulnerabilities.sql_injection.Dialect;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DialectTest {
 

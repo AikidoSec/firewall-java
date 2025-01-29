@@ -1,17 +1,16 @@
 package api_discovery;
 
+import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.api_discovery.APISpecMerger;
 import dev.aikido.agent_api.api_discovery.DataSchemaItem;
 import dev.aikido.agent_api.api_discovery.DataSchemaType;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class APISpecMergerTest {
 
@@ -88,7 +87,8 @@ class APISpecMergerTest {
     @Test
     void testMergeAPISpecsQueryBothPresent() {
         DataSchemaItem oldQuerySchema = new DataSchemaItem(DataSchemaType.OBJECT, Collections.emptyMap());
-        DataSchemaItem newQuerySchema = new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap("newProp", new DataSchemaItem(DataSchemaType.STRING)));
+        DataSchemaItem newQuerySchema = new DataSchemaItem(
+                DataSchemaType.OBJECT, Collections.singletonMap("newProp", new DataSchemaItem(DataSchemaType.STRING)));
 
         APISpec updatedSpec = new APISpec(new APISpec.Body(newQuerySchema, "newType"), newQuerySchema, null);
         APISpec oldSpec = new APISpec(new APISpec.Body(oldQuerySchema, "oldType"), oldQuerySchema, null);
@@ -152,11 +152,15 @@ class APISpecMergerTest {
 
     @Test
     void testMergeAPISpecsBodyAndAuthPresent() {
-        DataSchemaItem oldBodySchema = new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap("oldProp", new DataSchemaItem(DataSchemaType.STRING)));
-        DataSchemaItem newBodySchema = new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap("newProp", new DataSchemaItem(DataSchemaType.STRING)));
+        DataSchemaItem oldBodySchema = new DataSchemaItem(
+                DataSchemaType.OBJECT, Collections.singletonMap("oldProp", new DataSchemaItem(DataSchemaType.STRING)));
+        DataSchemaItem newBodySchema = new DataSchemaItem(
+                DataSchemaType.OBJECT, Collections.singletonMap("newProp", new DataSchemaItem(DataSchemaType.STRING)));
 
-        APISpec updatedSpec = new APISpec(new APISpec.Body(newBodySchema, "newType"), null, List.of(Map.of("type", "bearer")));
-        APISpec oldSpec = new APISpec(new APISpec.Body(oldBodySchema, "oldType"), null, List.of(Map.of("type", "apiKey")));
+        APISpec updatedSpec =
+                new APISpec(new APISpec.Body(newBodySchema, "newType"), null, List.of(Map.of("type", "bearer")));
+        APISpec oldSpec =
+                new APISpec(new APISpec.Body(oldBodySchema, "oldType"), null, List.of(Map.of("type", "apiKey")));
 
         APISpec result = APISpecMerger.mergeAPISpecs(updatedSpec, oldSpec);
 
@@ -177,6 +181,7 @@ class APISpecMergerTest {
         assertEquals(updatedSpec.query(), result.query());
         assertEquals(1, result.auth().size());
     }
+
     @Test
     void testMergeWithOldSpecBodyQueryNullReversed() {
         APISpec updatedSpec = createAPISpec("newType", "newQuery", List.of(Map.of("type", "bearer")));
@@ -203,9 +208,11 @@ class APISpecMergerTest {
 
     @Test
     void testMergeAPISpecsWithPartialUpdates() {
-        DataSchemaItem oldBodySchema = new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap("oldProp", new DataSchemaItem(DataSchemaType.STRING)));
+        DataSchemaItem oldBodySchema = new DataSchemaItem(
+                DataSchemaType.OBJECT, Collections.singletonMap("oldProp", new DataSchemaItem(DataSchemaType.STRING)));
         APISpec updatedSpec = new APISpec(new APISpec.Body(oldBodySchema, "updatedType"), null, null);
-        APISpec oldSpec = new APISpec(new APISpec.Body(oldBodySchema, "oldType"), null, List.of(Map.of("type", "apiKey")));
+        APISpec oldSpec =
+                new APISpec(new APISpec.Body(oldBodySchema, "oldType"), null, List.of(Map.of("type", "apiKey")));
 
         APISpec result = APISpecMerger.mergeAPISpecs(updatedSpec, oldSpec);
 
@@ -215,8 +222,10 @@ class APISpecMergerTest {
 
     @Test
     void testMergeAPISpecsWithDifferentBodyTypes() {
-        DataSchemaItem oldBodySchema = new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap("oldProp", new DataSchemaItem(DataSchemaType.STRING)));
-        DataSchemaItem newBodySchema = new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap("newProp", new DataSchemaItem(DataSchemaType.STRING)));
+        DataSchemaItem oldBodySchema = new DataSchemaItem(
+                DataSchemaType.OBJECT, Collections.singletonMap("oldProp", new DataSchemaItem(DataSchemaType.STRING)));
+        DataSchemaItem newBodySchema = new DataSchemaItem(
+                DataSchemaType.OBJECT, Collections.singletonMap("newProp", new DataSchemaItem(DataSchemaType.STRING)));
 
         APISpec updatedSpec = new APISpec(new APISpec.Body(newBodySchema, "newType"), null, null);
         APISpec oldSpec = new APISpec(new APISpec.Body(oldBodySchema, "oldType"), null, null);
@@ -240,15 +249,17 @@ class APISpecMergerTest {
 
     @Test
     void testMergeAPISpecsWithComplexSchemas() {
-        DataSchemaItem oldBodySchema = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "oldProp", new DataSchemaItem(DataSchemaType.STRING),
-                "anotherOldProp", new DataSchemaItem(DataSchemaType.NUMBER)
-        ));
+        DataSchemaItem oldBodySchema = new DataSchemaItem(
+                DataSchemaType.OBJECT,
+                Map.of(
+                        "oldProp", new DataSchemaItem(DataSchemaType.STRING),
+                        "anotherOldProp", new DataSchemaItem(DataSchemaType.NUMBER)));
 
-        DataSchemaItem newBodySchema = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "newProp", new DataSchemaItem(DataSchemaType.STRING),
-                "anotherNewProp", new DataSchemaItem(DataSchemaType.BOOL)
-        ));
+        DataSchemaItem newBodySchema = new DataSchemaItem(
+                DataSchemaType.OBJECT,
+                Map.of(
+                        "newProp", new DataSchemaItem(DataSchemaType.STRING),
+                        "anotherNewProp", new DataSchemaItem(DataSchemaType.BOOL)));
 
         APISpec updatedSpec = new APISpec(new APISpec.Body(newBodySchema, "newType"), null, null);
         APISpec oldSpec = new APISpec(new APISpec.Body(oldBodySchema, "oldType"), null, null);
@@ -262,9 +273,15 @@ class APISpecMergerTest {
 
     // Helper method to create APISpec instances for testing
     private APISpec createAPISpec(String bodyType, String queryType, List<Map<String, String>> auth) {
-        DataSchemaItem bodySchema = bodyType != null ? new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap("prop", new DataSchemaItem(DataSchemaType.STRING))) : null;
+        DataSchemaItem bodySchema = bodyType != null
+                ? new DataSchemaItem(
+                        DataSchemaType.OBJECT,
+                        Collections.singletonMap("prop", new DataSchemaItem(DataSchemaType.STRING)))
+                : null;
         DataSchemaItem querySchema = queryType != null
-                ? new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap(queryType + "Prop", new DataSchemaItem(DataSchemaType.STRING)))
+                ? new DataSchemaItem(
+                        DataSchemaType.OBJECT,
+                        Collections.singletonMap(queryType + "Prop", new DataSchemaItem(DataSchemaType.STRING)))
                 : null;
         return new APISpec(bodySchema != null ? new APISpec.Body(bodySchema, bodyType) : null, querySchema, auth);
     }

@@ -1,10 +1,10 @@
 package vulnerabilities.ssrf;
 
-import org.junit.jupiter.api.Test;
-
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 public class IsPrivateIPTest {
 
@@ -44,5 +44,4 @@ public class IsPrivateIPTest {
         assertFalse(isPrivateIp("256.256.256.256")); // Invalid IPv4
         assertFalse(isPrivateIp("::g")); // Invalid IPv6
     }
-
 }

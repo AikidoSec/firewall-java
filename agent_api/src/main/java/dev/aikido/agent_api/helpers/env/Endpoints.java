@@ -2,6 +2,7 @@ package dev.aikido.agent_api.helpers.env;
 
 public final class Endpoints {
     private Endpoints() {}
+
     public static String getAikidoAPIEndpoint() {
         String endpoint = System.getenv("AIKIDO_ENDPOINT");
         if (endpoint != null && !endpoint.isEmpty()) {

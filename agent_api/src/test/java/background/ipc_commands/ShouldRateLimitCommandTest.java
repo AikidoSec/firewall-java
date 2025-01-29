@@ -1,5 +1,7 @@
 package background.ipc_commands;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.ServiceConfiguration;
@@ -9,14 +11,10 @@ import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.ratelimiting.RateLimiter;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ShouldRateLimitCommandTest {
     private ShouldRateLimitCommand command;
@@ -58,6 +56,7 @@ class ShouldRateLimitCommandTest {
         assertFalse(result.get().block());
         assertNull(result.get().trigger());
     }
+
     @Test
     void testExecuteWithValidDataAndUserBlocked() {
         // Arrange
@@ -158,5 +157,4 @@ class ShouldRateLimitCommandTest {
         assertEquals(ShouldRateLimit.RateLimitDecision.class, new ShouldRateLimitCommand().getOutputClass());
         assertEquals(ShouldRateLimitCommand.Req.class, new ShouldRateLimitCommand().getInputClass());
     }
-
 }

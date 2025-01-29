@@ -6,6 +6,7 @@ import dev.aikido.agent_api.helpers.logging.Logger;
 
 public final class ThreadIPCClientFactory {
     private static final Logger logger = LogManager.getLogger(ThreadIPCClientFactory.class);
+
     private ThreadIPCClientFactory() {}
 
     public static ThreadIPCClient getDefaultThreadIPCClient() {

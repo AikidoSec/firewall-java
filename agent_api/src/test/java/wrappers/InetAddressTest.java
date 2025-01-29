@@ -1,22 +1,21 @@
 package wrappers;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
-import utils.EmptySampleContextObject;
-
 import java.io.IOException;
 import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import utils.EmptySampleContextObject;
 
 public class InetAddressTest {
     private HttpClient httpClient;
@@ -26,11 +25,13 @@ public class InetAddressTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @BeforeEach
     void clearThreadCache() {
         httpClient = HttpClient.newHttpClient();
         cleanup();
     }
+
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
         ThreadCache.set(getEmptyThreadCacheObject());
@@ -46,24 +47,22 @@ public class InetAddressTest {
             fetchResponse("http://localhost:5000/api/test");
         });
         assertEquals(
-            "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
-            exception1.getMessage());
+                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+                exception1.getMessage());
 
         RuntimeException exception2 = assertThrows(RuntimeException.class, () -> {
             fetchResponse("http://localhost:5000");
         });
         assertEquals(
-            "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
-            exception2.getMessage());
-
+                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+                exception2.getMessage());
 
         RuntimeException exception3 = assertThrows(RuntimeException.class, () -> {
             fetchResponse("https://localhost:5000/api/test");
         });
         assertEquals(
-            "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
-            exception3.getMessage());
-
+                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+                exception3.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -74,7 +73,9 @@ public class InetAddressTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             fetchResponse("http://localhost/api/test");
         });
-        assertEquals("dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery", exception.getMessage());
+        assertEquals(
+                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+                exception.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -119,8 +120,6 @@ public class InetAddressTest {
             fetchResponseHttpClient("https://localhost:5000/api/runtime/config");
         });
         assertTrue(exception3.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
-
-
     }
 
     private void fetchResponse(String urlString) throws IOException, SSRFException {
@@ -134,6 +133,7 @@ public class InetAddressTest {
 
         int responseCode = connection.getResponseCode();
     }
+
     private void fetchResponseHttpClient(String urlString) throws InterruptedException, IOException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()

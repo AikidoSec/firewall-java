@@ -1,10 +1,10 @@
 package dev.aikido.agent_api.api_discovery;
 
-import java.lang.reflect.*;
-import java.util.*;
-
 import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
 import static dev.aikido.agent_api.helpers.patterns.PrimitiveType.isPrimitiveOrString;
+
+import java.lang.reflect.*;
+import java.util.*;
 
 public class DataSchemaGenerator {
     // Maximum depth to traverse the data structure to get the schema for improved performance
@@ -46,7 +46,7 @@ public class DataSchemaGenerator {
             }
             return new DataSchemaItem(DataSchemaType.ARRAY, items);
         }
-        if(data.getClass().isEnum()) {
+        if (data.getClass().isEnum()) {
             // Handle enums differently as to avoid recursion :
             return new DataSchemaItem(DataSchemaType.ENUM);
         }

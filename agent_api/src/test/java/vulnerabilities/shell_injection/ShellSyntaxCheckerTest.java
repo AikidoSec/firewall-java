@@ -1,11 +1,10 @@
 package vulnerabilities.shell_injection;
 
-
-import org.junit.jupiter.api.Test;
-
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellSyntaxChecker.containsShellSyntax;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 public class ShellSyntaxCheckerTest {
 
@@ -38,16 +37,12 @@ public class ShellSyntaxCheckerTest {
 
     @Test
     public void testDetectsCommandsSurroundedBySeparators() {
-        assertTrue(containsShellSyntax(
-                "find /path/to/search -type f -name \"pattern\" -exec rm {} \\;", "rm"
-        ));
+        assertTrue(containsShellSyntax("find /path/to/search -type f -name \"pattern\" -exec rm {} \\;", "rm"));
     }
 
     @Test
     public void testDetectsCommandsWithSeparatorBefore() {
-        assertTrue(containsShellSyntax(
-                "find /path/to/search -type f -name \"pattern\" | xargs rm", "rm"
-        ));
+        assertTrue(containsShellSyntax("find /path/to/search -type f -name \"pattern\" | xargs rm", "rm"));
     }
 
     @Test

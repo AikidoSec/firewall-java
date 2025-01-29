@@ -1,15 +1,18 @@
 package dev.aikido.agent_api.context;
 
-import java.util.*;
-
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
+import java.util.*;
+
 public class SpringMVCContextObject extends SpringContextObject {
     public SpringMVCContextObject(
-            String method, StringBuffer url, String rawIp, Map<String, String[]> queryParams,
-            HashMap<String, List<String>> cookies, HashMap<String, String> headers
-    ) {
+            String method,
+            StringBuffer url,
+            String rawIp,
+            Map<String, String[]> queryParams,
+            HashMap<String, List<String>> cookies,
+            HashMap<String, String> headers) {
         this.method = method;
         if (url != null) {
             this.url = url.toString();
@@ -22,6 +25,7 @@ public class SpringMVCContextObject extends SpringContextObject {
         this.source = "SpringFramework";
         this.redirectStartNodes = new ArrayList<>();
     }
+
     @Override
     public Object getBody() {
         if (this.body != null) {

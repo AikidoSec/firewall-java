@@ -2,7 +2,6 @@ package dev.aikido.agent_api.background.ipc_commands;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.User;
-
 import java.util.Optional;
 
 public class RegisterUserCommand extends Command<User, Command.EmptyResult> {
@@ -12,7 +11,9 @@ public class RegisterUserCommand extends Command<User, Command.EmptyResult> {
     }
 
     @Override
-    public String getName() { return "REGISTER_USER"; }
+    public String getName() {
+        return "REGISTER_USER";
+    }
 
     @Override
     public Class<User> getInputClass() {

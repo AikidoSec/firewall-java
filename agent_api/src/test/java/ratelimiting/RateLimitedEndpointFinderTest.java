@@ -1,14 +1,13 @@
 package ratelimiting;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class RateLimitedEndpointFinderTest {
 

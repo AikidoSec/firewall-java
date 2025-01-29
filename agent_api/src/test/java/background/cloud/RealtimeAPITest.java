@@ -1,13 +1,12 @@
 package background.cloud;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.background.cloud.RealtimeAPI;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class RealtimeAPITest {
     private RealtimeAPI realtimeAPI;
@@ -17,7 +16,7 @@ public class RealtimeAPITest {
         realtimeAPI = new RealtimeAPI();
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localhost:5000/realtime")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "http://localhost:5000/realtime")
     @Test
     public void testGetConfigSuccess() throws Exception {
         String token = "Bearer testToken";
@@ -28,7 +27,7 @@ public class RealtimeAPITest {
         assertEquals(0, response.get().configUpdatedAt());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localnothost:2500")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "http://localnothost:2500")
     @Test
     public void testURLNotAvailable() throws Exception {
         String token = "Bearer testToken";
@@ -38,7 +37,7 @@ public class RealtimeAPITest {
         assertFalse(response.isPresent());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "")
     @Test
     public void testNot200OK() throws Exception {
         String token = "Bearer testToken";

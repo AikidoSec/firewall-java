@@ -1,9 +1,13 @@
 package dev.aikido.agent_api.collectors;
 
+import static dev.aikido.agent_api.api_discovery.GetApiInfo.getApiInfo;
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
+import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
+
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
-import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.background.ipc_commands.InitRouteCommand;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
@@ -11,10 +15,6 @@ import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-
-import static dev.aikido.agent_api.api_discovery.GetApiInfo.getApiInfo;
-import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
-import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public final class WebResponseCollector {
     private WebResponseCollector() {}

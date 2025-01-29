@@ -1,9 +1,8 @@
 package dev.aikido.agent_api.helpers.patterns;
 
-import java.util.Base64;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
+import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,7 +27,7 @@ public final class LooksLikeJWT {
             String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
 
             Gson gson = new Gson();
-            Map<String, Object> jwtPayload = gson.fromJson(payload, new TypeToken<Map<String, Object>>(){}.getType());
+            Map<String, Object> jwtPayload = gson.fromJson(payload, new TypeToken<Map<String, Object>>() {}.getType());
 
             return new Result(true, jwtPayload);
         } catch (Exception ignored) {
@@ -37,21 +36,18 @@ public final class LooksLikeJWT {
     }
 
     // Helper class to hold the result
-        public record Result(boolean success, Map<String, Object> payload) {
+    public record Result(boolean success, Map<String, Object> payload) {
         @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (!(o instanceof Result)) return false;
-                Result result = (Result) o;
-                return success == result.success && Objects.equals(payload, result.payload);
-            }
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Result)) return false;
+            Result result = (Result) o;
+            return success == result.success && Objects.equals(payload, result.payload);
+        }
 
         @Override
-            public String toString() {
-                return "Result{" +
-                        "success=" + success +
-                        ", payload=" + payload +
-                        '}';
-            }
+        public String toString() {
+            return "Result{" + "success=" + success + ", payload=" + payload + '}';
         }
+    }
 }

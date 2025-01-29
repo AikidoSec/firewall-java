@@ -1,20 +1,19 @@
 package dev.aikido.agent_api.vulnerabilities.shell_injection;
 
+import static dev.aikido.agent_api.vulnerabilities.shell_injection.DangerousShellChars.containDangerousCharacter;
+import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellCommandsRegex.getCommandsRegex;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import static dev.aikido.agent_api.vulnerabilities.shell_injection.DangerousShellChars.containDangerousCharacter;
-import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellCommandsRegex.getCommandsRegex;
-
 public final class ShellSyntaxChecker {
     private ShellSyntaxChecker() {}
-    private static final List<String> SEPARATORS = Arrays.asList(
-            " ", "\t", "\n", ";", "&", "|", "(", ")", "<", ">"
-    );
+
+    private static final List<String> SEPARATORS = Arrays.asList(" ", "\t", "\n", ";", "&", "|", "(", ")", "<", ">");
 
     public static boolean containsShellSyntax(String command, String userInput) {
-        if(userInput.isBlank()) {
+        if (userInput.isBlank()) {
             return false; // The entire user input is just whitespace, ignore
         }
         if (containDangerousCharacter(userInput)) {

@@ -1,14 +1,13 @@
 package dev.aikido.agent.wrappers;
 
 import dev.aikido.agent_api.collectors.URLCollector;
+import java.lang.reflect.Method;
+import java.net.URI;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import java.lang.reflect.Method;
-import java.net.URI;
 
 public class ApacheHttpClientWrapper implements Wrapper {
     public String getName() {
@@ -16,19 +15,21 @@ public class ApacheHttpClientWrapper implements Wrapper {
         // https://hc.apache.org/httpcomponents-client-5.4.x/current/httpclient5/apidocs/org/apache/hc/client5/http/classic/HttpClient.html#execute-org.apache.hc.core5.http.ClassicHttpRequest-
         return ApacheHttpClientAdvice.class.getName();
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("org.apache.http").and(ElementMatchers.nameContains("HttpClient")))
+        return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("org.apache.http")
+                        .and(ElementMatchers.nameContains("HttpClient")))
                 .and(ElementMatchers.nameContainsIgnoreCase("execute"));
     }
+
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
         return ElementMatchers.nameContains("org.apache").and(ElementMatchers.nameEndsWith("HttpClient"));
     }
+
     public class ApacheHttpClientAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static void before(
-                @Advice.Argument(0) Object request
-        ) throws Throwable {
+        public static void before(@Advice.Argument(0) Object request) throws Throwable {
             if (request == null) {
                 return;
             }

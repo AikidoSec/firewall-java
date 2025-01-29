@@ -1,16 +1,15 @@
 package dev.aikido.agent_api.background;
 
-import dev.aikido.agent_api.background.ipc_commands.CommandRouter;
-import org.newsclub.net.unix.AFUNIXServerSocket;
-import org.newsclub.net.unix.AFUNIXSocket;
-import org.newsclub.net.unix.AFUNIXSocketAddress;
+import static dev.aikido.agent_api.background.utilities.IPCFacilitator.readFromSocket;
+import static dev.aikido.agent_api.background.utilities.IPCFacilitator.writeToSocket;
 
+import dev.aikido.agent_api.background.ipc_commands.CommandRouter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
-
-import static dev.aikido.agent_api.background.utilities.IPCFacilitator.readFromSocket;
-import static dev.aikido.agent_api.background.utilities.IPCFacilitator.writeToSocket;
+import org.newsclub.net.unix.AFUNIXServerSocket;
+import org.newsclub.net.unix.AFUNIXSocket;
+import org.newsclub.net.unix.AFUNIXSocketAddress;
 
 public class BackgroundReceiver {
     private final AFUNIXServerSocket socket;
@@ -19,9 +18,8 @@ public class BackgroundReceiver {
     public BackgroundReceiver(File socketFile, BackgroundProcess process) throws IOException, InterruptedException {
         // Delete previous socket file :
         commandRouter = new CommandRouter(
-            /* connection manager: */ process.getCloudConnectionManager(),
-            /* attack queue: */ process.getAttackQueue()
-        );
+                /* connection manager: */ process.getCloudConnectionManager(),
+                /* attack queue: */ process.getAttackQueue());
 
         // Create a new receiver:
         // Create a new server socket :
@@ -29,6 +27,7 @@ public class BackgroundReceiver {
         socket.bind(AFUNIXSocketAddress.of(socketFile));
         this.listen();
     }
+
     private void listen() throws IOException, InterruptedException {
         while (!socket.isClosed()) {
             AFUNIXSocket channel = socket.accept();

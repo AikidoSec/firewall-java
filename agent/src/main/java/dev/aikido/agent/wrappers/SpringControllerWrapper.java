@@ -1,17 +1,15 @@
 package dev.aikido.agent.wrappers;
 
+import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
+import static net.bytebuddy.matcher.ElementMatchers.*;
+
 import dev.aikido.agent_api.collectors.SpringAnnotationCollector;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Parameter;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
-
-import java.lang.reflect.Executable;
-import java.lang.reflect.Parameter;
-
-
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
-import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /* We wrap the controller functions annotated with an @RequestMapping
  * We check the input for @RequestBody, @RequestParam, @PathVariable, ...
@@ -25,15 +23,13 @@ public class SpringControllerWrapper implements Wrapper {
     @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
         // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/package-summary.html
-        return isAnnotatedWith(
-                nameContainsIgnoreCase("org.springframework.web.bind.annotation")
-                    .and(nameContainsIgnoreCase("DeleteMapping"))
-                    .or(nameContainsIgnoreCase("GetMapping"))
-                    .or(nameContainsIgnoreCase("PatchMapping"))
-                    .or(nameContainsIgnoreCase("PostMapping"))
-                    .or(nameContainsIgnoreCase("PutMapping"))
-                    .or(nameContainsIgnoreCase("RequestMapping"))
-        );
+        return isAnnotatedWith(nameContainsIgnoreCase("org.springframework.web.bind.annotation")
+                .and(nameContainsIgnoreCase("DeleteMapping"))
+                .or(nameContainsIgnoreCase("GetMapping"))
+                .or(nameContainsIgnoreCase("PatchMapping"))
+                .or(nameContainsIgnoreCase("PostMapping"))
+                .or(nameContainsIgnoreCase("PutMapping"))
+                .or(nameContainsIgnoreCase("RequestMapping")));
     }
 
     @Override
@@ -48,8 +44,8 @@ public class SpringControllerWrapper implements Wrapper {
         @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
                 @Advice.Origin Executable method,
-                @Advice.AllArguments(readOnly = false, typing = DYNAMIC) Object[] args
-        ) throws Exception {
+                @Advice.AllArguments(readOnly = false, typing = DYNAMIC) Object[] args)
+                throws Exception {
             Parameter[] parameters = method.getParameters();
             SpringAnnotationCollector.report(parameters, args);
         }

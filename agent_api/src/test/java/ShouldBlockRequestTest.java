@@ -1,3 +1,6 @@
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.ShouldBlockRequest;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
@@ -6,18 +9,14 @@ import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
+import java.sql.SQLException;
+import java.util.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-
-import java.sql.SQLException;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class ShouldBlockRequestTest {
     public static class SampleContextObject extends ContextObject {
@@ -39,7 +38,9 @@ public class ShouldBlockRequestTest {
     public static void clean() {
         Context.set(null);
         ThreadCache.set(null);
-    };
+    }
+    ;
+
     @BeforeEach
     public void setUp() throws SQLException {
         // Connect to the MySQL database
@@ -60,7 +61,6 @@ public class ShouldBlockRequestTest {
         var res1 = ShouldBlockRequest.shouldBlockRequest();
         assertTrue(Context.get().middlewareExecuted());
         assertFalse(res1.block());
-
 
         Context.set(new SampleContextObject());
         ThreadCache.set(null);
@@ -91,7 +91,6 @@ public class ShouldBlockRequestTest {
         assertFalse(res2.block());
     }
 
-
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     public void testUserSet() throws SQLException {
@@ -110,7 +109,8 @@ public class ShouldBlockRequestTest {
         ctx.setUser(new User("ID1", "John Doe", "127.0.0.1", 100));
         Context.set(ctx);
 
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of("ID1", "ID2", "ID3"), Set.of(), new Routes(), Optional.empty()));
+        ThreadCache.set(new ThreadCacheObject(
+                List.of(), Set.of("ID1", "ID2", "ID3"), Set.of(), new Routes(), Optional.empty()));
         var res2 = ShouldBlockRequest.shouldBlockRequest();
         assertTrue(res2.block());
         assertTrue(Context.get().middlewareExecuted());
@@ -118,8 +118,6 @@ public class ShouldBlockRequestTest {
         assertEquals("user", res2.data().trigger());
         assertEquals("blocked", res2.data().type());
         assertEquals("192.168.1.1", res2.data().ip());
-
-
 
         // Test users blocked but no user set :
         Context.set(new SampleContextObject());
@@ -142,18 +140,24 @@ public class ShouldBlockRequestTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     public void testEndpointsExistButNoMatch() throws SQLException {
         Context.set(null);
-        ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, false)
-        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
+        ThreadCache.set(new ThreadCacheObject(
+                List.of(new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, false)),
+                Set.of(),
+                Set.of(),
+                new Routes(),
+                Optional.empty()));
 
         // Test with thread cache set & rate-limiting disabled :
         var res1 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(res1.block());
 
         Context.set(null);
-        ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, true)
-        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
+        ThreadCache.set(new ThreadCacheObject(
+                List.of(new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, true)),
+                Set.of(),
+                Set.of(),
+                new Routes(),
+                Optional.empty()));
 
         // Test with thread cache set & rate-limiting enabled :
         var res2 = ShouldBlockRequest.shouldBlockRequest();
@@ -164,18 +168,24 @@ public class ShouldBlockRequestTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     public void testEndpointsExistWithMatch() throws SQLException {
         Context.set(null);
-        ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, false)
-        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
+        ThreadCache.set(new ThreadCacheObject(
+                List.of(new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, false)),
+                Set.of(),
+                Set.of(),
+                new Routes(),
+                Optional.empty()));
 
         // Test with match & rate-limiting disabled :
         var res1 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(res1.block());
 
         Context.set(null);
-        ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
-        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
+        ThreadCache.set(new ThreadCacheObject(
+                List.of(new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)),
+                Set.of(),
+                Set.of(),
+                new Routes(),
+                Optional.empty()));
 
         // Test with match & rate-limiting enabled :
         var res2 = ShouldBlockRequest.shouldBlockRequest();
@@ -186,9 +196,12 @@ public class ShouldBlockRequestTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "")
     public void testThreadClientInvalid() throws SQLException {
         Context.set(new SampleContextObject());
-        ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
-        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
+        ThreadCache.set(new ThreadCacheObject(
+                List.of(new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)),
+                Set.of(),
+                Set.of(),
+                new Routes(),
+                Optional.empty()));
 
         // Test with match & rate-limiting enabled :
         var res1 = ShouldBlockRequest.shouldBlockRequest();
@@ -199,13 +212,15 @@ public class ShouldBlockRequestTest {
     @ClearEnvironmentVariable(key = "AIKIDO_TOKEN")
     public void testThreadClientInvalid2() throws SQLException {
         Context.set(new SampleContextObject());
-        ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
-        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
+        ThreadCache.set(new ThreadCacheObject(
+                List.of(new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)),
+                Set.of(),
+                Set.of(),
+                new Routes(),
+                Optional.empty()));
 
         // Test with match & rate-limiting enabled :
         var res1 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(res1.block());
     }
-
 }

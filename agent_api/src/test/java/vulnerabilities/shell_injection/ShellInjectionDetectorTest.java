@@ -1,20 +1,26 @@
 package vulnerabilities.shell_injection;
 
-import dev.aikido.agent_api.vulnerabilities.shell_injection.ShellInjectionDetector;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import dev.aikido.agent_api.vulnerabilities.shell_injection.ShellInjectionDetector;
+import org.junit.jupiter.api.Test;
 
 public class ShellInjectionDetectorTest {
 
     private void assertIsShellInjection(String command, String userInput) {
-        assertTrue(new ShellInjectionDetector().run(userInput, new String[]{command}).isDetectedAttack(),
+        assertTrue(
+                new ShellInjectionDetector()
+                        .run(userInput, new String[] {command})
+                        .isDetectedAttack(),
                 String.format("command: %s, userInput: %s", command, userInput));
     }
 
     private void assertIsNotShellInjection(String command, String userInput) {
-        assertFalse(new ShellInjectionDetector().run(userInput, new String[]{command}).isDetectedAttack(),
+        assertFalse(
+                new ShellInjectionDetector()
+                        .run(userInput, new String[] {command})
+                        .isDetectedAttack(),
                 String.format("command: %s, userInput: %s", command, userInput));
     }
 
@@ -36,9 +42,8 @@ public class ShellInjectionDetectorTest {
     @Test
     void testUswrInputButWrongArgs() {
         assertFalse(new ShellInjectionDetector().run("123", null).isDetectedAttack());
-        assertFalse(new ShellInjectionDetector().run("123", new String[]{}).isDetectedAttack());
-        assertFalse(new ShellInjectionDetector().run("123", new String[]{null}).isDetectedAttack());
-
+        assertFalse(new ShellInjectionDetector().run("123", new String[] {}).isDetectedAttack());
+        assertFalse(new ShellInjectionDetector().run("123", new String[] {null}).isDetectedAttack());
     }
 
     @Test
@@ -55,12 +60,12 @@ public class ShellInjectionDetectorTest {
     void testDetectsCommandSubstitution() {
         assertIsShellInjection("ls $(echo)", "$(echo)");
         assertIsShellInjection("ls \"$(echo)\"", "$(echo)");
-        assertIsShellInjection("echo $(echo \"Inner: $(echo \"This is nested\")\")",
-                "$(echo \"Inner: $(echo \"This is nested\")\")");
+        assertIsShellInjection(
+                "echo $(echo \"Inner: $(echo \"This is nested\")\")", "$(echo \"Inner: $(echo \"This is nested\")\")");
 
         assertIsNotShellInjection("ls '$(echo)'", "$(echo)");
-        assertIsNotShellInjection("ls '$(echo \"Inner: $(echo \"This is nested\")\")'",
-                "$(echo \"Inner: $(echo \"This is nested\")\")");
+        assertIsNotShellInjection(
+                "ls '$(echo \"Inner: $(echo \"This is nested\")\")'", "$(echo \"Inner: $(echo \"This is nested\")\")");
     }
 
     @Test
@@ -240,7 +245,8 @@ public class ShellInjectionDetectorTest {
 
     @Test
     void testIgnoresCommandsWhereMultipleSpacesMatchUserInput() {
-        assertIsNotShellInjection("ls   -l", "   "); // Multiple spaces between arguments should not be considered injection
+        assertIsNotShellInjection(
+                "ls   -l", "   "); // Multiple spaces between arguments should not be considered injection
     }
 
     @Test
@@ -260,17 +266,20 @@ public class ShellInjectionDetectorTest {
 
     @Test
     void testHandlesSpacesWithinQuotedArgumentsCorrectly() {
-        assertIsNotShellInjection("command 'arg with spaces'", " "); // Spaces within a quoted argument should not be flagged
+        assertIsNotShellInjection(
+                "command 'arg with spaces'", " "); // Spaces within a quoted argument should not be flagged
     }
 
     @Test
     void testCorrectlyInterpretsSpacesInMixedArgumentTypes() {
-        assertIsNotShellInjection("command arg1 'arg with spaces' arg2", " "); // Mixed argument types with internal spaces are safe
+        assertIsNotShellInjection(
+                "command arg1 'arg with spaces' arg2", " "); // Mixed argument types with internal spaces are safe
     }
 
     @Test
     void testIgnoresSpacesInCommandsWithConcatenatedArguments() {
-        assertIsNotShellInjection("command 'arg1'arg2'arg3'", " "); // Lack of spaces in concatenated arguments is intentional and safe
+        assertIsNotShellInjection(
+                "command 'arg1'arg2'arg3'", " "); // Lack of spaces in concatenated arguments is intentional and safe
     }
 
     @Test
@@ -280,8 +289,10 @@ public class ShellInjectionDetectorTest {
 
     @Test
     void testConsidersSpacesInEnvironmentVariableAssignmentsAsSafe() {
-        assertIsNotShellInjection("ENV_VAR='value' command", " "); // Spaces around environment variable assignments are not injections
+        assertIsNotShellInjection(
+                "ENV_VAR='value' command", " "); // Spaces around environment variable assignments are not injections
     }
+
     @Test
     void testNewLinesInCommandsAreConsideredInjections() {
         assertIsShellInjection("ls \nrm", "\nrm");
@@ -322,6 +333,7 @@ public class ShellInjectionDetectorTest {
         assertIsShellInjection("find /path/to/search -type f -name \"pattern\" -exec rm {} \\;", "rm");
         assertIsShellInjection("ls .|rm", "rm");
     }
+
     @Test
     void testIgnoresDangerousCommandsIfPartOfString() {
         assertIsNotShellInjection("binary sleepwithme", "sleepwithme");
@@ -399,15 +411,14 @@ public class ShellInjectionDetectorTest {
     void testRealCase() {
         assertIsShellInjection(
                 "command -disable-update-check -target https://examplx.com|curl+https://cde-123.abc.domain.com+%23 -json-export /tmp/5891/8526757.json -tags microsoft,windows,exchange,iis,gitlab,oracle,cisco,joomla -stats -stats-interval 3 -retries 3 -no-stdin",
-                "https://examplx.com|curl+https://cde-123.abc.domain.com+%23"
-        );
+                "https://examplx.com|curl+https://cde-123.abc.domain.com+%23");
     }
+
     @Test
     void testFalsePositiveWithEmail() {
         assertIsNotShellInjection(
                 "echo token | docker login --username john.doe@acme.com --password-stdin hub.acme.com",
-                "john.doe@acme.com"
-        );
+                "john.doe@acme.com");
     }
 
     @Test
@@ -419,19 +430,13 @@ public class ShellInjectionDetectorTest {
     @Test
     void testAllowsCommaSeparatedList() {
         assertIsNotShellInjection(
-                "command -tags php,laravel,drupal,phpmyadmin,symfony -stats",
-                "php,laravel,drupal,phpmyadmin,symfony"
-        );
+                "command -tags php,laravel,drupal,phpmyadmin,symfony -stats", "php,laravel,drupal,phpmyadmin,symfony");
     }
 
     @Test
     void testItFlagsCommaInLoop() {
         assertIsShellInjection(
-                "command for (( i=0, j=10; i<j; i++, j-- ))\n" +
-                        "do\n" +
-                        "    echo \"$i $j\"\n" +
-                        "done",
-                "for (( i=0, j=10; i<j; i++, j-- ))"
-        );
+                "command for (( i=0, j=10; i<j; i++, j-- ))\n" + "do\n" + "    echo \"$i $j\"\n" + "done",
+                "for (( i=0, j=10; i<j; i++, j-- ))");
     }
 }

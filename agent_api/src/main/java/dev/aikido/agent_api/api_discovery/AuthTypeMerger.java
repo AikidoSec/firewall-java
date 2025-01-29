@@ -8,7 +8,8 @@ import java.util.Objects;
 public final class AuthTypeMerger {
     private AuthTypeMerger() {}
 
-    public static List<Map<String, String>> mergeAuthTypes(List<Map<String, String>> existing, List<Map<String, String>> newAuth) {
+    public static List<Map<String, String>> mergeAuthTypes(
+            List<Map<String, String>> existing, List<Map<String, String>> newAuth) {
         // Check if newAuth is null or empty
         if (newAuth == null || newAuth.isEmpty()) {
             return existing;
@@ -44,9 +45,9 @@ public final class AuthTypeMerger {
             return false; // Return false if either map is null
         }
 
-        return Objects.equals(a.get("type"), b.get("type")) &&
-                Objects.equals(a.get("in"), b.get("in")) &&
-                Objects.equals(a.get("name"), b.get("name")) &&
-                Objects.equals(a.get("scheme"), b.get("scheme"));
+        return Objects.equals(a.get("type"), b.get("type"))
+                && Objects.equals(a.get("in"), b.get("in"))
+                && Objects.equals(a.get("name"), b.get("name"))
+                && Objects.equals(a.get("scheme"), b.get("scheme"));
     }
 }

@@ -1,5 +1,8 @@
 package wrappers;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import org.junit.jupiter.api.AfterEach;
@@ -8,20 +11,19 @@ import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
-
 public class RuntimeExecTest {
     @AfterEach
     void cleanup() {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @BeforeEach
     void clearThreadCache() {
         cleanup();
         ThreadCache.set(getEmptyThreadCacheObject());
     }
+
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
@@ -43,7 +45,6 @@ public class RuntimeExecTest {
         });
         assertEquals("Aikido Zen has blocked Shell Injection", exception2.getMessage());
 
-
         cleanup();
         assertDoesNotThrow(() -> {
             Runtime.getRuntime().exec("whoami && ls -la");
@@ -59,14 +60,14 @@ public class RuntimeExecTest {
     public void testOnlyScansStrings() {
         setContextAndLifecycle("whoami");
         assertDoesNotThrow(() -> {
-            Runtime.getRuntime().exec(new String[]{"whoami"});
+            Runtime.getRuntime().exec(new String[] {"whoami"});
         });
         assertDoesNotThrow(() -> {
-            Runtime.getRuntime().exec(new String[]{"whoami"}, new String[]{"MyEnvironmentVar=1"});
+            Runtime.getRuntime().exec(new String[] {"whoami"}, new String[] {"MyEnvironmentVar=1"});
         });
 
         Exception exception1 = assertThrows(RuntimeException.class, () -> {
-            Runtime.getRuntime().exec("whoami", new String[]{"MyEnvironmentVar=1"});
+            Runtime.getRuntime().exec("whoami", new String[] {"MyEnvironmentVar=1"});
         });
         assertEquals("Aikido Zen has blocked Shell Injection", exception1.getMessage());
     }

@@ -1,12 +1,11 @@
 package dev.aikido.agent_api.storage.routes;
 
+import static dev.aikido.agent_api.api_discovery.APISpecMerger.mergeAPISpecs;
+
 import com.google.gson.*;
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.context.RouteMetadata;
-
 import java.lang.reflect.Type;
-
-import static dev.aikido.agent_api.api_discovery.APISpecMerger.mergeAPISpecs;
 
 public class RouteEntry {
     final String method;
@@ -26,6 +25,7 @@ public class RouteEntry {
         this.hits = 0;
         this.apispec = null;
     }
+
     public RouteEntry(RouteMetadata routeMetadata) {
         this(routeMetadata.method(), routeMetadata.route());
     }
@@ -34,6 +34,7 @@ public class RouteEntry {
         hits++;
         deltaHits++; // Also increment delta.
     }
+
     public void incrementHits(int count) {
         hits += count;
     }

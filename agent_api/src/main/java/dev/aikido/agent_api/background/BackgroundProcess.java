@@ -1,5 +1,8 @@
 package dev.aikido.agent_api.background;
 
+import static dev.aikido.agent_api.Config.heartbeatEveryXSeconds;
+import static dev.aikido.agent_api.Config.pollingEveryXSeconds;
+
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.utilities.UDSPath;
@@ -7,21 +10,18 @@ import dev.aikido.agent_api.helpers.env.BlockingEnv;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static dev.aikido.agent_api.Config.heartbeatEveryXSeconds;
-import static dev.aikido.agent_api.Config.pollingEveryXSeconds;
-
 public class BackgroundProcess extends Thread {
     private static final Logger logger = LogManager.getLogger(BackgroundProcess.class);
     private CloudConnectionManager connectionManager;
     private final Token token;
     private BlockingQueue<APIEvent> attackQueue;
+
     public BackgroundProcess(String name, Token token) {
         super(name);
         this.token = token;
@@ -42,21 +42,24 @@ public class BackgroundProcess extends Thread {
                 new HeartbeatTask(connectionManager), // Heartbeat task: Sends statistics, route data, etc.
                 heartbeatEveryXSeconds * 1000, // Delay before first execution in milliseconds
                 heartbeatEveryXSeconds * 1000 // Interval in milliseconds
-        );
+                );
         timer.scheduleAtFixedRate(
                 new RealtimeTask(connectionManager), // Realtime task: makes sure config updates happen fast
                 pollingEveryXSeconds * 1000, // Delay before first execution in milliseconds
                 pollingEveryXSeconds * 1000 // Interval in milliseconds
-        );
+                );
         timer.scheduleAtFixedRate(
-                new AttackQueueConsumerTask(connectionManager, attackQueue), // Consumes from the attack queue (so attacks are reported in background)
-                /* delay: */ 0, /* interval: */ 2 * 1000 // Clear queue every 2 seconds
-        );
+                new AttackQueueConsumerTask(
+                        connectionManager,
+                        attackQueue), // Consumes from the attack queue (so attacks are reported in background)
+                /* delay: */ 0, /* interval: */
+                2 * 1000 // Clear queue every 2 seconds
+                );
         // Report initial statistics if those were not received
         timer.schedule(
                 new HeartbeatTask(connectionManager, true /* Check for initial statistics */), // Initial heartbeat task
                 60_000 // Delay in ms
-        );
+                );
         try {
             File queueDir = UDSPath.getUDSPath(token);
             if (!queueDir.getParentFile().canWrite()) {
@@ -72,6 +75,7 @@ public class BackgroundProcess extends Thread {
     public CloudConnectionManager getCloudConnectionManager() {
         return connectionManager;
     }
+
     public BlockingQueue<APIEvent> getAttackQueue() {
         return attackQueue;
     }

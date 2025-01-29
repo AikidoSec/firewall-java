@@ -1,17 +1,16 @@
 package dev.aikido.agent_api.background.cloud;
 
+import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoRealtimeEndpoint;
+
 import com.google.gson.Gson;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
-
-import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoRealtimeEndpoint;
 
 public class RealtimeAPI {
     private static final Logger logger = LogManager.getLogger(RealtimeAPI.class);
@@ -22,7 +21,9 @@ public class RealtimeAPI {
         // Create API :
         endpoint = getAikidoRealtimeEndpoint();
     }
+
     public record ConfigResponse(long configUpdatedAt) {}
+
     public Optional<ConfigResponse> getConfig(String token) {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
@@ -48,6 +49,7 @@ public class RealtimeAPI {
         Gson gson = new Gson();
         return Optional.of(gson.fromJson(res.body(), ConfigResponse.class));
     }
+
     private static HttpRequest createConfigRequest(String token, URI uri) {
         return HttpRequest.newBuilder()
                 .uri(uri) // Change to your target URL

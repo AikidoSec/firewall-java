@@ -1,15 +1,14 @@
 package helpers;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dev.aikido.agent_api.helpers.env.BooleanEnv;
 import dev.aikido.agent_api.helpers.net.ProxyForwardedParser;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ProxyForwardedParserTest {
 
@@ -84,7 +83,7 @@ class ProxyForwardedParserTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key="AIKIDO_TRUST_PROXY", value = "0")
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "0")
     void testGetIpFromRequest_TrustProxyFalse() {
         Map<String, String> headers = new HashMap<>();
         headers.put("x-forwarded-for", "192.168.1.1, 203.0.113.5");
@@ -94,7 +93,7 @@ class ProxyForwardedParserTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key="AIKIDO_TRUST_PROXY", value = "1")
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
     void testGetIpFromRequest_TrustProxyTrueWithNoValidIPs() {
         Map<String, String> headers = new HashMap<>();
         headers.put("x-forwarded-for", "invalid.ip.address, another.invalid");
@@ -106,7 +105,7 @@ class ProxyForwardedParserTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key="AIKIDO_TRUST_PROXY", value = "1")
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
     void testGetIpFromRequest_MultipleValidIPs() {
         Map<String, String> headers = new HashMap<>();
         headers.put("x-forwarded-for", "203.0.113.5, 192.168.1.1");
@@ -114,5 +113,4 @@ class ProxyForwardedParserTest {
         String result = parser.getIpFromRequest("10.0.0.1", headers);
         assertEquals("203.0.113.5", result); // Should return the first valid IP
     }
-
 }

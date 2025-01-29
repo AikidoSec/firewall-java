@@ -1,10 +1,10 @@
 package vulnerabilities.shell_injection;
 
-import org.junit.jupiter.api.Test;
-
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.CommandEncapsulationChecker.isSafelyEncapsulated;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 public class CommandEncapsulationCheckerTest {
 

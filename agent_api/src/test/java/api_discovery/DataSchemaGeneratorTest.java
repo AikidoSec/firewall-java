@@ -1,12 +1,13 @@
 package api_discovery;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.google.gson.Gson;
 import dev.aikido.agent_api.api_discovery.DataSchemaGenerator;
 import dev.aikido.agent_api.api_discovery.DataSchemaItem;
 import dev.aikido.agent_api.api_discovery.DataSchemaType;
-import org.junit.jupiter.api.Test;
 import java.util.*;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class DataSchemaGeneratorTest {
 
@@ -42,7 +43,8 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.OBJECT, schema.type());
         assertEquals(DataSchemaType.NUMBER, schema.properties().get("test").type());
         assertEquals(DataSchemaType.ARRAY, schema.properties().get("arr").type());
-        assertEquals(DataSchemaType.NUMBER, schema.properties().get("arr").items().type());
+        assertEquals(
+                DataSchemaType.NUMBER, schema.properties().get("arr").items().type());
     }
 
     @Test
@@ -55,12 +57,16 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.OBJECT, schema.type());
         assertEquals(DataSchemaType.NUMBER, schema.properties().get("test").type());
         assertEquals(DataSchemaType.ARRAY, schema.properties().get("arr").type());
-        assertEquals(DataSchemaType.OBJECT, schema.properties().get("arr").items().type());
-        assertEquals(DataSchemaType.BOOL, schema.properties().get("arr").items().properties().get("sub").type());
+        assertEquals(
+                DataSchemaType.OBJECT, schema.properties().get("arr").items().type());
+        assertEquals(
+                DataSchemaType.BOOL,
+                schema.properties().get("arr").items().properties().get("sub").type());
         assertEquals(DataSchemaType.EMPTY, schema.properties().get("x").type());
     }
 
     private record MyRecord(String a, Number abc, List<String> stringslist) {}
+
     @Test
     public void testExtractsFromClasses() {
         MyRecord myRecord = new MyRecord("Hello World", null, List.of("Abc", "def", "ghi"));
@@ -81,6 +87,7 @@ public class DataSchemaGeneratorTest {
         transient Number abc = null;
         List<String> stringslist = List.of("Abc", "def", "ghi");
     }
+
     @Test
     public void testTransientFields() {
         Map<String, Object> input = new HashMap<>();
@@ -101,6 +108,7 @@ public class DataSchemaGeneratorTest {
         transient boolean abc = false;
         List<Boolean> stringslist = List.of(true, false, true);
     }
+
     @Test
     public void testBooleanField() {
         Map<String, Object> input = new HashMap<>();
@@ -134,13 +142,11 @@ public class DataSchemaGeneratorTest {
         String schemaAsString = gson.toJson(schema);
         assertTrue(schemaAsString.contains("string"));
 
-
         obj = generateTestObjectWithDepth(20);
         schema = DataSchemaGenerator.getDataSchema(obj);
         schemaAsString = gson.toJson(schema);
 
         assertTrue(schemaAsString.contains("string"));
-
 
         obj = generateTestObjectWithDepth(21);
         schema = DataSchemaGenerator.getDataSchema(obj);

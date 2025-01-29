@@ -1,17 +1,15 @@
 package storage;
 
-import dev.aikido.agent_api.context.RouteMetadata;
-import dev.aikido.agent_api.storage.routes.Routes;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static dev.aikido.agent_api.storage.routes.RouteToKeyHelper.routeToKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import dev.aikido.agent_api.context.RouteMetadata;
+import dev.aikido.agent_api.storage.routes.Routes;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RoutesTest {
     private Routes routes;
@@ -70,6 +68,7 @@ public class RoutesTest {
         Map<String, Integer> deltaMap = routes.getDeltaMap();
         assertEquals(0, deltaMap.size());
     }
+
     @Test
     public void testGetDeltaMapWithNoIncrements() {
         RouteMetadata routeMetadata = new RouteMetadata("/test", "http://localhost/test", "GET");
@@ -108,6 +107,7 @@ public class RoutesTest {
         // Since the route was never initialized, hits should be 0
         assertNull(routes.get(routeMetadata));
     }
+
     @Test
     public void testImportFromDeltaMapWithZeroHits() {
         RouteMetadata routeMetadata = new RouteMetadata("/test", "http://localhost/test", "GET");
