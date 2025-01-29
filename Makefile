@@ -2,6 +2,9 @@ clean:
 	rm -rf dist/
 	./gradlew clean
 
+lint:
+	./gradlew spotlessApply
+
 build: clean check_binaries
 	mkdir -p dist/
 
