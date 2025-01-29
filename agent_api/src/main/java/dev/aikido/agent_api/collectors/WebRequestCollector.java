@@ -12,11 +12,15 @@ import static dev.aikido.agent_api.helpers.IPAccessController.ipAllowedToAccessR
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
 
 public final class WebRequestCollector {
-    private WebRequestCollector() {}
-    public record Res(String msg, Integer status) {};
+    private WebRequestCollector() {
+    }
+
+    public record Res(String msg, Integer status) {
+    }
 
     /**
      * This function gets called in the initial phases of a request.
+     *
      * @param newContext is the new ContextObject that holds headers, query, ...
      */
     public static Res report(ContextObject newContext) {

@@ -11,10 +11,14 @@ import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoint
 import static dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder.getRateLimitedEndpoint;
 
 public final class ShouldRateLimit {
-    private ShouldRateLimit() {}
-    public record RateLimitDecision(boolean block, String trigger) {}
+    private ShouldRateLimit() {
+    }
+
+    public record RateLimitDecision(boolean block, String trigger) {
+    }
+
     public static RateLimitDecision shouldRateLimit(
-            RouteMetadata routeMetadata, User user, String remoteAddress, CloudConnectionManager connectionManager
+        RouteMetadata routeMetadata, User user, String remoteAddress, CloudConnectionManager connectionManager
     ) {
         List<Endpoint> endpoints = connectionManager.getConfig().getEndpoints();
         List<Endpoint> matches = matchEndpoints(routeMetadata, endpoints);

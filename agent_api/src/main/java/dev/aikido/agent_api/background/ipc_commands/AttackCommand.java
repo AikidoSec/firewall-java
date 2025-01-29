@@ -13,7 +13,8 @@ import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
 public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResult> {
-    public record Req(Attack attack, ContextObject context) {}
+    public record Req(Attack attack, ContextObject context) {
+    }
 
     private static final Logger logger = LogManager.getLogger(AttackCommand.class);
     private final BlockingQueue<APIEvent> queue;
@@ -21,6 +22,7 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
     public AttackCommand(BlockingQueue<APIEvent> queue) {
         this.queue = queue;
     }
+
     public static void sendAttack(ThreadIPCClient client, Req req) {
         new AttackCommand(null).send(client, req);
     }
@@ -31,7 +33,9 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
     }
 
     @Override
-    public String getName() { return "ATTACK"; }
+    public String getName() {
+        return "ATTACK";
+    }
 
     @Override
     public Class<Req> getInputClass() {
@@ -51,7 +55,7 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
         }
         // Generate an attack event :
         DetectedAttack.DetectedAttackEvent detectedAttack = DetectedAttack.createAPIEvent(
-                data.attack, data.context, connectionManager
+            data.attack, data.context, connectionManager
         );
 
         // Increment statistics :

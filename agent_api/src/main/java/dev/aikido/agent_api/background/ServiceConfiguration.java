@@ -17,10 +17,11 @@ public class ServiceConfiguration {
     private boolean blockingEnabled;
     private boolean receivedAnyStats;
     private boolean middlewareInstalled;
-    private HashSet<String> bypassedIPs =  new HashSet<>();
+    private HashSet<String> bypassedIPs = new HashSet<>();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
     public ReportingApi.APIListsResponse blockedListsRes = null;
+
     public ServiceConfiguration(boolean blockingEnabled, String serverless) {
         if (serverless != null && serverless.isEmpty()) {
             throw new IllegalArgumentException("Serverless cannot be an empty string");
@@ -31,6 +32,7 @@ public class ServiceConfiguration {
         this.receivedAnyStats = true;
         this.middlewareInstalled = false;
     }
+
     public void updateConfig(APIResponse apiResponse) {
         if (apiResponse == null || !apiResponse.success()) {
             return;
@@ -38,36 +40,51 @@ public class ServiceConfiguration {
         this.blockingEnabled = apiResponse.block();
         if (apiResponse.allowedIPAddresses() != null) {
             this.bypassedIPs = new HashSet<>(apiResponse.allowedIPAddresses());
-        } if (apiResponse.blockedUserIds() != null) {
+        }
+        if (apiResponse.blockedUserIds() != null) {
             this.blockedUserIDs = new HashSet<>(apiResponse.blockedUserIds());
-        } if (apiResponse.endpoints() != null) {
+        }
+        if (apiResponse.endpoints() != null) {
             this.endpoints = apiResponse.endpoints();
         }
         this.receivedAnyStats = apiResponse.receivedAnyStats();
     }
+
     // Getters :
     public String getServerless() {
         return serverless;
     }
+
     public boolean isBlockingEnabled() {
         return blockingEnabled;
     }
-    public boolean hasReceivedAnyStats() {return receivedAnyStats; }
-    public boolean isMiddlewareInstalled() { return middlewareInstalled; }
+
+    public boolean hasReceivedAnyStats() {
+        return receivedAnyStats;
+    }
+
+    public boolean isMiddlewareInstalled() {
+        return middlewareInstalled;
+    }
+
     public HashSet<String> getBypassedIPs() {
         return bypassedIPs;
     }
+
     public List<Endpoint> getEndpoints() {
         return endpoints;
     }
+
     public HashSet<String> getBlockedUserIDs() {
         return blockedUserIDs;
     }
+
     public void storeBlockedListsRes(Optional<ReportingApi.APIListsResponse> apiListsResponse) {
         if (apiListsResponse.isPresent()) {
             this.blockedListsRes = apiListsResponse.get();
         }
     }
+
     public void setMiddlewareInstalled() {
         this.middlewareInstalled = true;
     }

@@ -29,6 +29,7 @@ public class BackgroundReceiver {
         socket.bind(AFUNIXSocketAddress.of(socketFile));
         this.listen();
     }
+
     private void listen() throws IOException, InterruptedException {
         while (!socket.isClosed()) {
             AFUNIXSocket channel = socket.accept();

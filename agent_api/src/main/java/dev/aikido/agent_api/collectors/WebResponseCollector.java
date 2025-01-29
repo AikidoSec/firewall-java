@@ -2,8 +2,8 @@ package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
-import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.background.ipc_commands.InitRouteCommand;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
@@ -17,12 +17,16 @@ import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.g
 import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
 
 public final class WebResponseCollector {
-    private WebResponseCollector() {}
+    private WebResponseCollector() {
+    }
+
     // Only do API Discovery on first 20 requests:
     private static final int ANALYSIS_ON_FIRST_X_REQUESTS = 20;
+
     /**
      * This function gets used after the code of a request is complete, and we have a status code
      * Here we can check if a route is useful, report it, build api specs, ...
+     *
      * @param statusCode is the response status code
      */
     public static void report(int statusCode) {

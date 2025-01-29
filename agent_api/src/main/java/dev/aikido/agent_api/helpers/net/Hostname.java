@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public final class Hostname {
-    private Hostname() {}
+    private Hostname() {
+    }
+
     public static String getHostname() {
         // getHostName function seem unreliable, so using "hostname" command which works for both UNIX(-like) systems and Windows
         // See https://stackoverflow.com/a/7800008 for more info.

@@ -40,7 +40,8 @@ public class PathTraversalDetector implements Detector {
         // Check for absolute path traversal
         if (startsWithUnsafePath(filePath, userInput)) {
             return new DetectorResult(true, Map.of("filename", filePath), PathTraversalException.get());
-        };
+        }
+        ;
         return new DetectorResult();
     }
 

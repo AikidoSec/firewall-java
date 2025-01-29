@@ -5,14 +5,13 @@ import dev.aikido.agent_api.vulnerabilities.Detector;
 import java.util.Map;
 
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.CommandEncapsulationChecker.isSafelyEncapsulated;
-import static dev.aikido.agent_api.vulnerabilities.shell_injection.DangerousShellChars.containDangerousCharacter;
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellSyntaxChecker.containsShellSyntax;
 
 public class ShellInjectionDetector implements Detector {
     @Override
     public DetectorResult run(String userInput, String[] arguments) {
         if (userInput.isEmpty() || arguments == null || arguments.length == 0 || arguments[0] == null) {
-           return new DetectorResult(); // Empty result.
+            return new DetectorResult(); // Empty result.
         }
         String command = arguments[0];
         if (userInput.equals("~") && command.length() > 1 && command.contains("~")) {

@@ -5,9 +5,11 @@ import dev.aikido.agent_api.context.ContextObject;
 import java.util.Map;
 
 public final class UserAgentFromContext {
-    private UserAgentFromContext() {}
+    private UserAgentFromContext() {
+    }
+
     public static String getUserAgent(ContextObject context) {
-        for (Map.Entry<String, String> entry: context.getHeaders().entrySet()) {
+        for (Map.Entry<String, String> entry : context.getHeaders().entrySet()) {
             if (entry.getKey().equalsIgnoreCase("user-agent")) {
                 return entry.getValue();
             }

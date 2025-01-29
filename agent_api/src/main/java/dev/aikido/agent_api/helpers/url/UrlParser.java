@@ -4,7 +4,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public final class UrlParser {
-    private UrlParser() {}
+    private UrlParser() {
+    }
 
     public static URI tryParseUrl(String url) {
         try {

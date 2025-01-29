@@ -5,31 +5,33 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class UnsafePathChecker {
-    private UnsafePathChecker() {}
+    private UnsafePathChecker() {
+    }
+
     private static final List<String> LINUX_ROOT_FOLDERS = Arrays.asList(
-            "/bin/",
-            "/boot/",
-            "/dev/",
-            "/etc/",
-            "/home/",
-            "/init/",
-            "/lib/",
-            "/media/",
-            "/mnt/",
-            "/opt/",
-            "/proc/",
-            "/root/",
-            "/run/",
-            "/sbin/",
-            "/srv/",
-            "/sys/",
-            "/tmp/",
-            "/usr/",
-            "/var/"
+        "/bin/",
+        "/boot/",
+        "/dev/",
+        "/etc/",
+        "/home/",
+        "/init/",
+        "/lib/",
+        "/media/",
+        "/mnt/",
+        "/opt/",
+        "/proc/",
+        "/root/",
+        "/run/",
+        "/sbin/",
+        "/srv/",
+        "/sys/",
+        "/tmp/",
+        "/usr/",
+        "/var/"
     );
     private static final List<String> DANGEROUS_PATH_STARTS = Arrays.asList(
-            "c:/",
-            "c:\\"
+        "c:/",
+        "c:\\"
     );
 
     public static boolean startsWithUnsafePath(String filePath) {
@@ -45,6 +47,7 @@ public final class UnsafePathChecker {
         }
         return false;
     }
+
     public static boolean startsWithUnsafePath(String filePath, String userInput) {
         String filePathLowercase = filePath.toLowerCase();
         String userinputLowercase = userInput.toLowerCase();

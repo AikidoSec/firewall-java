@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class LooksLikeASecret {
-    private LooksLikeASecret() {}
+    private LooksLikeASecret() {
+    }
 
     private static final String LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPERCASE = LOWERCASE.toUpperCase();

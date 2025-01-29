@@ -5,8 +5,11 @@ import java.util.Map;
 import java.util.concurrent.atomic.*;
 
 public final class PrimitiveType {
-    private PrimitiveType() {}
+    private PrimitiveType() {
+    }
+
     private static final Map<Class<?>, Class<?>> WRAPPER_TYPE_MAP;
+
     static {
         WRAPPER_TYPE_MAP = new HashMap<Class<?>, Class<?>>(16);
         WRAPPER_TYPE_MAP.put(Integer.class, int.class);
@@ -25,9 +28,11 @@ public final class PrimitiveType {
         WRAPPER_TYPE_MAP.put(AtomicIntegerArray.class, AtomicIntegerArray.class);
         WRAPPER_TYPE_MAP.put(AtomicLongArray.class, AtomicLongArray.class);
     }
+
     public static boolean isPrimitiveType(Object source) {
         return WRAPPER_TYPE_MAP.containsKey(source.getClass());
     }
+
     public static boolean isPrimitiveOrString(Object source) {
         if (WRAPPER_TYPE_MAP.containsKey(source.getClass())) {
             return true;

@@ -2,12 +2,12 @@ package dev.aikido.agent_api.background;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
+import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
-import dev.aikido.agent_api.context.User;
 
 import java.util.List;
 import java.util.TimerTask;
@@ -20,6 +20,7 @@ public class HeartbeatTask extends TimerTask {
     public HeartbeatTask(CloudConnectionManager connectionManager) {
         this(connectionManager, false);
     }
+
     public HeartbeatTask(CloudConnectionManager connectionManager, boolean shouldCheckForInitialStats) {
         this.connectionManager = connectionManager;
         this.shouldCheckForInitialStats = shouldCheckForInitialStats;

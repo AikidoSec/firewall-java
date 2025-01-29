@@ -10,11 +10,15 @@ import java.util.Optional;
 
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.BackgroundProcessIdentifier.isBackgroundProcess;
-import static dev.aikido.agent_api.thread_cache.ThreadCache.threadCache;
 
 public final class ThreadCacheRenewal {
-    private ThreadCacheRenewal() {}
-    public static ThreadCacheObject renewThreadCache() { return renewThreadCache(null); }
+    private ThreadCacheRenewal() {
+    }
+
+    public static ThreadCacheObject renewThreadCache() {
+        return renewThreadCache(null);
+    }
+
     public static ThreadCacheObject renewThreadCache(ThreadCacheObject currentThreadCache) {
         // Fetch thread cache over IPC:
         ThreadIPCClient client = getDefaultThreadIPCClient();
@@ -25,17 +29,17 @@ public final class ThreadCacheRenewal {
         if (currentThreadCache != null) {
             // Send stored data from thread cache to background process: hit counts, middleware data, ... :
             var updateRes = new UpdateAgentDataCommand.Res(
-                    /* routeHitDeltas */ currentThreadCache.getRoutes().getDeltaMap(),
-                    /* hitsDelta */ currentThreadCache.getTotalHits(),
-                    /* middlewareInstalled */ currentThreadCache.isMiddlewareInstalled(),
-                    /* hostnames */ currentThreadCache.getHostnames().asArray()
+                /* routeHitDeltas */ currentThreadCache.getRoutes().getDeltaMap(),
+                /* hitsDelta */ currentThreadCache.getTotalHits(),
+                /* middlewareInstalled */ currentThreadCache.isMiddlewareInstalled(),
+                /* hostnames */ currentThreadCache.getHostnames().asArray()
             );
             new UpdateAgentDataCommand().send(client, updateRes);
         }
 
-        // Fetch new data from background process : 
+        // Fetch new data from background process :
         Optional<SyncDataCommand.Res> result = new SyncDataCommand().send(client, new Command.EmptyResult());
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             SyncDataCommand.Res res = result.get();
             if (res != null) {
                 Optional<ReportingApi.APIListsResponse> blockedListsRes = Optional.empty();

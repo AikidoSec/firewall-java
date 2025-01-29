@@ -12,15 +12,19 @@ import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static dev.aikido.agent_api.helpers.extraction.UserAgentFromContext.getUserAgent;
 
 public final class DetectedAttack {
-    private DetectedAttack() {}
-    public record DetectedAttackEvent (
+    private DetectedAttack() {
+    }
+
+    public record DetectedAttackEvent(
         String type,
         RequestData request,
         AttackData attack,
         GetManagerInfo.ManagerInfo agent,
         long time
-    ) implements APIEvent {}
-    public record RequestData (
+    ) implements APIEvent {
+    }
+
+    public record RequestData(
         String method,
         Map<String, String> headers,
         String ipAddress,
@@ -29,21 +33,24 @@ public final class DetectedAttack {
         String body,
         String source,
         String route
-    ) {};
-    public record AttackData (
-            // Data gathered from Attack class :
-            String kind,
-            String operation,
-            String source,
-            String path,
-            String payload,
-            Map<String, String> metadata,
-            // Auxiliary attack data :
-            String module,
-            boolean blocked,
-            String stack,
-            User user
-    ) {};
+    ) {
+    }
+
+    public record AttackData(
+        // Data gathered from Attack class :
+        String kind,
+        String operation,
+        String source,
+        String path,
+        String payload,
+        Map<String, String> metadata,
+        // Auxiliary attack data :
+        String module,
+        boolean blocked,
+        String stack,
+        User user
+    ) {
+    }
 
     public static DetectedAttackEvent createAPIEvent(Attack attack, ContextObject context, CloudConnectionManager connectionManager) {
         RequestData requestData = new RequestData(
@@ -61,7 +68,7 @@ public final class DetectedAttack {
             "module", connectionManager.shouldBlock(), attack.stack, attack.user
         );
         return new DetectedAttackEvent(
-        "detected_attack", // type
+            "detected_attack", // type
             requestData, // request
             attackData, // attack
             connectionManager.getManagerInfo(), // agent

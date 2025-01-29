@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class DataSchemaMerger {
-    private DataSchemaMerger() {}
+    private DataSchemaMerger() {
+    }
 
     public static DataSchemaItem mergeDataSchemas(DataSchemaItem first, DataSchemaItem second) {
         // Cannot merge different types
@@ -28,17 +29,17 @@ public final class DataSchemaMerger {
                 } else {
                     // Add new property from the second schema
                     DataSchemaItem newSchema = new DataSchemaItem(
-                            secondProp.getValue(),
-                            /* optional: */ true
+                        secondProp.getValue(),
+                        /* optional: */ true
                     );
-                    mergedProps.put(key,newSchema);
+                    mergedProps.put(key, newSchema);
                 }
             }
             for (Map.Entry<String, DataSchemaItem> firstProp : first.properties().entrySet()) {
                 if (!second.properties().containsKey(firstProp.getKey())) {
                     // The key was removed in the second schema, mark as optional:
                     mergedProps.put(firstProp.getKey(), new DataSchemaItem(
-                            firstProp.getValue(), /* optional: */ true));
+                        firstProp.getValue(), /* optional: */ true));
                 }
             }
             return new DataSchemaItem(first.type(), mergedProps);

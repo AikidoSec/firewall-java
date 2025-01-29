@@ -1,7 +1,9 @@
 package dev.aikido.agent_api.helpers.env;
 
 public final class Endpoints {
-    private Endpoints() {}
+    private Endpoints() {
+    }
+
     public static String getAikidoAPIEndpoint() {
         String endpoint = System.getenv("AIKIDO_ENDPOINT");
         if (endpoint != null && !endpoint.isEmpty()) {
@@ -14,7 +16,7 @@ public final class Endpoints {
         // Default option :
         return "https://guard.aikido.dev/";
     }
-    
+
     public static String getAikidoRealtimeEndpoint() {
         String endpoint = System.getenv("AIKIDO_REALTIME_ENDPOINT");
         if (endpoint != null && !endpoint.isEmpty()) {

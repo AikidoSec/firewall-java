@@ -4,7 +4,9 @@ import dev.aikido.agent_api.vulnerabilities.Scanner;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
 
 public final class CommandCollector {
-    private CommandCollector() {}
+    private CommandCollector() {
+    }
+
     public static void report(Object command) {
         if (command instanceof String commandStr) {
             if (commandStr.isEmpty()) {

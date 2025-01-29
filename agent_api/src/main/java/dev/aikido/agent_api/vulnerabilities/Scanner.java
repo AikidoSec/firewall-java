@@ -16,8 +16,11 @@ import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
 import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
 
 public final class Scanner {
-    private Scanner() {}
+    private Scanner() {
+    }
+
     private static final Logger logger = LogManager.getLogger(Scanner.class);
+
     public static void scanForGivenVulnerability(Vulnerabilities.Vulnerability vulnerability, String operation, String[] arguments) {
         Detector detector = vulnerability.getDetector();
         if (detector.returnEarly(arguments)) {
@@ -45,9 +48,9 @@ public final class Scanner {
                     // Report attack :
                     reportAttack(
                         new Attack(
-                                operation, vulnerability, source,
-                                path, detectorResult.getMetadata(), userInput,
-                                getCurrentStackTrace(), ctx.getUser()), ctx
+                            operation, vulnerability, source,
+                            path, detectorResult.getMetadata(), userInput,
+                            getCurrentStackTrace(), ctx.getUser()), ctx
                     );
                     break;
                 }
@@ -60,6 +63,7 @@ public final class Scanner {
             throw exception.get();
         }
     }
+
     public static void reportAttack(Attack attack, ContextObject ctx) {
         logger.debug("Attack detected: %s", attack);
         ThreadIPCClient client = getDefaultThreadIPCClient();

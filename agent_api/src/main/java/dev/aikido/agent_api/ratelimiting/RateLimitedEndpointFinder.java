@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class RateLimitedEndpointFinder {
-    private RateLimitedEndpointFinder() {}
+    private RateLimitedEndpointFinder() {
+    }
+
     public static Endpoint getRateLimitedEndpoint(List<Endpoint> endpoints, String route) {
         if (endpoints == null || endpoints.isEmpty()) {
             return null;

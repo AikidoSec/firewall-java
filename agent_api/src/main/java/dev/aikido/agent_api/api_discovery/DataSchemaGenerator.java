@@ -1,7 +1,11 @@
 package dev.aikido.agent_api.api_discovery;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
 import static dev.aikido.agent_api.helpers.patterns.PrimitiveType.isPrimitiveOrString;
@@ -46,7 +50,7 @@ public class DataSchemaGenerator {
             }
             return new DataSchemaItem(DataSchemaType.ARRAY, items);
         }
-        if(data.getClass().isEnum()) {
+        if (data.getClass().isEnum()) {
             // Handle enums differently as to avoid recursion :
             return new DataSchemaItem(DataSchemaType.ENUM);
         }

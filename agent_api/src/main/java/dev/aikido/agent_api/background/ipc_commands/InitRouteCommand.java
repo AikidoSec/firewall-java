@@ -27,7 +27,6 @@ public class InitRouteCommand extends Command<RouteMetadata, Command.EmptyResult
     }
 
     /**
-     *
      * @param routeMetadata of class RouteMetadata
      * @return Nothing (Empty optional)
      */

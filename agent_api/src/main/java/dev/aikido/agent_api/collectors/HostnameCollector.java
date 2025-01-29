@@ -3,13 +3,13 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
-import dev.aikido.agent_api.helpers.logging.LogManager;
-import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -19,8 +19,11 @@ import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.g
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 
 public final class HostnameCollector {
-    private HostnameCollector() {}
+    private HostnameCollector() {
+    }
+
     private static final Logger logger = LogManager.getLogger(HostnameCollector.class);
+
     public static void report(String hostname, InetAddress[] inetAddresses) {
         try {
             logger.trace("HostnameCollector called with %s & inet addresses: %s", hostname, List.of(inetAddresses));
@@ -43,8 +46,8 @@ public final class HostnameCollector {
                 logger.debug("Hostname: %s, Port: %s, IPs: %s", hostnameEntry.getHostname(), hostnameEntry.getPort(), ipAddresses);
 
                 Attack attack = new SSRFDetector().run(
-                        hostname, hostnameEntry.getPort(), ipAddresses,
-                        /* operation: */ "java.net.InetAddress.getAllByName");
+                    hostname, hostnameEntry.getPort(), ipAddresses,
+                    /* operation: */ "java.net.InetAddress.getAllByName");
                 if (attack == null) {
                     continue;
                 }

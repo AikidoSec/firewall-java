@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public final class CommandEncapsulationChecker {
-    private CommandEncapsulationChecker() {}
+    private CommandEncapsulationChecker() {
+    }
+
     private static final List<Character> ESCAPE_CHARS = Arrays.asList('"', '\'');
     private static final List<Character> DANGEROUS_CHARS_INSIDE_DOUBLE_QUOTES = Arrays.asList('$', '`', '\\', '!');
 

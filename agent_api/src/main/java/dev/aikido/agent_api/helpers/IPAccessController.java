@@ -1,11 +1,15 @@
 package dev.aikido.agent_api.helpers;
 
 import dev.aikido.agent_api.background.Endpoint;
+
 import java.util.List;
+
 import static dev.aikido.agent_api.helpers.net.LocalhostIP.isLocalhostIP;
 
 public final class IPAccessController {
-    private IPAccessController() {}
+    private IPAccessController() {
+    }
+
     public static boolean ipAllowedToAccessRoute(String remoteAddress, List<Endpoint> endpoints) {
         if (remoteAddress != null && isLocalhostIP(remoteAddress)) {
             return true;

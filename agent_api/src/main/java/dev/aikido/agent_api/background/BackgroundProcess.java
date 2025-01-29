@@ -22,6 +22,7 @@ public class BackgroundProcess extends Thread {
     private CloudConnectionManager connectionManager;
     private final Token token;
     private BlockingQueue<APIEvent> attackQueue;
+
     public BackgroundProcess(String name, Token token) {
         super(name);
         this.token = token;
@@ -39,23 +40,23 @@ public class BackgroundProcess extends Thread {
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(
-                new HeartbeatTask(connectionManager), // Heartbeat task: Sends statistics, route data, etc.
-                heartbeatEveryXSeconds * 1000, // Delay before first execution in milliseconds
-                heartbeatEveryXSeconds * 1000 // Interval in milliseconds
+            new HeartbeatTask(connectionManager), // Heartbeat task: Sends statistics, route data, etc.
+            heartbeatEveryXSeconds * 1000, // Delay before first execution in milliseconds
+            heartbeatEveryXSeconds * 1000 // Interval in milliseconds
         );
         timer.scheduleAtFixedRate(
-                new RealtimeTask(connectionManager), // Realtime task: makes sure config updates happen fast
-                pollingEveryXSeconds * 1000, // Delay before first execution in milliseconds
-                pollingEveryXSeconds * 1000 // Interval in milliseconds
+            new RealtimeTask(connectionManager), // Realtime task: makes sure config updates happen fast
+            pollingEveryXSeconds * 1000, // Delay before first execution in milliseconds
+            pollingEveryXSeconds * 1000 // Interval in milliseconds
         );
         timer.scheduleAtFixedRate(
-                new AttackQueueConsumerTask(connectionManager, attackQueue), // Consumes from the attack queue (so attacks are reported in background)
-                /* delay: */ 0, /* interval: */ 2 * 1000 // Clear queue every 2 seconds
+            new AttackQueueConsumerTask(connectionManager, attackQueue), // Consumes from the attack queue (so attacks are reported in background)
+            /* delay: */ 0, /* interval: */ 2 * 1000 // Clear queue every 2 seconds
         );
         // Report initial statistics if those were not received
         timer.schedule(
-                new HeartbeatTask(connectionManager, true /* Check for initial statistics */), // Initial heartbeat task
-                60_000 // Delay in ms
+            new HeartbeatTask(connectionManager, true /* Check for initial statistics */), // Initial heartbeat task
+            60_000 // Delay in ms
         );
         try {
             File queueDir = UDSPath.getUDSPath(token);
@@ -72,6 +73,7 @@ public class BackgroundProcess extends Thread {
     public CloudConnectionManager getCloudConnectionManager() {
         return connectionManager;
     }
+
     public BlockingQueue<APIEvent> getAttackQueue() {
         return attackQueue;
     }

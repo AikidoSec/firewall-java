@@ -1,8 +1,8 @@
 package dev.aikido.agent_api.helpers;
 
 import dev.aikido.agent_api.background.ipc_commands.BlockingEnabledCommand;
-import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.background.ipc_commands.Command;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.helpers.env.BlockingEnv;
 
 import java.util.Optional;
@@ -10,10 +10,12 @@ import java.util.Optional;
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 
 public final class ShouldBlockHelper {
-    private ShouldBlockHelper() {}
+    private ShouldBlockHelper() {
+    }
 
     /**
      * Tries to fetch config over IPC, if that fails, uses environment variable
+     *
      * @return true if the attack should be blocked
      */
     public static boolean shouldBlock() {

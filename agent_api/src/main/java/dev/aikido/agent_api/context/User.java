@@ -8,6 +8,7 @@ public record User(String id, String name, String lastIpAddress, long firstSeenA
             existingUser.firstSeenAt(), lastSeenAt
         );
     }
+
     public User(String id, String name, String lastIpAddress, long time) {
         this(id, name, lastIpAddress, time, time);
 

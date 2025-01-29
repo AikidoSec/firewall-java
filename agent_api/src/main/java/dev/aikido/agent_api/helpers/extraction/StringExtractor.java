@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.helpers.extraction;
 
 import dev.aikido.agent_api.helpers.patterns.LooksLikeJWT;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -11,9 +12,11 @@ import static dev.aikido.agent_api.helpers.patterns.PrimitiveType.isPrimitiveTyp
 public class StringExtractor {
     // Ensures that we don't get recursion :
     Set<Object> scanned = new HashSet<>();
+
     public static Map<String, String> extractStringsFromObject(Object obj) {
         return new StringExtractor().extractStringsRecursive(obj, new ArrayList<>());
     }
+
     private Map<String, String> extractStringsRecursive(Object target, ArrayList<PathBuilder.PathPart> pathToPayload) {
         HashMap<String, String> result = new HashMap<>();
         if (target == null || scanned.contains(target)) {

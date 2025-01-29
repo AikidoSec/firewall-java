@@ -6,8 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
-
 /**
  * Class that holds users for the background process
  */

@@ -9,13 +9,16 @@ import static dev.aikido.agent_api.thread_cache.ThreadCacheRenewal.renewThreadCa
 public final class ThreadCache {
     private static final Logger logger = LogManager.getLogger(ThreadCache.class);
 
-    private ThreadCache() {}
+    private ThreadCache() {
+    }
 
     static final long timeToLiveMS = 60 * 1000; // 60 seconds
     static final ThreadLocal<ThreadCacheObject> threadCache = new ThreadLocal<>();
+
     public static ThreadCacheObject get() {
         return get(/* shouldFetch : */ true); // Default option is to fetch a new config.
     }
+
     public static ThreadCacheObject get(boolean shouldFetch) {
         ThreadCacheObject currentThreadCache = threadCache.get();
         // If the cache does not yet exist :
@@ -46,6 +49,7 @@ public final class ThreadCache {
 
         return currentThreadCache;
     }
+
     public static void set(ThreadCacheObject threadCacheObject) {
         if (threadCacheObject == null) {
             reset();
@@ -54,6 +58,7 @@ public final class ThreadCache {
             threadCache.set(threadCacheObject);
         }
     }
+
     public static void reset() {
         threadCache.remove();
     }

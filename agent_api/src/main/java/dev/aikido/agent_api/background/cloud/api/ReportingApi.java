@@ -25,12 +25,17 @@ public abstract class ReportingApi {
      */
     public abstract Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec);
 
-    public record APIListsResponse(List<ListsResponseEntry> blockedIPAddresses, String blockedUserAgents) {}
-    public record ListsResponseEntry(String source, String description, List<String> ips) {}
+    public record APIListsResponse(List<ListsResponseEntry> blockedIPAddresses, String blockedUserAgents) {
+    }
+
+    public record ListsResponseEntry(String source, String description, List<String> ips) {
+    }
+
     /**
      * Fetch blocked lists using a separate API call, these can include :
      * -> blocked IP Addresses (e.g. geo restrictions)
      * -> blocked User-Agents (e.g. bot blocking)
+     *
      * @param token the authentication token
      */
     public abstract Optional<APIListsResponse> fetchBlockedLists(String token);

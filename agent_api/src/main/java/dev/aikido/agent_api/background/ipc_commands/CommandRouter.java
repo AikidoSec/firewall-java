@@ -23,6 +23,7 @@ public class CommandRouter {
     private final List<Command> commands = new ArrayList<>();
 
     private final CloudConnectionManager connectionManager;
+
     public CommandRouter(CloudConnectionManager connectionManager, BlockingQueue<APIEvent> queue) {
         this.connectionManager = connectionManager;
         commands.add(new BlockingEnabledCommand());
@@ -37,8 +38,9 @@ public class CommandRouter {
 
     /**
      * Parses input string as an IPC command.
+     *
      * @param input raw IPC command.
-     * -> E.g. input = "ATTACK${'this': 'that'}"
+     *              -> E.g. input = "ATTACK${'this': 'that'}"
      */
     public Optional<byte[]> parseIPCInput(byte[] input) {
         ByteArrayHelper.CommandData commandData = splitByteArray(input, (byte) '$');
@@ -50,7 +52,7 @@ public class CommandRouter {
     }
 
     public Optional<byte[]> switchCommands(String commandName, byte[] data) {
-        for (Command command: commands) {
+        for (Command command : commands) {
             if (command.matchesName(commandName)) {
                 try {
                     // Parse input for the background process into the input object of the command :

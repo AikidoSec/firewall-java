@@ -21,6 +21,7 @@ public class Logger {
         }
         this.logClass = logClass;
     }
+
     public Logger(Class<?> logClass, LogLevel logLevel) {
         this.logLevel = logLevel;
         this.logClass = logClass;
@@ -48,15 +49,15 @@ public class Logger {
                     System.out.println(prefix + message);
                 }
             }
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             System.err.println("[AIKIDO LOGGER FAILURE] " + e.getMessage());
         }
     }
+
     public List<Object> parseArguments(Object[] args) {
         List<Object> parsedArgs = new ArrayList<>();
-        for (Object arg: args) {
-            if(arg instanceof Object[] argArray) {
+        for (Object arg : args) {
+            if (arg instanceof Object[] argArray) {
                 parsedArgs.add(Arrays.toString(argArray));
             } else if (arg instanceof Collection<?> collectionArg) {
                 String str = "[";
@@ -64,13 +65,13 @@ public class Logger {
                     str += el + ",";
                 }
                 char[] stringChars = str.toCharArray();
-                stringChars[str.length()-1] = ']'; // Replace last , with ']'
+                stringChars[str.length() - 1] = ']'; // Replace last , with ']'
                 parsedArgs.add(String.valueOf(stringChars));
             } else {
                 parsedArgs.add(arg);
             }
         }
-        for(int i = 0; i < parsedArgs.size(); i++) {
+        for (int i = 0; i < parsedArgs.size(); i++) {
             if (parsedArgs.get(i) instanceof String argString) {
                 // replace newline and carriage return to avoid log injection :
                 argString = argString.replaceAll("[\\r\\n]+", "");
@@ -86,18 +87,23 @@ public class Logger {
     public void trace(Object message, Object... args) {
         log(LogLevel.TRACE, message, args);
     }
+
     public void debug(Object message, Object... args) {
         log(LogLevel.DEBUG, message, args);
     }
+
     public void info(Object message, Object... args) {
         log(LogLevel.INFO, message, args);
     }
+
     public void warn(Object message, Object... args) {
         log(LogLevel.WARN, message, args);
     }
+
     public void error(Object message, Object... args) {
         log(LogLevel.ERROR, message, args);
     }
+
     public void fatal(Object message, Object... args) {
         log(LogLevel.FATAL, message, args);
     }

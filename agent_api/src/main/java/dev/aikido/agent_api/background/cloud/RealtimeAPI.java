@@ -22,12 +22,15 @@ public class RealtimeAPI {
         // Create API :
         endpoint = getAikidoRealtimeEndpoint();
     }
-    public record ConfigResponse(long configUpdatedAt) {}
+
+    public record ConfigResponse(long configUpdatedAt) {
+    }
+
     public Optional<ConfigResponse> getConfig(String token) {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(timeoutInSec))
-                    .build();
+                .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                .build();
             URI uri = URI.create(endpoint + "config");
             HttpRequest request = createConfigRequest(token, uri);
             // Send the request and get the response
@@ -48,11 +51,12 @@ public class RealtimeAPI {
         Gson gson = new Gson();
         return Optional.of(gson.fromJson(res.body(), ConfigResponse.class));
     }
+
     private static HttpRequest createConfigRequest(String token, URI uri) {
         return HttpRequest.newBuilder()
-                .uri(uri) // Change to your target URL
-                .header("Content-Type", "application/json") // Set Content-Type header
-                .header("Authorization", token) // Set Authorization header
-                .build();
+            .uri(uri) // Change to your target URL
+            .header("Content-Type", "application/json") // Set Content-Type header
+            .header("Authorization", token) // Set Authorization header
+            .build();
     }
 }

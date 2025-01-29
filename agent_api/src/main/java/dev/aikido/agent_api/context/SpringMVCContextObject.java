@@ -7,8 +7,8 @@ import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromU
 
 public class SpringMVCContextObject extends SpringContextObject {
     public SpringMVCContextObject(
-            String method, StringBuffer url, String rawIp, Map<String, String[]> queryParams,
-            HashMap<String, List<String>> cookies, HashMap<String, String> headers
+        String method, StringBuffer url, String rawIp, Map<String, String[]> queryParams,
+        HashMap<String, List<String>> cookies, HashMap<String, String> headers
     ) {
         this.method = method;
         if (url != null) {
@@ -22,6 +22,7 @@ public class SpringMVCContextObject extends SpringContextObject {
         this.source = "SpringFramework";
         this.redirectStartNodes = new ArrayList<>();
     }
+
     @Override
     public Object getBody() {
         if (this.body != null) {

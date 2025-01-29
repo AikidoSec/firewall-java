@@ -20,18 +20,20 @@ public class RealtimeTask extends TimerTask {
     private static final Logger logger = LogManager.getLogger(RealtimeTask.class);
     private final CloudConnectionManager connectionManager;
     private Optional<Long> configLastUpdatedAt;
+
     public RealtimeTask(CloudConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
         this.configLastUpdatedAt = Optional.empty();
     }
+
     @Override
     public void run() {
         logger.debug("Running realtime task, config last updated at: %s", configLastUpdatedAt);
         Optional<RealtimeAPI.ConfigResponse> res = new RealtimeAPI().getConfig(connectionManager.getToken());
 
-        if(res.isPresent()) {
+        if (res.isPresent()) {
             long configAccordingToCloudUpdatedAt = res.get().configUpdatedAt();
-            if(configLastUpdatedAt.isEmpty() || configLastUpdatedAt.get() < configAccordingToCloudUpdatedAt) {
+            if (configLastUpdatedAt.isEmpty() || configLastUpdatedAt.get() < configAccordingToCloudUpdatedAt) {
                 // Config was updated
                 configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt); // Store new time of last update
                 Optional<APIResponse> newConfig = connectionManager.getApi().fetchNewConfig(connectionManager.getToken(), /* Timeout in seconds: */ 3);

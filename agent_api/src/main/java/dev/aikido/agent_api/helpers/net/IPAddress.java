@@ -6,7 +6,8 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 public final class IPAddress {
-    private IPAddress() {}
+    private IPAddress() {
+    }
 
     public static String getIpAddress() {
         try {
@@ -39,7 +40,8 @@ public final class IPAddress {
                     }
                 }
             }
-        } catch (SocketException ignored) {}
+        } catch (SocketException ignored) {
+        }
         return "0.0.0.0";
     }
 }

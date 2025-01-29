@@ -7,12 +7,15 @@ import java.net.URI;
 import java.nio.file.Path;
 
 public final class FileCollector {
-    private FileCollector() {}
+    private FileCollector() {
+    }
+
     private static final int MAX_RECURSION_DEPTH = 3;
 
     public static void report(Object filePath, String operation) {
         report(filePath, operation, 0); // Start with depth of zero
     }
+
     public static void report(Object filePath, String operation, int depth) {
         if (filePath == null) {
             return; // Make sure filePath is defined

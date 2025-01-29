@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 public record APISpec(
-        Body body,
-        DataSchemaItem query,
-        List<Map<String, String>> auth
+    Body body,
+    DataSchemaItem query,
+    List<Map<String, String>> auth
 ) {
-    public record Body(DataSchemaItem schema, String type) {};
+    public record Body(DataSchemaItem schema, String type) {
+    }
 }

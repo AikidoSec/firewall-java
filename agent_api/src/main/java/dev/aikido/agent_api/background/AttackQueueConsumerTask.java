@@ -9,6 +9,7 @@ import java.util.concurrent.BlockingQueue;
 public class AttackQueueConsumerTask extends TimerTask {
     private final CloudConnectionManager connectionManager;
     private final BlockingQueue<APIEvent> queue;
+
     public AttackQueueConsumerTask(CloudConnectionManager connectionManager, BlockingQueue<APIEvent> queue) {
         this.connectionManager = connectionManager;
         this.queue = queue;
@@ -21,7 +22,8 @@ public class AttackQueueConsumerTask extends TimerTask {
             try {
                 APIEvent event = queue.take();
                 this.connectionManager.reportEvent(event, false /* Should not update config */);
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
         }
     }
 }

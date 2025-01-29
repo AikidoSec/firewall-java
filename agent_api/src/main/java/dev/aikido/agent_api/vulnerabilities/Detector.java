@@ -18,11 +18,13 @@ public interface Detector {
         private final boolean detectedAttack;
         private final Map<String, String> metadata;
         private final AikidoException exception;
+
         public DetectorResult(boolean detectedAttack, Map<String, String> metadata, AikidoException exception) {
             this.detectedAttack = detectedAttack;
             this.metadata = metadata;
             this.exception = exception;
         }
+
         public DetectorResult() {
             this.detectedAttack = false;
             this.metadata = null;
@@ -36,6 +38,7 @@ public interface Detector {
         public Map<String, String> getMetadata() {
             return metadata;
         }
+
         public AikidoException getException() {
             return this.exception;
         }

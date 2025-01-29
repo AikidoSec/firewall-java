@@ -37,7 +37,7 @@ public class FileWrapper implements Wrapper {
         // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodEnter
         public static void before(
-                @Advice.Argument(0) Object argument
+            @Advice.Argument(0) Object argument
         ) throws Throwable {
             try {
                 String prop = System.getProperty("AIK_INTERNAL_coverage_run");
@@ -45,7 +45,7 @@ public class FileWrapper implements Wrapper {
                     return;
                 }
                 if (Thread.currentThread().getClass().toString()
-                        .equals("class dev.aikido.agent_api.background.BackgroundProcess")) {
+                    .equals("class dev.aikido.agent_api.background.BackgroundProcess")) {
                     return; // Do not wrap File calls in background process.
                 }
             } catch (Throwable e) {

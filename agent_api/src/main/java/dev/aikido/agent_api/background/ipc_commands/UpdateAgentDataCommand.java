@@ -6,11 +6,16 @@ import dev.aikido.agent_api.storage.Hostnames;
 import java.util.Map;
 import java.util.Optional;
 
-/** UpdateAgentDataCommand
+/**
+ * UpdateAgentDataCommand
  * This command UPDATE_AGENT_DATA is responsible for updating route hits, total hits and executed middleware status.
  */
 public class UpdateAgentDataCommand extends Command<UpdateAgentDataCommand.Res, Command.EmptyResult> {
-    public record Res(Map<String, Integer> routeHitDeltas, int hitsDelta, boolean middlewareInstalled, Hostnames.HostnameEntry[] hostnames) {};
+    public record Res(Map<String, Integer> routeHitDeltas, int hitsDelta, boolean middlewareInstalled,
+                      Hostnames.HostnameEntry[] hostnames) {
+    }
+
+    ;
 
     @Override
     public boolean returnsData() {

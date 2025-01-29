@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 public final class GetBodyDataType {
-    private GetBodyDataType() {}
+    private GetBodyDataType() {
+    }
 
     private static final List<String> JSON_CONTENT_TYPES = List.of(
-            "application/json",
-            "application/vnd.api+json",
-            "application/csp-report",
-            "application/x-json"
+        "application/json",
+        "application/vnd.api+json",
+        "application/csp-report",
+        "application/x-json"
     );
 
     public static String getBodyDataType(Map<String, String> headers) {

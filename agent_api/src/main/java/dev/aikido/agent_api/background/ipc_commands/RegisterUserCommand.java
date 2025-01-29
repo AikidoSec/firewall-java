@@ -12,7 +12,9 @@ public class RegisterUserCommand extends Command<User, Command.EmptyResult> {
     }
 
     @Override
-    public String getName() { return "REGISTER_USER"; }
+    public String getName() {
+        return "REGISTER_USER";
+    }
 
     @Override
     public Class<User> getInputClass() {

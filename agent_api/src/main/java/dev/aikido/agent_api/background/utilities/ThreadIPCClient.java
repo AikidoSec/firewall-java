@@ -16,6 +16,7 @@ import static dev.aikido.agent_api.background.utilities.IPCFacilitator.writeToSo
 public class ThreadIPCClient {
     private static final Logger logger = LogManager.getLogger(ThreadIPCClient.class);
     private final AFUNIXSocketAddress socketAddress;
+
     public ThreadIPCClient(File socketFile) {
         try {
             this.socketAddress = AFUNIXSocketAddress.of(socketFile);
@@ -23,6 +24,7 @@ public class ThreadIPCClient {
             throw new RuntimeException(e);
         }
     }
+
     public Optional<byte[]> send(byte[] data, boolean receive) {
         AFUNIXSocket socket = null;
         try {

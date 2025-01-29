@@ -3,7 +3,9 @@ package dev.aikido.agent_api.helpers.extraction;
 import java.util.List;
 
 public final class PathBuilder {
-    private PathBuilder() {}
+    private PathBuilder() {
+    }
+
     public static String buildPathToPayload(List<PathPart> pathToPayload) {
         if (pathToPayload.isEmpty()) {
             return ".";
@@ -22,6 +24,7 @@ public final class PathBuilder {
 
         return result.toString();
     }
+
     public static class PathPart {
         private final String type;
         private String key; // Only used if type is "object"

@@ -7,12 +7,14 @@ import static dev.aikido.agent_api.api_discovery.AuthTypeMerger.mergeAuthTypes;
 import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
 
 public final class APISpecMerger {
-    private APISpecMerger() {}
+    private APISpecMerger() {
+    }
+
     public static APISpec mergeAPISpecs(APISpec updatedApiSpec, APISpec oldApiSpec) {
         if (updatedApiSpec == null) {
             return oldApiSpec;
         }
-        if(oldApiSpec == null) {
+        if (oldApiSpec == null) {
             return updatedApiSpec;
         }
 
@@ -29,7 +31,7 @@ public final class APISpecMerger {
         DataSchemaItem query = oldApiSpec.query();
         if (oldApiSpec.query() != null && updatedApiSpec.query() != null) {
             query = mergeDataSchemas(oldApiSpec.query(), updatedApiSpec.query());
-        } else if(updatedApiSpec.query() != null) {
+        } else if (updatedApiSpec.query() != null) {
             query = updatedApiSpec.query();
         }
 

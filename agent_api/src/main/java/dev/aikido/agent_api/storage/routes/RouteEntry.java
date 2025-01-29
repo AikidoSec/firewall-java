@@ -26,6 +26,7 @@ public class RouteEntry {
         this.hits = 0;
         this.apispec = null;
     }
+
     public RouteEntry(RouteMetadata routeMetadata) {
         this(routeMetadata.method(), routeMetadata.route());
     }
@@ -34,6 +35,7 @@ public class RouteEntry {
         hits++;
         deltaHits++; // Also increment delta.
     }
+
     public void incrementHits(int count) {
         hits += count;
     }

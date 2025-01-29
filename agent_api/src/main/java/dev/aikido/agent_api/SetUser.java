@@ -1,7 +1,7 @@
 package dev.aikido.agent_api;
 
-import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.background.ipc_commands.RegisterUserCommand;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
@@ -12,12 +12,16 @@ import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.g
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public final class SetUser {
-    private SetUser() {}
+    private SetUser() {
+    }
+
     private static final Logger logger = LogManager.getLogger(SetUser.class);
 
-    public record UserObject(String id, String name) {}
+    public record UserObject(String id, String name) {
+    }
+
     public static void setUser(UserObject user) {
-        if(user.id() == null || user.id().isEmpty() || user.name() == null || user.name().isEmpty()) {
+        if (user.id() == null || user.id().isEmpty() || user.name() == null || user.name().isEmpty()) {
             logger.info("User ID or name cannot be empty.");
             return;
         }

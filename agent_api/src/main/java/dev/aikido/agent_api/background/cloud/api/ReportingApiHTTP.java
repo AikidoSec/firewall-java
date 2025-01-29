@@ -23,15 +23,17 @@ public class ReportingApiHTTP extends ReportingApi {
     private final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
     private final String reportingUrl;
     private final Gson gson = new Gson();
+
     public ReportingApiHTTP(String reportingUrl) {
         // Reporting URL should end with trailing slash for now.
         this.reportingUrl = reportingUrl;
     }
+
     public Optional<APIResponse> fetchNewConfig(String token, int timeoutInSec) {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(timeoutInSec))
-                    .build();
+                .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                .build();
             URI uri = URI.create(reportingUrl + "api/runtime/config");
             HttpRequest request = createHttpRequest(Optional.empty(), token, uri);
             // Send the request and get the response
@@ -42,6 +44,7 @@ public class ReportingApiHTTP extends ReportingApi {
         }
         return Optional.empty();
     }
+
     @Override
     public Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec) {
         try {
@@ -105,6 +108,7 @@ public class ReportingApiHTTP extends ReportingApi {
         }
         return getUnsuccessfulAPIResponse("unknown_error");
     }
+
     private static HttpRequest createHttpRequest(Optional<APIEvent> event, String token, URI uri) {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(uri) // Change to your target URL
@@ -112,20 +116,21 @@ public class ReportingApiHTTP extends ReportingApi {
             .header("Authorization", token); // Set Authorization header
         if (event.isPresent()) {
             Gson gson = new GsonBuilder()
-                    // Use a custom serializer because api spec is transient in RouteEntry :
-                    .registerTypeAdapter(RouteEntry.class, new RouteEntry.RouteEntrySerializer())
-                    .create();
+                // Use a custom serializer because api spec is transient in RouteEntry :
+                .registerTypeAdapter(RouteEntry.class, new RouteEntry.RouteEntrySerializer())
+                .create();
             String requestPayload = gson.toJson(event.get());
             return requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
                 .build();
         }
         return requestBuilder.build();
     }
+
     private static APIResponse getUnsuccessfulAPIResponse(String error) {
         return new APIResponse(
-                false, // Success
-                error,
-                0, null, null, null, false, false // Unimportant values.
+            false, // Success
+            error,
+            0, null, null, null, false, false // Unimportant values.
         );
     }
 }

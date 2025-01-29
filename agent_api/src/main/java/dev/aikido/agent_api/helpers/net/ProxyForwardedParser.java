@@ -21,9 +21,10 @@ public class ProxyForwardedParser {
         // If no valid IP was found, or if X-Forwarded-For was not present, default to raw ip:
         return rawIp;
     }
+
     private static String extractIpFromHeader(String xForwardedForHeader) {
         String[] ips = xForwardedForHeader.split(",");
-        for (String ip: ips) {
+        for (String ip : ips) {
             ip = ip.trim();
 
             // Some proxies pass along port numbers inside x-forwarded-for :
