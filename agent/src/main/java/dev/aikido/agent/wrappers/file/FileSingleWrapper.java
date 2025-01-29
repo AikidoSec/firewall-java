@@ -10,11 +10,16 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
+/**
+ * File(URI uri)
+ * File(String pathname)
+ */
 public class FileSingleWrapper implements Wrapper {
     public String getName() {
         // Wrap File constructor.
@@ -22,7 +27,9 @@ public class FileSingleWrapper implements Wrapper {
         return FileSingleAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return isDeclaredBy(isSubTypeOf(File.class)).and(isConstructor()).and(takesArgument(0, String.class));
+        return isDeclaredBy(isSubTypeOf(File.class)).and(isConstructor()).and(
+                takesArgument(0, String.class).or(takesArgument(0, URI.class))
+        );
     }
 
     @Override
