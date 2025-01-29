@@ -32,7 +32,7 @@ public final class DNSRecordCollector {
 
             // Fetch hostnames from Context (this is to get port number e.g.)
             if (Context.get() == null || Context.get().getHostnames() == null) {
-                logger.trace("Thread cache is empty, returning.");
+                logger.trace("Context not defined, returning.");
                 return;
             }
             for (Hostnames.HostnameEntry hostnameEntry : Context.get().getHostnames().asArray()) {
