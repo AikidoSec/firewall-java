@@ -1,7 +1,9 @@
 package dev.aikido.agent.wrappers.javalin;
 
 import dev.aikido.agent.wrappers.Wrapper;
+import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.Context;
+import jakarta.servlet.http.HttpServletResponse;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -26,9 +28,13 @@ public class JavalinContextClearWrapper implements Wrapper {
     }
 
     public static class JavalinContextClearAdvice {
-        @Advice.OnMethodEnter
+        @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before() {
             Context.reset();
+        }
+        @Advice.OnMethodExit(suppress = Throwable.class)
+        public static void after(@Advice.Argument(1) HttpServletResponse response) {
+            WebResponseCollector.report(response.getStatus());
         }
     }
 }

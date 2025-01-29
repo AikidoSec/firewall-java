@@ -2,18 +2,14 @@ package dev.aikido.agent.wrappers.javalin;
 
 import dev.aikido.agent.wrappers.Wrapper;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
-import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.JavalinContextObject;
 import io.javalin.http.servlet.JavalinServletContext;
-import jakarta.servlet.http.HttpServletResponse;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.*;
-
-import java.lang.reflect.Executable;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
@@ -35,13 +31,11 @@ public class JavalinWrapper implements Wrapper {
     }
     public class JavalinAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static JavalinServletContext before(
-                @Advice.This(typing = DYNAMIC, optional = true) Object target,
-                @Advice.Origin Executable method,
+        public static void before(
                 @Advice.Argument(value = 0, typing = DYNAMIC, optional = true) JavalinServletContext ctx
-                ) {
+        ) {
             if (Context.get() != null) {
-                return ctx; // Do not extract if context already exists.
+                return; // Do not extract if context already exists.
             }
             // Create a context object :
             ContextObject context = new JavalinContextObject(
@@ -56,14 +50,6 @@ public class JavalinWrapper implements Wrapper {
                 ctx.status(response.status());
                 ctx.skipRemainingHandlers();
             }
-
-            return ctx;
-        }
-        @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
-        public static void after(
-                @Advice.Enter(typing = DYNAMIC) JavalinServletContext ctx
-        ) {
-            WebResponseCollector.report(ctx.statusCode());
         }
     }
 
