@@ -1,11 +1,10 @@
 package collectors;
 
-import dev.aikido.agent_api.collectors.HostnameCollector;
+import dev.aikido.agent_api.collectors.DNSRecordCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import org.junit.jupiter.api.*;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -15,12 +14,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public class HostnameCollectorTest {
+public class DNSRecordCollectorTest {
     InetAddress inetAddress1;
     InetAddress inetAddress2;
     @BeforeEach
@@ -34,7 +32,7 @@ public class HostnameCollectorTest {
     @Test
     public void testThreadCacheNull() {
         // Early return because of Context being null :
-        HostnameCollector.report("dev.aikido", new InetAddress[]{
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{
                 inetAddress1, inetAddress2
         });
     }
@@ -44,7 +42,7 @@ public class HostnameCollectorTest {
     public void testThreadCacheHostnames() {
         ContextObject myContextObject = mock(ContextObject.class);
         Context.set(myContextObject);
-        HostnameCollector.report("dev.aikido", new InetAddress[]{
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{
                 inetAddress1, inetAddress2
         });
         verify(myContextObject).getHostnames();
@@ -55,7 +53,7 @@ public class HostnameCollectorTest {
 
         Context.set(myContextObject);
 
-        HostnameCollector.report("dev.aikido", new InetAddress[]{
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{
                 inetAddress1, inetAddress2
         });
         verify(myContextObject, times(2)).getHostnames();
@@ -71,7 +69,7 @@ public class HostnameCollectorTest {
         when(myContextObject.getHostnames()).thenReturn(hostnames);
 
         Context.set(myContextObject);
-        HostnameCollector.report("dev.aikido", new InetAddress[]{
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{
                 inetAddress1, inetAddress2
         });
         verify(myContextObject, times(2)).getHostnames();
@@ -95,7 +93,7 @@ public class HostnameCollectorTest {
         Context.set(myContextObject);
 
         Exception exception = assertThrows(SSRFException.class, () -> {
-            HostnameCollector.report("dev.aikido", new InetAddress[]{
+            DNSRecordCollector.report("dev.aikido", new InetAddress[]{
                     inetAddress1, inetAddress2
             });
         });
