@@ -10,7 +10,7 @@ class FilesController {
     @PostMapping(path = "/read",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.TEXT_PLAIN_VALUE)
-    String read(@RequestParam String fileName) {
+    String read(@RequestParam(name = "fileName") String fileName) {
         println("Reading file: " + fileName)
         File specifiedFile = new File(fileName)
         StringBuilder stringBuilder = new StringBuilder()
