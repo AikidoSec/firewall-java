@@ -23,6 +23,9 @@ public final class URLCollector {
             logger.trace("Adding a new URL to the cache: %s", url);
             int port = getPortFromURL(url);
 
+            // We store hostname and port in two places, Thread Cache and Context. Thread Cache is for reporting
+            // outbound domains. Context is to have a map of hostnames with used port numbers to detect SSRF attacks.
+
             // Add to thread cache :
             ThreadCacheObject threadCache = ThreadCache.get();
             if (threadCache != null) {
