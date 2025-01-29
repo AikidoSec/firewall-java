@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class AgentArgumentParser {
-    private AgentArgumentParser() {}
+    private AgentArgumentParser() {
+    }
+
     public static Map<String, String> parseAgentArgs(String agentArgs) {
         Map<String, String> map = new HashMap<>();
         if (agentArgs == null) {

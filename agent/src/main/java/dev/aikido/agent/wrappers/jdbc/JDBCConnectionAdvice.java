@@ -19,17 +19,20 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public final class JDBCConnectionAdvice {
     public static final Logger logger = LogManager.getLogger(JDBCConnectionAdvice.class);
-    private JDBCConnectionAdvice() {}
+
+    private JDBCConnectionAdvice() {
+    }
+
     public static ElementMatcher<? super MethodDescription> getMatcher(String module) {
         ElementMatcher.Junction<? super MethodDescription> statementMatcher =
-                isDeclaredBy(nameContainsIgnoreCase(module).and(isSubTypeOf(Statement.class)))
+            isDeclaredBy(nameContainsIgnoreCase(module).and(isSubTypeOf(Statement.class)))
                 .and(
                     named("addBatch").or(named("execute"))
-                    .or(named("executeLargeUpdate")).or(named("executeQuery"))
-                    .or(named("executeUpdate"))
+                        .or(named("executeLargeUpdate")).or(named("executeQuery"))
+                        .or(named("executeUpdate"))
                 ).and(ElementMatchers.takesArgument(0, String.class));
         ElementMatcher.Junction<? super MethodDescription> connectionMatcher =
-                isDeclaredBy(nameContainsIgnoreCase(module).and(isSubTypeOf(Connection.class)))
+            isDeclaredBy(nameContainsIgnoreCase(module).and(isSubTypeOf(Connection.class)))
                 .and(
                     named("prepareStatement").or(named("prepareCall")).or(named("nativeSQL"))
                 );
@@ -42,9 +45,9 @@ public final class JDBCConnectionAdvice {
      */
     @Advice.OnMethodEnter
     public static void before(
-            @Advice.This(typing = DYNAMIC, optional = true) Object obj,
-            @Advice.Origin Executable method,
-            @Advice.Argument(0) String sql
+        @Advice.This(typing = DYNAMIC, optional = true) Object obj,
+        @Advice.Origin Executable method,
+        @Advice.Argument(0) String sql
     ) throws Throwable {
         if (sql != null) {
             try {
@@ -54,7 +57,7 @@ public final class JDBCConnectionAdvice {
                 if (obj instanceof Connection objConnection) {
                     databaseConnection = objConnection;
                     methodName = "Connection." + methodName;
-                } else if(obj instanceof Statement objStatement) {
+                } else if (obj instanceof Statement objStatement) {
                     databaseConnection = objStatement.getConnection();
                     methodName = "Statement." + methodName;
                 }

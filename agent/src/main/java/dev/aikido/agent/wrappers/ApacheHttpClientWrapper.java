@@ -16,18 +16,21 @@ public class ApacheHttpClientWrapper implements Wrapper {
         // https://hc.apache.org/httpcomponents-client-5.4.x/current/httpclient5/apidocs/org/apache/hc/client5/http/classic/HttpClient.html#execute-org.apache.hc.core5.http.ClassicHttpRequest-
         return ApacheHttpClientAdvice.class.getName();
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("org.apache.http").and(ElementMatchers.nameContains("HttpClient")))
-                .and(ElementMatchers.nameContainsIgnoreCase("execute"));
+            .and(ElementMatchers.nameContainsIgnoreCase("execute"));
     }
+
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
         return ElementMatchers.nameContains("org.apache").and(ElementMatchers.nameEndsWith("HttpClient"));
     }
+
     public class ApacheHttpClientAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
-                @Advice.Argument(0) Object request
+            @Advice.Argument(0) Object request
         ) throws Throwable {
             if (request == null) {
                 return;

@@ -17,18 +17,21 @@ public class OkHttpWrapper implements Wrapper {
         // https://square.github.io/okhttp/5.x/okhttp/okhttp3/-ok-http-client/new-call.html
         return OkHttpAdvice.class.getName();
     }
+
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
         return ElementMatchers.nameContains("okhttp3.OkHttpClient");
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.isDeclaredBy(ElementMatchers.nameContainsIgnoreCase("OkHttpClient"))
-                .and(ElementMatchers.nameContainsIgnoreCase("newCall"));
+            .and(ElementMatchers.nameContainsIgnoreCase("newCall"));
     }
+
     public class OkHttpAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
-                @Advice.Argument(0) Object request
+            @Advice.Argument(0) Object request
         ) throws Throwable {
             // This Object is an okhttp3.Request object, we will use reflection to access the URL:
             // We want to (safely) access request.url.toUrl()

@@ -16,12 +16,12 @@ shadowJar {
     mergeServiceFiles()
     manifest {
         attributes(
-                'Premain-Class': 'dev.aikido.agent.Agent',
-                'Agent-Class': 'dev.aikido.agent.Agent',
-                'Can-Redefine-Classes': 'true',
-                'Can-Retransform-Classes': 'true',
-                'Can-Set-Native-Method-Prefix': 'false',
-                'Implementation-Version': rootProject.version
+            'Premain-Class': 'dev.aikido.agent.Agent',
+            'Agent-Class': 'dev.aikido.agent.Agent',
+            'Can-Redefine-Classes': 'true',
+            'Can-Retransform-Classes': 'true',
+            'Can-Set-Native-Method-Prefix': 'false',
+            'Implementation-Version': rootProject.version
         )
     }
 }

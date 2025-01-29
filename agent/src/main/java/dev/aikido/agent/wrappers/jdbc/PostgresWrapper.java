@@ -8,7 +8,8 @@ import net.bytebuddy.matcher.ElementMatcher;
 import java.sql.Connection;
 import java.sql.Statement;
 
-import static net.bytebuddy.matcher.ElementMatchers.*;
+import static net.bytebuddy.matcher.ElementMatchers.isSubTypeOf;
+import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class PostgresWrapper implements Wrapper {
     public String getName() {
@@ -22,6 +23,6 @@ public class PostgresWrapper implements Wrapper {
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
         return nameContains("org.postgresql.jdbc")
-                .and(isSubTypeOf(Connection.class).or(isSubTypeOf(Statement.class)));
+            .and(isSubTypeOf(Connection.class).or(isSubTypeOf(Statement.class)));
     }
 }

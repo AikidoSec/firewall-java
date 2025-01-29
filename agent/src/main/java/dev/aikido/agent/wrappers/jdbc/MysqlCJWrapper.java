@@ -15,6 +15,7 @@ public class MysqlCJWrapper implements Wrapper {
     public String getName() {
         return JDBCConnectionAdvice.class.getName();
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return JDBCConnectionAdvice.getMatcher("com.mysql.cj.jdbc");
     }
@@ -22,6 +23,6 @@ public class MysqlCJWrapper implements Wrapper {
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
         return nameContains("com.mysql.cj.jdbc")
-                .and(isSubTypeOf(Connection.class).or(isSubTypeOf(Statement.class)));
+            .and(isSubTypeOf(Connection.class).or(isSubTypeOf(Statement.class)));
     }
 }

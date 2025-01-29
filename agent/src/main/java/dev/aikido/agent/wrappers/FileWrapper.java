@@ -1,21 +1,18 @@
 package dev.aikido.agent.wrappers;
+
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.implementation.bytecode.Throw;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.io.File;
-import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class FileWrapper implements Wrapper {
@@ -24,6 +21,7 @@ public class FileWrapper implements Wrapper {
         // https://docs.oracle.com/javase/8/docs/api/java/io/File.html
         return FileAdvice.class.getName();
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return isDeclaredBy(isSubTypeOf(File.class)).and(isConstructor()).and(takesArgument(0, String.class));
     }

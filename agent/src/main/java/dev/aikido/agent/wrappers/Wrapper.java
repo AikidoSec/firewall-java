@@ -6,6 +6,8 @@ import net.bytebuddy.matcher.ElementMatcher;
 
 public interface Wrapper {
     String getName();
+
     ElementMatcher<? super MethodDescription> getMatcher();
+
     public ElementMatcher<? super TypeDescription> getTypeMatcher();
 }

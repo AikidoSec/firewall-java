@@ -1,6 +1,6 @@
 package dev.aikido.agent;
 
-import dev.aikido.agent.wrappers.*;
+import dev.aikido.agent.wrappers.Wrapper;
 import dev.aikido.agent_api.helpers.env.BooleanEnv;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
@@ -18,6 +18,7 @@ import static dev.aikido.agent_api.vulnerabilities.sql_injection.RustSQLInterfac
 
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
+
     public static void premain(String agentArgs, Instrumentation inst) {
         // Check for 'AIKIDO_DISABLE' :
         if (new BooleanEnv("AIKIDO_DISABLE", /*default value*/ false).getValue()) {
@@ -30,7 +31,7 @@ public class Agent {
         loadLibrary();
 
         ElementMatcher.Junction wrapperTypeDescriptors = ElementMatchers.none();
-        for(Wrapper wrapper: WRAPPERS) {
+        for (Wrapper wrapper : WRAPPERS) {
             wrapperTypeDescriptors = wrapperTypeDescriptors.or(wrapper.getTypeMatcher());
         }
 
@@ -41,20 +42,22 @@ public class Agent {
             .installOn(inst);
 
         logger.info("Instrumentation installed.");
-        
+
         startDaemon(agentArgs);
     }
+
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
             var adviceAgentBuilder = new AgentBuilder.Transformer.ForAdvice()
-                    .include(Agent.class.getClassLoader());
-            for(Wrapper wrapper: WRAPPERS) {
+                .include(Agent.class.getClassLoader());
+            for (Wrapper wrapper : WRAPPERS) {
                 // Add wrapper as advice :
                 adviceAgentBuilder = adviceAgentBuilder.advice(wrapper.getMatcher(), wrapper.getName());
             }
             return adviceAgentBuilder;
         }
     }
+
     private static void setAikidoSysProperties() {
         String pathToAgentJar = Agent.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         String pathToAikidoDirectory = new File(pathToAgentJar).getParent();

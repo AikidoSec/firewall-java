@@ -15,6 +15,7 @@ public class MSSQLWrapper implements Wrapper {
     public String getName() {
         return JDBCConnectionAdvice.class.getName();
     }
+
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return JDBCConnectionAdvice.getMatcher("com.microsoft.sqlserver.jdbc");
     }
@@ -22,6 +23,6 @@ public class MSSQLWrapper implements Wrapper {
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
         return nameContains("com.microsoft.sqlserver.jdbc")
-                .and(isSubTypeOf(Connection.class).or(isSubTypeOf(Statement.class)));
+            .and(isSubTypeOf(Connection.class).or(isSubTypeOf(Statement.class)));
     }
 }

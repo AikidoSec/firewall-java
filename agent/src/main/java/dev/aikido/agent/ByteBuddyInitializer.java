@@ -15,12 +15,12 @@ public final class ByteBuddyInitializer {
 
     public static AgentBuilder createAgentBuilder(boolean debugMode) {
         AgentBuilder agentBuilder = new AgentBuilder.Default(
-                // default method graph compiler inspects the class hierarchy, we don't need it, so
-                // we use a simpler and faster strategy instead
-                new ByteBuddy()
-                        .with(MethodGraph.Compiler.ForDeclaredMethods.INSTANCE)
-                        .with(VisibilityBridgeStrategy.Default.NEVER)
-                        .with(InstrumentedType.Factory.Default.FROZEN)
+            // default method graph compiler inspects the class hierarchy, we don't need it, so
+            // we use a simpler and faster strategy instead
+            new ByteBuddy()
+                .with(MethodGraph.Compiler.ForDeclaredMethods.INSTANCE)
+                .with(VisibilityBridgeStrategy.Default.NEVER)
+                .with(InstrumentedType.Factory.Default.FROZEN)
         );
 
         //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
@@ -29,14 +29,14 @@ public final class ByteBuddyInitializer {
         // Disabling this would impair our ability to wrap Java's own classes :
         agentBuilder = agentBuilder.with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION);
         if (debugMode) {
-                agentBuilder = agentBuilder
-                    .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
-                    .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError());
+            agentBuilder = agentBuilder
+                .with(AgentBuilder.Listener.StreamWriting.toSystemError().withTransformationsOnly())
+                .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError());
         }
 
         // Ignore Byte Buddy and Aikido's internal code:
         agentBuilder = agentBuilder.ignore(
-                ElementMatchers.nameContains("bytebuddy")
+            ElementMatchers.nameContains("bytebuddy")
                 .or(ElementMatchers.nameContains("dev.aikido.agent"))
         );
 

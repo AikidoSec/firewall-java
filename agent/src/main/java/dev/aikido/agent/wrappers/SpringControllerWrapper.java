@@ -6,10 +6,8 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
-
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
@@ -27,13 +25,13 @@ public class SpringControllerWrapper implements Wrapper {
     public ElementMatcher<? super MethodDescription> getMatcher() {
         // https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/package-summary.html
         return isAnnotatedWith(
-                nameContainsIgnoreCase("org.springframework.web.bind.annotation")
-                    .and(nameContainsIgnoreCase("DeleteMapping"))
-                    .or(nameContainsIgnoreCase("GetMapping"))
-                    .or(nameContainsIgnoreCase("PatchMapping"))
-                    .or(nameContainsIgnoreCase("PostMapping"))
-                    .or(nameContainsIgnoreCase("PutMapping"))
-                    .or(nameContainsIgnoreCase("RequestMapping"))
+            nameContainsIgnoreCase("org.springframework.web.bind.annotation")
+                .and(nameContainsIgnoreCase("DeleteMapping"))
+                .or(nameContainsIgnoreCase("GetMapping"))
+                .or(nameContainsIgnoreCase("PatchMapping"))
+                .or(nameContainsIgnoreCase("PostMapping"))
+                .or(nameContainsIgnoreCase("PutMapping"))
+                .or(nameContainsIgnoreCase("RequestMapping"))
         );
     }
 
@@ -48,8 +46,8 @@ public class SpringControllerWrapper implements Wrapper {
          */
         @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void before(
-                @Advice.Origin Executable method,
-                @Advice.AllArguments(readOnly = false, typing = DYNAMIC) Object[] args
+            @Advice.Origin Executable method,
+            @Advice.AllArguments(readOnly = false, typing = DYNAMIC) Object[] args
         ) throws Exception {
             Parameter[] parameters = method.getParameters();
             SpringAnnotationCollector.report(parameters, args);
