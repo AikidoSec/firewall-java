@@ -105,11 +105,11 @@ public class HostnamesTest {
         assertTrue(containsEntry(entries, "test.com", 8080));
         assertTrue(containsEntry(entries, "newsite.com", 3000));
     }
+
     @Test
     public void testAddArrayWithNewEntries() {
         Hostnames.HostnameEntry[] entriesToAdd = {
-                new Hostnames.HostnameEntry("example.com", 80),
-                new Hostnames.HostnameEntry("test.com", 443)
+            new Hostnames.HostnameEntry("example.com", 80), new Hostnames.HostnameEntry("test.com", 443)
         };
         entriesToAdd[0].incrementHits();
         entriesToAdd[1].incrementHits();
@@ -126,8 +126,8 @@ public class HostnamesTest {
     public void testAddArrayWithExistingEntries() {
         hostnames.add("example.com", 80); // Initial entry
         Hostnames.HostnameEntry[] entriesToAdd = {
-                new Hostnames.HostnameEntry("example.com", 80), // Same entry, should merge hits
-                new Hostnames.HostnameEntry("test.com", 443)    // New entry
+            new Hostnames.HostnameEntry("example.com", 80), // Same entry, should merge hits
+            new Hostnames.HostnameEntry("test.com", 443) // New entry
         };
         entriesToAdd[0].incrementHits();
         entriesToAdd[1].incrementHits();
@@ -137,7 +137,7 @@ public class HostnamesTest {
         Hostnames.HostnameEntry[] entries = hostnames.asArray();
         assertEquals(2, entries.length);
         assertEquals(2, getHits(entries, "example.com", 80)); // Hits should be 2
-        assertEquals(1, getHits(entries, "test.com", 443));   // Hits should be 1
+        assertEquals(1, getHits(entries, "test.com", 443)); // Hits should be 1
     }
 
     @Test
@@ -147,8 +147,8 @@ public class HostnamesTest {
         hostnames.add("localhost", 3000);
 
         Hostnames.HostnameEntry[] entriesToAdd = {
-                new Hostnames.HostnameEntry("newsite.com", 8080), // This should cause an eviction
-                new Hostnames.HostnameEntry("example.com", 80)    // Should merge hits
+            new Hostnames.HostnameEntry("newsite.com", 8080), // This should cause an eviction
+            new Hostnames.HostnameEntry("example.com", 80) // Should merge hits
         };
         entriesToAdd[0].incrementHits();
         entriesToAdd[1].incrementHits(10);
@@ -166,8 +166,7 @@ public class HostnamesTest {
     @Test
     public void testAddArrayWithZeroPort() {
         Hostnames.HostnameEntry[] entriesToAdd = {
-                new Hostnames.HostnameEntry("example.com", 0),
-                new Hostnames.HostnameEntry("test.com", 0)
+            new Hostnames.HostnameEntry("example.com", 0), new Hostnames.HostnameEntry("test.com", 0)
         };
 
         hostnames.addArray(entriesToAdd);
@@ -186,6 +185,7 @@ public class HostnamesTest {
         }
         return false;
     }
+
     private int getHits(Hostnames.HostnameEntry[] entries, String hostname, int port) {
         for (Hostnames.HostnameEntry entry : entries) {
             if (entry.getHostname().equals(hostname) && entry.getPort() == port) {
