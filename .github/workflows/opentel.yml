@@ -1,76 +1,76 @@
 name: Test JavalinPostgres with OpenTelemetry
 
 on:
-  pull_request:
+    pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Check out code
+                uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '21'
-          distribution: 'adopt'
+            -   name: Set up JDK
+                uses: actions/setup-java@v2
+                with:
+                    java-version: '21'
+                    distribution: 'adopt'
 
-      - name: Build with Gradle
-        working-directory: ./
-        run: |
-          chmod +x gradlew
-          make binaries
-          make build
+            -   name: Build with Gradle
+                working-directory: ./
+                run: |
+                    chmod +x gradlew
+                    make binaries
+                    make build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: pkg-build
-          path: ./
+            -   name: Upload build artifacts
+                uses: actions/upload-artifact@v4
+                with:
+                    name: pkg-build
+                    path: ./
 
-  opentel_test:
-    runs-on: ubuntu-latest
-    needs: build
-    continue-on-error: true
-    strategy:
-      matrix:
-        java-version: [17, 18, 19, 20, 21]
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: pkg-build
+    opentel_test:
+        runs-on: ubuntu-latest
+        needs: build
+        continue-on-error: true
+        strategy:
+            matrix:
+                java-version: [ 17, 18, 19, 20, 21 ]
+        steps:
+            -   name: Download build artifacts
+                uses: actions/download-artifact@v4
+                with:
+                    name: pkg-build
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: ${{ matrix.java-version }}
-          distribution: 'adopt'
+            -   name: Set up JDK
+                uses: actions/setup-java@v2
+                with:
+                    java-version: ${{ matrix.java-version }}
+                    distribution: 'adopt'
 
-      - name: Start mock server
-        working-directory: ./end2end/server
-        run: |
-          docker build -t mock_core .
-          docker run --name mock_core -d -p 5000:5000 mock_core
-      - name: Setup IPC Folder
-        run: mkdir /opt/aikido && chmod a+rw /opt/aikido
-      - name: Start databases
-        working-directory: ./sample-apps/databases
-        run: |
-          docker compose down --volumes
-          docker compose up --build -d
-      - name: Install Python dependencies
-        run: python -m pip install -r end2end/requirements.txt
-      - name: Cleanup application
-        working-directory: ./sample-apps/JavalinPostgres
-        run: chmod +x ./gradlew && make clean
-      - name: Start Application (with and without Zen)
-        working-directory: ./sample-apps/JavalinPostgres
-        run: |
-          make runWithoutZen
-          AIKIDO_TMP_DIR="/opt/aikido" make runWithOpentel
+            -   name: Start mock server
+                working-directory: ./end2end/server
+                run: |
+                    docker build -t mock_core .
+                    docker run --name mock_core -d -p 5000:5000 mock_core
+            -   name: Setup IPC Folder
+                run: mkdir /opt/aikido && chmod a+rw /opt/aikido
+            -   name: Start databases
+                working-directory: ./sample-apps/databases
+                run: |
+                    docker compose down --volumes
+                    docker compose up --build -d
+            -   name: Install Python dependencies
+                run: python -m pip install -r end2end/requirements.txt
+            -   name: Cleanup application
+                working-directory: ./sample-apps/JavalinPostgres
+                run: chmod +x ./gradlew && make clean
+            -   name: Start Application (with and without Zen)
+                working-directory: ./sample-apps/JavalinPostgres
+                run: |
+                    make runWithoutZen
+                    AIKIDO_TMP_DIR="/opt/aikido" make runWithOpentel
 
-      - name: Run End-to-End tests
-        working-directory: ./
-        run: tail -f ./sample-apps/JavalinPostgres/output1.log & sleep 20 && python end2end/javalin_postgres.py
+            -   name: Run End-to-End tests
+                working-directory: ./
+                run: tail -f ./sample-apps/JavalinPostgres/output1.log & sleep 20 && python end2end/javalin_postgres.py

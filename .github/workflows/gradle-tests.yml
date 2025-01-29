@@ -1,88 +1,88 @@
 name: Run Gradle Tests
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+    push:
+        branches:
+            - main
+    pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Check out code
+                uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '21'
-          distribution: 'adopt'
+            -   name: Set up JDK
+                uses: actions/setup-java@v2
+                with:
+                    java-version: '21'
+                    distribution: 'adopt'
 
-      - name: Build with Gradle
-        working-directory: ./
-        run: |
-          chmod +x gradlew
-          make binaries
-          make build
+            -   name: Build with Gradle
+                working-directory: ./
+                run: |
+                    chmod +x gradlew
+                    make binaries
+                    make build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: pkg-build
-          path: ./
-  test-and-coverage:
-    needs: build
-    runs-on: ubuntu-latest
+            -   name: Upload build artifacts
+                uses: actions/upload-artifact@v4
+                with:
+                    name: pkg-build
+                    path: ./
+    test-and-coverage:
+        needs: build
+        runs-on: ubuntu-latest
 
-    continue-on-error: true
-    strategy:
-      matrix:
-        java-version: [17, 18, 19, 20, 21]
+        continue-on-error: true
+        strategy:
+            matrix:
+                java-version: [ 17, 18, 19, 20, 21 ]
 
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: pkg-build
+        steps:
+            -   name: Download build artifacts
+                uses: actions/download-artifact@v4
+                with:
+                    name: pkg-build
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: ${{ matrix.java-version }}
-          distribution: 'adopt'
+            -   name: Set up JDK
+                uses: actions/setup-java@v2
+                with:
+                    java-version: ${{ matrix.java-version }}
+                    distribution: 'adopt'
 
-      - name: Add local.aikido.io to /etc/hosts
-        run: |
-          echo "127.0.0.1 local.aikido.io" | sudo tee -a /etc/hosts
+            -   name: Add local.aikido.io to /etc/hosts
+                run: |
+                    echo "127.0.0.1 local.aikido.io" | sudo tee -a /etc/hosts
 
-      - name: Start databases
-        working-directory: ./sample-apps/databases
-        run: docker compose up --build -d && sleep 10
+            -   name: Start databases
+                working-directory: ./sample-apps/databases
+                run: docker compose up --build -d && sleep 10
 
-      - name: Start mock server
-        working-directory: ./end2end/server
-        run: docker build -t mock_core . && docker run --name mock_core -d -p 5000:5000 mock_core
+            -   name: Start mock server
+                working-directory: ./end2end/server
+                run: docker build -t mock_core . && docker run --name mock_core -d -p 5000:5000 mock_core
 
-      - name: Create temporary directory
-        run: |
-          mkdir -p /opt/aikido
-          chmod 777 /opt/aikido
+            -   name: Create temporary directory
+                run: |
+                    mkdir -p /opt/aikido
+                    chmod 777 /opt/aikido
 
-      - name: Run test cases
-        working-directory: ./
-        run: chmod +x gradlew && make test
+            -   name: Run test cases
+                working-directory: ./
+                run: chmod +x gradlew && make test
 
-      - name: Run coverage with Gradle
-        if: matrix.java-version == '21'  # Only run coverage for Java 21
-        working-directory: ./
-        run: chmod +x gradlew && ./gradlew clean && make cov
+            -   name: Run coverage with Gradle
+                if: matrix.java-version == '21'  # Only run coverage for Java 21
+                working-directory: ./
+                run: chmod +x gradlew && ./gradlew clean && make cov
 
-      - name: Upload coverage report to Codecov
-        if: matrix.java-version == '21'  # Only upload coverage for Java 21
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4
-        with:
-          fail_ci_if_error: true
-          files: ./agent_api/build/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
+            -   name: Upload coverage report to Codecov
+                if: matrix.java-version == '21'  # Only upload coverage for Java 21
+                uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4
+                with:
+                    fail_ci_if_error: true
+                    files: ./agent_api/build/jacoco/test/jacocoTestReport.xml
+                    token: ${{ secrets.CODECOV_TOKEN }}
+                    verbose: true
