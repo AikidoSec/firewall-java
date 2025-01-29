@@ -1,7 +1,6 @@
 package vulnerabilities.shell_injection;
 
 
-import dev.aikido.agent_api.vulnerabilities.shell_injection.ShellSyntaxChecker;
 import org.junit.jupiter.api.Test;
 
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellSyntaxChecker.containsShellSyntax;

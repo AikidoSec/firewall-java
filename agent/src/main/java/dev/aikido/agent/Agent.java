@@ -41,7 +41,7 @@ public class Agent {
             .installOn(inst);
 
         logger.info("Instrumentation installed.");
-        
+
         startDaemon(agentArgs);
     }
     private static class AikidoTransformer {

@@ -14,7 +14,7 @@ public final class Endpoints {
         // Default option :
         return "https://guard.aikido.dev/";
     }
-    
+
     public static String getAikidoRealtimeEndpoint() {
         String endpoint = System.getenv("AIKIDO_REALTIME_ENDPOINT");
         if (endpoint != null && !endpoint.isEmpty()) {

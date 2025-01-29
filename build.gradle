@@ -1,3 +1,7 @@
+plugins {
+    id("java")
+    id("com.diffplug.spotless") version "7.0.2"
+}
 allprojects {
     group = 'dev.aikido'
     version = '1.0-REPLACE-VERSION'
@@ -5,12 +9,33 @@ allprojects {
     repositories {
         mavenCentral()
     }
+}
+spotless {
+    // optional: limit format enforcement to just the files changed by this feature branch
+    //ratchetFrom 'origin/main'
 
+    format 'misc', {
+        // define the files to apply `misc` to
+        target '*.gradle', '.gitattributes', '.gitignore'
+
+        // define the steps to apply to those files
+        trimTrailingWhitespace()
+        leadingTabsToSpaces() // or leadingTabsToSpaces. Takes an integer argument if you don't like 4
+    }
+    java {
+        target '**/src/**/java/**/*.java'
+        targetExclude 'sample-apps/**'
+        // Use the default importOrder configuration
+        removeUnusedImports()
+        leadingTabsToSpaces(4)
+        trimTrailingWhitespace()
+        formatAnnotations()
+        endWithNewline()
+    }
 }
 
 subprojects {
     apply plugin: 'java' // Apply the Java plugin to all subprojects
-
     // Define common configurations for all subprojects
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'

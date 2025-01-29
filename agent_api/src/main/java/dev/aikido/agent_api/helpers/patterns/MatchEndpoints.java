@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrl;
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrlPath;
 
 public final class MatchEndpoints {

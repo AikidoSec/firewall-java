@@ -5,7 +5,6 @@ import dev.aikido.agent_api.vulnerabilities.Detector;
 import java.util.Map;
 
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.CommandEncapsulationChecker.isSafelyEncapsulated;
-import static dev.aikido.agent_api.vulnerabilities.shell_injection.DangerousShellChars.containDangerousCharacter;
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellSyntaxChecker.containsShellSyntax;
 
 public class ShellInjectionDetector implements Detector {

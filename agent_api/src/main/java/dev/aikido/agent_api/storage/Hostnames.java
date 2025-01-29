@@ -49,7 +49,7 @@ public class Hostnames {
             this.port = port;
             this.hits = 0;
         }
-        
+
         public void incrementHits() {
             hits++;
         }

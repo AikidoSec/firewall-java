@@ -1,9 +1,5 @@
 package helpers;
 
-import api_discovery.DataSchemaGeneratorTest;
-import dev.aikido.agent_api.api_discovery.DataSchemaGenerator;
-import dev.aikido.agent_api.api_discovery.DataSchemaItem;
-import dev.aikido.agent_api.api_discovery.DataSchemaType;
 import org.junit.jupiter.api.Test;
 
 import static dev.aikido.agent_api.helpers.extraction.StringExtractor.extractStringsFromObject;

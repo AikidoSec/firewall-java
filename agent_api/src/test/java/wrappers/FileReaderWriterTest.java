@@ -49,7 +49,7 @@ public class FileReaderWriterTest {
             new FileReader("/var/../file.txt");
         });
         assertEquals("Aikido Zen has blocked Path Traversal", exception2.getMessage());
-        
+
         cleanup();
         assertThrows(FileNotFoundException.class, () -> {
             new FileReader("/var/../file.txt");

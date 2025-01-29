@@ -4,18 +4,14 @@ import dev.aikido.agent_api.api_discovery.APISpec;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
-import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
 import dev.aikido.agent_api.background.ipc_commands.Command;
 import dev.aikido.agent_api.background.ipc_commands.CommandRouter;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.helpers.env.Token;
-import dev.aikido.agent_api.storage.routes.RouteEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;

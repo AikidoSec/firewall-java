@@ -1,9 +1,7 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.NettyContext;
 import dev.aikido.agent_api.context.SpringContextObject;
-import dev.aikido.agent_api.context.SpringMVCContextObject;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;

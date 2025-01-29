@@ -66,4 +66,3 @@ public class SqlDetector implements Detector {
         return pattern.matcher(cleanedInputForList).matches();
     }
 }
-

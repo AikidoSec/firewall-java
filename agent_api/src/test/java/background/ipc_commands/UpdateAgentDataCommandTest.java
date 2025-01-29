@@ -1,7 +1,6 @@
 package background.ipc_commands;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
-import dev.aikido.agent_api.background.ipc_commands.ShouldRateLimitCommand;
 import dev.aikido.agent_api.background.ipc_commands.UpdateAgentDataCommand;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.storage.Hostnames;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 public class UpdateAgentDataCommandTest {
     private UpdateAgentDataCommand command;

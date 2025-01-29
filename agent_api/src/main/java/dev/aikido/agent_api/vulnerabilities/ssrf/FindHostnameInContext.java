@@ -6,7 +6,6 @@ import dev.aikido.agent_api.vulnerabilities.StringsFromContext;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrl;
 

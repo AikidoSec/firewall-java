@@ -20,4 +20,3 @@ class ContextObjectTest {
         assertEquals(expectedBody, actualBody);
     }
 }
-

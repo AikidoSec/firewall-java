@@ -9,7 +9,6 @@ import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-import org.mockito.ArgumentCaptor;
 
 import java.util.Optional;
 

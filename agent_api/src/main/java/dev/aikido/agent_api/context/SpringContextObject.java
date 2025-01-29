@@ -26,4 +26,3 @@ public class SpringContextObject extends ContextObject {
         cache.remove("body"); // Reset body cache.
     }
 }
-

@@ -1,10 +1,8 @@
 package thread_cache;
 
-import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import org.junit.jupiter.api.Test;
-import utils.EmtpyThreadCacheObject;
 
 import java.util.List;
 import java.util.Optional;

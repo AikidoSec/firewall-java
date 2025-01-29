@@ -1,6 +1,5 @@
 package dev.aikido.agent_api.helpers;
 
-import dev.aikido.agent_api.background.BackgroundProcess;
 
 public final class BackgroundProcessIdentifier {
     private BackgroundProcessIdentifier() {}

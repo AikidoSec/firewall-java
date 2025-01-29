@@ -45,7 +45,7 @@ public class FileWrapperTest {
         assertThrows(RuntimeException.class, () -> {
             new File("/var/../file.txt");
         });
-        
+
         cleanup();
         assertDoesNotThrow(() -> {
             new File("/var/../file.txt");

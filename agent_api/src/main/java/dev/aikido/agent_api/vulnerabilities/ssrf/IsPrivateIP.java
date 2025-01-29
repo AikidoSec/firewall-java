@@ -1,6 +1,5 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
-import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 
 import java.util.Arrays;

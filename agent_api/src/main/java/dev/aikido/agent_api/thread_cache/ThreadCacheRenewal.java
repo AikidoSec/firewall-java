@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.BackgroundProcessIdentifier.isBackgroundProcess;
-import static dev.aikido.agent_api.thread_cache.ThreadCache.threadCache;
 
 public final class ThreadCacheRenewal {
     private ThreadCacheRenewal() {}
@@ -33,7 +32,7 @@ public final class ThreadCacheRenewal {
             new UpdateAgentDataCommand().send(client, updateRes);
         }
 
-        // Fetch new data from background process : 
+        // Fetch new data from background process :
         Optional<SyncDataCommand.Res> result = new SyncDataCommand().send(client, new Command.EmptyResult());
         if(result.isPresent()) {
             SyncDataCommand.Res res = result.get();

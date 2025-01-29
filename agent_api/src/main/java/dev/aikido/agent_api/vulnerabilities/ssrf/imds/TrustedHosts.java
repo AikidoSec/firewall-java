@@ -1,8 +1,6 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf.imds;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 public final class TrustedHosts {
     private TrustedHosts() {}

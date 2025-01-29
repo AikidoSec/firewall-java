@@ -1,4 +1,3 @@
-import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.ShouldBlockRequest;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;

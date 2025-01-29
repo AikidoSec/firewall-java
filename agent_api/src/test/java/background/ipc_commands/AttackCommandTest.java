@@ -11,7 +11,6 @@ import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import utils.EmptySampleContextObject;
 
 import java.util.Optional;

@@ -114,7 +114,7 @@ public class InetAddressTest {
             fetchResponseHttpClient("http://localhost:5000/mock/events");
         });
         assertTrue(exception2.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
-        
+
         Exception exception3 = assertThrows(Exception.class, () -> {
             fetchResponseHttpClient("https://localhost:5000/api/runtime/config");
         });

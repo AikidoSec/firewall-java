@@ -23,7 +23,7 @@ public class RedirectNode {
     public RedirectNode getOrigin() { return origin; }
     public RedirectNode getChild() { return child; }
     public URL getUrl() { return url; }
-    
+
     public void setChild(RedirectNode child) {
         RedirectNode currentOrigin = this.origin;
         while (currentOrigin != null) {

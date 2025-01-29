@@ -3,7 +3,6 @@ package dev.aikido.agent_api.vulnerabilities.ssrf;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.vulnerabilities.Attack;
-import dev.aikido.agent_api.vulnerabilities.Detector;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
 
 import java.util.HashSet;
@@ -58,7 +57,7 @@ public class SSRFDetector {
                     context.getUser()
             );
         }
-        
+
         return null;
     }
 }

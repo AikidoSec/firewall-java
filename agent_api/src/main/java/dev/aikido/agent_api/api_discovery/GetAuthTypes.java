@@ -3,7 +3,6 @@ package dev.aikido.agent_api.api_discovery;
 import dev.aikido.agent_api.context.ContextObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

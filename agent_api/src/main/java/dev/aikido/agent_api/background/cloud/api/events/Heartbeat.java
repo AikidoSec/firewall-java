@@ -23,7 +23,7 @@ public final class Heartbeat {
             List<User> users,
             boolean middlewareInstalled
     ) implements APIEvent {}
-    
+
     public static HeartbeatEvent get(
             CloudConnectionManager connectionManager,
             Statistics.StatsRecord stats, Hostnames.HostnameEntry[] hostnames, RouteEntry[] routes, List<User> users

@@ -3,7 +3,6 @@ package dev.aikido.agent_api.vulnerabilities;
 import dev.aikido.agent_api.vulnerabilities.path_traversal.PathTraversalDetector;
 import dev.aikido.agent_api.vulnerabilities.shell_injection.ShellInjectionDetector;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector;
-import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 
 public final class Vulnerabilities {
     private Vulnerabilities() {}

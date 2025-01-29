@@ -1,7 +1,6 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
 import dev.aikido.agent_api.vulnerabilities.AikidoException;
-import dev.aikido.agent_api.vulnerabilities.sql_injection.Dialect;
 
 public class SSRFException extends AikidoException {
     public SSRFException(String msg) {
