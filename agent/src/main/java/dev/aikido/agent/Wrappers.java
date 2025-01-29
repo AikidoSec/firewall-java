@@ -1,6 +1,7 @@
 package dev.aikido.agent;
 
 import dev.aikido.agent.wrappers.*;
+import dev.aikido.agent.wrappers.file.FileDoubleWrapper;
 import dev.aikido.agent.wrappers.file.FileSingleWrapper;
 import dev.aikido.agent.wrappers.javalin.*;
 import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
@@ -18,6 +19,7 @@ public final class Wrappers {
             new SpringMVCWrapper(),
             new SpringControllerWrapper(),
             new FileSingleWrapper(),
+            new FileDoubleWrapper(),
             new URLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
