@@ -26,6 +26,9 @@ spotless {
         target '**/src/**/java/**/*.java'
         targetExclude 'sample-apps/**'
         // Use the default importOrder configuration
+        importOrder()
+        palantirJavaFormat()
+
         removeUnusedImports()
         leadingTabsToSpaces(4)
         trimTrailingWhitespace()
