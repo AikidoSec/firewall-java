@@ -172,4 +172,38 @@ class WebRequestCollectorTest {
         assertEquals("You are not allowed to access this resource because you have been identified as a bot.", response.msg());
         assertEquals(403, response.status());
     }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
+    @Test
+    void testReport_userAgentBlocked_Ip_Bypassed() {
+        ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
+                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
+        ), "AI2Bot|hacker");
+        // Mock ThreadCache
+        threadCacheObject = new ThreadCacheObject(List.of(), Set.of(),
+                /* bypassedIps : */ Set.of("192.168.1.1"), new Routes(), Optional.of(blockedListsRes));
+        ThreadCache.set(threadCacheObject);
+
+
+        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
+
+        assertNull(response);
+    }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
+    @Test
+    void testReport_ipBlockedUsingLists_Ip_Bypassed() {
+        ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
+                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
+        ), "");
+        // Mock ThreadCache
+        threadCacheObject = new ThreadCacheObject(List.of(), Set.of(),
+                /* bypassedIps : */ Set.of("192.168.1.1"), new Routes(), Optional.of(blockedListsRes));
+        ThreadCache.set(threadCacheObject);
+
+
+        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
+
+        assertNull(response);
+    }
 }

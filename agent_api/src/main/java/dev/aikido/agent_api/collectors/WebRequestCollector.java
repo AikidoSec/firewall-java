@@ -18,6 +18,11 @@ public final class WebRequestCollector {
     /**
      * This function gets called in the initial phases of a request.
      * @param newContext is the new ContextObject that holds headers, query, ...
+     * Also returns a response depending on blocking status :
+     * 1) First check: IP allowed to access route (restricted /admin routes e.g.)
+     * 2) Bypassed IP? If bypassed, no further checks
+     * 3) Blocked IP Lists: e.g. geo-blocking, crowdsec, ...
+     * 4) UA Blocking: e.g. bot blocking, AI scraper blocking, ...
      */
     public static Res report(ContextObject newContext) {
         // Set new context :
@@ -31,16 +36,22 @@ public final class WebRequestCollector {
         // Increment total hits :
         threadCache.incrementTotalHits();
 
-        // Blocked IP lists (e.g. Geo restrictions)
-        ThreadCacheObject.BlockedResult ipBlocked = threadCache.isIpBlocked(newContext.getRemoteAddress());
-        if (ipBlocked.blocked()) {
+        // Per-route IP allowlists :
+        List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), threadCache.getEndpoints());
+        if (!ipAllowedToAccessRoute(newContext.getRemoteAddress(), matchedEndpoints)) {
             String msg = "Your IP address is not allowed to access this resource.";
             msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
             return new Res(msg, 403);
         }
-        // Per-route IP allowlists :
-        List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), threadCache.getEndpoints());
-        if (!ipAllowedToAccessRoute(newContext.getRemoteAddress(), matchedEndpoints)) {
+
+        // add check for bypassed ips (after IP Allowlist check)
+        if (threadCache.isBypassedIP(newContext.getRemoteAddress())) {
+            return null;
+        }
+
+        // Blocked IP lists (e.g. Geo restrictions)
+        ThreadCacheObject.BlockedResult ipBlocked = threadCache.isIpBlocked(newContext.getRemoteAddress());
+        if (ipBlocked.blocked()) {
             String msg = "Your IP address is not allowed to access this resource.";
             msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
             return new Res(msg, 403);
