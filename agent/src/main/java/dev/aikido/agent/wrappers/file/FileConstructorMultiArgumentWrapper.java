@@ -18,11 +18,11 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 /**
  * File(String parent, String child)
  */
-public class FileDoubleWrapper implements Wrapper {
+public class FileConstructorMultiArgumentWrapper implements Wrapper {
     public String getName() {
         // Wrap File constructor.
         // https://docs.oracle.com/javase/8/docs/api/java/io/File.html
-        return FileDoubleAdvice.class.getName();
+        return FileConstructorMultiArgumentAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return isDeclaredBy(isSubTypeOf(File.class)).and(isConstructor()).and(
@@ -35,7 +35,7 @@ public class FileDoubleWrapper implements Wrapper {
         return ElementMatchers.isSubTypeOf(File.class);
     }
 
-    public static class FileDoubleAdvice {
+    public static class FileConstructorMultiArgumentAdvice {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file

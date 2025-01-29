@@ -1,8 +1,8 @@
 package dev.aikido.agent;
 
 import dev.aikido.agent.wrappers.*;
-import dev.aikido.agent.wrappers.file.FileDoubleWrapper;
-import dev.aikido.agent.wrappers.file.FileSingleWrapper;
+import dev.aikido.agent.wrappers.file.FileConstructorMultiArgumentWrapper;
+import dev.aikido.agent.wrappers.file.FileConstructorSingleArgumentWrapper;
 import dev.aikido.agent.wrappers.javalin.*;
 import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
 import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
@@ -18,8 +18,8 @@ public final class Wrappers {
             new PostgresWrapper(),
             new SpringMVCWrapper(),
             new SpringControllerWrapper(),
-            new FileSingleWrapper(),
-            new FileDoubleWrapper(),
+            new FileConstructorSingleArgumentWrapper(),
+            new FileConstructorMultiArgumentWrapper(),
             new URLConnectionWrapper(),
             new InetAddressWrapper(),
             new RuntimeExecWrapper(),
