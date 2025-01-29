@@ -23,6 +23,7 @@ jobs:
         working-directory: ./
         run: |
           chmod +x gradlew
+          ./gradlew spotlessCheck
           make binaries
           make build
 
