@@ -1,5 +1,7 @@
 package dev.aikido.agent_api.collectors;
 
+import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
@@ -14,15 +16,29 @@ public final class URLCollector {
 
     private URLCollector() {}
     public static void report(URL url) {
-        ThreadCacheObject threadCache = ThreadCache.get();
-        if(threadCache != null && url != null) {
+        if(url != null) {
             if (!url.getProtocol().startsWith("http")) {
                 return; // Non-HTTP(S) URL 
             }
             logger.trace("Adding a new URL to the cache: %s", url);
             int port = getPortFromURL(url);
-            threadCache.getHostnames().add(url.getHost(), port);
-            ThreadCache.set(threadCache);
+
+            // We store hostname and port in two places, Thread Cache and Context. Thread Cache is for reporting
+            // outbound domains. Context is to have a map of hostnames with used port numbers to detect SSRF attacks.
+
+            // Add to thread cache :
+            ThreadCacheObject threadCache = ThreadCache.get();
+            if (threadCache != null) {
+                threadCache.getHostnames().add(url.getHost(), port);
+                ThreadCache.set(threadCache);
+            }
+
+            // Add to context :
+            ContextObject context = Context.get();
+            if (context != null) {
+                context.getHostnames().add(url.getHost(), port);
+                Context.set(context);
+            }
         }
     }
 }

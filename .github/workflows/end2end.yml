@@ -36,14 +36,15 @@ jobs:
     strategy:
       matrix:
         app:
-          - { name: SpringBootPostgres, test_file: end2end/spring_boot_postgres.py }
-          - { name: SpringBootMySQL, test_file: end2end/spring_boot_mysql.py }
-          - { name: SpringBootMSSQL, test_file: end2end/spring_boot_mssql.py }
-          - { name: SpringWebfluxSampleApp, test_file: end2end/spring_webflux_postgres.py }
-          - { name: SpringMVCPostgresKotlin, test_file: end2end/spring_mvc_postgres_kotlin.py }
-          - { name: SpringMVCPostgresGroovy, test_file: end2end/spring_mvc_postgres_groovy.py }
-          - { name: JavalinPostgres, test_file: end2end/javalin_postgres.py }
-          - { name: JavalinMySQLKotlin, test_file: end2end/javalin_mysql_kotlin.py }
+          - { name: SpringBootPostgres, test_file: end2end/spring_boot_postgres.py, with_ipc: true }
+          - { name: SpringBootPostgres, test_file: end2end/spring_boot_postgres.py, with_ipc: false }
+          - { name: SpringBootMySQL, test_file: end2end/spring_boot_mysql.py, with_ipc: true }
+          - { name: SpringBootMSSQL, test_file: end2end/spring_boot_mssql.py, with_ipc: true }
+          - { name: SpringWebfluxSampleApp, test_file: end2end/spring_webflux_postgres.py, with_ipc: true }
+          - { name: SpringMVCPostgresKotlin, test_file: end2end/spring_mvc_postgres_kotlin.py, with_ipc: true }
+          - { name: SpringMVCPostgresGroovy, test_file: end2end/spring_mvc_postgres_groovy.py, with_ipc: true }
+          - { name: JavalinPostgres, test_file: end2end/javalin_postgres.py, with_ipc: true }
+          - { name: JavalinMySQLKotlin, test_file: end2end/javalin_mysql_kotlin.py, with_ipc: true }
         java-version: [17, 18, 19, 20, 21]
     steps:
       - name: Download build artifacts
@@ -63,6 +64,7 @@ jobs:
           docker build -t mock_core .
           docker run --name mock_core -d -p 5000:5000 mock_core
       - name: Setup IPC Folder
+        if: matrix.app.with_ipc
         run: mkdir /opt/aikido && chmod a+rw /opt/aikido
       - name: Start databases
         working-directory: ./sample-apps/databases

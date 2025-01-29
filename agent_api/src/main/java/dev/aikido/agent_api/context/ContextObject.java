@@ -2,6 +2,7 @@ package dev.aikido.agent_api.context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.RedirectNode;
 
 import java.util.ArrayList;
@@ -25,6 +26,10 @@ public class ContextObject {
     protected boolean executedMiddleware;
     protected transient ArrayList<RedirectNode> redirectStartNodes;
     protected transient Map<String, Map<String, String>> cache = new HashMap<>();
+
+    // We store hostnames in the context object so we can match a given hostname (by DNS request)
+    // with its port number (which we know by instrumenting the URLs that get requested).
+    protected transient Hostnames hostnames = new Hostnames(1000); // max 1000 entries
 
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
@@ -69,6 +74,7 @@ public class ContextObject {
         return cookies;
     }
     public Map<String, Map<String, String>> getCache() { return cache; }
+    public Hostnames getHostnames() { return hostnames; }
 
     public String toJson() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

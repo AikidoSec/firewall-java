@@ -49,7 +49,7 @@ public class InetAddressWrapper implements Wrapper {
 
             try {
                 // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.HostnameCollector");
+                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.DNSRecordCollector");
 
                 // Run report with "argument"
                 for (Method method2: clazz.getMethods()) {
