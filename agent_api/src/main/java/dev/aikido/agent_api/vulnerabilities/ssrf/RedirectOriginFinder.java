@@ -9,12 +9,14 @@ import java.util.List;
 import static dev.aikido.agent_api.helpers.url.PortParser.getPortFromURL;
 
 public final class RedirectOriginFinder {
-    private RedirectOriginFinder() {}
+    private RedirectOriginFinder() {
+    }
+
     public static URL getRedirectOrigin(String hostname, int port) {
         List<RedirectNode> redirectStartNodes = Context.get().getRedirectStartNodes();
 
         // Loop over all start nodes :
-        for (RedirectNode node: redirectStartNodes) {
+        for (RedirectNode node : redirectStartNodes) {
             RedirectNode currentChild = node.getChild();
             while (currentChild != null) {
                 int childPort = getPortFromURL(currentChild.getUrl());

@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +19,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 public class SpringAnnotationCollectorTest {
 
@@ -41,18 +38,22 @@ public class SpringAnnotationCollectorTest {
         public String value() {
             return "";
         }
+
         @Override
         public String name() {
             return "";
         }
+
         @Override
         public boolean required() {
             return false;
         }
+
         @Override
         public String defaultValue() {
             return "";
         }
+
         public Class<? extends Annotation> annotationType() {
             return RequestParam.class;
         }
@@ -62,14 +63,17 @@ public class SpringAnnotationCollectorTest {
         public String value() {
             return "";
         }
+
         @Override
         public String name() {
             return "";
         }
+
         @Override
         public boolean required() {
             return false;
         }
+
         public Class<? extends Annotation> annotationType() {
             return PathVariable.class;
         }
@@ -79,7 +83,7 @@ public class SpringAnnotationCollectorTest {
     @BeforeEach
     public void setUp() {
         mockContext = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
+            "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
         );
         Context.set(mockContext);
     }
@@ -138,8 +142,8 @@ public class SpringAnnotationCollectorTest {
         SpringAnnotationCollector.report(new Parameter[]{parameter2}, new Object[]{"value3"});
 
         assertEquals(
-                Map.of("key1", "value1", "key2", "value2", "key3", "value3"),
-                mockContext.getParams());
+            Map.of("key1", "value1", "key2", "value2", "key3", "value3"),
+            mockContext.getParams());
     }
 
     @Test

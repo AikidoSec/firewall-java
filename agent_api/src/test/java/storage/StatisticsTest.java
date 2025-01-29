@@ -9,10 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StatisticsTest {
     private Statistics stats = null;
+
     @BeforeEach
     public void setup() {
         stats = new Statistics();
     }
+
     @Test
     public void testTotalHits() {
         assertEquals(0, stats.getTotalHits());

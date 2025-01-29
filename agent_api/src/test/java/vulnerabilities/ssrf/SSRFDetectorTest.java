@@ -14,7 +14,7 @@ import utils.EmptySampleContextObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,6 +26,7 @@ public class SSRFDetectorTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @AfterAll
     static void afterAll() {
         cleanup();
@@ -46,9 +47,9 @@ public class SSRFDetectorTest {
         URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
         RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://127.0.0.1:8080"));
         Attack attackData = new SSRFDetector().run(
-                "127.0.0.1", 8080,
-                List.of("127.0.0.1"),
-                "testop"
+            "127.0.0.1", 8080,
+            List.of("127.0.0.1"),
+            "testop"
         );
 
         assertNotNull(attackData);
@@ -70,9 +71,9 @@ public class SSRFDetectorTest {
         URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
         RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"));
         Attack attackData = new SSRFDetector().run(
-                "localhost", 80,
-                List.of("127.0.0.1"),
-                "test2nd_op"
+            "localhost", 80,
+            List.of("127.0.0.1"),
+            "test2nd_op"
         );
 
         assertNotNull(attackData);

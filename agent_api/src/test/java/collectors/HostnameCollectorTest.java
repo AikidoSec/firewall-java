@@ -6,7 +6,9 @@ import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.*;
 public class HostnameCollectorTest {
     InetAddress inetAddress1;
     InetAddress inetAddress2;
+
     @BeforeEach
     void setup() throws UnknownHostException {
         // We want to define InetAddresses here so it does not interfere with counts of getHostname()
@@ -34,7 +37,7 @@ public class HostnameCollectorTest {
     public void testThreadCacheNull() {
         // Early return because of Thread Cache being null :
         HostnameCollector.report("dev.aikido", new InetAddress[]{
-                inetAddress1, inetAddress2
+            inetAddress1, inetAddress2
         });
     }
 
@@ -45,7 +48,7 @@ public class HostnameCollectorTest {
         when(myThreadCache.getLastRenewedAtMS()).thenReturn(getUnixTimeMS());
         ThreadCache.set(myThreadCache);
         HostnameCollector.report("dev.aikido", new InetAddress[]{
-                inetAddress1, inetAddress2
+            inetAddress1, inetAddress2
         });
         verify(myThreadCache).getHostnames();
 
@@ -57,7 +60,7 @@ public class HostnameCollectorTest {
 
         ThreadCache.set(myThreadCache);
         HostnameCollector.report("dev.aikido", new InetAddress[]{
-                inetAddress1, inetAddress2
+            inetAddress1, inetAddress2
         });
         verify(myThreadCache, times(2)).getHostnames();
     }
@@ -75,7 +78,7 @@ public class HostnameCollectorTest {
 
         ThreadCache.set(myThreadCache);
         HostnameCollector.report("dev.aikido", new InetAddress[]{
-                inetAddress1, inetAddress2
+            inetAddress1, inetAddress2
         });
         verify(myThreadCache, times(2)).getHostnames();
     }
@@ -104,7 +107,7 @@ public class HostnameCollectorTest {
         Context.set(new SampleContextObject());
         Exception exception = assertThrows(SSRFException.class, () -> {
             HostnameCollector.report("dev.aikido", new InetAddress[]{
-                    inetAddress1, inetAddress2
+                inetAddress1, inetAddress2
             });
         });
         verify(myThreadCache, times(2)).getHostnames();

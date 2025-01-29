@@ -48,22 +48,22 @@ public class OkHttpTest {
             fetchResponse("http://localhost:5000/api/test");
         });
         assertEquals(
-                "Aikido Zen has blocked a server-side request forgery",
-                exception1.getMessage());
+            "Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
 
         RuntimeException exception2 = assertThrows(RuntimeException.class, () -> {
             fetchResponse("http://localhost:5000");
         });
         assertEquals(
-                "Aikido Zen has blocked a server-side request forgery",
-                exception2.getMessage());
+            "Aikido Zen has blocked a server-side request forgery",
+            exception2.getMessage());
 
         RuntimeException exception3 = assertThrows(RuntimeException.class, () -> {
             fetchResponse("https://localhost:5000/api/test");
         });
         assertEquals(
-                "Aikido Zen has blocked a server-side request forgery",
-                exception3.getMessage());
+            "Aikido Zen has blocked a server-side request forgery",
+            exception3.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -101,9 +101,9 @@ public class OkHttpTest {
 
     private void fetchResponse(String urlString) throws IOException {
         Request request = new Request.Builder()
-                .url(urlString)
-                .addHeader("Authorization", "Bearer invalid-token-2")
-                .build();
+            .url(urlString)
+            .addHeader("Authorization", "Bearer invalid-token-2")
+            .build();
         Response response = client.newCall(request).execute();
     }
 }

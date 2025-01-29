@@ -23,6 +23,7 @@ public class URLConnectionTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @AfterAll
     static void afterAll() {
         cleanup();

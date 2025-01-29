@@ -9,11 +9,9 @@ import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
-import org.mockito.ArgumentCaptor;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class RealtimeTaskTest {
@@ -35,7 +33,7 @@ class RealtimeTaskTest {
         realtimeTask = new RealtimeTask(connectionManager);
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localhost:5000/realtime")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "http://localhost:5000/realtime")
     @Test
     void testRunWithUpdatedConfig() {
         // Arrange
@@ -56,7 +54,7 @@ class RealtimeTaskTest {
         verify(serviceConfiguration).updateConfig(apiResponse);
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localhost:5000/realtime")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "http://localhost:5000/realtime")
     @Test
     void testRunWithNoConfigUpdate() {
         // Arrange

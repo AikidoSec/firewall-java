@@ -26,7 +26,7 @@ public class LooksLikeJWTTest {
     @Test
     void testReturnsPayloadForInvalidJwt() {
         assertEquals(new LooksLikeJWT.Result(false, null), LooksLikeJWT.tryDecodeAsJwt("/;ping%20localhost;.e30=."));
-        assertEquals(new LooksLikeJWT.Result(false,  null), LooksLikeJWT.tryDecodeAsJwt("/;ping%20localhost;.W10=."));
+        assertEquals(new LooksLikeJWT.Result(false, null), LooksLikeJWT.tryDecodeAsJwt("/;ping%20localhost;.W10=."));
     }
 
     @Test

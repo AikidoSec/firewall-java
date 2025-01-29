@@ -21,6 +21,7 @@ import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class ApacheHttpClientTest {
     private CloseableHttpClient client;
+
     @AfterEach
     void cleanup() {
         Context.set(null);
@@ -48,22 +49,22 @@ public class ApacheHttpClientTest {
             fetchResponse("http://localhost:5000/api/test");
         });
         assertEquals(
-                "Aikido Zen has blocked a server-side request forgery",
-                exception1.getMessage());
+            "Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
 
         RuntimeException exception2 = assertThrows(RuntimeException.class, () -> {
             fetchResponse("http://localhost:5000");
         });
         assertEquals(
-                "Aikido Zen has blocked a server-side request forgery",
-                exception2.getMessage());
+            "Aikido Zen has blocked a server-side request forgery",
+            exception2.getMessage());
 
         RuntimeException exception3 = assertThrows(RuntimeException.class, () -> {
             fetchResponse("https://localhost:5000/api/test");
         });
         assertEquals(
-                "Aikido Zen has blocked a server-side request forgery",
-                exception3.getMessage());
+            "Aikido Zen has blocked a server-side request forgery",
+            exception3.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")

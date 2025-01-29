@@ -29,6 +29,7 @@ public class HttpURLConnectionRedirectTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @AfterAll
     static void afterAll() {
         cleanup();
@@ -55,8 +56,8 @@ public class HttpURLConnectionRedirectTest {
             connection.getResponseCode();
         });
         assertEquals(
-                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
-                exception1.getMessage());
+            "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
@@ -74,8 +75,8 @@ public class HttpURLConnectionRedirectTest {
             connection.getResponseCode();
         });
         assertEquals(
-                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
-                exception1.getMessage());
+            "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
@@ -93,8 +94,8 @@ public class HttpURLConnectionRedirectTest {
             connection.getResponseCode();
         });
         assertEquals(
-                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
-                exception1.getMessage());
+            "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
@@ -112,8 +113,8 @@ public class HttpURLConnectionRedirectTest {
             connection.getResponseCode();
         });
         assertEquals(
-                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
-                exception1.getMessage());
+            "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
@@ -131,8 +132,8 @@ public class HttpURLConnectionRedirectTest {
             connection.getResponseCode();
         });
         assertEquals(
-                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
-                exception1.getMessage());
+            "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
@@ -150,7 +151,7 @@ public class HttpURLConnectionRedirectTest {
             connection.getResponseCode();
         });
         assertEquals(
-                "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
-                exception1.getMessage());
+            "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
     }
 }

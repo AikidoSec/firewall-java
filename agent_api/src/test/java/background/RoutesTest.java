@@ -1,8 +1,8 @@
 package background;
 
+import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.storage.routes.Routes;
-import dev.aikido.agent_api.context.RouteMetadata;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ class RoutesTest {
     void setUp() {
         routes = new Routes(2); // Set max size to 2 for testing
         routeMetadata1 = new RouteMetadata("/api/test1", "/api/test1", "GET");
-        routeMetadata2 = new RouteMetadata( "/api/test2", "/api/test2", "POST");
+        routeMetadata2 = new RouteMetadata("/api/test2", "/api/test2", "POST");
         routeMetadata3 = new RouteMetadata("/api/test3", "/api/test3", "PUT");
     }
 

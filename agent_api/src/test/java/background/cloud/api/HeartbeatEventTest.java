@@ -5,10 +5,10 @@ import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
+import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
-import dev.aikido.agent_api.context.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -30,18 +30,18 @@ public class HeartbeatEventTest {
     public void setUp() {
         connectionManager = Mockito.mock(CloudConnectionManager.class);
         managerInfo = new GetManagerInfo.ManagerInfo(
-                false, // dryMode
-                "localhost", // hostname
-                "1.0.0", // version
-                "firewall-java", // library
-                "127.0.0.1", // ipAddress
-                Collections.emptyMap(), // packages
-                "serverless", // serverless
-                Collections.emptyList(), // stack
-                new GetManagerInfo.OS("Linux", "5.4.0"), // os
-                false, // preventedPrototypePollution
-                "development", // nodeEnv
-                new GetManagerInfo.Platform("Java", "11") // platform
+            false, // dryMode
+            "localhost", // hostname
+            "1.0.0", // version
+            "firewall-java", // library
+            "127.0.0.1", // ipAddress
+            Collections.emptyMap(), // packages
+            "serverless", // serverless
+            Collections.emptyList(), // stack
+            new GetManagerInfo.OS("Linux", "5.4.0"), // os
+            false, // preventedPrototypePollution
+            "development", // nodeEnv
+            new GetManagerInfo.Platform("Java", "11") // platform
         );
     }
 

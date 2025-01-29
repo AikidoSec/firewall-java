@@ -7,11 +7,11 @@ import java.net.URL;
 
 import static dev.aikido.agent_api.helpers.url.PortParser.getPortFromURL;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.FindHostnameInContext.findHostnameInContext;
-import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.containsPrivateIP;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.RedirectOriginFinder.getRedirectOrigin;
 
 public final class PrivateIPRedirectFinder {
-    private PrivateIPRedirectFinder() {}
+    private PrivateIPRedirectFinder() {
+    }
 
     /**
      * This function is called before a outgoing request is made.

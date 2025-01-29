@@ -13,7 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class CommandRouterTest {
@@ -24,10 +25,11 @@ public class CommandRouterTest {
     public void setup() {
         cloudConnectionManager = Mockito.mock(CloudConnectionManager.class);
         commandRouter = new CommandRouter(
-                cloudConnectionManager,
-                new LinkedBlockingQueue<>()
+            cloudConnectionManager,
+            new LinkedBlockingQueue<>()
         );
     }
+
     @Test
     public void testIPCInputIsMalformed() {
         Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED%{}".getBytes(StandardCharsets.UTF_8));
@@ -43,11 +45,11 @@ public class CommandRouterTest {
     @Test
     public void testShouldBlockCommand() throws IOException {
         byte[] blockingTrue = new Gson()
-                .toJson(new BlockingEnabledCommand.Res(true))
-                .getBytes(StandardCharsets.UTF_8);
+            .toJson(new BlockingEnabledCommand.Res(true))
+            .getBytes(StandardCharsets.UTF_8);
         byte[] blockingFalse = new Gson()
-                .toJson(new BlockingEnabledCommand.Res(false))
-                .getBytes(StandardCharsets.UTF_8);
+            .toJson(new BlockingEnabledCommand.Res(false))
+            .getBytes(StandardCharsets.UTF_8);
 
         when(cloudConnectionManager.shouldBlock()).thenReturn(true);
         Optional<byte[]> result = commandRouter.parseIPCInput("BLOCKING_ENABLED${}".getBytes(StandardCharsets.UTF_8));

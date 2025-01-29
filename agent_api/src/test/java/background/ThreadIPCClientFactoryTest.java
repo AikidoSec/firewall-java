@@ -21,6 +21,7 @@ public class ThreadIPCClientFactoryTest {
     public void testWithNoAikidoToken() {
         assertNull(ThreadIPCClientFactory.getDefaultThreadIPCClient());
     }
+
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "not-empty-token")
     public void testWithNonEmptyToken() {

@@ -17,11 +17,13 @@ public class RuntimeExecTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @BeforeEach
     void clearThreadCache() {
         cleanup();
         ThreadCache.set(getEmptyThreadCacheObject());
     }
+
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }

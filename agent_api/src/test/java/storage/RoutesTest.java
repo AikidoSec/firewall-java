@@ -70,6 +70,7 @@ public class RoutesTest {
         Map<String, Integer> deltaMap = routes.getDeltaMap();
         assertEquals(0, deltaMap.size());
     }
+
     @Test
     public void testGetDeltaMapWithNoIncrements() {
         RouteMetadata routeMetadata = new RouteMetadata("/test", "http://localhost/test", "GET");
@@ -108,6 +109,7 @@ public class RoutesTest {
         // Since the route was never initialized, hits should be 0
         assertNull(routes.get(routeMetadata));
     }
+
     @Test
     public void testImportFromDeltaMapWithZeroHits() {
         RouteMetadata routeMetadata = new RouteMetadata("/test", "http://localhost/test", "GET");

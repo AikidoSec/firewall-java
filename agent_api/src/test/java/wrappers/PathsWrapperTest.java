@@ -19,11 +19,13 @@ public class PathsWrapperTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @BeforeEach
     void clearThreadCache() {
         cleanup();
         ThreadCache.set(getEmptyThreadCacheObject());
     }
+
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
@@ -39,7 +41,7 @@ public class PathsWrapperTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             Paths.get("/var/../opt/");
         });
-        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+        assertEquals("Aikido Zen has blocked Path Traversal", exception.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -56,8 +58,8 @@ public class PathsWrapperTest {
         Exception exception2 = assertThrows(RuntimeException.class, () -> {
             Paths.get("/var/", "/othervar/", "/../opt/", ".");
         });
-        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
-        assertEquals("Aikido Zen has blocked Path Traversal",  exception2.getMessage());
+        assertEquals("Aikido Zen has blocked Path Traversal", exception.getMessage());
+        assertEquals("Aikido Zen has blocked Path Traversal", exception2.getMessage());
 
     }
 }

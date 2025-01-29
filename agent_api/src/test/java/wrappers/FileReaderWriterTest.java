@@ -13,7 +13,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class FileReaderWriterTest {
@@ -22,6 +23,7 @@ public class FileReaderWriterTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @BeforeEach
     void clearThreadCache() {
         cleanup();
@@ -29,6 +31,7 @@ public class FileReaderWriterTest {
         String prop = System.getProperty("AIK_INTERNAL_coverage_run");
         Assumptions.assumeFalse(prop != null && prop.equals("1"), "With coverage enabled we skip File(...) test cases.");
     }
+
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
@@ -49,7 +52,7 @@ public class FileReaderWriterTest {
             new FileReader("/var/../file.txt");
         });
         assertEquals("Aikido Zen has blocked Path Traversal", exception2.getMessage());
-        
+
         cleanup();
         assertThrows(FileNotFoundException.class, () -> {
             new FileReader("/var/../file.txt");

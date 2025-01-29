@@ -5,6 +5,7 @@ import java.util.Objects;
 public class Dialect {
     private final int rustDialectInt;
     private final String humanName;
+
     public Dialect(String dialect) {
         if (Objects.equals(dialect, "postgresql")) {
             rustDialectInt = 9;
@@ -24,6 +25,7 @@ public class Dialect {
     public int getDialectInteger() {
         return rustDialectInt;
     }
+
     public String getHumanName() {
         return humanName;
     }

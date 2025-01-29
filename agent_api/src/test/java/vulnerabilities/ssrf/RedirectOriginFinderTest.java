@@ -128,6 +128,7 @@ public class RedirectOriginFinderTest {
 
         assertEquals("https://example.com", getRedirectOrigin("example.com", 443).toString());
     }
+
     @Test
     public void testMultipleRedirectsToSameDestination() throws MalformedURLException {
         RedirectCollector.report(new URL("https://a.com"), new URL("https://d.com"));
@@ -158,8 +159,8 @@ public class RedirectOriginFinderTest {
     public void testHandlesVeryLongRedirectChains() throws MalformedURLException {
         for (int i = 0; i < 100; i++) {
             RedirectCollector.report(
-                    new URL("https://example.com/" + i),
-                    new URL("https://example.com/" + (i + 1))
+                new URL("https://example.com/" + i),
+                new URL("https://example.com/" + (i + 1))
             );
         }
 
@@ -182,6 +183,7 @@ public class RedirectOriginFinderTest {
 
         assertEquals("https://example.com", getRedirectOrigin("example.com", 443).toString());
     }
+
     @Test
     public void testRedirectWithMatchingPort() throws MalformedURLException {
         RedirectCollector.report(new URL("https://example.com"), new URL("https://hackers.com:443"));
@@ -194,6 +196,7 @@ public class RedirectOriginFinderTest {
         RedirectCollector.report(new URL("https://example.com"), new URL("https://hackers.com:442"));
         assertNull(getRedirectOrigin("hackers.com", 443));
     }
+
     @Test
     public void testRedirectWithNonMatchingPort2() throws MalformedURLException {
         RedirectCollector.report(new URL("https://example.com"), new URL("https://hackers.com"));

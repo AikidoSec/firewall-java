@@ -2,14 +2,17 @@ import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.junitpioneer.jupiter.StdIo;
 import org.junitpioneer.jupiter.StdOut;
 
 import java.io.IOException;
-import java.sql.*;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
@@ -36,7 +39,8 @@ public class SetUserTest {
     public static void clean() {
         Context.set(null);
         ThreadCache.set(null);
-    };
+    }
+
     @BeforeEach
     public void setUp() throws SQLException {
         ThreadCache.set(getEmptyThreadCacheObject());
@@ -56,6 +60,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
         assertTrue(out.capturedString().contains("setUser(...) must be called before the Zen middleware is executed."));
     }
+
     @Test
     @StdIo
     public void testIndependenceFromThreadCacheNull(StdOut out) throws SQLException, IOException {
@@ -72,6 +77,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("", "Name"));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers2(StdOut out) throws SQLException {
@@ -79,6 +85,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("ID", ""));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers3(StdOut out) throws SQLException {
@@ -86,6 +93,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("", ""));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers4(StdOut out) throws SQLException {
@@ -93,6 +101,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject(null, ""));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers5(StdOut out) throws SQLException {
@@ -100,6 +109,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject(null, null));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidAndInvalidUsers6(StdOut out) throws SQLException {
@@ -107,6 +117,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("ID", null));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testValidUser(StdOut out) throws SQLException {
@@ -126,6 +137,7 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("ID", null));
         assertTrue(out.capturedString().contains("User ID or name cannot be empty."));
     }
+
     @Test
     @StdIo
     public void testWithContextSetButNotExecutedMiddleware(StdOut out) throws SQLException {

@@ -38,8 +38,8 @@ public class AttackTest {
         assertEquals(stack, attack.stack);
         assertEquals(user, attack.user);
         assertEquals(
-                "Attack{operation='SQL Injection', kind='sql_injection', source='User Input', pathToPayload='/api/vulnerable', metadata={userId=123}, payload='SELECT * FROM users WHERE id = 1', stack='Stack trace here', user=id}",
-                attack.toString()
+            "Attack{operation='SQL Injection', kind='sql_injection', source='User Input', pathToPayload='/api/vulnerable', metadata={userId=123}, payload='SELECT * FROM users WHERE id = 1', stack='Stack trace here', user=id}",
+            attack.toString()
         );
     }
 
@@ -67,8 +67,8 @@ public class AttackTest {
         assertEquals(payload, attack.payload);
         assertEquals(stack, attack.stack);
         assertEquals(
-                "Attack{operation='XSS Attack', kind='sql_injection', source='User Input', pathToPayload='/api/vulnerable', metadata={}, payload='<script>alert('XSS');</script>', stack='Stack trace here', user=123}",
-                attack.toString()
+            "Attack{operation='XSS Attack', kind='sql_injection', source='User Input', pathToPayload='/api/vulnerable', metadata={}, payload='<script>alert('XSS');</script>', stack='Stack trace here', user=123}",
+            attack.toString()
         );
     }
 }

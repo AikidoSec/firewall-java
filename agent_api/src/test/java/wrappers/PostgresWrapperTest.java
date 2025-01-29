@@ -10,7 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
@@ -23,6 +26,7 @@ public class PostgresWrapperTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @BeforeEach
     public void setUp() throws SQLException {
         // Connect to the PostgreSQL database
@@ -56,7 +60,7 @@ public class PostgresWrapperTest {
         Exception exception = assertThrows(SQLInjectionException.class, () -> {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
         });
-        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: PostgreSQL",  exception.getMessage());
+        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: PostgreSQL", exception.getMessage());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -94,7 +98,7 @@ public class PostgresWrapperTest {
         Exception exception = assertThrows(SQLInjectionException.class, () -> {
             connection.prepareStatement("SELECT * FROM pets;");
         });
-        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: PostgreSQL",  exception.getMessage());
+        assertEquals("Aikido Zen has blocked SQL Injection, Dialect: PostgreSQL", exception.getMessage());
     }
 
     @Test

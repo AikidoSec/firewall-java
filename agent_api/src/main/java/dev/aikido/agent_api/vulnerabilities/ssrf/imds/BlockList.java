@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class BlockList {
-    /** A list of IPs that shouldn't be accessed */
+    /**
+     * A list of IPs that shouldn't be accessed
+     */
     private final Set<String> blockedIPv4Addresses;
     private final Set<String> blockedIPv6Addresses;
 
@@ -14,7 +16,9 @@ public class BlockList {
         this.blockedIPv6Addresses = new HashSet<>();
     }
 
-    /** Add an address to this list */
+    /**
+     * Add an address to this list
+     */
     public void addAddress(String address, String addressType) {
         if ("ipv4".equals(addressType)) {
             blockedIPv4Addresses.add(address);
@@ -23,7 +27,9 @@ public class BlockList {
         }
     }
 
-    /** Check if the IP is on the list */
+    /**
+     * Check if the IP is on the list
+     */
     public boolean check(String address, String addressType) {
         if (addressType != null) {
             if ("ipv4".equals(addressType)) {

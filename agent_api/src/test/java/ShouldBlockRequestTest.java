@@ -1,4 +1,3 @@
-import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.ShouldBlockRequest;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
@@ -40,7 +39,8 @@ public class ShouldBlockRequestTest {
     public static void clean() {
         Context.set(null);
         ThreadCache.set(null);
-    };
+    }
+
     @BeforeEach
     public void setUp() throws SQLException {
         // Connect to the MySQL database
@@ -121,7 +121,6 @@ public class ShouldBlockRequestTest {
         assertEquals("192.168.1.1", res2.data().ip());
 
 
-
         // Test users blocked but no user set :
         Context.set(new SampleContextObject());
         var res3 = ShouldBlockRequest.shouldBlockRequest();
@@ -144,7 +143,7 @@ public class ShouldBlockRequestTest {
     public void testEndpointsExistButNoMatch() throws SQLException {
         Context.set(null);
         ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, false)
+            new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, false)
         ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with thread cache set & rate-limiting disabled :
@@ -153,7 +152,7 @@ public class ShouldBlockRequestTest {
 
         Context.set(null);
         ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, true)
+            new Endpoint("POST", "/api2/*", 1, 1000, Collections.emptyList(), false, false, true)
         ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with thread cache set & rate-limiting enabled :
@@ -166,7 +165,7 @@ public class ShouldBlockRequestTest {
     public void testEndpointsExistWithMatch() throws SQLException {
         Context.set(null);
         ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, false)
+            new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, false)
         ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with match & rate-limiting disabled :
@@ -175,7 +174,7 @@ public class ShouldBlockRequestTest {
 
         Context.set(null);
         ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
+            new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
         ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with match & rate-limiting enabled :
@@ -188,7 +187,7 @@ public class ShouldBlockRequestTest {
     public void testThreadClientInvalid() throws SQLException {
         Context.set(new SampleContextObject());
         ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
+            new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
         ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with match & rate-limiting enabled :
@@ -201,7 +200,7 @@ public class ShouldBlockRequestTest {
     public void testThreadClientInvalid2() throws SQLException {
         Context.set(new SampleContextObject());
         ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
+            new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
         ), Set.of(), Set.of(), new Routes(), Optional.empty()));
 
         // Test with match & rate-limiting enabled :

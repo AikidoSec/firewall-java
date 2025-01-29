@@ -8,7 +8,6 @@ import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 import dev.aikido.agent_api.thread_cache.ThreadCacheRenewal;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
@@ -29,7 +28,7 @@ public class ThreadCacheRenewalTest {
         BackgroundProcess backgroundProcess = new BackgroundProcess("test-background-process", new Token("token-123456"));
         backgroundProcess.setDaemon(true);
         backgroundProcess.start();
-        Thread.sleep(8*1000); // Wait for bg process to initialize
+        Thread.sleep(8 * 1000); // Wait for bg process to initialize
 
         ThreadCacheObject threadCacheObject = ThreadCacheRenewal.renewThreadCache();
         assertNotNull(threadCacheObject);
@@ -57,7 +56,7 @@ public class ThreadCacheRenewalTest {
         BackgroundProcess backgroundProcess = new BackgroundProcess("test-background-process", new Token("token-1234567"));
         backgroundProcess.setDaemon(true);
         backgroundProcess.start();
-        Thread.sleep(5*1000); // Wait for bg process to initialize
+        Thread.sleep(5 * 1000); // Wait for bg process to initialize
 
         ThreadCacheObject threadCacheObject = ThreadCacheRenewal.renewThreadCache();
         assertNotNull(threadCacheObject);

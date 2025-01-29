@@ -17,7 +17,7 @@ public class RealtimeAPITest {
         realtimeAPI = new RealtimeAPI();
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localhost:5000/realtime")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "http://localhost:5000/realtime")
     @Test
     public void testGetConfigSuccess() throws Exception {
         String token = "Bearer testToken";
@@ -28,7 +28,7 @@ public class RealtimeAPITest {
         assertEquals(0, response.get().configUpdatedAt());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localnothost:2500")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "http://localnothost:2500")
     @Test
     public void testURLNotAvailable() throws Exception {
         String token = "Bearer testToken";
@@ -38,7 +38,7 @@ public class RealtimeAPITest {
         assertFalse(response.isPresent());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="")
+    @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "")
     @Test
     public void testNot200OK() throws Exception {
         String token = "Bearer testToken";

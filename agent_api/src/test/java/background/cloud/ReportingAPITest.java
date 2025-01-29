@@ -10,11 +10,13 @@ import org.junitpioneer.jupiter.StdOut;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "trace")
 public class ReportingAPITest {
     ReportingApiHTTP api;
+
     @BeforeEach
     public void setup() {
         api = new ReportingApiHTTP("http://localhost:5000/");
@@ -27,6 +29,7 @@ public class ReportingAPITest {
         assertTrue(res.get().block());
         assertEquals(1, res.get().endpoints().size());
     }
+
     @Test
     @StdIo
     public void testFetchNewConfigInvalidEndpoint(StdOut out) {
@@ -34,8 +37,8 @@ public class ReportingAPITest {
         Optional<APIResponse> res = api.fetchNewConfig("token", 2);
         assertEquals(Optional.empty(), res);
         assertTrue(
-                out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Error while fetching new config from cloud"),
-                "Failed, string not in " + out.capturedString()
+            out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Error while fetching new config from cloud"),
+            "Failed, string not in " + out.capturedString()
         );
     }
 
@@ -52,10 +55,11 @@ public class ReportingAPITest {
         Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");
         assertEquals(Optional.empty(), res);
         assertTrue(
-                out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Failed to fetch blocked lists"),
-                "Failed, string not in " + out.capturedString()
+            out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Failed to fetch blocked lists"),
+            "Failed, string not in " + out.capturedString()
         );
     }
+
     @Test
     public void testListsResponse() {
         Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");

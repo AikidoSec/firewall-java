@@ -22,6 +22,7 @@ public class URLCollectorTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @AfterAll
     static void afterAll() {
         cleanup();
@@ -37,7 +38,7 @@ public class URLCollectorTest {
     @Test
     public void testNewUrlConnectionWithPort() throws IOException {
         setContextAndLifecycle("");
-        
+
         URLCollector.report(new URL("http://localhost:8080"));
         Hostnames.HostnameEntry[] hostnameArray = ThreadCache.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);

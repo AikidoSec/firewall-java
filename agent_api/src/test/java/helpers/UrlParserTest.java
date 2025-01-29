@@ -2,6 +2,7 @@ package helpers;
 
 import dev.aikido.agent_api.helpers.url.UrlParser;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 

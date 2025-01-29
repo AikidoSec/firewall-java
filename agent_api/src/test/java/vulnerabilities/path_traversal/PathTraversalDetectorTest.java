@@ -4,16 +4,20 @@ import dev.aikido.agent_api.vulnerabilities.Detector;
 import dev.aikido.agent_api.vulnerabilities.path_traversal.PathTraversalDetector;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PathTraversalDetectorTest {
     private final PathTraversalDetector pathTraversalDetector = new PathTraversalDetector();
+
     private void assertNotAttack(Detector.DetectorResult detectorResult) {
         assertFalse(detectorResult.isDetectedAttack());
     }
+
     private void assertAttack(Detector.DetectorResult detectorResult) {
         assertTrue(detectorResult.isDetectedAttack());
     }
+
     @Test
     public void testEmptyUserInput() {
         assertNotAttack(pathTraversalDetector.run("", new String[]{"test.txt"}));

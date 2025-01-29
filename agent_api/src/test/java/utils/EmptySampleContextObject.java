@@ -18,6 +18,7 @@ public class EmptySampleContextObject extends ContextObject {
         this.cookies = new HashMap<>();
         this.redirectStartNodes = new ArrayList<>();
     }
+
     public EmptySampleContextObject(String argument) {
         this();
         this.query.put("arg", List.of(argument));

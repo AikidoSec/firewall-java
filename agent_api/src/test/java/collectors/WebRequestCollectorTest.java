@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 class WebRequestCollectorTest {
@@ -58,8 +58,8 @@ class WebRequestCollectorTest {
     void testReport_ipNotAllowed() {
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
-                "GET", "/api/resource", 100, 100,
-                List.of("192.168.0.1"), false, false, false
+            "GET", "/api/resource", 100, 100,
+            List.of("192.168.0.1"), false, false, false
         )), Set.of(), Set.of(), new Routes(), Optional.empty());
         ThreadCache.set(threadCacheObject);
 
@@ -76,8 +76,8 @@ class WebRequestCollectorTest {
     void testReport_endpointAndIpAllowed() {
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
-                "GET", "/api/resource", 100, 100,
-                List.of("192.168.1.1"), false, false, false
+            "GET", "/api/resource", 100, 100,
+            List.of("192.168.1.1"), false, false, false
         )), Set.of(), Set.of(), new Routes(), Optional.empty());
         ThreadCache.set(threadCacheObject);
 
@@ -104,12 +104,12 @@ class WebRequestCollectorTest {
     @Test
     void testReport_ipBlockedTwice() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.1"))
+            new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.1"))
         ), "");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
-                "GET", "/api/resource", 100, 100,
-                List.of("192.168.0.1"), false, false, false
+            "GET", "/api/resource", 100, 100,
+            List.of("192.168.0.1"), false, false, false
         )), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
         ThreadCache.set(threadCacheObject);
 
@@ -125,7 +125,7 @@ class WebRequestCollectorTest {
     @Test
     void testReport_ipBlockedUsingLists() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
+            new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
         ), "");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
@@ -143,7 +143,7 @@ class WebRequestCollectorTest {
     @Test
     void testReport_ipNotBlockedUsingListsNorUserAgent() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
+            new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
         ), "Unrelated|random");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
@@ -159,7 +159,7 @@ class WebRequestCollectorTest {
     @Test
     void testReport_userAgentBlocked() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
+            new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
         ), "AI2Bot|hacker");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));

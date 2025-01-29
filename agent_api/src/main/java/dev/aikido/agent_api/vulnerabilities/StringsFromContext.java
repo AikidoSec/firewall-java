@@ -19,6 +19,7 @@ public class StringsFromContext {
         cookieStrings = loadFromCache(contextObject, "cookies", contextObject.getCookies());
         routeParamStrings = loadFromCache(contextObject, "routeParams", contextObject.getParams());
     }
+
     private static Map<String, String> loadFromCache(ContextObject contextObject, String prop, Object data) {
         if (contextObject.getCache().containsKey(prop)) {
             return contextObject.getCache().get(prop);
@@ -32,13 +33,14 @@ public class StringsFromContext {
 
         return Map.of();
     }
+
     public Map<String, Map<String, String>> getAll() {
         return Map.of(
-                "body", bodyStrings,
-                "query", queryStrings,
-                "headers", headersStrings,
-                "cookies", cookieStrings,
-                "routeParams", routeParamStrings
+            "body", bodyStrings,
+            "query", queryStrings,
+            "headers", headersStrings,
+            "cookies", cookieStrings,
+            "routeParams", routeParamStrings
         );
     }
 }

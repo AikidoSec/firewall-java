@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class RateLimitedEndpointFinderTest {
 
@@ -34,15 +35,15 @@ public class RateLimitedEndpointFinderTest {
     public void testReturnsNoneIfMatchingButNotEnabled() {
         List<Endpoint> endpoints = createEndpoints();
         Endpoint endpoint = new Endpoint(
-                endpoints.get(0).getMethod(),
-                endpoints.get(0).getRoute(),
-                endpoints.get(0).getRateLimiting().maxRequests(),
-                endpoints.get(0).getRateLimiting().windowSizeInMS(),
-                endpoints.get(0).getAllowedIPAddresses(),
-                endpoints.get(0).isGraphql(),
-                endpoints.get(0).protectionForcedOff(),
-                false // Rate limiting disabled
-                );
+            endpoints.get(0).getMethod(),
+            endpoints.get(0).getRoute(),
+            endpoints.get(0).getRateLimiting().maxRequests(),
+            endpoints.get(0).getRateLimiting().windowSizeInMS(),
+            endpoints.get(0).getAllowedIPAddresses(),
+            endpoints.get(0).isGraphql(),
+            endpoints.get(0).protectionForcedOff(),
+            false // Rate limiting disabled
+        );
         assertNull(RateLimitedEndpointFinder.getRateLimitedEndpoint(List.of(endpoint), "/api/login"));
     }
 

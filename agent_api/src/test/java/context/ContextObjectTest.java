@@ -2,7 +2,8 @@ package context;
 
 import dev.aikido.agent_api.context.ContextObject;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ContextObjectTest {
 

@@ -3,7 +3,6 @@ package dev.aikido.agent_api.vulnerabilities.ssrf;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.vulnerabilities.Attack;
-import dev.aikido.agent_api.vulnerabilities.Detector;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
 
 import java.util.HashSet;
@@ -19,14 +18,14 @@ import static dev.aikido.agent_api.vulnerabilities.ssrf.imds.Resolver.resolvesTo
 
 public class SSRFDetector {
     public Attack run(String hostname, int port, List<String> ipAddresses, String operation) {
-        if(hostname == null || hostname.isEmpty()) {
+        if (hostname == null || hostname.isEmpty()) {
             return null;
         }
 
         if (resolvesToImdsIp(new HashSet<>(ipAddresses), hostname)) {
             // An attacker could have stored a hostname in a database that points to an IMDS IP address
             // We don't check if the user input contains the hostname because context might not be available
-            if(shouldBlock()) {
+            if (shouldBlock()) {
                 throw SSRFException.get();
             }
         }
@@ -36,29 +35,29 @@ public class SSRFDetector {
         }
 
         ContextObject context = Context.get();
-        if(context == null) {
+        if (context == null) {
             return null;
         }
         FindHostnameInContext.Res attackFindings = findHostnameInContext(hostname, context, port);
         if (attackFindings == null) {
             attackFindings = isRedirectToPrivateIP(hostname, port);
         }
-        if(attackFindings != null) {
+        if (attackFindings != null) {
             return new Attack(
-                    operation,
-                    new Vulnerabilities.SSRFVulnerability(),
-                    attackFindings.source(),
-                    attackFindings.pathToPayload(),
-                    /*metadata*/ Map.of(
-                        "hostname", hostname,
-                        "port", String.valueOf(port)
-                    ),
-                    attackFindings.payload(),
-                    getCurrentStackTrace(),
-                    context.getUser()
+                operation,
+                new Vulnerabilities.SSRFVulnerability(),
+                attackFindings.source(),
+                attackFindings.pathToPayload(),
+                /*metadata*/ Map.of(
+                "hostname", hostname,
+                "port", String.valueOf(port)
+            ),
+                attackFindings.payload(),
+                getCurrentStackTrace(),
+                context.getUser()
             );
         }
-        
+
         return null;
     }
 }

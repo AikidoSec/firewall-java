@@ -4,20 +4,20 @@ import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
-import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class WebResponseCollectorTest {
@@ -25,6 +25,7 @@ public class WebResponseCollectorTest {
         public SampleContextObject() {
             this("GET");
         }
+
         public SampleContextObject(String method) {
             this.method = method;
             this.source = "web";
@@ -38,13 +39,15 @@ public class WebResponseCollectorTest {
             this.executedMiddleware = true; // Start with "executed middleware" as true
         }
     }
+
     public static RouteMetadata routeMetadata1 = new RouteMetadata("/api/resource", "https://example.com/api/resource", "GET");
 
     @BeforeAll
     public static void clean() {
         Context.set(null);
         ThreadCache.set(null);
-    };
+    }
+
     @BeforeEach
     public void setUp() throws SQLException {
         // Connect to the MySQL database
@@ -103,6 +106,7 @@ public class WebResponseCollectorTest {
         WebResponseCollector.report(-200);
         assertEquals(0, ThreadCache.get().getRoutes().size());
     }
+
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     public void testNothingHappensWithEmptyThreadCache() throws SQLException {

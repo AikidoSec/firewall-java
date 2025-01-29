@@ -7,7 +7,6 @@ import dev.aikido.agent_api.api_discovery.DataSchemaType;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -178,6 +177,7 @@ class APISpecMergerTest {
         assertEquals(updatedSpec.query(), result.query());
         assertEquals(1, result.auth().size());
     }
+
     @Test
     void testMergeWithOldSpecBodyQueryNullReversed() {
         APISpec updatedSpec = createAPISpec("newType", "newQuery", List.of(Map.of("type", "bearer")));
@@ -242,13 +242,13 @@ class APISpecMergerTest {
     @Test
     void testMergeAPISpecsWithComplexSchemas() {
         DataSchemaItem oldBodySchema = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "oldProp", new DataSchemaItem(DataSchemaType.STRING),
-                "anotherOldProp", new DataSchemaItem(DataSchemaType.NUMBER)
+            "oldProp", new DataSchemaItem(DataSchemaType.STRING),
+            "anotherOldProp", new DataSchemaItem(DataSchemaType.NUMBER)
         ));
 
         DataSchemaItem newBodySchema = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "newProp", new DataSchemaItem(DataSchemaType.STRING),
-                "anotherNewProp", new DataSchemaItem(DataSchemaType.BOOL)
+            "newProp", new DataSchemaItem(DataSchemaType.STRING),
+            "anotherNewProp", new DataSchemaItem(DataSchemaType.BOOL)
         ));
 
         APISpec updatedSpec = new APISpec(new APISpec.Body(newBodySchema, "newType"), null, null);
@@ -265,8 +265,8 @@ class APISpecMergerTest {
     private APISpec createAPISpec(String bodyType, String queryType, List<Map<String, String>> auth) {
         DataSchemaItem bodySchema = bodyType != null ? new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap("prop", new DataSchemaItem(DataSchemaType.STRING))) : null;
         DataSchemaItem querySchema = queryType != null
-                ? new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap(queryType + "Prop", new DataSchemaItem(DataSchemaType.STRING)))
-                : null;
+            ? new DataSchemaItem(DataSchemaType.OBJECT, Collections.singletonMap(queryType + "Prop", new DataSchemaItem(DataSchemaType.STRING)))
+            : null;
         return new APISpec(bodySchema != null ? new APISpec.Body(bodySchema, bodyType) : null, querySchema, auth);
     }
 }

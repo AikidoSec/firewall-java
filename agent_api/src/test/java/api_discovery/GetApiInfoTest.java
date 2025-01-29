@@ -29,13 +29,13 @@ public class GetApiInfoTest {
     public void testGetApiInfoWithFormEncodedContext() {
         Map<String, Object> body = new HashMap<>();
         body.put("data1", Map.of(
-                "data2", List.of(Map.of("Help", true), Map.of("Help", true, "location", "Sea")),
-                "identifier", "hsfkjewhfwehgkjwehgkj",
-                "active", true
+            "data2", List.of(Map.of("Help", true), Map.of("Help", true, "location", "Sea")),
+            "identifier", "hsfkjewhfwehgkjwehgkj",
+            "active", true
         ));
         body.put("user", Map.of(
-                "name", "John Doe",
-                "email", "john.doe@example.com"
+            "name", "John Doe",
+            "email", "john.doe@example.com"
         ));
 
         Mockito.when(context.getMethod()).thenReturn("GET");
@@ -98,8 +98,8 @@ public class GetApiInfoTest {
     public void testGetApiInfoWithJson() {
         Map<String, Object> body = new HashMap<>();
         body.put("user", Map.of(
-                "name", "John Doe",
-                "email", "john.doe@example.com"
+            "name", "John Doe",
+            "email", "john.doe@example.com"
         ));
 
         HashMap<String, List<String>> query = new HashMap<>();
@@ -159,6 +159,7 @@ public class GetApiInfoTest {
         assertNull(apiInfo.query());
         assertNull(apiInfo.auth());
     }
+
     @Test
     public void testGetApiInfoWithNullQueryAndBody() {
         Mockito.when(context.getMethod()).thenReturn("GET");
@@ -178,13 +179,13 @@ public class GetApiInfoTest {
     public void testGetApiInfoWithInvalidHeader() {
         Map<String, Object> body = new HashMap<>();
         body.put("data1", Map.of(
-                "data2", List.of(Map.of("Help", true), Map.of("Help", true, "location", "Sea")),
-                "identifier", "hsfkjewhfwehgkjwehgkj",
-                "active", true
+            "data2", List.of(Map.of("Help", true), Map.of("Help", true, "location", "Sea")),
+            "identifier", "hsfkjewhfwehgkjwehgkj",
+            "active", true
         ));
         body.put("user", Map.of(
-                "name", "John Doe",
-                "email", "john.doe@example.com"
+            "name", "John Doe",
+            "email", "john.doe@example.com"
         ));
 
         Mockito.when(context.getMethod()).thenReturn("GET");

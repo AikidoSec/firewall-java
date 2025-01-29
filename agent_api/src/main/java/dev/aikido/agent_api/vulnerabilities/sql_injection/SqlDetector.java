@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 public class SqlDetector implements Detector {
     private static final Logger logger = LogManager.getLogger(SqlDetector.class);
+
     /**
      * @param userInput contains the user input which we want to scan
      * @param arguments contains: [query, dialect]
@@ -28,6 +29,7 @@ public class SqlDetector implements Detector {
         }
         return new DetectorResult();
     }
+
     public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
         String queryLower = query.toLowerCase();
         String userInputLower = userInput.toLowerCase();
@@ -36,13 +38,14 @@ public class SqlDetector implements Detector {
         }
         return RustSQLInterface.detectSqlInjection(queryLower, userInputLower, dialect);
     }
+
     /**
-     *     Input : Lowercased query and user_input.
-     *     Returns true if the detect_sql_injection algo should return early :
-     *     - user_input is <= 1 char or user input larger than query
-     *     - user_input not in query
-     *     - user_input is alphanumerical
-     *     - user_input is an array of integers
+     * Input : Lowercased query and user_input.
+     * Returns true if the detect_sql_injection algo should return early :
+     * - user_input is <= 1 char or user input larger than query
+     * - user_input not in query
+     * - user_input is alphanumerical
+     * - user_input is an array of integers
      */
     public static boolean shouldReturnEarly(String query, String userInput) {
         // Check if userInput is less than or equal to 1 character or larger than query

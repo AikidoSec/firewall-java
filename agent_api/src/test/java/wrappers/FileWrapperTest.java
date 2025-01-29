@@ -21,6 +21,7 @@ public class FileWrapperTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @BeforeEach
     void clearThreadCache() {
         cleanup();
@@ -28,6 +29,7 @@ public class FileWrapperTest {
         String prop = System.getProperty("AIK_INTERNAL_coverage_run");
         Assumptions.assumeFalse(prop != null && prop.equals("1"), "With coverage enabled we skip File(...) test cases.");
     }
+
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
@@ -45,7 +47,7 @@ public class FileWrapperTest {
         assertThrows(RuntimeException.class, () -> {
             new File("/var/../file.txt");
         });
-        
+
         cleanup();
         assertDoesNotThrow(() -> {
             new File("/var/../file.txt");

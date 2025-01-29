@@ -15,9 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class ScannerTest {
@@ -27,6 +30,7 @@ class ScannerTest {
             this.remoteAddress = ip;
         }
     }
+
     public static class SampleContextObject3 extends EmptySampleContextObject {
         public SampleContextObject3(String route) {
             super("SELECT * FRO");
@@ -34,23 +38,25 @@ class ScannerTest {
             this.url = "http://localhost:5050" + route;
         }
     }
+
     private ThreadCacheObject threadCacheObject;
+
     @BeforeEach
     void setUp() {
         threadCacheObject = new ThreadCacheObject(
             List.of(
-                    new Endpoint(
-                        /* method */ "*", /* route */ "/api2/*",
-                        /* rlm params */ 0, 0,
-                        /* Allowed IPs */ List.of(), /* graphql */ false,
-                        /* forceProtectionOff */ true, /* rlm */ false
-                    ),
-                    new Endpoint(
-                        /* method */ "*", /* route */ "/api3/*",
-                        /* rlm params */ 0, 0,
-                        /* Allowed IPs */ List.of(), /* graphql */ false,
-                        /* forceProtectionOff */ false, /* rlm */ false
-                    )
+                new Endpoint(
+                    /* method */ "*", /* route */ "/api2/*",
+                    /* rlm params */ 0, 0,
+                    /* Allowed IPs */ List.of(), /* graphql */ false,
+                    /* forceProtectionOff */ true, /* rlm */ false
+                ),
+                new Endpoint(
+                    /* method */ "*", /* route */ "/api3/*",
+                    /* rlm params */ 0, 0,
+                    /* Allowed IPs */ List.of(), /* graphql */ false,
+                    /* forceProtectionOff */ false, /* rlm */ false
+                )
             ),
             Set.of(),
             Set.of("1.1.1.1", "2.2.2.2", "3.3.3.3"),
@@ -60,6 +66,7 @@ class ScannerTest {
         Context.set(new EmptySampleContextObject("SELECT * FRO"));
         ThreadCache.set(threadCacheObject);
     }
+
     @AfterEach
     void cleanup() {
         Context.set(null);

@@ -10,7 +10,10 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -26,11 +29,13 @@ public class InetAddressTest {
         Context.set(null);
         ThreadCache.set(null);
     }
+
     @BeforeEach
     void clearThreadCache() {
         httpClient = HttpClient.newHttpClient();
         cleanup();
     }
+
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
         ThreadCache.set(getEmptyThreadCacheObject());
@@ -114,7 +119,7 @@ public class InetAddressTest {
             fetchResponseHttpClient("http://localhost:5000/mock/events");
         });
         assertTrue(exception2.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
-        
+
         Exception exception3 = assertThrows(Exception.class, () -> {
             fetchResponseHttpClient("https://localhost:5000/api/runtime/config");
         });
@@ -134,12 +139,13 @@ public class InetAddressTest {
 
         int responseCode = connection.getResponseCode();
     }
+
     private void fetchResponseHttpClient(String urlString) throws InterruptedException, IOException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlString))
-                .GET() // GET is the default method, so this line is optional
-                .build();
+            .uri(URI.create(urlString))
+            .GET() // GET is the default method, so this line is optional
+            .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
     }

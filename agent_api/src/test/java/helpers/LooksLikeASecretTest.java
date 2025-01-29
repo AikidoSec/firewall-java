@@ -1,7 +1,6 @@
 package helpers;
 
 import dev.aikido.agent_api.helpers.patterns.LooksLikeASecret;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -35,8 +34,8 @@ public class LooksLikeASecretTest {
     @Test
     public void testShortStrings() {
         List<String> shortStrings = Arrays.asList(
-                "c", "NR", "7t3", "4qEK", "KJr6s", "KXiW4a", "Fupm2Vi",
-                "jiGmyGfg", "SJPLzVQ8t", "OmNf04j6mU"
+            "c", "NR", "7t3", "4qEK", "KJr6s", "KXiW4a", "Fupm2Vi",
+            "jiGmyGfg", "SJPLzVQ8t", "OmNf04j6mU"
         );
         for (String s : shortStrings) {
             assertFalse(LooksLikeASecret.looksLikeASecret(s));
@@ -52,10 +51,10 @@ public class LooksLikeASecretTest {
     @Test
     public void testVeryLongStrings() {
         assertTrue(LooksLikeASecret.looksLikeASecret(
-                "efDJHhzvkytpXoMkFUgag6shWJktYZ5QUrUCTfecFELpdvaoAT3tekI4ZhpzbqLt"
+            "efDJHhzvkytpXoMkFUgag6shWJktYZ5QUrUCTfecFELpdvaoAT3tekI4ZhpzbqLt"
         ));
         assertTrue(LooksLikeASecret.looksLikeASecret(
-                "XqSwF6ySwMdTomIdmgFWcMVXWf5L0oVvO5sIjaCPI7EjiPvRZhZGWx3A6mLl1HXPOHdUeabsjhngW06JiLhAchFwgtUaAYXLolZn75WsJVKHxEM1mEXhlmZepLCGwRAM"
+            "XqSwF6ySwMdTomIdmgFWcMVXWf5L0oVvO5sIjaCPI7EjiPvRZhZGWx3A6mLl1HXPOHdUeabsjhngW06JiLhAchFwgtUaAYXLolZn75WsJVKHxEM1mEXhlmZepLCGwRAM"
         ));
     }
 
@@ -75,34 +74,35 @@ public class LooksLikeASecretTest {
     @Test
     public void testCommonUrlTerms() {
         List<String> urlTerms = Arrays.asList(
-                "development", "programming", "applications", "implementation",
-                "environment", "technologies", "documentation", "demonstration",
-                "configuration", "administrator", "visualization", "international",
-                "collaboration", "opportunities", "functionality", "customization",
-                "specifications", "optimization", "contributions", "accessibility",
-                "subscription", "subscriptions", "infrastructure", "architecture",
-                "authentication", "sustainability", "notifications", "announcements",
-                "recommendations", "communication", "compatibility", "enhancement",
-                "integration", "performance", "improvements", "introduction",
-                "capabilities", "communities", "credentials", "integration",
-                "permissions", "validation", "serialization", "deserialization",
-                "rate-limiting", "throttling", "load-balancer", "microservices",
-                "endpoints", "data-transfer", "encryption", "authorization",
-                "bearer-token", "multipart", "urlencoded", "api-docs", "postman",
-                "json-schema", "serialization", "deserialization",    "rate-limiting",
-                "throttling", "load-balancer", "api-gateway", "microservices",
-                "endpoints", "data-transfer", "encryption", "signature",
-                "poppins-bold-webfont.woff2", "karla-bold-webfont.woff2", "startEmailBasedLogin",
-                "jenkinsFile", "ConnectionStrings.config", "coach", "login",
-                "payment_methods", "activity_logs", "feedback_responses",
-                "balance_transactions", "customer_sessions", "payment_intents",
-                "billing_portal", "subscription_items", "namedLayouts",
-                "PlatformAction", "quickActions", "queryLocator", "relevantItems", "parameterizedSearch"
+            "development", "programming", "applications", "implementation",
+            "environment", "technologies", "documentation", "demonstration",
+            "configuration", "administrator", "visualization", "international",
+            "collaboration", "opportunities", "functionality", "customization",
+            "specifications", "optimization", "contributions", "accessibility",
+            "subscription", "subscriptions", "infrastructure", "architecture",
+            "authentication", "sustainability", "notifications", "announcements",
+            "recommendations", "communication", "compatibility", "enhancement",
+            "integration", "performance", "improvements", "introduction",
+            "capabilities", "communities", "credentials", "integration",
+            "permissions", "validation", "serialization", "deserialization",
+            "rate-limiting", "throttling", "load-balancer", "microservices",
+            "endpoints", "data-transfer", "encryption", "authorization",
+            "bearer-token", "multipart", "urlencoded", "api-docs", "postman",
+            "json-schema", "serialization", "deserialization", "rate-limiting",
+            "throttling", "load-balancer", "api-gateway", "microservices",
+            "endpoints", "data-transfer", "encryption", "signature",
+            "poppins-bold-webfont.woff2", "karla-bold-webfont.woff2", "startEmailBasedLogin",
+            "jenkinsFile", "ConnectionStrings.config", "coach", "login",
+            "payment_methods", "activity_logs", "feedback_responses",
+            "balance_transactions", "customer_sessions", "payment_intents",
+            "billing_portal", "subscription_items", "namedLayouts",
+            "PlatformAction", "quickActions", "queryLocator", "relevantItems", "parameterizedSearch"
         );
         for (String term : urlTerms) {
             assertFalse(LooksLikeASecret.looksLikeASecret(term));
         }
     }
+
     @Test
     public void testKnownWordSeparators() {
         assertFalse(LooksLikeASecret.looksLikeASecret("this-is-a-secret-1"));
@@ -117,12 +117,12 @@ public class LooksLikeASecretTest {
     @Test
     public void testKnownSecrets() {
         List<String> secrets = Arrays.asList(
-                "yqHYTS<agpi^aa1",
-                "hIofuWBifkJI5iVsSNKKKDpBfmMqJJwuXMxau6AS8WZaHVLDAMeJXo3BwsFyrIIm",
-                "AG7DrGi3pDDIUU1PrEsj",
-                "CnJ4DunhYfv2db6T1FRfciRBHtlNKOYrjoz",
-                "Gic*EfMq:^MQ|ZcmX:yW1",
-                "AG7DrGi3pDDIUU1PrEsj"
+            "yqHYTS<agpi^aa1",
+            "hIofuWBifkJI5iVsSNKKKDpBfmMqJJwuXMxau6AS8WZaHVLDAMeJXo3BwsFyrIIm",
+            "AG7DrGi3pDDIUU1PrEsj",
+            "CnJ4DunhYfv2db6T1FRfciRBHtlNKOYrjoz",
+            "Gic*EfMq:^MQ|ZcmX:yW1",
+            "AG7DrGi3pDDIUU1PrEsj"
         );
 
         for (String secret : secrets) {

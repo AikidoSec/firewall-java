@@ -5,7 +5,9 @@ import dev.aikido.agent_api.api_discovery.DataSchemaGenerator;
 import dev.aikido.agent_api.api_discovery.DataSchemaItem;
 import dev.aikido.agent_api.api_discovery.DataSchemaType;
 import org.junit.jupiter.api.Test;
+
 import java.util.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataSchemaGeneratorTest {
@@ -60,7 +62,9 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.EMPTY, schema.properties().get("x").type());
     }
 
-    private record MyRecord(String a, Number abc, List<String> stringslist) {}
+    private record MyRecord(String a, Number abc, List<String> stringslist) {
+    }
+
     @Test
     public void testExtractsFromClasses() {
         MyRecord myRecord = new MyRecord("Hello World", null, List.of("Abc", "def", "ghi"));
@@ -81,6 +85,7 @@ public class DataSchemaGeneratorTest {
         transient Number abc = null;
         List<String> stringslist = List.of("Abc", "def", "ghi");
     }
+
     @Test
     public void testTransientFields() {
         Map<String, Object> input = new HashMap<>();
@@ -101,6 +106,7 @@ public class DataSchemaGeneratorTest {
         transient boolean abc = false;
         List<Boolean> stringslist = List.of(true, false, true);
     }
+
     @Test
     public void testBooleanField() {
         Map<String, Object> input = new HashMap<>();

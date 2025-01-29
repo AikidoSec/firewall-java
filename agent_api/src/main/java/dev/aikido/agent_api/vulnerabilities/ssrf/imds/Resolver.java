@@ -3,7 +3,9 @@ package dev.aikido.agent_api.vulnerabilities.ssrf.imds;
 import java.util.Set;
 
 public final class Resolver {
-    private Resolver() {}
+    private Resolver() {
+    }
+
     /**
      * Returns boolean value that's true if this is an IMDS IP/Hostname
      */

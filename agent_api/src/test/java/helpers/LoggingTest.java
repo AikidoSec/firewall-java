@@ -18,10 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LoggingTest {
     private static final int MAX_ARGUMENT_LENGTH = 300;
     Logger logger;
+
     @BeforeEach
     public void setup() {
         logger = new Logger(FileCollector.class, LogLevel.TRACE);
     }
+
     // Test logLevels :
     @Test
     public void testLogLevels() {
@@ -65,6 +67,7 @@ public class LoggingTest {
         assertFalse(out.capturedString().contains("TEST2"));
         assertFalse(out.capturedString().contains("TEST3"));
     }
+
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "fatal")
     @StdIo
@@ -105,6 +108,7 @@ public class LoggingTest {
         assertFalse(out.capturedString().contains("TEST2"));
         assertFalse(out.capturedString().contains("TEST3"));
     }
+
     @Test
     @StdIo
     public void testLoggerUsesProvidedLevel2(StdOut out) {
@@ -129,7 +133,7 @@ public class LoggingTest {
     @StdIo
     public void testLoggerCanHandleArraysAndCollections(StdOut out) {
         Logger logger = new Logger(FileCollector.class, LogLevel.DEBUG);
-        logger.info("Test %s %s", "String here", (new Integer[]{1, 6,2, 3}));
+        logger.info("Test %s %s", "String here", (new Integer[]{1, 6, 2, 3}));
         assertTrue(out.capturedString().contains("INFO dev.aikido.agent_api.collectors.FileCollector: Test String here [1, 6, 2, 3]"));
 
         logger.info("Test %s %s", "String2", (new String[]{"Hello", "World"}));
@@ -235,7 +239,7 @@ public class LoggingTest {
         String longString = generateLongString(350);
         Object[] args = {Arrays.asList("value1", longString)};
         List<Object> result = logger.parseArguments(args);
-        assertEquals(Arrays.asList(("[value1," + longString+ "]").substring(0, MAX_ARGUMENT_LENGTH)), result, "Collection string should be truncated to the maximum length.");
+        assertEquals(Arrays.asList(("[value1," + longString + "]").substring(0, MAX_ARGUMENT_LENGTH)), result, "Collection string should be truncated to the maximum length.");
     }
 
     @Test

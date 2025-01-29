@@ -8,13 +8,15 @@ import static dev.aikido.agent_api.vulnerabilities.shell_injection.DangerousShel
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellCommandsRegex.getCommandsRegex;
 
 public final class ShellSyntaxChecker {
-    private ShellSyntaxChecker() {}
+    private ShellSyntaxChecker() {
+    }
+
     private static final List<String> SEPARATORS = Arrays.asList(
-            " ", "\t", "\n", ";", "&", "|", "(", ")", "<", ">"
+        " ", "\t", "\n", ";", "&", "|", "(", ")", "<", ">"
     );
 
     public static boolean containsShellSyntax(String command, String userInput) {
-        if(userInput.isBlank()) {
+        if (userInput.isBlank()) {
             return false; // The entire user input is just whitespace, ignore
         }
         if (containDangerousCharacter(userInput)) {

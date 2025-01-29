@@ -1,15 +1,12 @@
 package helpers;
 
-import api_discovery.DataSchemaGeneratorTest;
-import dev.aikido.agent_api.api_discovery.DataSchemaGenerator;
-import dev.aikido.agent_api.api_discovery.DataSchemaItem;
-import dev.aikido.agent_api.api_discovery.DataSchemaType;
 import org.junit.jupiter.api.Test;
 
-import static dev.aikido.agent_api.helpers.extraction.StringExtractor.extractStringsFromObject;
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.*;
+
+import static dev.aikido.agent_api.helpers.extraction.StringExtractor.extractStringsFromObject;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class StringExtractorTest {
     private static Map<String, String> fromObj(Map<String, Object> obj) {
@@ -28,39 +25,40 @@ public class StringExtractorTest {
     @Test
     public void testExtractQueryObjects() {
         assertEquals(fromObj(Map.of("age", ".", "$gt", ".age", "21", ".age.$gt")),
-                extractStringsFromObject(Map.of("age", Map.of("$gt", "21"))));
+            extractStringsFromObject(Map.of("age", Map.of("$gt", "21"))));
         assertEquals(fromObj(Map.of("title", ".", "$ne", ".title", "null", ".title.$ne")),
-                extractStringsFromObject(Map.of("title", Map.of("$ne", "null"))));
+            extractStringsFromObject(Map.of("title", Map.of("$ne", "null"))));
         assertEquals(fromObj(Map.of("user_input", ".", "age", ".",
-                        "whaat2", ".age", "dangerous", ".user_input.[1]", "whaat", ".user_input.[0]")),
-                extractStringsFromObject(Map.of("age", "whaat2", "user_input", new String[]{"whaat", "dangerous"})));
+                "whaat2", ".age", "dangerous", ".user_input.[1]", "whaat", ".user_input.[0]")),
+            extractStringsFromObject(Map.of("age", "whaat2", "user_input", new String[]{"whaat", "dangerous"})));
     }
 
     @Test
     public void testExtractCookieObjects() {
         assertEquals(fromObj(Map.of("session2", ".", "session", ".", "ABC", ".session", "DEF", ".session2")),
-                extractStringsFromObject(Map.of("session", "ABC", "session2", "DEF")));
+            extractStringsFromObject(Map.of("session", "ABC", "session2", "DEF")));
         assertEquals(fromObj(Map.of("session2", ".", "session", ".", "ABC", ".session")),
-                extractStringsFromObject(Map.of("session", "ABC", "session2", 1234)));
+            extractStringsFromObject(Map.of("session", "ABC", "session2", 1234)));
     }
 
     @Test
     public void testExtractHeaderObjects() {
         assertEquals(fromObj(Map.of("Content-Type", ".", "application/json", ".Content-Type")),
-                extractStringsFromObject(Map.of("Content-Type", "application/json")));
+            extractStringsFromObject(Map.of("Content-Type", "application/json")));
         assertEquals(fromObj(Map.of("Content-Type", ".")),
-                extractStringsFromObject(Map.of("Content-Type", 54321)));
+            extractStringsFromObject(Map.of("Content-Type", 54321)));
         assertEquals(fromObj(Map.of("Content-Type", ".", "application/json", ".Content-Type", "ExtraHeader", ".", "value", ".ExtraHeader")),
-                extractStringsFromObject(Map.of("Content-Type", "application/json", "ExtraHeader", "value")));
+            extractStringsFromObject(Map.of("Content-Type", "application/json", "ExtraHeader", "value")));
     }
 
     @Test
     public void testExtractBodyObjects() {
         assertEquals(fromObj(Map.of("nested", ".nested", "$ne", ".nested.nested")),
-                extractStringsFromObject(Map.of("nested", Map.of("nested", Map.of("$ne", true)))));
+            extractStringsFromObject(Map.of("nested", Map.of("nested", Map.of("$ne", true)))));
         assertEquals(fromObj(Map.of("age", ".", "$lt", ".age", "$gt", ".age", "21", ".age.$gt", "100", ".age.$lt")),
-                extractStringsFromObject(Map.of("age", Map.of("$gt", "21", "$lt", "100"))));
+            extractStringsFromObject(Map.of("age", Map.of("$gt", "21", "$lt", "100"))));
     }
+
     @Test
     public void testDecodesJwts() {
         Map<String, String> input = new HashMap<>();
@@ -212,7 +210,10 @@ public class StringExtractorTest {
 
         assertEquals(expectedOutput, extractStringsFromObject(input));
     }
-    private record MyRecord(String a, Number abc, List<String> stringslist) {}
+
+    private record MyRecord(String a, Number abc, List<String> stringslist) {
+    }
+
     @Test
     public void testExtractsFromClasses() {
         MyRecord myRecord = new MyRecord("Hello World", null, List.of("Abc", "def", "ghi"));
@@ -349,6 +350,7 @@ public class StringExtractorTest {
         Number abc = 2;
         List<String> stringsList = List.of("Abc", "def", "ghi");
     }
+
     @Test
     public void testItDoesNotScanTransientProperties() {
         Map<String, Object> input = new HashMap<>();
@@ -369,6 +371,7 @@ public class StringExtractorTest {
         Number abc = 2;
         transient List<String> stringsList = List.of("Abc", "def", "ghi");
     }
+
     @Test
     public void testItDoesNotScanTransientProperties2() {
         Map<String, Object> input = new HashMap<>();
@@ -387,10 +390,12 @@ public class StringExtractorTest {
         String a = "Hello World";
         Number abc = 2;
         List<String> stringsList = List.of("Abc", "def", "ghi");
+
         public void setClass3(MyClass3 myClass) {
             class3 = myClass; // Allow referencing yourself
         }
     }
+
     @Test
     public void testItChecksScannedClasses() {
         Map<String, Object> input = new HashMap<>();

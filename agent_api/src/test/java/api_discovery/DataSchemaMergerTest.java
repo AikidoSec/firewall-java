@@ -1,13 +1,14 @@
 package api_discovery;
 
-import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
-import static org.junit.jupiter.api.Assertions.*;
-
 import dev.aikido.agent_api.api_discovery.DataSchemaItem;
 import dev.aikido.agent_api.api_discovery.DataSchemaType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.Map;
+
+import static dev.aikido.agent_api.api_discovery.DataSchemaMerger.mergeDataSchemas;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataSchemaMergerTest {
 
@@ -21,19 +22,19 @@ public class DataSchemaMergerTest {
     @BeforeEach
     public void setUp() {
         schemaA = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "name", new DataSchemaItem(DataSchemaType.STRING),
-                "age", new DataSchemaItem(DataSchemaType.NUMBER)
+            "name", new DataSchemaItem(DataSchemaType.STRING),
+            "age", new DataSchemaItem(DataSchemaType.NUMBER)
         ));
 
         schemaB = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "age", new DataSchemaItem(DataSchemaType.NUMBER),
-                "email", new DataSchemaItem(DataSchemaType.STRING)
+            "age", new DataSchemaItem(DataSchemaType.NUMBER),
+            "email", new DataSchemaItem(DataSchemaType.STRING)
         ));
 
         schemaC = new DataSchemaItem(DataSchemaType.EMPTY);
 
         schemaD = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "address", new DataSchemaItem(DataSchemaType.STRING)
+            "address", new DataSchemaItem(DataSchemaType.STRING)
         ));
 
         schemaE = new DataSchemaItem(DataSchemaType.ARRAY, new DataSchemaItem(DataSchemaType.STRING));
@@ -88,10 +89,10 @@ public class DataSchemaMergerTest {
     @Test
     public void testMergeWithNestedSchemas() {
         DataSchemaItem nestedSchemaA = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "details", schemaA
+            "details", schemaA
         ));
         DataSchemaItem nestedSchemaB = new DataSchemaItem(DataSchemaType.OBJECT, Map.of(
-                "details", schemaB
+            "details", schemaB
         ));
         DataSchemaItem merged = mergeDataSchemas(nestedSchemaA, nestedSchemaB);
         assertTrue(merged.properties().containsKey("details"));
