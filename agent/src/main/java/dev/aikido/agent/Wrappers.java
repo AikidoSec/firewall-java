@@ -1,6 +1,7 @@
 package dev.aikido.agent;
 
 import dev.aikido.agent.wrappers.*;
+import dev.aikido.agent.wrappers.file.FileWrapper;
 import dev.aikido.agent.wrappers.javalin.*;
 import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
 import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
