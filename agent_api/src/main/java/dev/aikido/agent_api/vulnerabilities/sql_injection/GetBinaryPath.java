@@ -21,6 +21,8 @@ public final class GetBinaryPath {
             fileName.append("aarch64-"); // Add architecture to file name
         } else if (architecture.contains("64")) {
             fileName.append("x86_64-"); // Add architecture to file name
+        } else {
+            fileName.append("x86_64-"); // Default to x86-64
         }
 
         if (os.contains("win")) {
@@ -29,6 +31,8 @@ public final class GetBinaryPath {
             fileName.append("apple-darwin.dylib"); // macOS
         } else if (os.contains("nix") || os.contains("nux")) {
             fileName.append("unknown-linux-gnu.so"); // Linux
+        } else {
+            fileName.append("unknown-linux-gnu.so"); // Default to linux.
         }
         return fileName.toString();
     }
