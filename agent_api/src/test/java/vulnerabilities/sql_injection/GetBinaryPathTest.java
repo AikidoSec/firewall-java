@@ -1,6 +1,7 @@
 package vulnerabilities.sql_injection;
 
 import dev.aikido.agent_api.vulnerabilities.sql_injection.GetBinaryPath;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -12,6 +13,13 @@ public class GetBinaryPathTest {
     @BeforeEach
     public void setUp() {
         // Clear system properties before each test
+        System.clearProperty("AIK_agent_dir");
+        System.clearProperty("os.name");
+        System.clearProperty("os.arch");
+    }
+    @AfterEach
+    public void after() {
+        // Clear system properties after each test
         System.clearProperty("AIK_agent_dir");
         System.clearProperty("os.name");
         System.clearProperty("os.arch");
