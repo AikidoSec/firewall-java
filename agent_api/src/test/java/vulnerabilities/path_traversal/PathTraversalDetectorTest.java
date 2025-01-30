@@ -133,4 +133,70 @@ public class PathTraversalDetectorTest {
     public void testDoesNotAbsolutePathInsideAnotherFolder() {
         assertNotAttack(pathTraversalDetector.run("/etc/config", new String[]{"/etc/app/data/etc/config"}));
     }
+
+    @Test
+    public void testUserInputContainsMultipleUnsafePathParts() {
+        assertNotAttack(pathTraversalDetector.run("../../../", new String[]{"directory/../../file.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithMixedPathSeparators() {
+        assertNotAttack(pathTraversalDetector.run("..\\..\\", new String[]{"directory/../file.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithEncodedCharacters() {
+        assertAttack(pathTraversalDetector.run("%2E%2E/../", new String[]{"directory/%2E%2E/../file.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithEncodedBackslash() {
+        assertNotAttack(pathTraversalDetector.run("%5C%5C", new String[]{"directory/%5C%5Cfile.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithSpaces() {
+        assertNotAttack(pathTraversalDetector.run("test file", new String[]{"directory/test file.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithLeadingSpaces() {
+        assertNotAttack(pathTraversalDetector.run(" test.txt", new String[]{"directory/test.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithTrailingSpaces() {
+        assertNotAttack(pathTraversalDetector.run("test.txt ", new String[]{"directory/test.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithSpecialCharacters() {
+        assertNotAttack(pathTraversalDetector.run("test@file.txt", new String[]{"directory/test@file.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithAbsolutePath() {
+        assertAttack(pathTraversalDetector.run("/etc/passwd", new String[]{"/etc/passwd"}));
+    }
+
+    @Test
+    public void testUserInputWithMixedCase() {
+        assertNotAttack(pathTraversalDetector.run("Test.txt", new String[]{"directory/test.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithLongPath() {
+        String longUserInput = "a".repeat(260); // Assuming a long input
+        assertNotAttack(pathTraversalDetector.run(longUserInput, new String[]{"directory/test.txt"}));
+    }
+
+    @Test
+    public void testUserInputWithEmptyFilePath() {
+        assertNotAttack(pathTraversalDetector.run("test", new String[]{""}));
+    }
+
+    @Test
+    public void testUserInputWithFilePathContainingSpaces() {
+        assertNotAttack(pathTraversalDetector.run("test file", new String[]{"directory/test file.txt"}));
+    }
 }
