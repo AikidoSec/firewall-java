@@ -283,7 +283,7 @@ public class ShouldBlockRequestTest {
         assertEquals("blocked", res.data().type());
         assertEquals("192.168.1.1", res.data().ip());
     }
-    
+
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "valid-token")
     public void testNoUserWithEndpoints() throws SQLException {

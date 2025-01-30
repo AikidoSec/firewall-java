@@ -1,25 +1,28 @@
 package vulnerabilities.sql_injection;
 
 import dev.aikido.agent_api.vulnerabilities.sql_injection.GetBinaryPath;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class GetBinaryPathTest {
+    @BeforeAll
+    public static void copyStart() {
+        System.setProperty("copy.AIK_agent_dir", System.getProperty("AIK_agent_dir"));
+        System.setProperty("copy.os.name", System.getProperty("os.name"));
+        System.setProperty("copy.os.arch", System.getProperty("os.arch"));
+    }
+    @AfterAll
+    public static void cleanup() {
+        System.setProperty("AIK_agent_dir", System.getProperty("copy.AIK_agent_dir"));
+        System.setProperty("os.name", System.getProperty("copy.os.name"));
+        System.setProperty("os.arch", System.getProperty("copy.os.arch"));
+    }
 
     @BeforeEach
     public void setUp() {
         // Clear system properties before each test
-        System.clearProperty("AIK_agent_dir");
-        System.clearProperty("os.name");
-        System.clearProperty("os.arch");
-    }
-    @AfterEach
-    public void after() {
-        // Clear system properties after each test
         System.clearProperty("AIK_agent_dir");
         System.clearProperty("os.name");
         System.clearProperty("os.arch");
