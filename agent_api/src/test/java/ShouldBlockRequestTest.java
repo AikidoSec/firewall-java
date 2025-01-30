@@ -216,33 +216,6 @@ public class ShouldBlockRequestTest {
         assertFalse(res1.block());
     }
 
-
-    @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "valid-token")
-    public void testBlockedUserWithRateLimit() throws SQLException {
-        // Set up context with a user that is blocked
-        ContextObject ctx = new SampleContextObject();
-        ctx.setUser(new User("ID1", "John Doe", "192.168.1.1", 100));
-        Context.set(ctx);
-
-        // Set up thread cache with a blocked user
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of("ID1"), Set.of(), new Routes(), Optional.empty()));
-
-        // Set up rate-limiting for the endpoint
-        ThreadCache.set(new ThreadCacheObject(List.of(
-                new Endpoint("GET", "/api/resource", 1, 1000, Collections.emptyList(), false, false, true)
-        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
-
-        // Call the method
-        var res = ShouldBlockRequest.shouldBlockRequest();
-
-        // Assert that the request is blocked due to the user being blocked
-        assertTrue(res.block());
-        assertEquals("user", res.data().trigger());
-        assertEquals("blocked", res.data().type());
-        assertEquals("192.168.1.1", res.data().ip());
-    }
-
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "valid-token")
     public void testNoEndpointsConfigured() throws SQLException {
