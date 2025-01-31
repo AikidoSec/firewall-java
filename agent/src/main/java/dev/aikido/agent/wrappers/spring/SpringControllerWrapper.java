@@ -1,12 +1,12 @@
-package dev.aikido.agent.wrappers;
+package dev.aikido.agent.wrappers.spring;
 
+import dev.aikido.agent.wrappers.Wrapper;
 import dev.aikido.agent_api.collectors.SpringAnnotationCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
 

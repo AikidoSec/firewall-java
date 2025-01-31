@@ -1,20 +1,17 @@
 package dev.aikido.agent_api.context;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
-public class NettyContext extends SpringContextObject {
-    public NettyContext(
+public class SpringWebfluxContextObject extends SpringContextObject {
+    public SpringWebfluxContextObject(
             String method, String uri, InetSocketAddress rawIp,
             HashMap<String, List<String>> cookies,
             Map<String, List<String>> query,
-            List<Map.Entry<String, String>> headerEntries
+            Map<String, String> headerEntries
 
     ) {
         this.method  = method;
@@ -25,15 +22,15 @@ public class NettyContext extends SpringContextObject {
 
         this.route = buildRouteFromUrl(this.url);
         this.remoteAddress = getIpFromRequest(rawIp.getAddress().getHostAddress(), this.headers);
-        this.source = "ReactorNetty";
+        this.source = "SpringWebflux";
         this.redirectStartNodes = new ArrayList<>();
     }
 
-    private static HashMap<String, String> extractHeaders(List<Map.Entry<String, String>> entries) {
-        HashMap<String, String> headers = new HashMap<>();
-        for(Map.Entry<String, String> entry: entries) {
-            headers.put(entry.getKey().toLowerCase(), entry.getValue());
+    private static HashMap<String, String> extractHeaders(Map<String, String> map) {
+        HashMap<String, String> newMap = new HashMap<>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            newMap.put(entry.getKey().toLowerCase(), entry.getValue());
         }
-        return headers;
-    };
+        return newMap;
+    }
 }

@@ -8,6 +8,9 @@ import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
 import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
 import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
 import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
+import dev.aikido.agent.wrappers.spring.SpringWebfluxWrapper;
+import dev.aikido.agent.wrappers.spring.SpringControllerWrapper;
+import dev.aikido.agent.wrappers.spring.SpringMVCWrapper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +20,7 @@ public final class Wrappers {
     public static final List<Wrapper> WRAPPERS = Arrays.asList(
             new PostgresWrapper(),
             new SpringMVCWrapper(),
+            new SpringWebfluxWrapper(),
             new SpringControllerWrapper(),
             new FileConstructorSingleArgumentWrapper(),
             new FileConstructorMultiArgumentWrapper(),
@@ -33,7 +37,6 @@ public final class Wrappers {
             new ApacheHttpClientWrapper(),
             new PathWrapper(),
             new PathsWrapper(),
-            new NettyWrapper(),
             new JavalinWrapper(),
             new JavalinDataWrapper(),
             new JavalinContextClearWrapper()
