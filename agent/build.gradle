@@ -10,6 +10,7 @@ dependencies {
     compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0' // For Context object (Spring Boot)
     compileOnly 'io.projectreactor.netty:reactor-netty-http:1.2.1' // For Spring Webflux
     compileOnly 'io.javalin:javalin:6.4.0'
+    compileOnly 'org.springframework:spring-web:5.3.20'
 }
 
 shadowJar {
