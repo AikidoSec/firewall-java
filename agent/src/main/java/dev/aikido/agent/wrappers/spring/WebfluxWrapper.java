@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
- * We need to get the Request/Response object before any filters get called, So we wrap HttpServer
- * Users can add their own handlers using .route(...) or .handle(...) on HttpServer. .route(...) uses .handle(...)
- * under-the-hood and .handle(...) creates a HttpServerHandle : https://github.com/reactor/reactor-netty/blob/bb60f6c25e4a305aa9ec2ed81f866e0dd7ae7552/reactor-netty-http/src/main/java/reactor/netty/http/server/HttpServer.java#L1186
- *
+ * We need to get the Request/Response object before any filters get called, So we wrap HttpServer.
+ * Users can add their own handlers using .route(...) or .handle(...).
+ * on HttpServer. .route(...) uses .handle(...) under-the-hood and .handle(...) creates a HttpServerHandle object
+ * [github link](https://github.com/reactor/reactor-netty/blob/bb60f6c25e4a305aa9ec2ed81f866e0dd7ae7552/reactor-netty-http/src/main/java/reactor/netty/http/server/HttpServer.java#L1186)
  */
 public class WebfluxWrapper implements Wrapper {
     public String getName() {
@@ -43,7 +43,7 @@ public class WebfluxWrapper implements Wrapper {
                 .and(nameContains("HttpServerHandle"));
     }
     public static class WebfluxAdvice {
-        @Advice.OnMethodEnter(suppress = Throwable.class)
+        @Advice.OnMethodEnter//(suppress = Throwable.class)
         public static void before(
                 @Advice.Origin Executable method,
                 @Advice.Argument(0) Connection connection,
