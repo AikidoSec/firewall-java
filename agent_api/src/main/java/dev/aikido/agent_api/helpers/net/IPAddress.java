@@ -1,13 +1,11 @@
 package dev.aikido.agent_api.helpers.net;
 
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
 
 public final class IPAddress {
-    private IPAddress() {}
+    private IPAddress() {
+    }
 
     public static String getIpAddress() {
         try {
