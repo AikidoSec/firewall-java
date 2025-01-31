@@ -1,9 +1,12 @@
 import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.ShouldBlockRequest;
 import dev.aikido.agent_api.background.Endpoint;
+import dev.aikido.agent_api.background.ipc_commands.ShouldRateLimitCommand;
+import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
+import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
@@ -17,7 +20,11 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import java.sql.SQLException;
 import java.util.*;
 
+import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class ShouldBlockRequestTest {
@@ -209,4 +216,62 @@ public class ShouldBlockRequestTest {
         assertFalse(res1.block());
     }
 
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "valid-token")
+    public void testNoEndpointsConfigured() throws SQLException {
+        // Set up context with a user
+        ContextObject ctx = new SampleContextObject();
+        ctx.setUser(new User("ID3", "Alice", "192.168.1.3", 100));
+        Context.set(ctx);
+
+        // Set up thread cache with no endpoints
+        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.empty()));
+
+        // Call the method
+        var res = ShouldBlockRequest.shouldBlockRequest();
+
+        // Assert that the request is not blocked
+        assertFalse(res.block());
+    }
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "valid-token")
+    public void testBlockedUserWithMultipleEndpoints() throws SQLException {
+        // Set up context with a blocked user
+        ContextObject ctx = new SampleContextObject();
+        ctx.setUser(new User("ID1", "John Doe", "192.168.1.1", 100));
+        Context.set(ctx);
+
+        // Set up thread cache with multiple endpoints and a blocked user
+        ThreadCache.set(new ThreadCacheObject(List.of(
+                new Endpoint("GET", "/api/resource", 1, 1000, Collections.emptyList(), false, false, true),
+                new Endpoint("POST", "/api/resource", 1, 1000, Collections.emptyList(), false, false, true)
+        ), Set.of("ID1"), Set.of(), new Routes(), Optional.empty()));
+
+        // Call the method
+        var res = ShouldBlockRequest.shouldBlockRequest();
+
+        // Assert that the request is blocked due to the user being blocked
+        assertTrue(res.block());
+        assertEquals("user", res.data().trigger());
+        assertEquals("blocked", res.data().type());
+        assertEquals("192.168.1.1", res.data().ip());
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "valid-token")
+    public void testNoUserWithEndpoints() throws SQLException {
+        // Set up context without a user
+        Context.set(new SampleContextObject());
+
+        // Set up thread cache with endpoints
+        ThreadCache.set(new ThreadCacheObject(List.of(
+                new Endpoint("GET", "/api/resource", 1, 1000, Collections.emptyList(), false, false, true)
+        ), Set.of(), Set.of(), new Routes(), Optional.empty()));
+
+        // Call the method
+        var res = ShouldBlockRequest.shouldBlockRequest();
+
+        // Assert that the request is not blocked
+        assertFalse(res.block());
+    }
 }
