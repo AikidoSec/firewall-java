@@ -8,6 +8,9 @@ import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
 import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
 import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
 import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
+import dev.aikido.agent.wrappers.spring.NettyWrapper;
+import dev.aikido.agent.wrappers.spring.SpringControllerWrapper;
+import dev.aikido.agent.wrappers.spring.SpringMVCWrapper;
 
 import java.util.Arrays;
 import java.util.List;
