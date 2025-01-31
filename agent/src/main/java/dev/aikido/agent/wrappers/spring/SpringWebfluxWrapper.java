@@ -85,7 +85,7 @@ public class SpringWebfluxWrapper implements Wrapper {
                     cookieMap, query, req.getHeaders().toSingleValueMap()
             );
 
-            // If a response is present, write the response :
+            // If the request gets blocked (e.g. IP Blocking), write a response here : 
             WebRequestCollector.Res zenResponse = WebRequestCollector.report(context);
             if (zenResponse != null && res != null) {
                 // Write message :
