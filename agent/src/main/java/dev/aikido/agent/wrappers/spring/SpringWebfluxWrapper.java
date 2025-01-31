@@ -99,7 +99,7 @@ public class SpringWebfluxWrapper implements Wrapper {
             return res; // Return to analyze status code in OnMethodExit.
         }
 
-        @Advice.OnMethodExit//(onThrowable = Throwable.class, suppress = Throwable.class)
+        @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
         public static void onExit(
                 @Advice.Enter Object enterResult,
                 @Advice.Return(readOnly = false) Mono<Void> returnValue
