@@ -8,7 +8,7 @@ import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
 import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
 import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
 import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
-import dev.aikido.agent.wrappers.spring.NettyWrapper;
+import dev.aikido.agent.wrappers.spring.WebfluxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringControllerWrapper;
 import dev.aikido.agent.wrappers.spring.SpringMVCWrapper;
 
@@ -36,7 +36,7 @@ public final class Wrappers {
             new ApacheHttpClientWrapper(),
             new PathWrapper(),
             new PathsWrapper(),
-            new NettyWrapper(),
+            new WebfluxWrapper(),
             new JavalinWrapper(),
             new JavalinDataWrapper(),
             new JavalinContextClearWrapper()

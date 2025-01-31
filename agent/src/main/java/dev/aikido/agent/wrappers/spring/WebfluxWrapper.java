@@ -30,9 +30,9 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * under-the-hood and .handle(...) creates a HttpServerHandle : https://github.com/reactor/reactor-netty/blob/bb60f6c25e4a305aa9ec2ed81f866e0dd7ae7552/reactor-netty-http/src/main/java/reactor/netty/http/server/HttpServer.java#L1186
  *
  */
-public class NettyWrapper implements Wrapper {
+public class WebfluxWrapper implements Wrapper {
     public String getName() {
-        return MyGenericAdvice.class.getName();
+        return WebfluxAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return isDeclaredBy(getTypeMatcher()).and(named("onStateChange"));
@@ -42,7 +42,7 @@ public class NettyWrapper implements Wrapper {
         return isDeclaredBy(nameContains("reactor.netty.http.server.HttpServer"))
                 .and(nameContains("HttpServerHandle"));
     }
-    public class MyGenericAdvice {
+    public static class WebfluxAdvice {
         @Advice.OnMethodEnter//(suppress = Throwable.class)
         public static void before(
                 @Advice.Origin Executable method,
