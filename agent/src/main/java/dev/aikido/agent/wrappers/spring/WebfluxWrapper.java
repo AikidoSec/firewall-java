@@ -4,7 +4,7 @@ import dev.aikido.agent.wrappers.Wrapper;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.context.NettyContext;
+import dev.aikido.agent_api.context.SpringWebfluxContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -73,7 +73,7 @@ public class WebfluxWrapper implements Wrapper {
                     }
 
                     // Create context object :
-                    ContextObject context = new NettyContext(
+                    ContextObject context = new SpringWebfluxContextObject(
                             target.method().toString(), target.uri(), target.remoteAddress(), cookieMap, query, headerEntries
                     );
                     WebRequestCollector.report(context);

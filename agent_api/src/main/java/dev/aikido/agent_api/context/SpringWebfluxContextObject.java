@@ -9,8 +9,8 @@ import java.util.Map;
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
-public class NettyContext extends SpringContextObject {
-    public NettyContext(
+public class SpringWebfluxContextObject extends SpringContextObject {
+    public SpringWebfluxContextObject(
             String method, String uri, InetSocketAddress rawIp,
             HashMap<String, List<String>> cookies,
             Map<String, List<String>> query,
