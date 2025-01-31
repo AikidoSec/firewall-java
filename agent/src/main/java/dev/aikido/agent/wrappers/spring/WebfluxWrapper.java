@@ -1,10 +1,12 @@
 package dev.aikido.agent.wrappers.spring;
 
 import dev.aikido.agent.wrappers.Wrapper;
-import dev.aikido.agent_api.context.NettyContext;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.context.NettyContext;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.cookie.Cookie;
 import net.bytebuddy.asm.Advice;
@@ -17,9 +19,10 @@ import reactor.netty.http.server.HttpServerRequest;
 import reactor.netty.http.server.HttpServerResponse;
 import reactor.netty.http.server.HttpServerState;
 
-
 import java.lang.reflect.Executable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
@@ -31,24 +34,31 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * [github link](https://github.com/reactor/reactor-netty/blob/bb60f6c25e4a305aa9ec2ed81f866e0dd7ae7552/reactor-netty-http/src/main/java/reactor/netty/http/server/HttpServer.java#L1186)
  */
 public class WebfluxWrapper implements Wrapper {
+    public static final Logger logger = LogManager.getLogger(WebfluxWrapper.class);
+
+    @Override
     public String getName() {
         return WebfluxAdvice.class.getName();
     }
+
+    @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return isDeclaredBy(getTypeMatcher()).and(named("onStateChange"));
     }
+
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
         return isDeclaredBy(nameContains("reactor.netty.http.server.HttpServer"))
                 .and(nameContains("HttpServerHandle"));
     }
+
     public static class WebfluxAdvice {
         @Advice.OnMethodEnter//(suppress = Throwable.class)
         public static void before(
                 @Advice.Origin Executable method,
                 @Advice.Argument(0) Connection connection,
                 @Advice.Argument(1) ConnectionObserver.State state
-                ) {
+        ) {
             if (state == HttpServerState.REQUEST_RECEIVED) {
                 if (connection instanceof HttpServerRequest target) {
                     // Extract headers & query parameters :
@@ -64,11 +74,14 @@ public class WebfluxWrapper implements Wrapper {
 
                     // Create context object :
                     ContextObject context = new NettyContext(
-                            target.method().toString(), target.uri(), target.remoteAddress(),  cookieMap, query, headerEntries
+                            target.method().toString(), target.uri(), target.remoteAddress(), cookieMap, query, headerEntries
                     );
                     WebRequestCollector.report(context);
                 }
-            } else if(state == HttpServerState.DISCONNECTING) {
+                if (connection instanceof HttpServerResponse response) {
+                    logger.error("Response: %s", response);
+                }
+            } else if (state == HttpServerState.DISCONNECTING) {
                 if (connection instanceof HttpServerResponse response) {
                     WebResponseCollector.report(response.status().code());
                 }
