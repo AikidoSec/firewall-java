@@ -85,7 +85,7 @@ public class SpringWebfluxWrapper implements Wrapper {
                     cookieMap, query, req.getHeaders().toSingleValueMap()
             );
 
-            // If the request gets blocked (e.g. IP Blocking), write a response here : 
+            // If the request gets blocked (e.g. IP Blocking), write a response here :
             WebRequestCollector.Res zenResponse = WebRequestCollector.report(context);
             if (zenResponse != null && res != null) {
                 // Write message :
@@ -104,6 +104,9 @@ public class SpringWebfluxWrapper implements Wrapper {
                 @Advice.Enter Object enterResult,
                 @Advice.Return(readOnly = false) Mono<Void> returnValue
         ) {
+            // enterResult can be two things : Either the SkipOnWrapper or the ServerHttpResponse
+            // ServerHttpResponse -> Extract status code.
+            // SkipOnWrapper -> we blocked a request (e.g. IP Blocking), and are returning the value below
             if (enterResult instanceof SkipOnWrapper wrapper && wrapper.mono() != null) {
                 returnValue = wrapper.mono();
             } else if (enterResult instanceof ServerHttpResponse res) {
