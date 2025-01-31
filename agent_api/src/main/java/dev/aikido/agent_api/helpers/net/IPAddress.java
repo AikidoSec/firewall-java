@@ -3,6 +3,7 @@ package dev.aikido.agent_api.helpers.net;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 public final class IPAddress {
@@ -10,36 +11,17 @@ public final class IPAddress {
 
     public static String getIpAddress() {
         try {
-            NetworkInterface bestInterface = null;
+            String hostAddress = InetAddress.getLocalHost().getHostAddress();
 
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (networkInterfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = networkInterfaces.nextElement();
-
-                // Check if the network interface is up and not a loop-back
-                if (networkInterface.isUp() && !networkInterface.isLoopback()) {
-                    // Check if it has at least one valid IP address
-                    Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                    while (inetAddresses.hasMoreElements()) {
-                        InetAddress inetAddress = inetAddresses.nextElement();
-                        if (!inetAddress.isLoopbackAddress()) { // Check if the address is not a loop-back address
-                            bestInterface = networkInterface;
-                            break; // Found a valid interface, no need to check further
-                        }
-                    }
-                }
+            // Remove the zone index if present
+            if (hostAddress.contains("%")) {
+                hostAddress = hostAddress.substring(0, hostAddress.indexOf('%'));
             }
 
-            if (bestInterface != null) {
-                Enumeration<InetAddress> inetAddresses = bestInterface.getInetAddresses();
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (!inetAddress.isLoopbackAddress()) {
-                        return inetAddress.getHostAddress();
-                    }
-                }
-            }
-        } catch (SocketException ignored) {}
+            return hostAddress;
+        } catch (UnknownHostException ignored) {
+            // pass-through
+        }
         return "0.0.0.0";
     }
 }
