@@ -99,6 +99,9 @@ public class SpringWebfluxWrapper implements Wrapper {
             return res; // Return to analyze status code in OnMethodExit.
         }
 
+        /** onExit()
+         * We can use @Advice.Return to overwrite the returned value of handle(...) i.e. to block requests.
+         */
         @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)
         public static void onExit(
                 @Advice.Enter Object enterResult,
