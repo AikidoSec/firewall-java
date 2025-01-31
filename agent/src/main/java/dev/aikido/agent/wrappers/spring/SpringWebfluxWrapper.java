@@ -14,13 +14,11 @@ import net.bytebuddy.matcher.ElementMatcher;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,7 +52,7 @@ public class SpringWebfluxWrapper implements Wrapper {
         return nameContainsIgnoreCase("org.springframework.web.server.adapter.HttpWebHandlerAdapter");
     }
 
-    public record SkipOnWrapper(Mono<Void> mono) {
+    public record SkipOnWrapper(Mono<Void> newReturnValue) {
     }
 
     public static class SpringWebfluxAdvice {
@@ -110,8 +108,8 @@ public class SpringWebfluxWrapper implements Wrapper {
             // enterResult can be two things : Either the SkipOnWrapper or the ServerHttpResponse
             // ServerHttpResponse -> Extract status code.
             // SkipOnWrapper -> we blocked a request (e.g. IP Blocking), and are returning the value below
-            if (enterResult instanceof SkipOnWrapper wrapper && wrapper.mono() != null) {
-                returnValue = wrapper.mono();
+            if (enterResult instanceof SkipOnWrapper wrapper && wrapper.newReturnValue() != null) {
+                returnValue = wrapper.newReturnValue();
             } else if (enterResult instanceof ServerHttpResponse res) {
                 // Report status code of response :
                 Integer statusCode = res.getRawStatusCode();
