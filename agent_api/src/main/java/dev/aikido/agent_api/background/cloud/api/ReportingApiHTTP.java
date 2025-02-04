@@ -107,6 +107,7 @@ public class ReportingApiHTTP extends ReportingApi {
     }
     private static HttpRequest createHttpRequest(Optional<APIEvent> event, String token, URI uri) {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+            .timeout(Duration.ofSeconds(5)) // Set 5 second timeout
             .uri(uri) // Change to your target URL
             .header("Content-Type", "application/json") // Set Content-Type header
             .header("Authorization", token); // Set Authorization header
