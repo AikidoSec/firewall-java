@@ -6,6 +6,8 @@ import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.Routes;
@@ -32,6 +34,7 @@ public class CloudConnectionManager {
     private final Users users;
     private final Statistics stats;
     private final Hostnames hostnames;
+    private static final Logger logger = LogManager.getLogger(CloudConnectionManager.class);
 
     public CloudConnectionManager(boolean block, Token token, String serverless) {
         this(block, token, serverless, new ReportingApiHTTP(getAikidoAPIEndpoint()));
@@ -49,15 +52,21 @@ public class CloudConnectionManager {
         this.hostnames = new Hostnames(5000); // max entry size is 5000
     }
     public void onStart() {
-        reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
+        Optional<APIResponse> res = reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
+        if (res.isPresent() && res.get().success()) {
+            logger.error("Successfully established connection with Aikido Cloud.");
+        } else {
+            logger.error("Something went wrong whilst trying to connect to Aikido Cloud. Running offline.");
+        }
         // Fetch blocked lists using separate API call : 
         config.storeBlockedListsRes(api.fetchBlockedLists(token));
     }
-    public void reportEvent(APIEvent event, boolean updateConfig) {
+    public Optional<APIResponse> reportEvent(APIEvent event, boolean updateConfig) {
         Optional<APIResponse> res = this.api.report(this.token, event, timeout);
         if (res.isPresent() && updateConfig) {
             config.updateConfig(res.get());
         }
+        return res;
     }
     public boolean shouldBlock() {
         return this.config.isBlockingEnabled();
