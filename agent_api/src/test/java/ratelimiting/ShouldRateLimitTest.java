@@ -5,8 +5,8 @@ import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
-import dev.aikido.agent_api.ratelimiting.FixedWindowRateLimiter;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
+import dev.aikido.agent_api.ratelimiting.sliding_window.SlidingWindowRateLimiter;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -30,7 +30,7 @@ public class ShouldRateLimitTest {
         // Mock the CloudConnectionManager
         CloudConnectionManager cm = Mockito.mock(CloudConnectionManager.class);
         Mockito.when(cm.getConfig()).thenReturn(configMock);
-        Mockito.when(cm.getRateLimiter()).thenReturn(new FixedWindowRateLimiter(5000, 120*60*1000));
+        Mockito.when(cm.getRateLimiter()).thenReturn(new SlidingWindowRateLimiter(5000, 120*60*1000));
 
         return cm;
     }
