@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class ReportingApi {
+    public int timeoutInSec;
+
+    public ReportingApi(int timeoutInSec) {
+        this.timeoutInSec = timeoutInSec;
+    }
+
     /**
      * Converts results into an API response object.
      *
@@ -20,10 +26,8 @@ public abstract class ReportingApi {
      *
      * @param token        The authentication token.
      * @param event        The event to report.
-     * @param timeoutInSec The timeout in seconds.
-     * @return
      */
-    public abstract Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec);
+    public abstract Optional<APIResponse> report(String token, APIEvent event);
 
     public record APIListsResponse(List<ListsResponseEntry> blockedIPAddresses, String blockedUserAgents) {}
     public record ListsResponseEntry(String source, String description, List<String> ips) {}

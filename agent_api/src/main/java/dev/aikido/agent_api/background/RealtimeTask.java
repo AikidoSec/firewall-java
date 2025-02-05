@@ -34,7 +34,7 @@ public class RealtimeTask extends TimerTask {
             if(configLastUpdatedAt.isEmpty() || configLastUpdatedAt.get() < configAccordingToCloudUpdatedAt) {
                 // Config was updated
                 configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt); // Store new time of last update
-                Optional<APIResponse> newConfig = connectionManager.getApi().fetchNewConfig(connectionManager.getToken(), /* Timeout in seconds: */ 3);
+                Optional<APIResponse> newConfig = connectionManager.getApi().fetchNewConfig(connectionManager.getToken());
                 newConfig.ifPresent(connectionManager.getConfig()::updateConfig);
 
                 // Fetch blocked lists from separate API route :
