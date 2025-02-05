@@ -21,6 +21,21 @@ public class ReportingAPITest {
     }
 
     @Test
+    public void testTimeoutValid() {
+        api = new ReportingApiHTTP("http://localhost:5000/delayed/2/", 3); // Allowed delay
+        Optional<APIResponse> res = api.fetchNewConfig("token");
+        assertTrue(res.isPresent());
+        assertTrue(res.get().block());
+        assertEquals(1, res.get().endpoints().size());
+    }
+    @Test
+    public void testTimeoutInvalid() {
+        api = new ReportingApiHTTP("http://localhost:5000/delayed/4/", 3); // Allowed delay
+        Optional<APIResponse> res = api.fetchNewConfig("token");
+        assertFalse(res.isPresent());
+    }
+
+    @Test
     public void testFetchNewConfig() {
         Optional<APIResponse> res = api.fetchNewConfig("token");
         assertTrue(res.isPresent());
