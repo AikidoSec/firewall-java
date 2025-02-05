@@ -34,7 +34,7 @@ public class CloudConnectionManager {
     private final Hostnames hostnames;
 
     public CloudConnectionManager(boolean block, Token token, String serverless) {
-        this(block, token, serverless, new ReportingApiHTTP(getAikidoAPIEndpoint()));
+        this(block, token, serverless, new ReportingApiHTTP(getAikidoAPIEndpoint(), timeout));
     }
     public CloudConnectionManager(boolean block, Token token, String serverless, ReportingApi api) {
         this.config = new ServiceConfiguration(block, serverless);
@@ -54,7 +54,7 @@ public class CloudConnectionManager {
         config.storeBlockedListsRes(api.fetchBlockedLists(token));
     }
     public void reportEvent(APIEvent event, boolean updateConfig) {
-        Optional<APIResponse> res = this.api.report(this.token, event, timeout);
+        Optional<APIResponse> res = this.api.report(this.token, event);
         if (res.isPresent() && updateConfig) {
             config.updateConfig(res.get());
         }
