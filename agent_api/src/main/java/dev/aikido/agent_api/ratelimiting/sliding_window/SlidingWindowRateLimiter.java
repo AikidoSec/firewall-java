@@ -18,7 +18,7 @@ public class SlidingWindowRateLimiter implements RateLimiter {
         SlidingWindowEntries entries = rateLimitedItems.get(key);
         if (entries == null) {
             // Create new item
-            entries = new SlidingWindowEntries(windowSizeInMs);
+            entries = new SlidingWindowEntries(windowSizeInMs, maxRequests);
             rateLimitedItems.set(key, entries);
         }
 
