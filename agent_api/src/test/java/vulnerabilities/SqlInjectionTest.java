@@ -268,7 +268,7 @@ public class SqlInjectionTest {
 
     @Test
     public void testUserInputIsMultiline() {
-        isSqlInjection("SELECT * FROM users WHERE id = 'a'\nOR 1=1#'", "a'\nOR 1=1#", "all");
+        isSqlInjection("SELECT * FROM users WHERE id = 'a'\nOR 1=1#'", "a'\nOR 1=1#", "mysql");
         isNotSqlInjection("SELECT * FROM users WHERE id = 'a\nb\nc';", "a\nb\nc", "all");
     }
 
