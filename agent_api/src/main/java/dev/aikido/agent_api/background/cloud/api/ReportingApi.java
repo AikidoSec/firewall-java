@@ -13,10 +13,6 @@ public abstract class ReportingApi {
         this.timeoutInSec = timeoutInSec;
     }
 
-    public void setTimeout(int timeoutInSec) {
-        this.timeoutInSec = timeoutInSec;
-    }
-
     /**
      * Converts results into an API response object.
      *
