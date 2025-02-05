@@ -7,12 +7,12 @@ import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.ratelimiting.RateLimiter;
+import dev.aikido.agent_api.ratelimiting.sliding_window.SlidingWindowRateLimiter;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.background.users.Users;
 import dev.aikido.agent_api.helpers.env.Token;
-import dev.aikido.agent_api.ratelimiting.FixedWindowRateLimiter;
 
 import java.util.Optional;
 
@@ -42,7 +42,7 @@ public class CloudConnectionManager {
         this.api = api;
         this.token = token.get();
         this.routes = new Routes(200); // Max size is 200 routes.
-        this.rateLimiter = new FixedWindowRateLimiter(
+        this.rateLimiter = new SlidingWindowRateLimiter(
                 /*maxItems:*/ 5000, /*TTL in ms:*/ 120 * 60 * 1000 // 120 minutes
         );
         this.users = new Users();
