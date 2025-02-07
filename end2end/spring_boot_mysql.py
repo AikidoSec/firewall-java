@@ -47,12 +47,15 @@ print("✅ Attack reporting tested (2x)")
 # Test forceProtectionOff
 make_post_request(urls["enabled"], payloads["unsafe"], status_code=500)
 
+# Tests with /api/* and method * protection forced off.
+event_handler.set_protection(False, True)
+time.sleep(70) # Wait for config to be fetched
+make_post_request(urls["enabled"], payloads["unsafe"], status_code=200)
+
+# Tests with /api/pets/create protection forced off.
 event_handler.set_protection(True, False)
 time.sleep(70) # Wait for config to be fetched
 make_post_request(urls["enabled"], payloads["unsafe"], status_code=200)
 
-event_handler.set_protection(False, True)
-time.sleep(70) # Wait for config to be fetched
-make_post_request(urls["enabled"], payloads["unsafe"], status_code=200)
 
 print("✅ Tested force protection off")
