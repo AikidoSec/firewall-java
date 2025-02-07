@@ -23,6 +23,24 @@ responses = {
                     "windowSizeInMS": 1000 * 5,
                 },
                 "graphql": False,
+            },
+            {
+                "route": "/api/pets/create",
+                "method": "POST",
+                "forceProtectionOff": False,
+                "rateLimiting": {
+                    "enabled": False,
+                },
+                "graphql": False,
+            },
+            {
+                "route": "/api/*",
+                "method": "*",
+                "forceProtectionOff": False,
+                "rateLimiting": {
+                    "enabled": False,
+                },
+                "graphql": False,
             }
         ],
         "blockedUserIds": ["12345"],
@@ -75,7 +93,7 @@ def mock_set_config():
     configUpdatedAt = int(time.time())
     responses["config"] = request.get_json()
     responses["config"]["configUpdatedAt"] = configUpdatedAt
-    responses["configUpdatedAt"] = { "serviceId": 1, "configUpdatedAt": configUpdatedAt }
+    responses["configUpdatedAt"] = configUpdatedAt
     return jsonify({})
 
 
@@ -87,6 +105,17 @@ def mock_get_events():
 def mock_reset():
     global events
     events = [] # Reset events
+    return jsonify({})
+
+@app.route('/mock/set_protection', methods=['POST'])
+def mock_set_protection():
+    req = request.get_json()
+    global responses
+    responses["config"]["endpoints"][1]["forceProtectionOff"] = bool(req["api_pets_create"])
+    responses["config"]["endpoints"][2]["forceProtectionOff"] = bool(req["api"])
+    responses["config"]["configUpdatedAt"] = int(time.time()*1000)
+    responses["configUpdatedAt"] = int(time.time()*1000)
+
     return jsonify({})
 
 if __name__ == '__main__':
