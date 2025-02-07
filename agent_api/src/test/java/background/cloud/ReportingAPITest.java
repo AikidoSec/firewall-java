@@ -25,7 +25,7 @@ public class ReportingAPITest {
         Optional<APIResponse> res = api.fetchNewConfig("token", 2);
         assertTrue(res.isPresent());
         assertTrue(res.get().block());
-        assertEquals(1, res.get().endpoints().size());
+        assertEquals(3, res.get().endpoints().size());
     }
     @Test
     @StdIo
