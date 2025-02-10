@@ -1,4 +1,4 @@
 import json
 
-with open('attack_events.json', 'r') as file:
+with open('end2end/attack_events.json', 'r') as file:
     events = json.load(file)
