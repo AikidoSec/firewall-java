@@ -1,35 +1,15 @@
-from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads, test_payloads_path_variables
-from spring_boot_mysql.test_bot_blocking import test_bot_blocking
-from spring_boot_mysql.test_ratelimiting import test_ratelimiting_per_user, test_ratelimiting
-from spring_boot_mysql.test_ip_blocking import test_ip_blocking
-payloads = {
-    "safe": { "name": "Bobby" },
-    "unsafe": { "name": "Malicious Pet', 'Gru from the Minions') -- " }
-}
-payloads_exec = {
-    "safe": "Johhny",
-    "unsafe": "'; sleep 2; # "
-}
-urls = {
-    "disabled": "http://localhost:8091",
-    "enabled":  "http://localhost:8090"
-}
+from utils import App
 
-test_safe_vs_unsafe_payloads(payloads, urls, route="/api/pets/create")
-print("✅ Tested safe/unsafe payloads on /api/create")
+spring_webflux_postgres_app = App(8090)
+spring_webflux_postgres_app.add_payload(
+    "SQL", route="/api/pets/create",
+    safe={"name": "Bobby"}, unsafe={"name": "Malicious Pet', 'Gru from the Minions') -- "}
+)
+spring_webflux_postgres_app.add_payload(
+    "Command Injection", route="/api/commands/execute/", pathvar=True,
+    safe="Johnny", unsafe="'; sleep 2; # "
+)
 
-# Test blocklists
-test_ip_blocking("http://localhost:8090/")
-print("✅ Tested IP Blocking")
-test_bot_blocking("http://localhost:8090/")
-print("✅ Tested bot blocking")
-
-# Test ratelimiting (we can use a header to set user) :
-test_ratelimiting("http://localhost:8090/test_ratelimiting_1")
-print("✅ Tested rate-limiting")
-test_ratelimiting_per_user("http://localhost:8090/test_ratelimiting_1")
-print("✅ Tested rate-limiting per user")
-
-# Test path variables :
-test_payloads_path_variables(payloads_exec, urls, route="/api/commands/execute/")
-print("✅ Tested attack using path variables.")
+spring_webflux_postgres_app.test_all_payloads()
+spring_webflux_postgres_app.test_blocking()
+spring_webflux_postgres_app.test_rate_limiting()
