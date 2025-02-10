@@ -9,5 +9,44 @@
     "payload": "Malicious Pet\", \"Gru from the Minions\") -- ",
     "source": "body",
     "operation": "(MySQL Connector/J) java.sql.Connection.prepareStatement"
+  },
+  "javalin_postgres_attack": {
+    "blocked": true,
+    "kind": "sql_injection",
+    "metadata": {
+      "sql": "INSERT INTO pets (pet_name, owner) VALUES ('Malicious Pet', 'Gru from the Minions') -- ', 'Aikido Security')"
+    },
+    "path": ".name",
+    "payload": "Malicious Pet', 'Gru from the Minions') -- ",
+    "source": "body",
+    "operation": "(PostgreSQL JDBC Driver) java.sql.Connection.prepareStatement"
+  },
+  "spring_mysql_boot_mysql_attack": {
+    "blocked": true,
+    "kind": "sql_injection",
+    "metadata": {
+      "sql": "INSERT INTO pets (pet_name, owner) VALUES (\"Malicious Pet\", \"Gru from the Minions\") -- \", \"Aikido Security\")"
+    },
+    "path": ".name",
+    "payload": "Malicious Pet\", \"Gru from the Minions\") -- ",
+    "source": "body",
+    "operation": "(MySQL Connector/J) java.sql.Connection.prepareStatement",
+    "user": {
+      "id": "123"
+    }
+  },
+  "spring_mysql_boot_mariadb_attack": {
+    "blocked": true,
+    "kind": "sql_injection",
+    "metadata": {
+      "sql": "INSERT INTO pets (pet_name, owner) VALUES (\"Malicious Pet\", \"Gru from the Minions\") -- \", \"Aikido Security\")"
+    },
+    "path": ".name",
+    "payload": "Malicious Pet\", \"Gru from the Minions\") -- ",
+    "source": "body",
+    "operation": "(MariaDB Connector/J) java.sql.Connection.prepareStatement",
+    "user": {
+      "id": "456"
+    }
   }
 }
