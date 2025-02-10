@@ -31,9 +31,7 @@
     "payload": "Malicious Pet\", \"Gru from the Minions\") -- ",
     "source": "body",
     "operation": "(MySQL Connector/J) java.sql.Connection.prepareStatement",
-    "user": {
-      "id": "123"
-    }
+    "user_id": "123"
   },
   "spring_mysql_boot_mariadb_attack": {
     "blocked": true,
@@ -45,8 +43,6 @@
     "payload": "Malicious Pet\", \"Gru from the Minions\") -- ",
     "source": "body",
     "operation": "(MariaDB Connector/J) java.sql.Connection.prepareStatement",
-    "user": {
-      "id": "456"
-    }
+    "user_id": "456"
   }
 }
