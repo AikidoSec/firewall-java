@@ -188,6 +188,7 @@ class WebRequestCollectorTest {
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
 
         assertNull(response);
+        assertNull(Context.get());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
@@ -205,5 +206,6 @@ class WebRequestCollectorTest {
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
 
         assertNull(response);
+        assertNull(Context.get());
     }
 }
