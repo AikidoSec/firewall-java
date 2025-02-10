@@ -1,12 +1,10 @@
-from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads
+from utils import App
 
-payloads = {
-    "safe": { "name": "Bobby" },
-    "unsafe": { "name": "Malicious Pet', 'Gru from the Minions'); -- " }
-}
-urls = {
-    "disabled": "http://localhost:8087/api/pets/create",
-    "enabled": "http://localhost:8086/api/pets/create"
-}
+spring_boot_mssql_app = App(8086)
+spring_boot_mssql_app.add_payload(
+    "sql", route="/api/pets/create",
+    safe={"name": "Bobby"}, unsafe={"name": "Malicious Pet', 'Gru from the Minions'); -- "}
+)
 
-test_safe_vs_unsafe_payloads(payloads, urls) # This makes 4 requests and asserts their status codes
+spring_boot_mssql_app.test_all_payloads()
+spring_boot_mssql_app.test_blocking()
