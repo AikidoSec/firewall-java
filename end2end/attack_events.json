@@ -1,0 +1,13 @@
+{
+  "javalin_mysql_attack": {
+    "blocked": true,
+    "kind": "sql_injection",
+    "metadata": {
+      "sql": "INSERT INTO pets (pet_name, owner) VALUES (\"Malicious Pet\", \"Gru from the Minions\") -- \", \"Aikido Security\")"
+    },
+    "path": ".name",
+    "payload": "Malicious Pet\", \"Gru from the Minions\") -- ",
+    "source": "body",
+    "operation": "(MySQL Connector/J) java.sql.Connection.prepareStatement"
+  }
+}
