@@ -17,13 +17,10 @@ class App:
         self.payloads = {}
         self.event_handler = EventHandler()
 
-    def add_payload(self, key, route, safe, unsafe, pathvar=False, test_event=None, user=None):
+    def add_payload(self, key, route, safe, unsafe, pathvar=False, test_event=None, user=None, json=True):
         self.payloads[key] = {
-            "route": route,
-            "safe": safe, "unsafe": unsafe,
-            "pathvar": pathvar,
-            "test_event": test_event,
-            "user": user
+            "route": route, "safe": safe, "unsafe": unsafe, "pathvar": pathvar, "test_event": test_event,
+            "user": user, "json": json
         }
 
     def test_payload(self, key):
