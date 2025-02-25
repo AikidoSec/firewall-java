@@ -12,12 +12,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public class ThreadCacheObject {
     private final List<Endpoint> endpoints;
     private final Set<String> blockedUserIds;
-    private final Set<String> bypassedIPs;
+    private final IPList bypassedIPs;
     private final long lastRenewedAtMS;
     private final Hostnames hostnames;
     private final Routes routes;
@@ -35,7 +36,7 @@ public class ThreadCacheObject {
         // Set endpoints :
         this.endpoints = endpoints;
         this.blockedUserIds = blockedUserIDs;
-        this.bypassedIPs = bypassedIPs;
+        this.bypassedIPs = createIPList(bypassedIPs);
         this.routes = routes;
         this.hostnames = new Hostnames(5000);
         this.updateBlockedLists(blockedListsRes);
@@ -64,7 +65,7 @@ public class ThreadCacheObject {
         return routes;
     }
     public boolean isBypassedIP(String ip) {
-        return bypassedIPs.contains(ip);
+        return bypassedIPs.matches(ip);
     }
 
     /**
@@ -85,10 +86,7 @@ public class ThreadCacheObject {
             // Update blocked IP addresses (e.g. for geo restrictions) :
             if (res.blockedIPAddresses() != null) {
                 for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
-                    IPList ipList = new IPList();
-                    for (String ip : entry.ips()) {
-                        ipList.add(ip);
-                    }
+                    IPList ipList = createIPList(entry.ips());
                     blockedIps.add(new BlockedIpEntry(ipList, entry.description()));
                 }
             }
