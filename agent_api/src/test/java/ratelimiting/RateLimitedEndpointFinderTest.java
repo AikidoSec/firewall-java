@@ -38,7 +38,7 @@ public class RateLimitedEndpointFinderTest {
                 endpoints.get(0).getRoute(),
                 endpoints.get(0).getRateLimiting().maxRequests(),
                 endpoints.get(0).getRateLimiting().windowSizeInMS(),
-                endpoints.get(0).getAllowedIPAddresses(),
+                Collections.emptyList(),
                 endpoints.get(0).isGraphql(),
                 endpoints.get(0).protectionForcedOff(),
                 false // Rate limiting disabled

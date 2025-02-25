@@ -19,7 +19,7 @@ public final class IPAccessController {
                 // Feature might not be enabled
                 continue;
             }
-            if (endpoint.getAllowedIPAddresses().isEmpty()) {
+            if (endpoint.getAllowedIPAddresses().length() == 0) {
                 // We will continue to check all the other matches
                 continue;
             }
@@ -30,7 +30,7 @@ public final class IPAccessController {
                 return false;
             }
 
-            if (!endpoint.getAllowedIPAddresses().contains(remoteAddress)) {
+            if (!endpoint.getAllowedIPAddresses().matches(remoteAddress)) {
                 // The IP is not in the allowlist, so block
                 return false;
             }
