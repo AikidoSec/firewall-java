@@ -15,12 +15,8 @@ public final class IPAccessController {
         }
 
         for (Endpoint endpoint : endpoints) {
-            if (endpoint.getAllowedIPAddresses() == null) {
+            if (endpoint.allowedIpAddressesEmpty()) {
                 // Feature might not be enabled
-                continue;
-            }
-            if (endpoint.getAllowedIPAddresses().length() == 0) {
-                // We will continue to check all the other matches
                 continue;
             }
 
@@ -30,7 +26,7 @@ public final class IPAccessController {
                 return false;
             }
 
-            if (!endpoint.getAllowedIPAddresses().matches(remoteAddress)) {
+            if (!endpoint.isIpAllowed(remoteAddress)) {
                 // The IP is not in the allowlist, so block
                 return false;
             }

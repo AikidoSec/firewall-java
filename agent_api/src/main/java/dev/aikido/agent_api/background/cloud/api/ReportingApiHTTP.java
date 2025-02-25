@@ -2,9 +2,7 @@ package dev.aikido.agent_api.background.cloud.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
-import dev.aikido.agent_api.helpers.IPListDeserializer;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.helpers.net.IPList;
@@ -104,9 +102,7 @@ public class ReportingApiHTTP extends ReportingApi {
             return getUnsuccessfulAPIResponse("invalid_token");
         } else if (status == 200) {
             try {
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                gsonBuilder.registerTypeAdapter(IPList.class, new IPListDeserializer());
-                return gsonBuilder.create().fromJson(res.body(), APIResponse.class);
+                return new Gson().fromJson(res.body(), APIResponse.class);
             } catch (Throwable e) {
                 logger.debug("json error: %s", e);
                 return getUnsuccessfulAPIResponse("json_deserialize");
