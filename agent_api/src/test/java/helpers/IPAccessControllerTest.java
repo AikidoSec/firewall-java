@@ -82,6 +82,29 @@ public class IPAccessControllerTest {
         );
         assertFalse(IPAccessController.ipAllowedToAccessRoute("3.4.5.6", endpoints));
     }
+    @Test
+    public void testWithSubnet() {
+        List<Endpoint> endpoints = List.of(
+                genEndpoint(List.of("10.0.0.0/8"))
+        );
+        assertTrue(IPAccessController.ipAllowedToAccessRoute("10.0.0.1", endpoints));
+        assertTrue(IPAccessController.ipAllowedToAccessRoute("10.0.0.20", endpoints));
+        assertTrue(IPAccessController.ipAllowedToAccessRoute("10.0.1.50", endpoints));
+        assertFalse(IPAccessController.ipAllowedToAccessRoute("1.1.1.1", endpoints));
+    }
+
+    @Test
+    public void testSubnetMultiple() {
+        List<Endpoint> endpoints = List.of(
+                genEndpoint(List.of("10.0.0.0/8")),
+                genEndpoint(List.of("10.0.0.0/24"))
+        );
+        assertTrue(IPAccessController.ipAllowedToAccessRoute("10.0.0.1", endpoints));
+        assertTrue(IPAccessController.ipAllowedToAccessRoute("10.0.0.20", endpoints));
+        assertTrue(IPAccessController.ipAllowedToAccessRoute("10.0.0.255", endpoints));
+        assertFalse(IPAccessController.ipAllowedToAccessRoute("10.0.1.1", endpoints));
+        assertFalse(IPAccessController.ipAllowedToAccessRoute("10.0.1.50", endpoints));
+    }
 
     @Test
     public void testIfAllowedIpsIsEmptyOrBroken() {
