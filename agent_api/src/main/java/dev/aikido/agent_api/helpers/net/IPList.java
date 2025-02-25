@@ -2,14 +2,15 @@ package dev.aikido.agent_api.helpers.net;
 
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-import java.util.List;
-import java.util.ArrayList;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class IPList {
-    private List<IPAddress> ipAddresses;
+    private Set<IPAddress> ipAddresses;
 
     public IPList() {
-        this.ipAddresses = new ArrayList<>();
+        this.ipAddresses = new HashSet<>();
     }
 
     public void add(String ipOrCIDR) {
@@ -37,5 +38,8 @@ public class IPList {
             }
         }
         return false;
+    }
+    public int length() {
+        return ipAddresses.size();
     }
 }
