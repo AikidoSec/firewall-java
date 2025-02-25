@@ -23,9 +23,10 @@ public class ThreadCacheObject {
     private final Hostnames hostnames;
     private final Routes routes;
 
-    // IP Blocking (e.g. Geo-IP Restrictions) :
-    public record BlockedIpEntry(IPList blocklist, String description) {}
-    private List<BlockedIpEntry> blockedIps = new ArrayList<>();
+    // IP restrictions (e.g. Geo-IP Restrictions) :
+    public record IPListEntry(IPList ipList, String description) {}
+    private List<IPListEntry> blockedIps = new ArrayList<>();
+    private List<IPListEntry> allowedIps = new ArrayList<>();
     // User-Agent Blocking (e.g. bot blocking) :
     private Pattern blockedUserAgentRegex;
 
@@ -72,8 +73,13 @@ public class ThreadCacheObject {
      * Check if the IP is blocked (e.g. Geo IP Restrictions)
      */
     public BlockedResult isIpBlocked(String ip) {
-        for (BlockedIpEntry entry: blockedIps) {
-            if (entry.blocklist.matches(ip)) {
+        for (IPListEntry entry: allowedIps) {
+            if (!entry.ipList.matches(ip)) {
+                return new BlockedResult(true, entry.description);
+            }
+        }
+        for (IPListEntry entry: blockedIps) {
+            if (entry.ipList.matches(ip)) {
                 return new BlockedResult(true, entry.description);
             }
         }
@@ -87,7 +93,14 @@ public class ThreadCacheObject {
             if (res.blockedIPAddresses() != null) {
                 for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
                     IPList ipList = createIPList(entry.ips());
-                    blockedIps.add(new BlockedIpEntry(ipList, entry.description()));
+                    blockedIps.add(new IPListEntry(ipList, entry.description()));
+                }
+            }
+            // Update allowed IP addresses (e.g. for geo restrictions) :
+            if (res.allowedIPAddresses() != null) {
+                for (ReportingApi.ListsResponseEntry entry: res.allowedIPAddresses()) {
+                    IPList ipList = createIPList(entry.ips());
+                    this.allowedIps.add(new IPListEntry(ipList, entry.description()));
                 }
             }
             // Update Blocked User-Agents regex
