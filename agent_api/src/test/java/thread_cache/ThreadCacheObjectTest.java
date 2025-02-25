@@ -24,7 +24,7 @@ public class ThreadCacheObjectTest {
                         "fd00:3234:5678:9abc::1/64",
                         "5.6.7.8/32"
                 ))
-        ), "Test|One")));
+        ), null, "Test|One")));
 
         assertEquals(new ThreadCacheObject.BlockedResult(true, "description"), tCache.isIpBlocked("1.2.3.4"));
         assertEquals(new ThreadCacheObject.BlockedResult(false, null), tCache.isIpBlocked("2.3.4.5"));
@@ -59,9 +59,9 @@ public class ThreadCacheObjectTest {
                         "fd00:3234:5678:9abc::1/64",
                         "5.6.7.8/32"
                 ))
-        ), "Test|One")));
+        ), null, "Test|One")));
 
-        tCache.updateBlockedLists(Optional.of(new ReportingApi.APIListsResponse(null, null)));
+        tCache.updateBlockedLists(Optional.of(new ReportingApi.APIListsResponse(null,  null,null)));
 
         assertEquals(new ThreadCacheObject.BlockedResult(true, "description"), tCache.isIpBlocked("1.2.3.4"));
         assertEquals(new ThreadCacheObject.BlockedResult(false, null), tCache.isIpBlocked("2.3.4.5"));
@@ -96,16 +96,16 @@ public class ThreadCacheObjectTest {
                         "fd00:3234:5678:9abc::1/64",
                         "5.6.7.8/32"
                 ))
-        ), "Test|One")));
+        ), null, "Test|One")));
 
-        tCache.updateBlockedLists(Optional.of(new ReportingApi.APIListsResponse(null, "")));
+        tCache.updateBlockedLists(Optional.of(new ReportingApi.APIListsResponse(null, null, "")));
 
         assertTrue(tCache.isBlockedUserAgent("This is my TEST user agent"));
         assertTrue(tCache.isBlockedUserAgent("Test"));
         assertTrue(tCache.isBlockedUserAgent("TEst and ONE"));
         assertFalse(tCache.isBlockedUserAgent("Est|On"));
         assertFalse(tCache.isBlockedUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"));
-        tCache.updateBlockedLists(Optional.of(new ReportingApi.APIListsResponse(null, "Mozilla")));
+        tCache.updateBlockedLists(Optional.of(new ReportingApi.APIListsResponse(null, null, "Mozilla")));
 
         assertFalse(tCache.isBlockedUserAgent("This is my TEST user agent"));
         assertFalse(tCache.isBlockedUserAgent("Test"));
