@@ -14,6 +14,9 @@ public class IPList {
     }
 
     public void add(String ipOrCIDR) {
+        if (ipOrCIDR == null) {
+            return; // Don't add if IP is null
+        }
         IPAddress ip = new IPAddressString(ipOrCIDR).getAddress();
         if (ipOrCIDR.contains("/")) {
             // CIDR :

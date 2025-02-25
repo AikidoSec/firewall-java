@@ -109,6 +109,7 @@ public class IPListTest {
     @Test
     public void testBlocklistSubnetWithSubnet2() {
         blocklist.add("192.168.2.1/24"); // Single IP subnet
+        blocklist.add(null); // null is ignored
 
         assertTrue(blocklist.matches("192.168.2.1"));
         assertTrue(blocklist.matches("192.168.2.2"));
