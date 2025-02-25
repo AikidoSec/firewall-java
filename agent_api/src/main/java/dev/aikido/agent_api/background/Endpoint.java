@@ -1,6 +1,10 @@
 package dev.aikido.agent_api.background;
 
+import dev.aikido.agent_api.helpers.net.IPList;
+
 import java.util.List;
+
+import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 
 public class Endpoint {
     public record RateLimitingConfig(long maxRequests, long windowSizeInMS, boolean enabled) {}
@@ -16,8 +20,8 @@ public class Endpoint {
             boolean forceProtectionOff, boolean rateLimitingEnabled) {
         this.method = method;
         this.route = route;
-        this.rateLimiting = new RateLimitingConfig(maxRequests, windowSizeMS, rateLimitingEnabled);
         this.allowedIPAddresses = allowedIPAddresses;
+        this.rateLimiting = new RateLimitingConfig(maxRequests, windowSizeMS, rateLimitingEnabled);
         this.graphql = graphql;
         this.forceProtectionOff = forceProtectionOff;
     }
@@ -32,13 +36,18 @@ public class Endpoint {
     public RateLimitingConfig getRateLimiting() {
         return rateLimiting;
     }
-    public List<String> getAllowedIPAddresses() {
-        return allowedIPAddresses;
-    }
     public boolean isGraphql() {
         return graphql;
     }
     public boolean protectionForcedOff() {
         return forceProtectionOff;
+    }
+
+    // allowed ip addresses :
+    public boolean allowedIpAddressesEmpty() {
+        return allowedIPAddresses == null || allowedIPAddresses.size() == 0;
+    }
+    public boolean isIpAllowed(String ip) {
+        return createIPList(allowedIPAddresses).matches(ip);
     }
 }
