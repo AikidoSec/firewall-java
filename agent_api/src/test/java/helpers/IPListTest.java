@@ -19,10 +19,12 @@ public class IPListTest {
         assertFalse(blocklist.matches("192.168.1.1"));
         blocklist.add("192.168.1.1");
         assertTrue(blocklist.matches("192.168.1.1"));
+        assertEquals(1, blocklist.length());
 
         // Test adding the same address again
         blocklist.add("192.168.1.1");
         assertTrue(blocklist.matches("192.168.1.1"));
+        assertEquals(1, blocklist.length());
     }
 
     @Test
@@ -43,6 +45,7 @@ public class IPListTest {
         assertTrue(blocklist.matches("10.0.0.1"));
         assertTrue(blocklist.matches("10.1.1.1"));
         assertFalse(blocklist.matches("172.16.0.1"));
+        assertEquals(2, blocklist.length());
     }
 
     @Test
