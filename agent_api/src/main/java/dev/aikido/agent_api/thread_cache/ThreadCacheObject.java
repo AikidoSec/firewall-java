@@ -2,7 +2,7 @@ package dev.aikido.agent_api.thread_cache;
 
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
-import dev.aikido.agent_api.helpers.net.BlockList;
+import dev.aikido.agent_api.helpers.net.IPList;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.routes.Routes;
 
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
@@ -24,7 +23,7 @@ public class ThreadCacheObject {
     private final Routes routes;
 
     // IP Blocking (e.g. Geo-IP Restrictions) :
-    public record BlockedIpEntry(BlockList blocklist, String description) {}
+    public record BlockedIpEntry(IPList blocklist, String description) {}
     private List<BlockedIpEntry> blockedIps = new ArrayList<>();
     // User-Agent Blocking (e.g. bot blocking) :
     private Pattern blockedUserAgentRegex;
@@ -73,7 +72,7 @@ public class ThreadCacheObject {
      */
     public BlockedResult isIpBlocked(String ip) {
         for (BlockedIpEntry entry: blockedIps) {
-            if (entry.blocklist.isBlocked(ip)) {
+            if (entry.blocklist.matches(ip)) {
                 return new BlockedResult(true, entry.description);
             }
         }
@@ -86,11 +85,11 @@ public class ThreadCacheObject {
             // Update blocked IP addresses (e.g. for geo restrictions) :
             if (res.blockedIPAddresses() != null) {
                 for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
-                    BlockList blockList = new BlockList();
+                    IPList ipList = new IPList();
                     for (String ip : entry.ips()) {
-                        blockList.add(ip);
+                        ipList.add(ip);
                     }
-                    blockedIps.add(new BlockedIpEntry(blockList, entry.description()));
+                    blockedIps.add(new BlockedIpEntry(ipList, entry.description()));
                 }
             }
             // Update Blocked User-Agents regex
