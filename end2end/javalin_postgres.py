@@ -30,7 +30,18 @@ javalin_postgres_app.add_payload(
     safe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=../secrets/key.txt;fpath=home.txt'}),
     unsafe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=home.txt;fpath=123;fpath=../secrets/key.txt'}),
 )
-
+javalin_postgres_app.add_payload(
+    "path_traversal_via_cookie_all_same",
+    # Last fpath in Cookie list gets taken : ctx.cookieMap()
+    safe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'fpath=home.txt;fpath=../secrets/key.txt;fpath=home.txt'}),
+    unsafe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'fpath=../secrets/key.txt;fpath=../secrets/key.txt'}),
+)
+javalin_postgres_app.add_payload(
+    "path_traversal_via_cookiemap_all_same",
+    # Last fpath in Cookie list gets taken : ctx.cookieMap()
+    safe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=home.txt;fpath=../secrets/key.txt;fpath=home.txt'}),
+    unsafe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=../secrets/key.txt;fpath=../secrets/key.txt'}),
+)
 javalin_postgres_app.test_all_payloads()
 javalin_postgres_app.test_blocking()
 javalin_postgres_app.test_rate_limiting()
