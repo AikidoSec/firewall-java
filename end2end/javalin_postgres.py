@@ -1,7 +1,7 @@
 from __init__ import events
 from utils import App, Request
 
-javalin_postgres_app = App(8100)
+javalin_postgres_app = App(8088)
 
 javalin_postgres_app.add_payload(
     "sql",
