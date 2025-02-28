@@ -3,7 +3,7 @@ from utils import App, Request
 
 javalin_postgres_app = App(8100)
 
-javalin_postgres_app.add_payload_2(
+javalin_postgres_app.add_payload(
     "sql",
     safe_request=Request(
         route="/api/create", body={"name": "Bobby"}
@@ -13,7 +13,7 @@ javalin_postgres_app.add_payload_2(
     ),
     test_event=events["javalin_postgres_attack"]
 )
-javalin_postgres_app.add_payload_2(
+javalin_postgres_app.add_payload(
     "exec",
     safe_request=Request(route="/api/execute/Bobby", method='GET'),
     unsafe_request=Request(route="/api/execute/Malicious%20Pet%27%2C%20%27Gru%20from%20the%20Minions%27%29%20--%20", method='GET')
