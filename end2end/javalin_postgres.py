@@ -20,9 +20,15 @@ javalin_postgres_app.add_payload(
 )
 javalin_postgres_app.add_payload(
     "path_traversal_via_cookie",
-    # First path in Cookie list gets taken : ctx.cookie(str key)
-    safe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'path=home.txt;path=123;path=../secrets/key.txt'}),
-    unsafe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'path=../secrets/key.txt;path=home.txt'})
+    # First fpath in Cookie list gets taken : ctx.cookie(str key)
+    safe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'fpath=home.txt;fpath=123;fpath=../secrets/key.txt'}),
+    unsafe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'fpath=../secrets/key.txt;fpath=home.txt'})
+)
+javalin_postgres_app.add_payload(
+    "path_traversal_via_cookiemap",
+    # Last fpath in Cookie list gets taken : ctx.cookieMap()
+    safe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=../secrets/key.txt;fpath=home.txt'}),
+    unsafe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=home.txt;fpath=123;fpath=../secrets/key.txt'}),
 )
 
 javalin_postgres_app.test_all_payloads()

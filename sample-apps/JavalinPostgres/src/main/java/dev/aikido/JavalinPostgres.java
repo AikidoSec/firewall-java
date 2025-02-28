@@ -94,12 +94,12 @@ public class JavalinPostgres {
             ctx.result(content);
         });
         app.get("/api/read_cookie", ctx -> {
-            String filePath = ctx.cookie("path");
+            String filePath = ctx.cookie("fpath");
             String content = Helpers.readFile(filePath);
             ctx.result(content);
         });
         app.get("/api/read_cookiemap", ctx -> {
-            String filePath = ctx.cookieMap().get("path");
+            String filePath = ctx.cookieMap().get("fpath");
             String content = Helpers.readFile(filePath);
             ctx.result(content);
         });
