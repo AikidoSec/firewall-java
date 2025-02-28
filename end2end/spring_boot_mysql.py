@@ -1,20 +1,22 @@
 from __init__ import events
-from utils import App
+from utils import App, Request
 
 spring_boot_mysql_app = App(8082)
-payloads = {
-    "safe": {"name": "Bobby"},
-    "unsafe": {"name": 'Malicious Pet", "Gru from the Minions") -- '}
-}
+
 spring_boot_mysql_app.add_payload(
-    "sql_mysql", route="/api/pets/create",
-    safe={"name": "Bobby"}, unsafe={"name": 'Malicious Pet", "Gru from the Minions") -- '},
-    test_event=events["spring_mysql_boot_mysql_attack"], user="123"
+    "sql_mysql",test_event=events["spring_mysql_boot_mysql_attack"],
+    safe_request=Request("/api/pets/create", headers={'user': '123'}, body={"name": "Bobby"}),
+    unsafe_request=Request(
+        "/api/pets/create", headers={'user': '123'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
+    )
 )
+
 spring_boot_mysql_app.add_payload(
-    "sql_mariadb", route="/api/pets/create/mariadb",
-    safe={"name": "Bobby"}, unsafe={"name": 'Malicious Pet", "Gru from the Minions") -- '},
-    test_event=events["spring_mysql_boot_mariadb_attack"], user="456"
+    "sql_mariadb",test_event=events["spring_mysql_boot_mariadb_attack"],
+    safe_request=Request("/api/pets/create/mariadb", headers={'user': '456'}, body={"name": "Bobby"}),
+    unsafe_request=Request(
+        "/api/pets/create/mariadb", headers={'user': '456'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
+    )
 )
 
 spring_boot_mysql_app.test_all_payloads()

@@ -2,11 +2,11 @@ import time
 
 from .EventHandler import EventHandler
 from .assert_equals import assert_eq
+from .request import Request
 from .test_bot_blocking import test_bot_blocking
 from .test_ip_blocking import test_ip_blocking
 from .test_ratelimiting import test_ratelimiting, test_ratelimiting_per_user
-from .test_safe_vs_unsafe_payloads import test_payloads_path_variables, test_safe_vs_unsafe_payloads
-
+from .test_payloads_safe_vs_unsafe import test_payloads_safe_vs_unsafe
 
 class App:
     def __init__(self, port):
@@ -17,10 +17,11 @@ class App:
         self.payloads = {}
         self.event_handler = EventHandler()
 
-    def add_payload(self, key, route, safe, unsafe, pathvar=False, test_event=None, user=None, json=True):
+    def add_payload(self,key, safe_request, unsafe_request, test_event=None):
         self.payloads[key] = {
-            "route": route, "safe": safe, "unsafe": unsafe, "pathvar": pathvar, "test_event": test_event,
-            "user": user, "json": json
+            "safe": safe_request,
+            "unsafe": unsafe_request,
+            "test_event": test_event
         }
 
     def test_payload(self, key):
@@ -29,10 +30,7 @@ class App:
         payload = self.payloads.get(key)
 
         self.event_handler.reset()
-        if payload["pathvar"] is True:
-            test_payloads_path_variables(payload, self.urls, payload["route"])
-        else:
-            test_safe_vs_unsafe_payloads(payload, self.urls, payload["route"], user_id=payload["user"])
+        test_payloads_safe_vs_unsafe(payload, self.urls)
         print("✅ Tested payload: " + key)
 
         if payload["test_event"]:
