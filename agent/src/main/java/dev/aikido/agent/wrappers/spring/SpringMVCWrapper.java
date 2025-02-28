@@ -73,7 +73,15 @@ public class SpringMVCWrapper implements Wrapper {
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
-                    cookiesMap.put(cookie.getName(), List.of(cookie.getValue()));
+                    List<String> newValue;
+                    // If the cookie is already inside the map, add the value to the existing list
+                    if (cookiesMap.containsKey(cookie.getName())) {
+                        newValue = cookiesMap.get(cookie.getName());
+                        newValue.add(cookie.getValue());
+                    } else {
+                        newValue = List.of(cookie.getValue());
+                    }
+                    cookiesMap.put(cookie.getName(), newValue);
                 }
             }
 
