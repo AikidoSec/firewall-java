@@ -37,21 +37,21 @@ class CloudConnectionManagerTest {
     @Test
     void testOnStartReportsEvent() {
         // Arrange
-        when(mockApi.report(anyString(), any(APIEvent.class), anyInt())).thenReturn(Optional.of(mock(APIResponse.class)));
+        when(mockApi.report(anyString(), any(APIEvent.class))).thenReturn(Optional.of(mock(APIResponse.class)));
 
         // Act
         cloudConnectionManager.onStart();
 
         // Assert
         ArgumentCaptor<APIEvent> eventCaptor = ArgumentCaptor.forClass(APIEvent.class);
-        verify(mockApi).report(eq("token"), eventCaptor.capture(), eq(10));
+        verify(mockApi).report(eq("token"), eventCaptor.capture());
     }
 
     @Test
     void testReportEventUpdatesConfigWhenResponseIsPresent() {
         // Arrange
         APIResponse mockResponse = mock(APIResponse.class);
-        when(mockApi.report(anyString(), any(APIEvent.class), anyInt())).thenReturn(Optional.of(mockResponse));
+        when(mockApi.report(anyString(), any(APIEvent.class))).thenReturn(Optional.of(mockResponse));
 
         // Act
         cloudConnectionManager.reportEvent(Started.get(cloudConnectionManager), true);
@@ -63,14 +63,14 @@ class CloudConnectionManagerTest {
     @Test
     void testReportEventDoesNotUpdateConfigWhenResponseIsNotPresent() {
         // Arrange
-        when(mockApi.report(anyString(), any(APIEvent.class), anyInt())).thenReturn(Optional.empty());
+        when(mockApi.report(anyString(), any(APIEvent.class))).thenReturn(Optional.empty());
 
         // Act
         cloudConnectionManager.reportEvent(Started.get(cloudConnectionManager), true);
 
         // Assert
         // No interaction with config update
-        verify(mockApi).report(anyString(), any(APIEvent.class), anyInt());
+        verify(mockApi).report(anyString(), any(APIEvent.class));
     }
 
     @Test

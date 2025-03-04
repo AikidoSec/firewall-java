@@ -69,6 +69,10 @@ def post_events():
         events.append(request.get_json())
     return jsonify(responses["config"])
 
+@app.route('/delayed/<int:delay>/api/runtime/config')
+def delayed_route(delay):
+    time.sleep(delay)
+    return jsonify(responses["config"])
 
 @app.route('/mock/config', methods=['POST'])
 def mock_set_config():

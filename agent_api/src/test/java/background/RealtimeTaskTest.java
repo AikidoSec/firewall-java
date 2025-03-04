@@ -46,7 +46,7 @@ class RealtimeTaskTest {
         RealtimeAPI.ConfigResponse configResponse = mock(RealtimeAPI.ConfigResponse.class);
         // Mock the API response for fetching new config
         APIResponse apiResponse = mock(APIResponse.class);
-        when(reportingApiHTTP.fetchNewConfig(token, 3)).thenReturn(Optional.of(apiResponse));
+        when(reportingApiHTTP.fetchNewConfig(token)).thenReturn(Optional.of(apiResponse));
 
         // Act
         realtimeTask.run();
@@ -67,7 +67,7 @@ class RealtimeTaskTest {
         RealtimeAPI.ConfigResponse configResponse = mock(RealtimeAPI.ConfigResponse.class);
         // Mock the API response for fetching new config
         APIResponse apiResponse = mock(APIResponse.class);
-        when(reportingApiHTTP.fetchNewConfig(token, 3)).thenReturn(Optional.of(apiResponse));
+        when(reportingApiHTTP.fetchNewConfig(token)).thenReturn(Optional.of(apiResponse));
 
         // Act
         realtimeTask.run();
@@ -89,7 +89,7 @@ class RealtimeTaskTest {
         // Arrange
         String token = "test-token";
         when(connectionManager.getToken()).thenReturn(token);
-        when(reportingApiHTTP.fetchNewConfig(token, 3)).thenReturn(Optional.empty());
+        when(reportingApiHTTP.fetchNewConfig(token)).thenReturn(Optional.empty());
         // Act
         realtimeTask.run();
 
