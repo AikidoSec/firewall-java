@@ -68,6 +68,9 @@ public class ContextObject {
         return headers;
     }
     public String getHeader(String key) {
+        if (this.headers == null || this.headers.isEmpty()) {
+            return null;
+        }
         for (Map.Entry<String, List<String>> entry: this.headers.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(key)) {
                 List<String> headerValues = entry.getValue();
