@@ -8,7 +8,6 @@ import dev.aikido.agent_api.api_discovery.GetApiInfo;
 import dev.aikido.agent_api.context.ContextObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +17,33 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GetApiInfoTest {
 
-    private ContextObject context;
+    private TestContextObject context;
 
     @BeforeEach
     public void setUp() {
-        context = Mockito.mock(ContextObject.class);
+        context = new TestContextObject();
+    }
+
+    // Static subclass of ContextObject for testing
+    static class TestContextObject extends ContextObject {
+        public void setHeaders(HashMap<String, List<String>> headers) {
+            this.headers = headers;
+        }
+
+        public void setBody(Object body) {
+            this.body = body;
+        }
+
+        public void setQuery(HashMap<String, List<String>> query) {
+            this.query = query;
+        }
+        public void setMethod(String method) {
+            this.method = method;
+        }
+        public void setUrl(String url) {
+            this.url = url;
+            this.route = url;
+        }
     }
 
     @Test
@@ -38,11 +59,11 @@ public class GetApiInfoTest {
                 "email", "john.doe@example.com"
         ));
 
-        Mockito.when(context.getMethod()).thenReturn("GET");
-        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
-        Mockito.when(context.getBody()).thenReturn(body);
-        HashMap<String, String> headers = new HashMap<>(Map.of("content-type", "application/x-www-form-urlencoded"));
-        Mockito.when(context.getHeaders()).thenReturn(headers);
+        context.setMethod("GET");
+        context.setUrl("/api/resource1");
+        context.setBody(body);
+        HashMap<String, List<String>> headers = new HashMap<>(Map.of("content-type", List.of("application/x-www-form-urlencoded")));
+        context.setHeaders(headers);
         APISpec apiInfo = GetApiInfo.getApiInfo(context);
         assertNotNull(apiInfo);
         assertNotNull(apiInfo.body().schema());
@@ -93,7 +114,6 @@ public class GetApiInfoTest {
 
         assertEquals("form-urlencoded", apiInfo.body().type());
     }
-
     @Test
     public void testGetApiInfoWithJson() {
         Map<String, Object> body = new HashMap<>();
@@ -105,11 +125,11 @@ public class GetApiInfoTest {
         HashMap<String, List<String>> query = new HashMap<>();
         query.put("user2", List.of("a", "b"));
 
-        Mockito.when(context.getMethod()).thenReturn("GET");
-        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
-        Mockito.when(context.getBody()).thenReturn(body);
-        Mockito.when(context.getQuery()).thenReturn(query);
-        Mockito.when(context.getHeaders()).thenReturn(new HashMap<>(Map.of("content-type", "application/json")));
+        context.setMethod("GET");
+        context.setUrl("/api/resource1");
+        context.setBody(body);
+        context.setQuery(query);
+        context.setHeaders(new HashMap<>(Map.of("content-type", List.of("application/json"))));
 
         APISpec apiInfo = GetApiInfo.getApiInfo(context);
         assertNotNull(apiInfo);
@@ -122,17 +142,16 @@ public class GetApiInfoTest {
         assertNull(apiInfo.auth());
     }
 
-
     @Test
     public void testGetApiInfoWithEmptyBody() {
         HashMap<String, List<String>> query = new HashMap<>();
         query.put("user2", List.of("a", "b"));
 
-        Mockito.when(context.getMethod()).thenReturn("GET");
-        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
-        Mockito.when(context.getBody()).thenReturn(null);
-        Mockito.when(context.getQuery()).thenReturn(query);
-        Mockito.when(context.getHeaders()).thenReturn(new HashMap<>(Map.of("content-type", "application/json")));
+        context.setMethod("GET");
+        context.setUrl("/api/resource1");
+        context.setBody(null);
+        context.setQuery(query);
+        context.setHeaders(new HashMap<>(Map.of("content-type", List.of("application/json"))));
 
         APISpec apiInfo = GetApiInfo.getApiInfo(context);
         assertNotNull(apiInfo);
@@ -147,11 +166,11 @@ public class GetApiInfoTest {
     public void testGetApiInfoWithEmptyQueryAndBody() {
         HashMap<String, List<String>> query = new HashMap<>();
 
-        Mockito.when(context.getMethod()).thenReturn("GET");
-        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
-        Mockito.when(context.getBody()).thenReturn(null);
-        Mockito.when(context.getQuery()).thenReturn(query);
-        Mockito.when(context.getHeaders()).thenReturn(new HashMap<>(Map.of("content-type", "application/json")));
+        context.setMethod("GET");
+        context.setUrl("/api/resource1");
+        context.setBody(null);
+        context.setQuery(query);
+        context.setHeaders(new HashMap<>(Map.of("content-type", List.of("application/json"))));
 
         APISpec apiInfo = GetApiInfo.getApiInfo(context);
         assertNotNull(apiInfo);
@@ -159,13 +178,14 @@ public class GetApiInfoTest {
         assertNull(apiInfo.query());
         assertNull(apiInfo.auth());
     }
+
     @Test
     public void testGetApiInfoWithNullQueryAndBody() {
-        Mockito.when(context.getMethod()).thenReturn("GET");
-        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
-        Mockito.when(context.getBody()).thenReturn(null);
-        Mockito.when(context.getQuery()).thenReturn(null);
-        Mockito.when(context.getHeaders()).thenReturn(new HashMap<>(Map.of("content-type", "application/json")));
+        context.setMethod("GET");
+        context.setUrl("/api/resource1");
+        context.setBody(null);
+        context.setQuery(null);
+        context.setHeaders(new HashMap<>(Map.of("content-type", List.of("application/json"))));
 
         APISpec apiInfo = GetApiInfo.getApiInfo(context);
         assertNotNull(apiInfo);
@@ -173,7 +193,6 @@ public class GetApiInfoTest {
         assertNull(apiInfo.query());
         assertNull(apiInfo.auth());
     }
-
     @Test
     public void testGetApiInfoWithInvalidHeader() {
         Map<String, Object> body = new HashMap<>();
@@ -186,12 +205,11 @@ public class GetApiInfoTest {
                 "name", "John Doe",
                 "email", "john.doe@example.com"
         ));
-
-        Mockito.when(context.getMethod()).thenReturn("GET");
-        Mockito.when(context.getUrl()).thenReturn("/api/resource1");
-        Mockito.when(context.getBody()).thenReturn(body);
-        HashMap<String, String> headers = new HashMap<>(Map.of("content-type", "application/invalid-form-type"));
-        Mockito.when(context.getHeaders()).thenReturn(headers);
+        context.setMethod("GET");
+        context.setUrl("/api/resource1");
+        context.setBody(body);
+        HashMap<String, List<String>> headers = new HashMap<>(Map.of("content-type", List.of("application/invalid-form-type")));
+        context.setHeaders(headers);
 
         APISpec apiInfo = GetApiInfo.getApiInfo(context);
         assertNotNull(apiInfo);
@@ -199,5 +217,4 @@ public class GetApiInfoTest {
         assertNull(apiInfo.query());
         assertNull(apiInfo.auth());
     }
-
 }

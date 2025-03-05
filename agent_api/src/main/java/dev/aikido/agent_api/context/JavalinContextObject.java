@@ -20,7 +20,7 @@ public class JavalinContextObject extends ContextObject {
         this.cookies = cookies;
         this.headers = extractHeaders(headers);
         this.route = buildRouteFromUrl(this.url);
-        this.remoteAddress = getIpFromRequest(rawIp, this.headers);
+        this.remoteAddress = getIpFromRequest(rawIp, this.getHeader("x-forwarded-for"));
         this.source = "Javalin";
         this.redirectStartNodes = new ArrayList<>();
 
@@ -31,11 +31,11 @@ public class JavalinContextObject extends ContextObject {
         this.params = params;
         this.cache.remove("routeParams"); // Reset cache
     }
-    private static HashMap<String, String> extractHeaders(Map<String, String> rawHeaders) {
-        HashMap<String, String> headers = new HashMap<>();
+    private static HashMap<String, List<String>> extractHeaders(Map<String, String> rawHeaders) {
+        HashMap<String, List<String>> headers = new HashMap<>();
         for (Map.Entry<String, String> entry: rawHeaders.entrySet()) {
             // Lower-case keys :
-            headers.put(entry.getKey().toLowerCase(), entry.getValue());
+            headers.put(entry.getKey().toLowerCase(), List.of(entry.getValue()));
         }
         return headers;
     }

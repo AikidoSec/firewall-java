@@ -21,6 +21,14 @@ public class FilesController {
     public String readCookie(@CookieValue(value = "fpath", defaultValue = "") String filePath) {
         return readFile(filePath);
     }
+    @GetMapping("/read_header_1")
+    public String readHeaders(@RequestHeader(value = "x-path", defaultValue = "") String xpath) {
+        return readFile(xpath);
+    }
+    @GetMapping("/read_header_2")
+    public String readHeaders2(@RequestHeader(value = "x-path", defaultValue = "") String[] xpath) {
+        return readFile(xpath[0]);
+    }
     private static String readFile(String fileName) {
         System.out.println("Reading file: "+ fileName);
         File specifiedFile = new File(fileName);

@@ -21,8 +21,8 @@ public class StringsFromContextTest {
                         "sessionId", List.of("abc123"),
                         "userId", List.of("user1"))),
                 /* headers: */ new HashMap<>(Map.of(
-                        "content-type", "application/json",
-                        "authorization", "Bearer token"))
+                        "content-type", new Vector<>(List.of("application/json")).elements(),
+                        "authorization", new Vector<>(List.of("Bearer token")).elements()))
         );
     }
 
@@ -34,8 +34,8 @@ public class StringsFromContextTest {
                 "headers", Map.of(
                         "content-type", ".",
                         "authorization", ".",
-                        "application/json", ".content-type",
-                        "Bearer token", ".authorization"),
+                        "application/json", ".content-type.[0]",
+                        "Bearer token", ".authorization.[0]"),
                 "cookies", Map.of(
                         "user1", ".userId.[0]",
                         "abc123", ".sessionId.[0]",
@@ -58,8 +58,8 @@ public class StringsFromContextTest {
                 "headers", Map.of(
                         "content-type", ".",
                         "authorization", ".",
-                        "application/json", ".content-type",
-                        "Bearer token", ".authorization"),
+                        "application/json", ".content-type.[0]",
+                        "Bearer token", ".authorization.[0]"),
                 "cookies", Map.of(
                         "user1", ".userId.[0]",
                         "abc123", ".sessionId.[0]",
@@ -83,8 +83,8 @@ public class StringsFromContextTest {
                 "headers", Map.of(
                         "content-type", ".",
                         "authorization", ".",
-                        "application/json", ".content-type",
-                        "Bearer token", ".authorization"),
+                        "application/json", ".content-type.[0]",
+                        "Bearer token", ".authorization.[0]"),
                 "cookies", Map.of(
                         "user1", ".userId.[0]",
                         "abc123", ".sessionId.[0]",

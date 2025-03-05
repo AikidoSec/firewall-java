@@ -57,7 +57,7 @@ public final class WebRequestCollector {
             return new Res(msg, 403);
         }
         // User-Agent blocking (e.g. blocking bots)
-        String userAgent = newContext.getHeaders().get("user-agent");
+        String userAgent = newContext.getHeader("user-agent");
         if (userAgent != null && !userAgent.isEmpty()) {
             if (threadCache.isBlockedUserAgent(userAgent)) {
                 String msg = "You are not allowed to access this resource because you have been identified as a bot.";

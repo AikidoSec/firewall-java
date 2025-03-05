@@ -17,7 +17,7 @@ class SpringWebfluxContextObjectTest {
     private InetSocketAddress rawIp;
     private HashMap<String, List<String>> cookies;
     private Map<String, List<String>> query;
-    private Map<String, String> headerEntries;
+    private Map<String, List<String>> headers;
 
     @BeforeEach
     void setUp() {
@@ -26,24 +26,24 @@ class SpringWebfluxContextObjectTest {
         rawIp = new InetSocketAddress("192.168.1.1", 8080);
         cookies = new HashMap<>();
         query = new HashMap<>();
-        headerEntries = new HashMap<>();
+        headers = new HashMap<>();
     }
 
     @Test
     void testConstructorWithValidInputs() {
-        headerEntries.put("Content-Type", "application/json");
+        headers.put("Content-Type", List.of("application/json"));
         cookies.put("sessionId", Collections.singletonList("abc123"));
         query.put("param", Collections.singletonList("value"));
 
         SpringWebfluxContextObject contextObject = new SpringWebfluxContextObject(
-                method, uri, rawIp, cookies, query, headerEntries
+                method, uri, rawIp, cookies, query, headers
         );
 
         assertEquals(method, contextObject.getMethod());
         assertEquals(uri, contextObject.getUrl());
         assertEquals(cookies, contextObject.getCookies());
         assertEquals(query, contextObject.getQuery());
-        assertEquals("application/json", contextObject.getHeaders().get("content-type"));
+        assertEquals("application/json", contextObject.getHeader("content-type"));
         assertEquals("192.168.1.1", contextObject.getRemoteAddress());
         assertEquals("SpringWebflux", contextObject.getSource());
         assertNotNull(contextObject.getRoute());

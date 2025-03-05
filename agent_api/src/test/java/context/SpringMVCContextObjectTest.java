@@ -31,6 +31,7 @@ class SpringMVCContextObjectTest {
         assertEquals("http://localhost/test", springContextObject.getUrl());
         assertEquals("/test", springContextObject.getRoute());
     }
+
     @Test
     void testGetRouteWithNumbers() {
         // Act
@@ -52,10 +53,15 @@ class SpringMVCContextObjectTest {
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
     void testIpRequestFeature() {
-        HashMap<String, String> headers = new HashMap<>(Map.of("x-forwarded-for", "invalid.ip, in.va.li.d, 1.2.3.4"));
+        // Create headers with Enumeration
+        Vector<String> forwardedForValues = new Vector<>(List.of("invalid.ip", "in.va.li.d", "1.2.3.4"));
+        HashMap<String, Enumeration<String>> headers = new HashMap<>();
+        headers.put("x-forwarded-for", forwardedForValues.elements());
+
         springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
         );
+
         assertEquals(1, springContextObject.getHeaders().size());
         assertEquals("1.2.3.4", springContextObject.getRemoteAddress());
     }
@@ -63,10 +69,15 @@ class SpringMVCContextObjectTest {
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
     void testIpRequestFeature_InvalidHeader() {
-        HashMap<String, String> headers = new HashMap<>(Map.of("x-forwarded-for", "invalid.ip, in.va.li.d"));
+        // Create headers with Enumeration
+        Vector<String> forwardedForValues = new Vector<>(List.of("invalid.ip", "in.va.li.d"));
+        HashMap<String, Enumeration<String>> headers = new HashMap<>();
+        headers.put("x-forwarded-for", forwardedForValues.elements());
+
         springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
         );
+
         assertEquals(1, springContextObject.getHeaders().size());
         assertEquals("192.168.1.1", springContextObject.getRemoteAddress());
     }
@@ -74,10 +85,15 @@ class SpringMVCContextObjectTest {
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "0")
     void testIpRequestFeature_TrustProxyOff() {
-        HashMap<String, String> headers = new HashMap<>(Map.of("x-forwarded-for", "invalid.ip, in.va.li.d, 1.2.3.4"));
+        // Create headers with Enumeration
+        Vector<String> forwardedForValues = new Vector<>(List.of("invalid.ip", "in.va.li.d", "1.2.3.4"));
+        HashMap<String, Enumeration<String>> headers = new HashMap<>();
+        headers.put("x-forwarded-for", forwardedForValues.elements());
+
         springContextObject = new SpringMVCContextObject(
                 "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
         );
+
         assertEquals(1, springContextObject.getHeaders().size());
         assertEquals("192.168.1.1", springContextObject.getRemoteAddress());
     }

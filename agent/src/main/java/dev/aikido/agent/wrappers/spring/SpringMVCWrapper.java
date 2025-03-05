@@ -62,11 +62,11 @@ public class SpringMVCWrapper implements Wrapper {
                 return response;
             }
             // extract headers :
-            HashMap<String, String> headersMap = new HashMap<>();
+            HashMap<String, Enumeration<String>> headersMap = new HashMap<>();
             Enumeration<String> headerNames = request.getHeaderNames();
             while (headerNames != null && headerNames.hasMoreElements()) {
                 String headerName = headerNames.nextElement();
-                String headerValue = request.getHeader(headerName);
+                Enumeration<String> headerValue = request.getHeaders(headerName);
                 headersMap.put(headerName, headerValue);
             }
             // extract cookies :
