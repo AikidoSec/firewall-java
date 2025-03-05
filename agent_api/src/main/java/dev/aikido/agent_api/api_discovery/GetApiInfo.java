@@ -30,12 +30,11 @@ public final class GetApiInfo {
     private static APISpec.Body getBodyInfo(ContextObject context) {
         Object body = context.getBody();
         if (body != null) {
-            DataSchemaItem dataSchema = getDataSchema(body);
-            String dataType = getBodyDataType(context.getHeaders());
-            if(dataType != null && dataSchema != null) {
+            String dataType = getBodyDataType(context.getHeader("content-type"));
+            if(dataType != null) {
                 return new APISpec.Body(
                         /* schema: */ getDataSchema(body),
-                        /* type: */ getBodyDataType(context.getHeaders())
+                        /* type: */ getBodyDataType(context.getHeader("content-type"))
                 );
             }
         }
