@@ -31,6 +31,17 @@ spring_boot_mysql_app.add_payload(
     unsafe_request=Request("/api/files/read_cookie", method='GET', headers={'Cookie': 'fpath=../databases/docker-compose.yml;fpath=../databases/docker-compose.yml'}),
 )
 
+spring_boot_mysql_app.add_payload(
+    "path_traversal_via_header_1_single",
+    safe_request=Request("/api/files/read_header_1", method='GET', headers={'x-path': 'Makefile'}),
+    unsafe_request=Request("/api/files/read_header_1", method='GET', headers={'x-path': '../databases/docker-compose.yml'})
+)
+spring_boot_mysql_app.add_payload(
+    "path_traversal_via_header_2_single",
+    safe_request=Request("/api/files/read_header_2", method='GET', headers={'x-path': 'Makefile'}),
+    unsafe_request=Request("/api/files/read_header_2", method='GET', headers={'x-path': '../databases/docker-compose.yml'})
+)
+
 spring_boot_mysql_app.test_all_payloads()
 spring_boot_mysql_app.test_blocking()
 spring_boot_mysql_app.test_rate_limiting()
