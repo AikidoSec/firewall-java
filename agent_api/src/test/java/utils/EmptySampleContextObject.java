@@ -22,4 +22,8 @@ public class EmptySampleContextObject extends ContextObject {
         this();
         this.query.put("arg", List.of(argument));
     }
+    public EmptySampleContextObject(HashMap<String, List<String>> headers) {
+        this();
+        this.headers = headers;
+    }
 }
