@@ -75,7 +75,7 @@ public class ContextObject {
             if (entry.getKey().equalsIgnoreCase(key)) {
                 List<String> headerValues = entry.getValue();
                 if (headerValues != null && !headerValues.isEmpty()) {
-                    return headerValues.getLast(); // Last header is default
+                    return headerValues.get(headerValues.size() - 1); // Last header is default
                 }
             }
         }
