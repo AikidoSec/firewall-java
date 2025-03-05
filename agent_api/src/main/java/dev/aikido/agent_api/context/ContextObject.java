@@ -16,7 +16,7 @@ public class ContextObject {
     protected String url;
     protected String route;
     protected String remoteAddress;
-    protected HashMap<String, String> headers;
+    protected HashMap<String, List<String>> headers;
     protected HashMap<String, List<String>> query;
     protected HashMap<String, List<String>> cookies;
     protected Object params;
@@ -64,8 +64,19 @@ public class ContextObject {
     public String getRemoteAddress() {
         return remoteAddress;
     }
-    public HashMap<String, String> getHeaders() {
+    public HashMap<String, List<String>> getHeaders() {
         return headers;
+    }
+    public String getHeader(String key) {
+        for (Map.Entry<String, List<String>> entry: this.headers.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(key)) {
+                List<String> headerValues = entry.getValue();
+                if (headerValues != null && !headerValues.isEmpty()) {
+                    return headerValues.getFirst();
+                }
+            }
+        }
+        return null;
     }
     public HashMap<String, List<String>> getQuery() {
         return query;
