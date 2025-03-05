@@ -72,14 +72,14 @@ class ContextObjectTest {
     }
 
     @Test
-    public void testGetHeaderReturnsFirstValueWhenMultipleValuesPresent() {
+    public void testGetHeaderReturnsLastValueWhenMultipleValuesPresent() {
         List<String> multipleValues = new ArrayList<>();
         multipleValues.add("value1");
         multipleValues.add("value2");
         context.getHeaders().put("Custom-Header", multipleValues);
 
         String result = context.getHeader("Custom-Header");
-        assertEquals("value1", result);
+        assertEquals("value2", result);
     }
 
     @Test
