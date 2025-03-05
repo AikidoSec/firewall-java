@@ -33,7 +33,7 @@ class JavalinContextObjectTest {
         assertEquals("GET", contextObject.getMethod());
         assertEquals("http://example.com/api/resource", contextObject.getUrl());
         assertEquals("192.168.1.1", contextObject.getRemoteAddress());
-        assertEquals("application/json", contextObject.getHeaders().get("content-type"));
+        assertEquals("application/json", contextObject.getHeader("content-type"));
         assertEquals(1, contextObject.getQuery().size());
         assertEquals("value1", contextObject.getQuery().get("param1").get(0));
         assertEquals(1, contextObject.getCookies().size());
@@ -86,7 +86,7 @@ class JavalinContextObjectTest {
     @Test
     void testHeadersExtraction() {
         // Test headers extraction through the constructor
-        assertEquals("application/json", contextObject.getHeaders().get("content-type"));
+        assertEquals("application/json", contextObject.getHeader("content-type"));
         assertEquals(1, contextObject.getHeaders().size());
         assertTrue(contextObject.getHeaders().containsKey("content-type"));
     }
