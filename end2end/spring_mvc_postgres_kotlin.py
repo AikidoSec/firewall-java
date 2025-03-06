@@ -1,38 +1,22 @@
-from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads, test_payloads_path_variables
+from utils import App, Request
 
-payloads = {
-    "safe": { "name": "Bobby" },
-    "unsafe": { "name": "Malicious Pet', 'Gru from the Minions') -- " }
-}
-payloads_exec = {
-    "safe": "Johhny",
-    "unsafe": "'; sleep 2; # "
-}
-payloads_ssrf = {
-    "safe": { "url": "https://aikido.dev/" },
-    "unsafe": { "url": "http://localhost:5000" },
-    "json": False,
-}
-payloads_path_traversal = {
-    "safe": { "fileName": "README.md" },
-    "unsafe": { "fileName": "./../databases/docker-compose.yml" },
-    "json": False,
-}
-urls = {
-    "disabled": "http://localhost:8093",
-    "enabled":  "http://localhost:8092"
-}
+spring_postgres_kotlin_app = App(8092)
+spring_postgres_kotlin_app.add_payload("sql",
+    safe_request=Request("/api/pets/create", body={"name": "Bobby"}),
+    unsafe_request=Request("/api/pets/create", body={"name": "Malicious Pet', 'Gru from the Minions') -- "})
+)
+spring_postgres_kotlin_app.add_payload("command injection",
+    safe_request=Request("/api/commands/execute/Johnny", method='GET'),
+    unsafe_request=Request("/api/commands/execute/%27%3B%20sleep%202%3B%20%23%20", method='GET'),
+)
+spring_postgres_kotlin_app.add_payload("server-side request forgery",
+    safe_request=Request("/api/requests/get", data_type='form', body={"url": "https://aikido.dev/"}),
+    unsafe_request=Request("/api/requests/get", data_type='form', body={"url": "http://localhost:5000"})
+)
+spring_postgres_kotlin_app.add_payload("path traversal",
+    safe_request=Request("/api/files/read", data_type='form', body={"fileName": "README.md"}),
+    unsafe_request=Request("/api/files/read", data_type='form', body={"fileName": "./../databases/docker-compose.yml"})
+)
 
-test_safe_vs_unsafe_payloads(payloads, urls, route="/api/pets/create") # This makes 4 requests and asserts their status codes
-print("✅ SQL Tested")
-# Test if it can block attacks coming from a path variable:
-test_payloads_path_variables(payloads_exec, urls, route="/api/commands/execute/")
-print("✅ Path variables and Command Injection Tested")
 
-# Test SSRF :
-test_safe_vs_unsafe_payloads(payloads_ssrf, urls, route="/api/requests/get") # This makes 4 requests and asserts their status codes
-print("✅ SSRF Tested")
-
-# Test path traversal :
-test_safe_vs_unsafe_payloads(payloads_path_traversal, urls, route="/api/files/read") # This makes 4 requests and asserts their status codes
-print("✅ Path Traversal Tested")
+spring_postgres_kotlin_app.test_all_payloads()
