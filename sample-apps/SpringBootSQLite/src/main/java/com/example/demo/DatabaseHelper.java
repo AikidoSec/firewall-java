@@ -9,11 +9,9 @@ import java.util.ArrayList;
 public class DatabaseHelper {
     private static Connection getDBConnection() {
         // The url specifies the address of our database along with username and password credentials
-        final String url = "jdbc:sqlite://localhost:3306/db";
-        final String user = "user";
-        final String password = "password";
+        final String url = "jdbc:sqlite:db.sqlite"; // Adjust the path as needed
         try {
-            return DriverManager.getConnection(url, user, password);
+            return DriverManager.getConnection(url);
         } catch (SQLException e) {
             System.out.println("Exception occurred in getDBConnection(): " + e);
             return null;
@@ -74,5 +72,29 @@ public class DatabaseHelper {
             System.out.println("Exception occurred in createPetByName(...): " + e);
         }
         return 0;
+    }
+    public static void initializeDatabase() {
+        Connection conn = getDBConnection();
+        if (conn == null) {
+            return;
+        }
+        try {
+            // Create the pets table if it does not exist
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS pets (" +
+                    "pet_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "pet_name TEXT NOT NULL, " +
+                    "owner TEXT NOT NULL" +
+                    ");";
+            Statement stmt = conn.createStatement();
+            stmt.execute(createTableSQL);
+        } catch (SQLException e) {
+            System.out.println("Exception occurred in initializeDatabase(): " + e);
+        } finally {
+            try {
+                conn.close(); // Close the connection
+            } catch (SQLException e) {
+                System.out.println("Exception occurred while closing connection: " + e);
+            }
+        }
     }
 }

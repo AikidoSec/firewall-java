@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 public class DemoApplication {
 
 	public static void main(String[] args) {
+		DatabaseHelper.initializeDatabase(); // Initialize database
 		SpringApplication.run(DemoApplication.class, args);
 	}
 	@Bean
