@@ -15,6 +15,9 @@ public class Dialect {
         } else if (Objects.equals(dialect, "microsoft sql server")) {
             rustDialectInt = 7;
             humanName = "Microsoft SQL";
+        } else if(Objects.equals(dialect, "sqlite")) {
+          rustDialectInt = 12;
+          humanName = "SQLite";
         } else {
             rustDialectInt = 0; // Default option
             humanName = "Generic";
