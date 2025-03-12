@@ -17,15 +17,13 @@ public final class ConfigStore {
     private static final ReentrantLock mutex = new ReentrantLock();
 
     public static Configuration getConfig() {
-        mutex.lock();
-        Configuration result = config;
-        mutex.unlock();
-        return result;
+        return config;
     }
 
     public static void updateFromAPIResponse(APIResponse apiResponse) {
         mutex.lock();
         try {
+            logger.trace("Updating config from APIResponse");
             config.updateConfig(apiResponse);
         } catch (Throwable e) {
             logger.debug("An error occurred updating service config: %s", e.getMessage());
@@ -36,6 +34,7 @@ public final class ConfigStore {
     public static void updateFromAPIListsResponse(Optional<ReportingApi.APIListsResponse> response) {
         mutex.lock();
         try {
+            logger.trace("Updating config from APIListsResponse");
             config.updateBlockedLists(response);
         } catch (Throwable e) {
             logger.debug("An error occurred updating service config: %s", e.getMessage());
@@ -45,12 +44,14 @@ public final class ConfigStore {
 
     public static void updateBlocking(boolean blocking) {
         mutex.lock();
+        logger.trace("Blocking updated: %s", blocking);
         config.setBlocking(blocking);
         mutex.unlock();
     }
 
     public static void setMiddlewareInstalled(boolean middlewareInstalled) {
         mutex.lock();
+        logger.trace("middlewareInstalled updated: %s", middlewareInstalled);
         config.setMiddlewareInstalled(middlewareInstalled);
         mutex.unlock();
     }
