@@ -10,7 +10,6 @@ import java.util.Optional;
 
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.BackgroundProcessIdentifier.isBackgroundProcess;
-import static dev.aikido.agent_api.thread_cache.ThreadCache.threadCache;
 
 public final class ThreadCacheRenewal {
     private ThreadCacheRenewal() {}
@@ -25,7 +24,6 @@ public final class ThreadCacheRenewal {
         if (currentThreadCache != null) {
             // Send stored data from thread cache to background process: hit counts, middleware data, ... :
             var updateRes = new UpdateAgentDataCommand.Res(
-                    /* routeHitDeltas */ currentThreadCache.getRoutes().getDeltaMap(),
                     /* hostnames */ currentThreadCache.getHostnames().asArray()
             );
             new UpdateAgentDataCommand().send(client, updateRes);

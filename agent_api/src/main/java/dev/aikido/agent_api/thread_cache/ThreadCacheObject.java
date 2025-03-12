@@ -14,11 +14,9 @@ import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 public class ThreadCacheObject {
     private final long lastRenewedAtMS;
     private final Hostnames hostnames;
-    private final Routes routes;
 
     public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedListsRes) {
         this.lastRenewedAtMS = getUnixTimeMS();
-        this.routes = routes;
         this.hostnames = new Hostnames(5000);
     }
 
@@ -27,8 +25,5 @@ public class ThreadCacheObject {
     }
     public Hostnames getHostnames() {
         return hostnames;
-    }
-    public Routes getRoutes() {
-        return routes;
     }
 }
