@@ -12,6 +12,8 @@ import dev.aikido.agent_api.vulnerabilities.Attack;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
+import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
+
 public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResult> {
     public record Req(Attack attack, ContextObject context) {}
 
@@ -56,7 +58,7 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
 
         // Increment statistics :
         connectionManager.getStats().incrementAttacksDetected();
-        if (connectionManager.shouldBlock()) {
+        if (getConfig().isBlockingEnabled()) {
             connectionManager.getStats().incrementAttacksBlocked(); // Also increment blocked attacks.
         }
 

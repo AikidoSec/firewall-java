@@ -1,13 +1,14 @@
 package dev.aikido.agent_api.background.cloud;
 
 import dev.aikido.agent_api.Config;
-import dev.aikido.agent_api.background.ServiceConfiguration;
+import dev.aikido.agent_api.storage.Configuration;
 
 import java.util.List;
 import java.util.Map;
 
 import static dev.aikido.agent_api.helpers.net.Hostname.getHostname;
 import static dev.aikido.agent_api.helpers.net.IPAddress.getIpAddress;
+import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
 
 /**
  * Class to give you the "agent" info, which is the CloudConnectionManager in Java.
@@ -33,15 +34,15 @@ public final class GetManagerInfo {
     public record Platform(String name, String version) {}
 
     public static ManagerInfo getManagerInfo(CloudConnectionManager connectionManager) {
-        ServiceConfiguration serviceConfig = connectionManager.getConfig();
+        Configuration config = getConfig();
         return new ManagerInfo(
-            !connectionManager.shouldBlock(), // dryMode
+            !config.isBlockingEnabled(), // dryMode
             getHostname(), // hostname
             Config.pkgVersion, // version
             "firewall-java", // library
             getIpAddress(), // ipAddress
             Map.of(), // packages (FIX LATER)
-            serviceConfig.getServerless(), // serverless
+            null, // serverless is not supported for Java
             List.of(), // stack
             getOSInfo(), // os
             false, // preventedPrototypePollution, should be removed from API

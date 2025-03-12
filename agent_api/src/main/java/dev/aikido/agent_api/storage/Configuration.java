@@ -68,7 +68,7 @@ public class Configuration {
     }
 
     // Blocking status, i.e. should an attack be throwing an error or not
-    public boolean isBlocking() {
+    public boolean isBlockingEnabled() {
         return blocking;
     }
 
