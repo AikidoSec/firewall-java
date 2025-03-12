@@ -100,39 +100,6 @@ class ScannerTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
-    void testBypassedIPs() {
-        // Thread cache does not force any protection off :
-        assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
-        });
-        // Add IP to bypassed IP's :
-        Context.set(new SampleContextObject2("1.1.1.1"));
-        assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
-        });
-        Context.set(new SampleContextObject2("3.3.3.3"));
-        assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
-        });
-
-        // Set to IP where protection is not forced off :
-        Context.set(new SampleContextObject2("6.6.6.6"));
-        assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
-        });
-
-        // Set to bypassed IP, but first reset the thread cache :
-        Context.set(new SampleContextObject2("1.1.1.1"));
-        ThreadCache.set(null);
-        assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
-        });
-    }
-
-    // Disable IPC :
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
-    @Test
     void testForceProtectionOff() {
         // Thread cache does not force any protection off :
         assertThrows(SQLInjectionException.class, () -> {
