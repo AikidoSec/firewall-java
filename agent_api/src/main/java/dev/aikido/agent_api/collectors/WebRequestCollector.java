@@ -3,13 +3,13 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
+import dev.aikido.agent_api.storage.Configuration;
 
 import java.util.List;
 
 import static dev.aikido.agent_api.helpers.IPAccessController.ipAllowedToAccessRoute;
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
+import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
 
 public final class WebRequestCollector {
     private WebRequestCollector() {}
@@ -25,24 +25,24 @@ public final class WebRequestCollector {
      * 4) UA Blocking: e.g. bot blocking, AI scraper blocking, ...
      */
     public static Res report(ContextObject newContext) {
-        ThreadCacheObject threadCache = ThreadCache.get();
+        Configuration config = getConfig();
         // Set new context :
         Context.reset();
 
-        if (threadCache != null && threadCache.isBypassedIP(newContext.getRemoteAddress())) {
+        if (config != null && config.isBypassedIP(newContext.getRemoteAddress())) {
             return null; // Do not set context if IP is bypassed.
         } else {
             Context.set(newContext);
         }
 
-        if (threadCache == null) {
+        if (config == null) {
             return null;
         }
-        // Increment total hits :
-        threadCache.incrementTotalHits();
+        // Increment total hits : TODO
+        // config.incrementTotalHits();
 
         // Per-route IP allowlists :
-        List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), threadCache.getEndpoints());
+        List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), config.getEndpoints());
         if (!ipAllowedToAccessRoute(newContext.getRemoteAddress(), matchedEndpoints)) {
             String msg = "Your IP address is not allowed to access this resource.";
             msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
@@ -50,7 +50,7 @@ public final class WebRequestCollector {
         }
 
         // Blocked IP lists (e.g. Geo restrictions)
-        ThreadCacheObject.BlockedResult ipBlocked = threadCache.isIpBlocked(newContext.getRemoteAddress());
+        Configuration.BlockedResult ipBlocked = config.isIpBlocked(newContext.getRemoteAddress());
         if (ipBlocked.blocked()) {
             String msg = "Your IP address is not allowed to access this resource.";
             msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
@@ -59,7 +59,7 @@ public final class WebRequestCollector {
         // User-Agent blocking (e.g. blocking bots)
         String userAgent = newContext.getHeaders().get("user-agent");
         if (userAgent != null && !userAgent.isEmpty()) {
-            if (threadCache.isBlockedUserAgent(userAgent)) {
+            if (config.isBlockedUserAgent(userAgent)) {
                 String msg = "You are not allowed to access this resource because you have been identified as a bot.";
                 return new Res(msg, 403);
             }
