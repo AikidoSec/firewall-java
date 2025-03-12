@@ -10,7 +10,7 @@ import java.util.Optional;
  * This command UPDATE_AGENT_DATA is responsible for updating route hits, total hits and executed middleware status.
  */
 public class UpdateAgentDataCommand extends Command<UpdateAgentDataCommand.Res, Command.EmptyResult> {
-    public record Res(Map<String, Integer> routeHitDeltas, int hitsDelta, Hostnames.HostnameEntry[] hostnames) {};
+    public record Res(Map<String, Integer> routeHitDeltas, Hostnames.HostnameEntry[] hostnames) {};
 
     @Override
     public boolean returnsData() {
@@ -41,7 +41,6 @@ public class UpdateAgentDataCommand extends Command<UpdateAgentDataCommand.Res, 
         if (data.hostnames != null) {
             connectionManager.getHostnames().addArray(data.hostnames);
         }
-        connectionManager.getStats().incrementTotalHits(data.hitsDelta);
 
         return Optional.empty();
     }

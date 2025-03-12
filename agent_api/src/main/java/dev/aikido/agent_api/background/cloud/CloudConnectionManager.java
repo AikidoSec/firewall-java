@@ -29,7 +29,6 @@ public class CloudConnectionManager {
     private final Routes routes;
     private final RateLimiter rateLimiter;
     private final Users users;
-    private final Statistics stats;
     private final Hostnames hostnames;
 
     public CloudConnectionManager(boolean block, Token token, String serverless) {
@@ -44,7 +43,6 @@ public class CloudConnectionManager {
                 /*maxItems:*/ 5000, /*TTL in ms:*/ 120 * 60 * 1000 // 120 minutes
         );
         this.users = new Users();
-        this.stats = new Statistics();
         this.hostnames = new Hostnames(5000); // max entry size is 5000
     }
     public void onStart() {
@@ -78,7 +76,6 @@ public class CloudConnectionManager {
     public Users getUsers() {
         return users;
     }
-    public Statistics getStats() { return stats; }
 
     public Hostnames getHostnames() {
         return hostnames;

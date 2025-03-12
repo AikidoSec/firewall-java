@@ -4,6 +4,7 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.Configuration;
+import dev.aikido.agent_api.storage.StatisticsStore;
 
 import java.util.List;
 
@@ -38,8 +39,8 @@ public final class WebRequestCollector {
         if (config == null) {
             return null;
         }
-        // Increment total hits : TODO
-        // config.incrementTotalHits();
+        // Increment total hits
+        StatisticsStore.incrementHits();
 
         // Per-route IP allowlists :
         List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), config.getEndpoints());

@@ -16,7 +16,6 @@ public class ThreadCacheObject {
     private final Hostnames hostnames;
     private final Routes routes;
 
-    private int totalHits = 0;
     public ThreadCacheObject(List<Endpoint> endpoints, Set<String> blockedUserIDs, Set<String> bypassedIPs, Routes routes, Optional<ReportingApi.APIListsResponse> blockedListsRes) {
         this.lastRenewedAtMS = getUnixTimeMS();
         this.routes = routes;
@@ -31,10 +30,5 @@ public class ThreadCacheObject {
     }
     public Routes getRoutes() {
         return routes;
-    }
-
-    public int getTotalHits() { return totalHits; }
-    public void incrementTotalHits() {
-        this.totalHits += 1;
     }
 }
