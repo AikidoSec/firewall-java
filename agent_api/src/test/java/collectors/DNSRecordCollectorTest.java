@@ -4,7 +4,7 @@ import dev.aikido.agent_api.collectors.DNSRecordCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.Hostnames;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
+import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import org.junit.jupiter.api.*;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -102,7 +102,7 @@ public class DNSRecordCollectorTest {
 
     @AfterEach
     public void cleanup() {
-        ThreadCache.set(null);
+        HostnamesStore.clear();
         Context.set(null);
     }
 }

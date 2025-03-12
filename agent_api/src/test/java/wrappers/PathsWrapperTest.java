@@ -1,7 +1,6 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,18 +10,15 @@ import utils.EmptySampleContextObject;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class PathsWrapperTest {
     @AfterEach
     void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
     }
     @BeforeEach
     void clearThreadCache() {
         cleanup();
-        ThreadCache.set(getEmptyThreadCacheObject());
     }
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));

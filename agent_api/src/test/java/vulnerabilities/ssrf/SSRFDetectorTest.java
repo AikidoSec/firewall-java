@@ -3,7 +3,6 @@ package vulnerabilities.ssrf;
 import dev.aikido.agent_api.collectors.RedirectCollector;
 import dev.aikido.agent_api.collectors.URLCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 import org.junit.jupiter.api.AfterAll;
@@ -18,13 +17,11 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class SSRFDetectorTest {
     @BeforeAll
     static void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
     }
     @AfterAll
     static void afterAll() {
@@ -33,7 +30,6 @@ public class SSRFDetectorTest {
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
-        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
 
