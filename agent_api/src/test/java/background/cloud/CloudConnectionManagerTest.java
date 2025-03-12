@@ -1,22 +1,23 @@
 package background.cloud;
 
-import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
-import dev.aikido.agent_api.background.users.Users;
+import dev.aikido.agent_api.background.users.UsersStore;
+import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.ratelimiting.RateLimiter;
-import dev.aikido.agent_api.storage.Hostnames;
-import dev.aikido.agent_api.storage.Statistics;
-import dev.aikido.agent_api.storage.routes.Routes;
+import dev.aikido.agent_api.storage.*;
+import dev.aikido.agent_api.storage.routes.RouteEntry;
+import dev.aikido.agent_api.storage.routes.RoutesStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,9 +56,6 @@ class CloudConnectionManagerTest {
 
         // Act
         cloudConnectionManager.reportEvent(Started.get(cloudConnectionManager), true);
-
-        // Assert
-        ServiceConfiguration config = cloudConnectionManager.getConfig();
     }
 
     @Test
@@ -76,7 +74,7 @@ class CloudConnectionManagerTest {
     @Test
     void testShouldBlockReturnsConfigValue() {
         // Act
-        boolean shouldBlock = cloudConnectionManager.shouldBlock();
+        boolean shouldBlock = ConfigStore.getConfig().isBlockingEnabled();
 
         // Assert
         assertTrue(shouldBlock);
@@ -94,7 +92,7 @@ class CloudConnectionManagerTest {
     @Test
     void testGetRoutesReturnsRoutesInstance() {
         // Act
-        Routes routes = cloudConnectionManager.getRoutes();
+        RouteEntry[] routes = RoutesStore.getRoutesAsList();
 
         // Assert
         assertNotNull(routes);
@@ -112,7 +110,7 @@ class CloudConnectionManagerTest {
     @Test
     void testGetUsersReturnsUsersInstance() {
         // Act
-        Users users = cloudConnectionManager.getUsers();
+        List<User> users = UsersStore.getUsersAsList();
 
         // Assert
         assertNotNull(users);
@@ -121,7 +119,7 @@ class CloudConnectionManagerTest {
     @Test
     void testGetStatsReturnsNotNull() {
         // Act
-        Statistics stats = cloudConnectionManager.getStats();
+        Statistics.StatsRecord stats = StatisticsStore.getStatsRecord();
 
         // Assert
         assertNotNull(stats);
@@ -130,7 +128,7 @@ class CloudConnectionManagerTest {
     @Test
     void testGetHostnamesReturnsNotNull() {
         // Act
-        Hostnames hostnames = cloudConnectionManager.getHostnames();
+        Hostnames.HostnameEntry[] hostnames = HostnamesStore.getHostnamesAsList();
 
         // Assert
         assertNotNull(hostnames);
