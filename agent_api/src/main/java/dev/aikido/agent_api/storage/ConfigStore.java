@@ -61,9 +61,15 @@ public final class ConfigStore {
     }
 
     public static void setMiddlewareInstalled(boolean middlewareInstalled) {
+        // We want to avoid a write lock if possible for performance reasons :
+        boolean currentMiddlewareInstalled = getConfig().isMiddlewareInstalled();
+        if (currentMiddlewareInstalled == middlewareInstalled) {
+            return;
+        }
+
         mutex.writeLock().lock();
         try {
-            logger.trace("middlewareInstalled updated: %s", middlewareInstalled);
+            logger.debug("middlewareInstalled updated: %s", middlewareInstalled);
             config.setMiddlewareInstalled(middlewareInstalled);
         } finally {
             mutex.writeLock().unlock();
