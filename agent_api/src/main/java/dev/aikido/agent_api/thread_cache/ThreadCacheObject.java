@@ -2,7 +2,7 @@ package dev.aikido.agent_api.thread_cache;
 
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
-import dev.aikido.agent_api.helpers.net.BlockList;
+import dev.aikido.agent_api.helpers.net.IPList;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.routes.Routes;
 
@@ -10,22 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public class ThreadCacheObject {
     private final List<Endpoint> endpoints;
     private final Set<String> blockedUserIds;
-    private final Set<String> bypassedIPs;
+    private final IPList bypassedIPs;
     private final long lastRenewedAtMS;
     private final Hostnames hostnames;
     private final Routes routes;
 
-    // IP Blocking (e.g. Geo-IP Restrictions) :
-    public record BlockedIpEntry(BlockList blocklist, String description) {}
-    private List<BlockedIpEntry> blockedIps = new ArrayList<>();
+    // IP restrictions (e.g. Geo-IP Restrictions) :
+    public record IPListEntry(IPList ipList, String description) {}
+    private List<IPListEntry> blockedIps = new ArrayList<>();
+    private List<IPListEntry> allowedIps = new ArrayList<>();
     // User-Agent Blocking (e.g. bot blocking) :
     private Pattern blockedUserAgentRegex;
 
@@ -36,7 +37,7 @@ public class ThreadCacheObject {
         // Set endpoints :
         this.endpoints = endpoints;
         this.blockedUserIds = blockedUserIDs;
-        this.bypassedIPs = bypassedIPs;
+        this.bypassedIPs = createIPList(bypassedIPs);
         this.routes = routes;
         this.hostnames = new Hostnames(5000);
         this.updateBlockedLists(blockedListsRes);
@@ -64,13 +65,21 @@ public class ThreadCacheObject {
     public Routes getRoutes() {
         return routes;
     }
+    public boolean isBypassedIP(String ip) {
+        return bypassedIPs.matches(ip);
+    }
 
     /**
      * Check if the IP is blocked (e.g. Geo IP Restrictions)
      */
     public BlockedResult isIpBlocked(String ip) {
-        for (BlockedIpEntry entry: blockedIps) {
-            if (entry.blocklist.isBlocked(ip)) {
+        for (IPListEntry entry: allowedIps) {
+            if (!entry.ipList.matches(ip)) {
+                return new BlockedResult(true, entry.description);
+            }
+        }
+        for (IPListEntry entry: blockedIps) {
+            if (entry.ipList.matches(ip)) {
                 return new BlockedResult(true, entry.description);
             }
         }
@@ -83,11 +92,15 @@ public class ThreadCacheObject {
             // Update blocked IP addresses (e.g. for geo restrictions) :
             if (res.blockedIPAddresses() != null) {
                 for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
-                    BlockList blockList = new BlockList();
-                    for (String ip : entry.ips()) {
-                        blockList.add(ip);
-                    }
-                    blockedIps.add(new BlockedIpEntry(blockList, entry.description()));
+                    IPList ipList = createIPList(entry.ips());
+                    blockedIps.add(new IPListEntry(ipList, entry.description()));
+                }
+            }
+            // Update allowed IP addresses (e.g. for geo restrictions) :
+            if (res.allowedIPAddresses() != null) {
+                for (ReportingApi.ListsResponseEntry entry: res.allowedIPAddresses()) {
+                    IPList ipList = createIPList(entry.ips());
+                    this.allowedIps.add(new IPListEntry(ipList, entry.description()));
                 }
             }
             // Update Blocked User-Agents regex

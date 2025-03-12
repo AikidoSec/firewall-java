@@ -22,21 +22,25 @@ public final class WebRequestCollector {
      * This function gets called in the initial phases of a request.
      * @param newContext is the new ContextObject that holds headers, query, ...
      * Also returns a response depending on blocking status :
-     * 1) First check: IP allowed to access route (restricted /admin routes e.g.)
-     * 2) Bypassed IP? If bypassed, no further checks
+     * 1) If the IP is bypassed we just won't set the context object
+     * 2) IP allowed to access route (restricted /admin routes e.g.)
      * 3) Blocked IP Lists: e.g. geo-blocking, crowdsec, ...
      * 4) UA Blocking: e.g. bot blocking, AI scraper blocking, ...
      */
     public static Res report(ContextObject newContext) {
+        ThreadCacheObject threadCache = ThreadCache.get();
         // Set new context :
         Context.reset();
-        Context.set(newContext);
-        ThreadCacheObject threadCache = ThreadCache.get();
-        ServiceConfiguration config = getServiceConfig();
+
+        if (threadCache != null && threadCache.isBypassedIP(newContext.getRemoteAddress())) {
+            return null; // Do not set context if IP is bypassed.
+        } else {
+            Context.set(newContext);
+        }
+
         if (threadCache == null) {
             return null;
         }
-
         // Increment total hits :
         threadCache.incrementTotalHits();
 
@@ -46,11 +50,6 @@ public final class WebRequestCollector {
             String msg = "Your IP address is not allowed to access this resource.";
             msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
             return new Res(msg, 403);
-        }
-
-        // add check for bypassed ips (after IP Allowlist check)
-        if (config.isBypassedIP(newContext.getRemoteAddress())) {
-            return null;
         }
 
         // Blocked IP lists (e.g. Geo restrictions)
