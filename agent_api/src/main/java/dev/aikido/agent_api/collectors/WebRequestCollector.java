@@ -31,9 +31,9 @@ public final class WebRequestCollector {
 
         if (threadCache != null && threadCache.isBypassedIP(newContext.getRemoteAddress())) {
             return null; // Do not set context if IP is bypassed.
-        } else {
-            Context.set(newContext);
         }
+
+        Context.set(newContext);
 
         if (threadCache == null) {
             return null;
