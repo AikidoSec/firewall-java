@@ -7,8 +7,6 @@ import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.storage.ConfigStore;
 import dev.aikido.agent_api.storage.Hostnames;
-import dev.aikido.agent_api.storage.Statistics;
-import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.background.users.Users;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.ratelimiting.RateLimiter;
@@ -26,7 +24,6 @@ public class CloudConnectionManager {
 
     private final ReportingApi api;
     private final String token;
-    private final Routes routes;
     private final RateLimiter rateLimiter;
     private final Users users;
     private final Hostnames hostnames;
@@ -38,7 +35,6 @@ public class CloudConnectionManager {
         ConfigStore.updateBlocking(block);
         this.api = api;
         this.token = token.get();
-        this.routes = new Routes(200); // Max size is 200 routes.
         this.rateLimiter = new RateLimiter(
                 /*maxItems:*/ 5000, /*TTL in ms:*/ 120 * 60 * 1000 // 120 minutes
         );
@@ -59,9 +55,6 @@ public class CloudConnectionManager {
 
     public GetManagerInfo.ManagerInfo getManagerInfo() {
         return GetManagerInfo.getManagerInfo(this);
-    }
-    public Routes getRoutes() {
-        return routes;
     }
     public String getToken() {
         return token;

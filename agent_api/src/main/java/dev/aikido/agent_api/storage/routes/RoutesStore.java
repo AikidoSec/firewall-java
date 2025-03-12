@@ -16,11 +16,18 @@ public final class RoutesStore {
 
     }
 
-    public static Routes getRoutes() {
+    public static int getRouteHits(RouteMetadata routeMetadata) {
         mutex.lock();
-        Routes routes = RoutesStore.routes;
+        int hits = routes.get(routeMetadata).getHits();
         mutex.unlock();
-        return routes;
+        return hits;
+    }
+
+    public static RouteEntry[] getRoutesAsList() {
+        mutex.lock();
+        RouteEntry[] routesList = routes.asList();
+        mutex.unlock();
+        return routesList;
     }
 
     public static void updateApiSpec(RouteMetadata routeMetadata, APISpec apiSpec) {
@@ -42,6 +49,16 @@ public final class RoutesStore {
             routes.incrementRoute(routeMetadata);
         } catch (Throwable e) {
             logger.debug("Error occurred incrementing route hits: %s", e.getMessage());
+        }
+        mutex.unlock();
+    }
+
+    public static void clear() {
+        mutex.lock();
+        try {
+            routes.clear();
+        } catch (Throwable e) {
+            logger.debug("Error occurred whilst clearing routes: %s", e.getMessage());
         }
         mutex.unlock();
     }

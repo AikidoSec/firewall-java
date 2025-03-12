@@ -40,9 +40,8 @@ public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataComman
         List<Endpoint> endpoints = List.of();
         Set<String> blockedUserIDs = Set.of();
         Set <String> bypassedIPs = Set.of();
-        Routes routes = connectionManager.getRoutes();
 
-        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, null);
+        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, null, null);
         return Optional.of(syncDataResult);
     }
 }

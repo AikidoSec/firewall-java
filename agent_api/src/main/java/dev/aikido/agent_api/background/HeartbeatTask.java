@@ -9,6 +9,7 @@ import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.StatisticsStore;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.context.User;
+import dev.aikido.agent_api.storage.routes.RoutesStore;
 
 import java.util.List;
 import java.util.TimerTask;
@@ -41,10 +42,10 @@ public class HeartbeatTask extends TimerTask {
         // Get data :
         Statistics.StatsRecord stats = getStats().getRecord();
         Hostnames.HostnameEntry[] hostnames = connectionManager.getHostnames().asArray();
-        RouteEntry[] routes = connectionManager.getRoutes().asList();
+        RouteEntry[] routes = RoutesStore.getRoutesAsList();
         List<User> users = connectionManager.getUsers().asList();
         // Clear data :
-        connectionManager.getRoutes().clear();
+        RoutesStore.clear();
         connectionManager.getUsers().clear();
         StatisticsStore.clear();
         connectionManager.getHostnames().clear();

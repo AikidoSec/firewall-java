@@ -30,7 +30,7 @@ public final class WebResponseCollector {
 
         // API Spec code :
         RoutesStore.addRouteHits(routeMetadata);
-        int hits = RoutesStore.getRoutes().get(routeMetadata).getHits();
+        int hits = RoutesStore.getRouteHits(routeMetadata);
         if (hits <= ANALYSIS_ON_FIRST_X_REQUESTS) {
             APISpec apiSpec = getApiInfo(context);
             RoutesStore.updateApiSpec(routeMetadata, apiSpec);
