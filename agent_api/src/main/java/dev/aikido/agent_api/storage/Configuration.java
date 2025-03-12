@@ -13,6 +13,7 @@ import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 public class Configuration {
     private boolean blocking;
     private boolean receivedAnyStats = true;
+    private boolean middlewareInstalled = false;
     private List<Endpoint> endpoints = new ArrayList<>();
     private Set<String> blockedUserIds = new HashSet<>();
     private IPList bypassedIPs = new IPList();
@@ -146,5 +147,14 @@ public class Configuration {
 
     public boolean hasReceivedAnyStats() {
         return this.receivedAnyStats;
+    }
+
+    // middlewareInstalled: indicates that the shouldBlockRequest function was called
+    public void setMiddlewareInstalled() {
+        this.middlewareInstalled = true;
+    }
+
+    public boolean isMiddlewareInstalled() {
+        return this.middlewareInstalled;
     }
 }
