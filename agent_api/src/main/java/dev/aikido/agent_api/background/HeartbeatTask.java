@@ -12,6 +12,8 @@ import dev.aikido.agent_api.context.User;
 import java.util.List;
 import java.util.TimerTask;
 
+import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
+
 public class HeartbeatTask extends TimerTask {
     private static final Logger logger = LogManager.getLogger(HeartbeatTask.class);
     private final CloudConnectionManager connectionManager;
@@ -27,7 +29,7 @@ public class HeartbeatTask extends TimerTask {
 
     @Override
     public void run() {
-        if (shouldCheckForInitialStats && connectionManager.getConfig().hasReceivedAnyStats()) {
+        if (shouldCheckForInitialStats && getConfig().hasReceivedAnyStats()) {
             // Stats were already sent, so return :
             return;
         }
