@@ -6,7 +6,6 @@ import dev.aikido.agent_api.helpers.logging.Logger;
 import java.util.concurrent.locks.ReentrantLock;
 
 public final class StatisticsStore {
-    private static final Logger logger = LogManager.getLogger(StatisticsStore.class);
     private static final ReentrantLock mutex = new ReentrantLock();
     private static final Statistics stats = new Statistics();
 
