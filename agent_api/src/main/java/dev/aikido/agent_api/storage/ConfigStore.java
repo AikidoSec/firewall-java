@@ -43,7 +43,7 @@ public final class ConfigStore {
         mutex.unlock();
     }
 
-    public static void updateServiceConfigBlocking(boolean blocking) {
+    public static void updateBlocking(boolean blocking) {
         mutex.lock();
         config.setBlocking(blocking);
         mutex.unlock();

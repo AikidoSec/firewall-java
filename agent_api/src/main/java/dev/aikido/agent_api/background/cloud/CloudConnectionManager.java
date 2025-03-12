@@ -1,11 +1,11 @@
 package dev.aikido.agent_api.background.cloud;
 
-import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
+import dev.aikido.agent_api.storage.ConfigStore;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.Routes;
@@ -24,7 +24,6 @@ public class CloudConnectionManager {
     // Constants:
     private static final int timeout = 10; // Timeout for HTTP requests to cloud
 
-    private final ServiceConfiguration config;
     private final ReportingApi api;
     private final String token;
     private final Routes routes;
@@ -37,7 +36,7 @@ public class CloudConnectionManager {
         this(block, token, serverless, new ReportingApiHTTP(getAikidoAPIEndpoint(), timeout));
     }
     public CloudConnectionManager(boolean block, Token token, String serverless, ReportingApi api) {
-        this.config = new ServiceConfiguration(block, serverless);
+        ConfigStore.updateBlocking(block);
         this.api = api;
         this.token = token.get();
         this.routes = new Routes(200); // Max size is 200 routes.
@@ -51,21 +50,15 @@ public class CloudConnectionManager {
     public void onStart() {
         reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
         // Fetch blocked lists using separate API call : 
-        config.storeBlockedListsRes(api.fetchBlockedLists(token));
+        ConfigStore.updateFromAPIListsResponse(api.fetchBlockedLists(token));
     }
     public void reportEvent(APIEvent event, boolean updateConfig) {
         Optional<APIResponse> res = this.api.report(this.token, event);
         if (res.isPresent() && updateConfig) {
-            config.updateConfig(res.get());
+            ConfigStore.updateFromAPIResponse(res.get());
         }
     }
-    public boolean shouldBlock() {
-        return this.config.isBlockingEnabled();
-    }
 
-    public ServiceConfiguration getConfig() {
-        return this.config;
-    }
     public GetManagerInfo.ManagerInfo getManagerInfo() {
         return GetManagerInfo.getManagerInfo(this);
     }
