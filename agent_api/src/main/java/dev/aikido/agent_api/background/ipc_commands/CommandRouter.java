@@ -26,7 +26,6 @@ public class CommandRouter {
     public CommandRouter(CloudConnectionManager connectionManager, BlockingQueue<APIEvent> queue) {
         this.connectionManager = connectionManager;
         commands.add(new BlockingEnabledCommand());
-        commands.add(new InitRouteCommand());
         commands.add(new SyncDataCommand());
         commands.add(new ShouldRateLimitCommand());
         commands.add(new RegisterUserCommand());
