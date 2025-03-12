@@ -48,4 +48,10 @@ public final class ConfigStore {
         config.setBlocking(blocking);
         mutex.unlock();
     }
+
+    public static void setMiddlewareInstalled() {
+        mutex.lock();
+        config.setMiddlewareInstalled();
+        mutex.unlock();
+    }
 }

@@ -27,13 +27,12 @@ public final class ThreadCacheRenewal {
             var updateRes = new UpdateAgentDataCommand.Res(
                     /* routeHitDeltas */ currentThreadCache.getRoutes().getDeltaMap(),
                     /* hitsDelta */ currentThreadCache.getTotalHits(),
-                    /* middlewareInstalled */ currentThreadCache.isMiddlewareInstalled(),
                     /* hostnames */ currentThreadCache.getHostnames().asArray()
             );
             new UpdateAgentDataCommand().send(client, updateRes);
         }
 
-        // Fetch new data from background process : 
+        // Fetch new data from background process :
         Optional<SyncDataCommand.Res> result = new SyncDataCommand().send(client, new Command.EmptyResult());
         if(result.isPresent()) {
             SyncDataCommand.Res res = result.get();
