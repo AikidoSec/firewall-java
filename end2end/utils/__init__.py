@@ -17,7 +17,7 @@ class App:
         self.payloads = {}
         self.event_handler = EventHandler()
 
-    def add_payload(self,key, safe_request, unsafe_request, test_event=None):
+    def add_payload(self,key, safe_request, unsafe_request=None, test_event=None):
         self.payloads[key] = {
             "safe": safe_request,
             "unsafe": unsafe_request,
