@@ -150,8 +150,8 @@ public class Configuration {
     }
 
     // middlewareInstalled: indicates that the shouldBlockRequest function was called
-    public void setMiddlewareInstalled() {
-        this.middlewareInstalled = true;
+    public void setMiddlewareInstalled(boolean middlewareInstalled) {
+        this.middlewareInstalled = middlewareInstalled;
     }
 
     public boolean isMiddlewareInstalled() {

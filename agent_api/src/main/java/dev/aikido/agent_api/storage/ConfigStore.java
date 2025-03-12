@@ -49,9 +49,9 @@ public final class ConfigStore {
         mutex.unlock();
     }
 
-    public static void setMiddlewareInstalled() {
+    public static void setMiddlewareInstalled(boolean middlewareInstalled) {
         mutex.lock();
-        config.setMiddlewareInstalled();
+        config.setMiddlewareInstalled(middlewareInstalled);
         mutex.unlock();
     }
 }

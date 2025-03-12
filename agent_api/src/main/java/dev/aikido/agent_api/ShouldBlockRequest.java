@@ -28,7 +28,7 @@ public final class ShouldBlockRequest {
             return new ShouldBlockRequestResult(false, null); // Blocking false
         }
         context.setExecutedMiddleware(true); // Mark middleware as executed.
-        ConfigStore.setMiddlewareInstalled();
+        ConfigStore.setMiddlewareInstalled(true);
         Context.set(context);
         if (context.getUser() != null) {
             if (config.isUserBlocked(context.getUser().id())) {
