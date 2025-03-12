@@ -25,21 +25,20 @@ class RoutesTest {
 
     @Test
     void testInitializeRoute() {
-        routes.initializeRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata1);
         assertEquals(1, routes.size());
         assertNotNull(routes.get(routeMetadata1));
     }
 
     @Test
     void testInitializeDuplicateRoute() {
-        routes.initializeRoute(routeMetadata1);
-        routes.initializeRoute(routeMetadata1); // Should not add again
+        routes.incrementRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata1); // Should not add again
         assertEquals(1, routes.size());
     }
 
     @Test
     void testIncrementRouteHits() {
-        routes.initializeRoute(routeMetadata1);
         routes.incrementRoute(routeMetadata1);
         RouteEntry entry = routes.get(routeMetadata1);
         assertNotNull(entry);
@@ -48,17 +47,17 @@ class RoutesTest {
 
     @Test
     void testIncrementNonExistentRoute() {
-        routes.incrementRoute(routeMetadata1); // Should not throw or add
-        assertEquals(0, routes.size());
+        routes.incrementRoute(routeMetadata1);
+        assertEquals(1, routes.size());
     }
 
     @Test
     void testManageRoutesSize() {
-        routes.initializeRoute(routeMetadata1);
-        routes.initializeRoute(routeMetadata2);
+        routes.incrementRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata2);
         assertEquals(2, routes.size());
 
-        routes.initializeRoute(routeMetadata3); // This should evict the least used route
+        routes.incrementRoute(routeMetadata3); // This should evict the least used route
 
         assertEquals(2, routes.size());
         assertNull(routes.get(routeMetadata1)); // routeMetadata1 should be evicted
@@ -67,38 +66,38 @@ class RoutesTest {
 
     @Test
     void testClearRoutes() {
-        routes.initializeRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata1);
         routes.clear();
         assertEquals(0, routes.size());
     }
 
     @Test
     void testMultipleInitializations() {
-        routes.initializeRoute(routeMetadata1);
-        routes.initializeRoute(routeMetadata2);
-        routes.initializeRoute(routeMetadata3);
+        routes.incrementRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata2);
+        routes.incrementRoute(routeMetadata3);
         assertEquals(2, routes.size()); // Only 2 should remain
     }
 
     @Test
     void testIncrementMultipleTimes() {
-        routes.initializeRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata1);
         for (int i = 0; i < 5; i++) {
             routes.incrementRoute(routeMetadata1);
         }
         RouteEntry entry = routes.get(routeMetadata1);
         assertNotNull(entry);
-        assertEquals(5, entry.getHits());
+        assertEquals(6, entry.getHits());
     }
 
     @Test
     void testDefaultConstructor() {
         routes = new Routes();
-        routes.initializeRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata1);
         routes.incrementRoute(routeMetadata1); // Increment hits for routeMetadata1
-        routes.initializeRoute(routeMetadata2);
+        routes.incrementRoute(routeMetadata2);
         for (int i = 0; i < (1000 - 1); i++) {
-            routes.initializeRoute(new RouteMetadata(String.valueOf(i), "api/test3", "GET"));
+            routes.incrementRoute(new RouteMetadata(String.valueOf(i), "api/test3", "GET"));
         }
         assertEquals(1000, routes.asList().length);
         assertNull(routes.get(routeMetadata2)); // routeMetadata2 should be evicted
@@ -107,10 +106,10 @@ class RoutesTest {
 
     @Test
     void testEvictionOrder() {
-        routes.initializeRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata1);
         routes.incrementRoute(routeMetadata1); // Increment hits for routeMetadata1
-        routes.initializeRoute(routeMetadata2);
-        routes.initializeRoute(routeMetadata3); // This should evict routeMetadata2 (routeMetadata1 has more hits)
+        routes.incrementRoute(routeMetadata2);
+        routes.incrementRoute(routeMetadata3); // This should evict routeMetadata2 (routeMetadata1 has more hits)
 
         assertNull(routes.get(routeMetadata2)); // routeMetadata2 should be evicted
         assertNotNull(routes.get(routeMetadata1)); // routeMetadata1 should still exist
@@ -119,27 +118,27 @@ class RoutesTest {
 
     @Test
     void testSizeAfterEviction() {
-        routes.initializeRoute(routeMetadata1);
-        routes.initializeRoute(routeMetadata2);
+        routes.incrementRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata2);
         assertEquals(2, routes.size());
 
-        routes.initializeRoute(new RouteMetadata("DELETE", "", "/api/test4")); // Evict one
+        routes.incrementRoute(new RouteMetadata("DELETE", "", "/api/test4")); // Evict one
         assertEquals(2, routes.size()); // Size should remain 2
     }
 
     @Test
     void testIterator() {
-        routes.initializeRoute(routeMetadata1);
-        routes.initializeRoute(routeMetadata2);
+        routes.incrementRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata2);
         assertEquals(2, routes.size());
     }
 
     @Test
     void testIteratorAfterEviction() {
-        routes.initializeRoute(routeMetadata1);
-        routes.initializeRoute(routeMetadata2);
+        routes.incrementRoute(routeMetadata1);
+        routes.incrementRoute(routeMetadata2);
         assertEquals(2, routes.size()); // Should still be 2 after eviction
-        routes.initializeRoute(routeMetadata3); // Evict one
+        routes.incrementRoute(routeMetadata3); // Evict one
 
         assertEquals(2, routes.size()); // Should still be 2 after eviction
     }

@@ -16,15 +16,15 @@ public class StatisticsTest {
     @Test
     public void testTotalHits() {
         assertEquals(0, stats.getTotalHits());
-        stats.incrementTotalHits(20);
-        assertEquals(20, stats.getTotalHits());
-        stats.incrementTotalHits(1);
-        assertEquals(21, stats.getTotalHits());
+        stats.incrementHits();
+        assertEquals(1, stats.getTotalHits());
+        stats.incrementHits();
+        assertEquals(2, stats.getTotalHits());
     }
 
     @Test
     public void testClear() {
-        stats.incrementTotalHits(20);
+        stats.incrementHits();
         stats.incrementAttacksBlocked();
         stats.incrementAttacksBlocked();
         stats.incrementAttacksDetected();
@@ -32,7 +32,7 @@ public class StatisticsTest {
         stats.incrementAttacksDetected();
         assertEquals(3, stats.getAttacksDetected());
         assertEquals(2, stats.getAttacksBlocked());
-        assertEquals(20, stats.getTotalHits());
+        assertEquals(1, stats.getTotalHits());
 
         // Reset :
         stats.clear();
