@@ -1,14 +1,12 @@
 package dev.aikido.agent_api;
 
-import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
-import dev.aikido.agent_api.background.ipc_commands.RegisterUserCommand;
+import dev.aikido.agent_api.background.users.UsersStore;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
-import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public final class SetUser {
@@ -36,10 +34,7 @@ public final class SetUser {
         currentContext.setUser(validatedUser);
         Context.set(currentContext);
 
-        // Register user (Send to cloud)
-        ThreadIPCClient threadClient = getDefaultThreadIPCClient();
-        if (threadClient != null) {
-            new RegisterUserCommand().send(threadClient, validatedUser);
-        }
+        // Register user (to report back to Aikido's dashboard)
+        UsersStore.addUser(validatedUser);
     }
 }

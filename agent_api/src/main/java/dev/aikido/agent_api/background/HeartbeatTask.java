@@ -2,6 +2,7 @@ package dev.aikido.agent_api.background;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
+import dev.aikido.agent_api.background.users.UsersStore;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.Hostnames;
@@ -43,10 +44,10 @@ public class HeartbeatTask extends TimerTask {
         Statistics.StatsRecord stats = getStats().getRecord();
         Hostnames.HostnameEntry[] hostnames = connectionManager.getHostnames().asArray();
         RouteEntry[] routes = RoutesStore.getRoutesAsList();
-        List<User> users = connectionManager.getUsers().asList();
+        List<User> users = UsersStore.getUsersAsList();
         // Clear data :
         RoutesStore.clear();
-        connectionManager.getUsers().clear();
+        UsersStore.clear();
         StatisticsStore.clear();
         connectionManager.getHostnames().clear();
 
