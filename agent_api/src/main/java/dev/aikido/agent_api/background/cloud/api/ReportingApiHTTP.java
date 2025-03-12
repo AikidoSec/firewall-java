@@ -23,17 +23,21 @@ public class ReportingApiHTTP extends ReportingApi {
     private final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
     private final String reportingUrl;
     private final Gson gson = new Gson();
-    public ReportingApiHTTP(String reportingUrl) {
+    public ReportingApiHTTP(String reportingUrl, int timeoutInSec) {
         // Reporting URL should end with trailing slash for now.
+        super(timeoutInSec);
         this.reportingUrl = reportingUrl;
     }
-    public Optional<APIResponse> fetchNewConfig(String token, int timeoutInSec) {
+
+    public Optional<APIResponse> fetchNewConfig(String token) {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
                     .build();
+
             URI uri = URI.create(reportingUrl + "api/runtime/config");
             HttpRequest request = createHttpRequest(Optional.empty(), token, uri);
+
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return Optional.of(toApiResponse(httpResponse));
@@ -42,14 +46,17 @@ public class ReportingApiHTTP extends ReportingApi {
         }
         return Optional.empty();
     }
+
     @Override
-    public Optional<APIResponse> report(String token, APIEvent event, int timeoutInSec) {
+    public Optional<APIResponse> report(String token, APIEvent event) {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(timeoutInSec))
                 .build();
+
             URI uri = URI.create(reportingUrl + "api/runtime/events");
             HttpRequest request = createHttpRequest(Optional.of(event), token, uri);
+
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return Optional.of(toApiResponse(httpResponse));
@@ -105,9 +112,10 @@ public class ReportingApiHTTP extends ReportingApi {
         }
         return getUnsuccessfulAPIResponse("unknown_error");
     }
-    private static HttpRequest createHttpRequest(Optional<APIEvent> event, String token, URI uri) {
+    private HttpRequest createHttpRequest(Optional<APIEvent> event, String token, URI uri) {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(uri) // Change to your target URL
+            .timeout(Duration.ofSeconds(timeoutInSec))
             .header("Content-Type", "application/json") // Set Content-Type header
             .header("Authorization", token); // Set Authorization header
         if (event.isPresent()) {

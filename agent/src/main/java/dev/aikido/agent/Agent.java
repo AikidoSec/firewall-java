@@ -1,6 +1,7 @@
 package dev.aikido.agent;
 
 import dev.aikido.agent.wrappers.*;
+import dev.aikido.agent_api.Config;
 import dev.aikido.agent_api.helpers.env.BooleanEnv;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
@@ -23,7 +24,7 @@ public class Agent {
         if (new BooleanEnv("AIKIDO_DISABLE", /*default value*/ false).getValue()) {
             return; // AIKIDO_DISABLE is true, so we will not be wrapping anything.
         }
-        logger.info("Aikido Java Agent loaded.");
+        logger.info("Zen by Aikido v%s starting.", Config.pkgVersion);
         setAikidoSysProperties();
 
         // Test loading of zen binaries :

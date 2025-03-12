@@ -1,35 +1,16 @@
-from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads, test_payloads_path_variables
-from spring_boot_mysql.test_bot_blocking import test_bot_blocking
-from spring_boot_mysql.test_ratelimiting import test_ratelimiting_per_user, test_ratelimiting
-from spring_boot_mysql.test_ip_blocking import test_ip_blocking
-payloads = {
-    "safe": { "name": "Bobby" },
-    "unsafe": { "name": "Malicious Pet', 'Gru from the Minions') -- " }
-}
-payloads_exec = {
-    "safe": "Johhny",
-    "unsafe": "'; sleep 2; # "
-}
-urls = {
-    "disabled": "http://localhost:8091",
-    "enabled":  "http://localhost:8090"
-}
+from utils import App, Request
 
-test_safe_vs_unsafe_payloads(payloads, urls, route="/api/pets/create")
-print("✅ Tested safe/unsafe payloads on /api/create")
+spring_webflux_postgres_app = App(8090)
 
-# Test blocklists
-test_ip_blocking("http://localhost:8090/")
-print("✅ Tested IP Blocking")
-test_bot_blocking("http://localhost:8090/")
-print("✅ Tested bot blocking")
+spring_webflux_postgres_app.add_payload("sql",
+    safe_request=Request("/api/pets/create", body={"name": "Bobby"}),
+    unsafe_request=Request("/api/pets/create", body={"name": "Malicious Pet', 'Gru from the Minions') -- "})
+)
+spring_webflux_postgres_app.add_payload("command injection",
+    safe_request=Request("/api/commands/execute/Johnny", method='GET'),
+    unsafe_request=Request("/api/commands/execute/%27%3B%20sleep%202%3B%20%23%20", method='GET'),
+)
 
-# Test ratelimiting (we can use a header to set user) :
-test_ratelimiting("http://localhost:8090/test_ratelimiting_1")
-print("✅ Tested rate-limiting")
-test_ratelimiting_per_user("http://localhost:8090/test_ratelimiting_1")
-print("✅ Tested rate-limiting per user")
-
-# Test path variables :
-test_payloads_path_variables(payloads_exec, urls, route="/api/commands/execute/")
-print("✅ Tested attack using path variables.")
+spring_webflux_postgres_app.test_all_payloads()
+spring_webflux_postgres_app.test_blocking()
+spring_webflux_postgres_app.test_rate_limiting()
