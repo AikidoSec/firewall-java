@@ -64,9 +64,6 @@ public class ThreadCacheObject {
     public Routes getRoutes() {
         return routes;
     }
-    public boolean isBypassedIP(String ip) {
-        return bypassedIPs.contains(ip);
-    }
 
     /**
      * Check if the IP is blocked (e.g. Geo IP Restrictions)

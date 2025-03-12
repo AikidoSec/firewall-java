@@ -52,10 +52,16 @@ public class ServiceConfiguration {
     public boolean isBlockingEnabled() {
         return blockingEnabled;
     }
+    public void setBlocking(boolean blocking) {
+        blockingEnabled = blocking;
+    }
     public boolean hasReceivedAnyStats() {return receivedAnyStats; }
     public boolean isMiddlewareInstalled() { return middlewareInstalled; }
     public HashSet<String> getBypassedIPs() {
         return bypassedIPs;
+    }
+    public boolean isBypassedIP(String ip) {
+        return bypassedIPs.contains(ip);
     }
     public List<Endpoint> getEndpoints() {
         return endpoints;
