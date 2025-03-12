@@ -43,7 +43,6 @@ public class Endpoint {
         return forceProtectionOff;
     }
 
-    // allowed ip addresses :
     public boolean allowedIpAddressesEmpty() {
         return allowedIPAddresses == null || allowedIPAddresses.size() == 0;
     }
