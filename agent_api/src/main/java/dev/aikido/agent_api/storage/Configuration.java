@@ -32,9 +32,10 @@ public class Configuration {
 
     // allowedIps, blockedIps, blockedUserAgentRegex are updated using this function
     public void updateBlockedLists(Optional<ReportingApi.APIListsResponse> blockedListsRes) {
-        if (!blockedListsRes.isEmpty()) {
+        if (blockedListsRes.isPresent()) {
             ReportingApi.APIListsResponse res = blockedListsRes.get();
             // Update blocked IP addresses (e.g. for geo restrictions) :
+            this.blockedIps.clear(); // reset
             if (res.blockedIPAddresses() != null) {
                 for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
                     IPList ipList = createIPList(entry.ips());
@@ -42,6 +43,7 @@ public class Configuration {
                 }
             }
             // Update allowed IP addresses (e.g. for geo restrictions) :
+            this.allowedIps.clear(); // reset
             if (res.allowedIPAddresses() != null) {
                 for (ReportingApi.ListsResponseEntry entry : res.allowedIPAddresses()) {
                     IPList ipList = createIPList(entry.ips());
@@ -49,6 +51,7 @@ public class Configuration {
                 }
             }
             // Update Blocked User-Agents regex
+            this.blockedUserAgentRegex = null; // reset
             if (res.blockedUserAgents() != null && !res.blockedUserAgents().isEmpty()) {
                 this.blockedUserAgentRegex = Pattern.compile(res.blockedUserAgents(), Pattern.CASE_INSENSITIVE);
             }

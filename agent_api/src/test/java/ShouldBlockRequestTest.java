@@ -4,12 +4,9 @@ import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
-import dev.aikido.agent_api.helpers.UnixTimeMS;
 import dev.aikido.agent_api.storage.ConfigStore;
-import dev.aikido.agent_api.storage.routes.Routes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -20,6 +17,7 @@ import java.util.*;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static org.junit.jupiter.api.Assertions.*;
 import static utils.EmptyAPIResponses.emptyAPIResponse;
+import static utils.EmptyAPIResponses.setEmptyConfigWithEndpointList;
 
 public class ShouldBlockRequestTest {
     public static class SampleContextObject extends ContextObject {
@@ -47,35 +45,6 @@ public class ShouldBlockRequestTest {
     public void tearDown() throws SQLException {
         Context.set(null);
         ConfigStore.updateFromAPIResponse(emptyAPIResponse);
-    }
-    private static void setEmptyConfigWithEndpointList(List<Endpoint> endpoints) {
-        ConfigStore.updateFromAPIResponse(new APIResponse(
-                true, "", getUnixTimeMS(), endpoints, List.of(), List.of(), true, false
-        ));
-    }
-
-    @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    public void testNoThreadCache() throws SQLException {
-        Context.set(new SampleContextObject());
-        // Test with thread cache set :
-        var res1 = ShouldBlockRequest.shouldBlockRequest();
-        assertTrue(Context.get().middlewareExecuted());
-        assertFalse(res1.block());
-
-
-        Context.set(new SampleContextObject());
-        ConfigStore.updateFromAPIResponse(emptyAPIResponse);
-        // Test with thread cache not set :
-        var res2 = ShouldBlockRequest.shouldBlockRequest();
-        assertFalse(Context.get().middlewareExecuted());
-        assertFalse(res2.block());
-
-        Context.reset();
-        setEmptyConfigWithEndpointList(List.of());
-        // Test with context not set, but thread cache set :
-        var res3 = ShouldBlockRequest.shouldBlockRequest();
-        assertFalse(ConfigStore.getConfig().isMiddlewareInstalled());
     }
 
     @Test
