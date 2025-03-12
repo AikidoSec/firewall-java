@@ -23,7 +23,7 @@ public final class ShouldRateLimit {
         if (rateLimitedEndpoint == null) {
             return new RateLimitDecision(/*block*/false, null);
         }
-        
+
         long windowSizeInMS = rateLimitedEndpoint.getRateLimiting().windowSizeInMS();
         long maxRequests = rateLimitedEndpoint.getRateLimiting().maxRequests();
         if (user != null) {
