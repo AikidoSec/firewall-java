@@ -1,10 +1,8 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.background.Endpoint;
-import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 
@@ -12,7 +10,6 @@ import java.util.List;
 
 import static dev.aikido.agent_api.helpers.IPAccessController.ipAllowedToAccessRoute;
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
-import static dev.aikido.agent_api.storage.ServiceConfigStore.getServiceConfig;
 
 public final class WebRequestCollector {
     private WebRequestCollector() {}
