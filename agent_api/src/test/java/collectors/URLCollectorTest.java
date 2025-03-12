@@ -6,6 +6,7 @@ import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
@@ -24,6 +25,11 @@ public class URLCollectorTest {
     }
     @AfterAll
     static void afterAll() {
+        cleanup();
+    }
+
+    @BeforeEach
+    void beforeEach() {
         cleanup();
     }
 
