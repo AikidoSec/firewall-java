@@ -33,7 +33,7 @@ public final class ShouldBlockRequest {
         ConfigStore.setMiddlewareInstalled();
         Context.set(context);
         if (context.getUser() != null) {
-            if (threadCache.isBlockedUserID(context.getUser().id())) {
+            if (config.isUserBlocked(context.getUser().id())) {
                 return new ShouldBlockRequestResult(/*block*/ true, new BlockedRequestResult(
                         /*type*/ "blocked",/*trigger*/ "user", context.getRemoteAddress()
                 ));
@@ -41,7 +41,7 @@ public final class ShouldBlockRequest {
         }
 
         // Get matched endpoints:
-        List<Endpoint> matches = matchEndpoints(context.getRouteMetadata(), threadCache.getEndpoints());
+        List<Endpoint> matches = matchEndpoints(context.getRouteMetadata(), config.getEndpoints());
 
         // Rate-limiting :
         if (matches != null && getRateLimitedEndpoint(matches, context.getRoute()) != null) {

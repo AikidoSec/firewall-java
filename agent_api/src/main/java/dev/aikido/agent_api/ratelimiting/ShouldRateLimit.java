@@ -9,6 +9,7 @@ import java.util.List;
 
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
 import static dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder.getRateLimitedEndpoint;
+import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
 
 public final class ShouldRateLimit {
     private ShouldRateLimit() {}
@@ -16,17 +17,13 @@ public final class ShouldRateLimit {
     public static RateLimitDecision shouldRateLimit(
             RouteMetadata routeMetadata, User user, String remoteAddress, CloudConnectionManager connectionManager
     ) {
-        List<Endpoint> endpoints = connectionManager.getConfig().getEndpoints();
+        List<Endpoint> endpoints = getConfig().getEndpoints();
         List<Endpoint> matches = matchEndpoints(routeMetadata, endpoints);
         Endpoint rateLimitedEndpoint = getRateLimitedEndpoint(matches, routeMetadata.route());
         if (rateLimitedEndpoint == null) {
             return new RateLimitDecision(/*block*/false, null);
         }
-
-        boolean bypassedIP = connectionManager.getConfig().getBypassedIPs().contains(remoteAddress);
-        if (bypassedIP) {
-            return new RateLimitDecision(/*block*/false, null); // No rate-limiting for bypassed IPs
-        }
+        
         long windowSizeInMS = rateLimitedEndpoint.getRateLimiting().windowSizeInMS();
         long maxRequests = rateLimitedEndpoint.getRateLimiting().maxRequests();
         if (user != null) {
