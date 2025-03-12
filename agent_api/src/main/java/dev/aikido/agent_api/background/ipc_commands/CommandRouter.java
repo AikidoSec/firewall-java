@@ -29,7 +29,6 @@ public class CommandRouter {
         commands.add(new SyncDataCommand());
         commands.add(new ShouldRateLimitCommand());
         commands.add(new AttackCommand(queue));
-        commands.add(new UpdateAgentDataCommand());
     }
 
     /**

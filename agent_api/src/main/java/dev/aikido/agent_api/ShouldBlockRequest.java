@@ -8,8 +8,6 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
 import dev.aikido.agent_api.storage.ConfigStore;
 import dev.aikido.agent_api.storage.Configuration;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 
 import java.util.List;
 import java.util.Optional;

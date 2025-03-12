@@ -6,6 +6,7 @@ import dev.aikido.agent_api.background.users.UsersStore;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.StatisticsStore;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.TimerTask;
 
 import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
-import static dev.aikido.agent_api.storage.StatisticsStore.getStats;
+import static dev.aikido.agent_api.storage.StatisticsStore.getStatsRecord;
 
 public class HeartbeatTask extends TimerTask {
     private static final Logger logger = LogManager.getLogger(HeartbeatTask.class);
@@ -41,15 +42,15 @@ public class HeartbeatTask extends TimerTask {
         logger.debug("Sending out a heartbeat");
 
         // Get data :
-        Statistics.StatsRecord stats = getStats().getRecord();
-        Hostnames.HostnameEntry[] hostnames = connectionManager.getHostnames().asArray();
+        Statistics.StatsRecord stats = getStatsRecord();
+        Hostnames.HostnameEntry[] hostnames = HostnamesStore.getHostnamesAsList();
         RouteEntry[] routes = RoutesStore.getRoutesAsList();
         List<User> users = UsersStore.getUsersAsList();
         // Clear data :
         RoutesStore.clear();
         UsersStore.clear();
         StatisticsStore.clear();
-        connectionManager.getHostnames().clear();
+        HostnamesStore.clear();
 
         // Create and send event :
         Heartbeat.HeartbeatEvent event = Heartbeat.get(connectionManager, stats, hostnames, routes, users);
