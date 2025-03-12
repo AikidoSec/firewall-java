@@ -6,7 +6,7 @@ import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.util.Optional;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public final class ConfigStore {
     private ConfigStore() {
@@ -14,45 +14,59 @@ public final class ConfigStore {
 
     private static final Logger logger = LogManager.getLogger(ConfigStore.class);
     private static final Configuration config = new Configuration();
-    private static final ReentrantLock mutex = new ReentrantLock();
+    private static final ReentrantReadWriteLock mutex = new ReentrantReadWriteLock();
 
+    // Getters:
     public static Configuration getConfig() {
-        return config;
+        mutex.readLock().lock();
+        try {
+            return config;
+        } finally {
+            mutex.readLock().unlock();
+        }
     }
 
     public static void updateFromAPIResponse(APIResponse apiResponse) {
-        mutex.lock();
+        mutex.writeLock().lock();
         try {
             logger.trace("Updating config from APIResponse");
             config.updateConfig(apiResponse);
         } catch (Throwable e) {
             logger.debug("An error occurred updating service config: %s", e.getMessage());
+        } finally {
+            mutex.writeLock().unlock();
         }
-        mutex.unlock();
     }
 
     public static void updateFromAPIListsResponse(Optional<ReportingApi.APIListsResponse> response) {
-        mutex.lock();
+        mutex.writeLock().lock();
         try {
             logger.trace("Updating config from APIListsResponse");
             config.updateBlockedLists(response);
         } catch (Throwable e) {
             logger.debug("An error occurred updating service config: %s", e.getMessage());
+        } finally {
+            mutex.writeLock().unlock();
         }
-        mutex.unlock();
     }
 
     public static void updateBlocking(boolean blocking) {
-        mutex.lock();
-        logger.trace("Blocking updated: %s", blocking);
-        config.setBlocking(blocking);
-        mutex.unlock();
+        mutex.writeLock().lock();
+        try {
+            logger.trace("Blocking updated: %s", blocking);
+            config.setBlocking(blocking);
+        } finally {
+            mutex.writeLock().unlock();
+        }
     }
 
     public static void setMiddlewareInstalled(boolean middlewareInstalled) {
-        mutex.lock();
-        logger.trace("middlewareInstalled updated: %s", middlewareInstalled);
-        config.setMiddlewareInstalled(middlewareInstalled);
-        mutex.unlock();
+        mutex.writeLock().lock();
+        try {
+            logger.trace("middlewareInstalled updated: %s", middlewareInstalled);
+            config.setMiddlewareInstalled(middlewareInstalled);
+        } finally {
+            mutex.writeLock().unlock();
+        }
     }
 }
