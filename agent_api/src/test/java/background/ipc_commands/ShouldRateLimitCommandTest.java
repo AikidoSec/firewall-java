@@ -4,7 +4,6 @@ package background.ipc_commands;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
-import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
 import dev.aikido.agent_api.background.ipc_commands.ShouldRateLimitCommand;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;

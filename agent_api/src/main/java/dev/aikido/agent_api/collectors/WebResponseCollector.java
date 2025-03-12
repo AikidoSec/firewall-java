@@ -1,7 +1,6 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.api_discovery.APISpec;
-import dev.aikido.agent_api.background.ipc_commands.ApiDiscoveryCommand;
 import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.background.ipc_commands.InitRouteCommand;
 import dev.aikido.agent_api.context.Context;
@@ -9,6 +8,7 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.storage.routes.Routes;
+import dev.aikido.agent_api.storage.routes.RoutesStore;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 
@@ -52,8 +52,7 @@ public final class WebResponseCollector {
         currentRoute.incrementHits(); // Increment hits so we can limit with constant:
         if (currentRoute.getHits() <= ANALYSIS_ON_FIRST_X_REQUESTS) {
             APISpec apiSpec = getApiInfo(context);
-            ApiDiscoveryCommand.Req req = new ApiDiscoveryCommand.Req(apiSpec, routeMetadata);
-            new ApiDiscoveryCommand().send(threadClient, req);
+            RoutesStore.updateApiSpec(routeMetadata, apiSpec);
         }
     }
 }
