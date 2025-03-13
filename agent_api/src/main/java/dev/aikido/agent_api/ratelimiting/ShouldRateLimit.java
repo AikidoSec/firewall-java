@@ -23,10 +23,6 @@ public final class ShouldRateLimit {
             return new RateLimitDecision(/*block*/false, null);
         }
 
-        boolean bypassedIP = connectionManager.getConfig().getBypassedIPs().contains(remoteAddress);
-        if (bypassedIP) {
-            return new RateLimitDecision(/*block*/false, null); // No rate-limiting for bypassed IPs
-        }
         long windowSizeInMS = rateLimitedEndpoint.getRateLimiting().windowSizeInMS();
         long maxRequests = rateLimitedEndpoint.getRateLimiting().maxRequests();
         if (user != null) {

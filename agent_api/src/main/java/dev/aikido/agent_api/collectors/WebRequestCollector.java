@@ -29,15 +29,15 @@ public final class WebRequestCollector {
         // Set new context :
         Context.reset();
 
-        if (threadCache != null && threadCache.isBypassedIP(newContext.getRemoteAddress())) {
+        if (threadCache == null) {
+            Context.set(newContext); // Still set the context object, even when thread cache is non-existant.
+            return null;
+        } else if (threadCache.isBypassedIP(newContext.getRemoteAddress())) {
             return null; // Do not set context if IP is bypassed.
-        } else {
-            Context.set(newContext);
         }
 
-        if (threadCache == null) {
-            return null;
-        }
+        Context.set(newContext);
+
         // Increment total hits :
         threadCache.incrementTotalHits();
 

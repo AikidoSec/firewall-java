@@ -60,29 +60,6 @@ public class ShouldRateLimitTest {
     }
 
     @Test
-    public void testRateLimitingIpAllowed() {
-        List<Endpoint> endpoints = new ArrayList<>();
-        endpoints.add(new Endpoint("POST", "/login",
-                /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
-                false, false, true));
-        HashSet<String> bypassedIPS = new HashSet<>();
-        bypassedIPS.add("1.2.3.4");
-        connectionManager = createConnectionManager(endpoints, bypassedIPS);
-
-        RouteMetadata routeMetadata = createRouteMetadata("POST", "/login");
-        String remoteAddress = "1.2.3.4";
-
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(routeMetadata, null, remoteAddress, connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(routeMetadata, null, remoteAddress, connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(routeMetadata, null, remoteAddress, connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(routeMetadata, null, remoteAddress, connectionManager));
-    }
-
-    @Test
     public void testRateLimitingByUser() {
         List<Endpoint> endpoints = new ArrayList<>();
         endpoints.add(new Endpoint("POST", "/login",
@@ -236,25 +213,4 @@ public class ShouldRateLimitTest {
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
                 ShouldRateLimit.shouldRateLimit(metadata, new User("123456", "User 456", "1.2.3.4", 0), "1.2.3.4", connectionManager));
     }
-
-    @Test
-    public void testRateLimitingBypassedIpWithUser() {
-        List<Endpoint> endpoints = new ArrayList<>();
-        endpoints.add(new Endpoint("POST", "/login",
-                /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
-                false, false, true));
-
-        CloudConnectionManager connectionManager = createConnectionManager(endpoints, new HashSet<>(Arrays.asList("1.2.3.4")));
-
-        // All requests from the bypassed IP should not be blocked
-        RouteMetadata metadata = createRouteMetadata("POST", "/login");
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
-        }
-    }
+}
