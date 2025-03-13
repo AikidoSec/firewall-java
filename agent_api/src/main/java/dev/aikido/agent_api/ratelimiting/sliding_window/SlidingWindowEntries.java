@@ -25,17 +25,11 @@ public class SlidingWindowEntries {
 
     public int getHitsInWindow(long currentTime) {
         this.clearEntries(currentTime);
-
-        return entries.size(); // Returns all entries that are inside the current time window.
+        return entries.size();
     }
 
     private void clearEntries(long currentTime) {
         long thresholdTime = currentTime - windowSizeMS;
         entries.removeIf(entry -> entry < thresholdTime); // remove if the entry is too old
-
-        // Ensure the number of entries exceeds maxRequests by only 1
-        while (entries.size() > (maxRequests+1)) {
-            entries.remove(0); // Remove the oldest entry
-        }
     }
 }
