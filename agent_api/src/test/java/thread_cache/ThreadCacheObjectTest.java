@@ -8,6 +8,7 @@ import utils.EmtpyThreadCacheObject;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
@@ -135,5 +136,23 @@ public class ThreadCacheObjectTest {
         assertTrue(threadCacheObject.isMiddlewareInstalled());
         threadCacheObject.setMiddlewareInstalled();
         assertTrue(threadCacheObject.isMiddlewareInstalled());
+    }
+    @Test
+    public void testThreadCacheBypassedIPs() {
+        ThreadCacheObject tCache = getEmptyThreadCacheObject(Set.of("1.2.3.4", "5.6.7.8"));
+        assertTrue(tCache.isBypassedIP("1.2.3.4"));
+        assertFalse(tCache.isBypassedIP("1.2.3.5"));
+        assertTrue(tCache.isBypassedIP("5.6.7.8"));
+        assertFalse(tCache.isBypassedIP("5.6.7.9"));
+    }
+
+    @Test
+    public void testThreadCacheBypassedIPsSubnet() {
+        ThreadCacheObject tCache = getEmptyThreadCacheObject(Set.of("10.0.0.0/24"));
+        assertTrue(tCache.isBypassedIP("10.0.0.200"));
+        assertTrue(tCache.isBypassedIP("10.0.0.1"));
+        assertTrue(tCache.isBypassedIP("10.0.0.255"));
+        assertFalse(tCache.isBypassedIP("10.0.1.1"));
+        assertFalse(tCache.isBypassedIP("1.2.3.4"));
     }
 }
