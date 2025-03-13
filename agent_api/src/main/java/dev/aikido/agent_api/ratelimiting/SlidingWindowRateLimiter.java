@@ -23,6 +23,12 @@ public class SlidingWindowRateLimiter implements RateLimiter {
         // clear entries that are not in the rate-limiting window anymore
         requestTimestamps.removeIf(entry -> entry < currentTime - windowSizeInMs);
 
+        // Ensure the number of entries exceeds maxRequests by only 1
+        while (requestTimestamps.size() > (maxRequests+1)) {
+            // We remove the oldest entry, since this one has become useless if the limit is already exceeded
+            requestTimestamps.remove(0);
+        }
+
         // Update entries by adding the new timestamp and storing it in the LRU Cache
         requestTimestamps.add(currentTime);
         rateLimitedItems.set(key, requestTimestamps);
