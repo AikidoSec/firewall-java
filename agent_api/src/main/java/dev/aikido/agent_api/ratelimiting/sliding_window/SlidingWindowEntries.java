@@ -18,11 +18,14 @@ public class SlidingWindowEntries {
         this.windowSizeMS = windowSizeMS;
         this.maxRequests = maxRequests;
     }
+
     public void addHit(long currentTime) {
         entries.add(currentTime);
     }
+
     public int getHitsInWindow(long currentTime) {
         this.clearEntries(currentTime);
+
         return entries.size(); // Returns all entries that are inside the current time window.
     }
 
