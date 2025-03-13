@@ -22,7 +22,7 @@ public class SlidingWindowRateLimiter implements RateLimiter {
             rateLimitedItems.set(key, entries);
         }
 
-        entries.addHit(currentTime); // Add a new hit.
+        entries.addHit(currentTime);
 
         return entries.getHitsInWindow(currentTime) <= maxRequests;
     }
