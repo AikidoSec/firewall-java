@@ -6,7 +6,7 @@ import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
-import dev.aikido.agent_api.ratelimiting.sliding_window.SlidingWindowRateLimiter;
+import dev.aikido.agent_api.ratelimiting.SlidingWindowRateLimiter;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
