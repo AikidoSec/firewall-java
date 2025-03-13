@@ -1,7 +1,7 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
+import dev.aikido.agent_api.storage.HostnamesStore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class HttpURLConnectionRedirectTest {
 
@@ -27,7 +26,7 @@ public class HttpURLConnectionRedirectTest {
     @BeforeAll
     static void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
+        HostnamesStore.clear();
     }
     @AfterAll
     static void afterAll() {
@@ -36,7 +35,7 @@ public class HttpURLConnectionRedirectTest {
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
-        ThreadCache.set(getEmptyThreadCacheObject());
+        HostnamesStore.clear();
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")

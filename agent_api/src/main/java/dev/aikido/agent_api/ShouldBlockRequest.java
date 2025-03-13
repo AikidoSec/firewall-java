@@ -6,8 +6,8 @@ import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
+import dev.aikido.agent_api.storage.ConfigStore;
+import dev.aikido.agent_api.storage.Configuration;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +15,7 @@ import java.util.Optional;
 import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
 import static dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder.getRateLimitedEndpoint;
+import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
 
 public final class ShouldBlockRequest {
     private ShouldBlockRequest() {}
@@ -22,15 +23,15 @@ public final class ShouldBlockRequest {
     public record BlockedRequestResult(String type, String trigger, String ip) {}
     public static ShouldBlockRequestResult shouldBlockRequest() {
         ContextObject context = Context.get();
-        ThreadCacheObject threadCache = ThreadCache.get();
-        if (context == null || threadCache == null) {
+        Configuration config = getConfig();
+        if (context == null || config == null) {
             return new ShouldBlockRequestResult(false, null); // Blocking false
         }
         context.setExecutedMiddleware(true); // Mark middleware as executed.
-        threadCache.setMiddlewareInstalled();
+        ConfigStore.setMiddlewareInstalled(true);
         Context.set(context);
         if (context.getUser() != null) {
-            if (threadCache.isBlockedUserID(context.getUser().id())) {
+            if (config.isUserBlocked(context.getUser().id())) {
                 return new ShouldBlockRequestResult(/*block*/ true, new BlockedRequestResult(
                         /*type*/ "blocked",/*trigger*/ "user", context.getRemoteAddress()
                 ));
@@ -38,7 +39,7 @@ public final class ShouldBlockRequest {
         }
 
         // Get matched endpoints:
-        List<Endpoint> matches = matchEndpoints(context.getRouteMetadata(), threadCache.getEndpoints());
+        List<Endpoint> matches = matchEndpoints(context.getRouteMetadata(), config.getEndpoints());
 
         // Rate-limiting :
         if (matches != null && getRateLimitedEndpoint(matches, context.getRoute()) != null) {

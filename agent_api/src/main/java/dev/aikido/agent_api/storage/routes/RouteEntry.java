@@ -32,10 +32,6 @@ public class RouteEntry {
 
     public void incrementHits() {
         hits++;
-        deltaHits++; // Also increment delta.
-    }
-    public void incrementHits(int count) {
-        hits += count;
     }
 
     public int getHits() {
@@ -44,10 +40,6 @@ public class RouteEntry {
 
     public void updateApiSpec(APISpec newApiSpec) {
         this.apispec = mergeAPISpecs(newApiSpec, this.apispec);
-    }
-
-    public int getDeltaHits() {
-        return deltaHits;
     }
 
     public static class RouteEntrySerializer implements JsonSerializer<RouteEntry> {

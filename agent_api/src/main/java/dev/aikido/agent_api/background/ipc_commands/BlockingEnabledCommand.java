@@ -4,6 +4,8 @@ import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 
 import java.util.Optional;
 
+import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
+
 public class BlockingEnabledCommand extends Command<Command.EmptyResult, BlockingEnabledCommand.Res> {
     public record Res(boolean isBlockingEnabled) {}
 
@@ -29,7 +31,7 @@ public class BlockingEnabledCommand extends Command<Command.EmptyResult, Blockin
     @Override
     public Optional<Res> execute(EmptyResult data, CloudConnectionManager connectionManager) {
         // "data" can be safely ignored, we just need to return if blocking is enabled
-        boolean isBlockingEnabled = connectionManager.shouldBlock();
+        boolean isBlockingEnabled = getConfig().isBlockingEnabled();
         return Optional.of( new Res(isBlockingEnabled));
     }
 }

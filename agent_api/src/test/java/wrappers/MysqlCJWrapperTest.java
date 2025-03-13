@@ -1,7 +1,6 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,7 +12,6 @@ import utils.EmptySampleContextObject;
 import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class MysqlCJWrapperTest {
     private Connection connection;
@@ -21,14 +19,12 @@ public class MysqlCJWrapperTest {
     @BeforeAll
     public static void clean() {
         Context.set(null);
-        ThreadCache.set(null);
     }
 
     @BeforeEach
     public void setUp() throws SQLException {
         // Connect to the MySQL database
         connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/db", "user", "password");
-        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @AfterEach
@@ -37,15 +33,12 @@ public class MysqlCJWrapperTest {
             connection.close();
         }
         Context.set(null);
-        ThreadCache.set(null);
     }
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testSelectSqlWithPrepareStatement() throws SQLException {
-        ThreadCache.set(null);
-
         assertDoesNotThrow(() -> {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
         });
@@ -64,8 +57,6 @@ public class MysqlCJWrapperTest {
     @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSelectSqlSafeWithPrepareStatement() throws SQLException {
-        ThreadCache.set(null);
-
         Context.set(new EmptySampleContextObject("FROM"));
         assertDoesNotThrow(() -> {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
@@ -84,8 +75,6 @@ public class MysqlCJWrapperTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testSelectSqlWithPreparedStatementWithoutExecute() throws SQLException {
-        ThreadCache.set(null);
-
         Context.set(new EmptySampleContextObject("SELECT * FROM notpets;"));
         assertDoesNotThrow(() -> {
             connection.prepareStatement("SELECT pet_name FROM pets;");

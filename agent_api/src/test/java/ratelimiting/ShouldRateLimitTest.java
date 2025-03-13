@@ -1,19 +1,21 @@
 package ratelimiting;
 
 import dev.aikido.agent_api.background.Endpoint;
-import dev.aikido.agent_api.background.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.ratelimiting.RateLimiter;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
-import org.junit.jupiter.api.BeforeEach;
+import dev.aikido.agent_api.storage.ConfigStore;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static utils.EmptyAPIResponses.emptyAPIResponse;
+import static utils.EmptyAPIResponses.setEmptyConfigWithEndpointList;
 
 public class ShouldRateLimitTest {
     private CloudConnectionManager connectionManager;
@@ -22,18 +24,19 @@ public class ShouldRateLimitTest {
         return new RouteMetadata(route, route, method);
     }
 
-    private CloudConnectionManager createConnectionManager(List<Endpoint> endpoints, HashSet<String> bypassedIPs) {
-        // Mock the configuration object
-        ServiceConfiguration configMock = Mockito.mock(ServiceConfiguration.class);
-        Mockito.when(configMock.getEndpoints()).thenReturn(endpoints);
-        Mockito.when(configMock.getBypassedIPs()).thenReturn(bypassedIPs);
+    private CloudConnectionManager createConnectionManager(List<Endpoint> endpoints) {
+        setEmptyConfigWithEndpointList(endpoints); // add endpoints
 
         // Mock the CloudConnectionManager
         CloudConnectionManager cm = Mockito.mock(CloudConnectionManager.class);
-        Mockito.when(cm.getConfig()).thenReturn(configMock);
         Mockito.when(cm.getRateLimiter()).thenReturn(new RateLimiter(5000, 120*60*1000));
 
         return cm;
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        ConfigStore.updateFromAPIResponse(emptyAPIResponse);
     }
 
 
@@ -44,7 +47,7 @@ public class ShouldRateLimitTest {
                 /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
                 false, false, true));
 
-        connectionManager = createConnectionManager(endpoints, new HashSet<>());
+        connectionManager = createConnectionManager(endpoints);
 
         RouteMetadata routeMetadata = createRouteMetadata("POST", "/login");
         String remoteAddress = "1.2.3.4";
@@ -60,36 +63,13 @@ public class ShouldRateLimitTest {
     }
 
     @Test
-    public void testRateLimitingIpAllowed() {
-        List<Endpoint> endpoints = new ArrayList<>();
-        endpoints.add(new Endpoint("POST", "/login",
-                /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
-                false, false, true));
-        HashSet<String> bypassedIPS = new HashSet<>();
-        bypassedIPS.add("1.2.3.4");
-        connectionManager = createConnectionManager(endpoints, bypassedIPS);
-
-        RouteMetadata routeMetadata = createRouteMetadata("POST", "/login");
-        String remoteAddress = "1.2.3.4";
-
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(routeMetadata, null, remoteAddress, connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(routeMetadata, null, remoteAddress, connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(routeMetadata, null, remoteAddress, connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(routeMetadata, null, remoteAddress, connectionManager));
-    }
-
-    @Test
     public void testRateLimitingByUser() {
         List<Endpoint> endpoints = new ArrayList<>();
         endpoints.add(new Endpoint("POST", "/login",
                 /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
                 false, false, true));
 
-        connectionManager = createConnectionManager(endpoints, new HashSet<>());
+        connectionManager = createConnectionManager(endpoints);
 
         RouteMetadata routeMetadata = createRouteMetadata("POST", "/login");
         User user = new User("user123", "John Doe", "1.1.1.1", 0);
@@ -111,7 +91,7 @@ public class ShouldRateLimitTest {
                 /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
                 false, false, true));
 
-        connectionManager = createConnectionManager(endpoints, new HashSet<>());
+        connectionManager = createConnectionManager(endpoints);
 
         // Test requests to different API endpoints
         RouteMetadata routeMetadataLogin = createRouteMetadata("POST", "/api/login");
@@ -137,7 +117,7 @@ public class ShouldRateLimitTest {
                 /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
                 false, false, true));
 
-        connectionManager = createConnectionManager(endpoints, new HashSet<>());
+        connectionManager = createConnectionManager(endpoints);
 
         RouteMetadata routeMetadata = createRouteMetadata("POST", "/login");
         User user = new User("user123", "John Doe", "1.2.3.4", 0);
@@ -162,7 +142,7 @@ public class ShouldRateLimitTest {
                 /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
                 false, false, true));
 
-        CloudConnectionManager connectionManager = createConnectionManager(endpoints, new HashSet<>());
+        CloudConnectionManager connectionManager = createConnectionManager(endpoints);
 
         // Test requests to different API endpoints with various methods
         RouteMetadata metadata = createRouteMetadata("POST", "/api/login");
@@ -190,7 +170,7 @@ public class ShouldRateLimitTest {
                 /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
                 false, false, true));
 
-        CloudConnectionManager connectionManager = createConnectionManager(endpoints, new HashSet<>());
+        CloudConnectionManager connectionManager = createConnectionManager(endpoints);
 
         // First request from first IP
         RouteMetadata metadata = createRouteMetadata("POST", "/login");
@@ -217,7 +197,7 @@ public class ShouldRateLimitTest {
                 /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
                 false, false, true));
 
-        CloudConnectionManager connectionManager = createConnectionManager(endpoints, new HashSet<>());
+        CloudConnectionManager connectionManager = createConnectionManager(endpoints);
 
         // First request from user 1
         RouteMetadata metadata = createRouteMetadata("POST", "/login");
@@ -236,25 +216,4 @@ public class ShouldRateLimitTest {
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
                 ShouldRateLimit.shouldRateLimit(metadata, new User("123456", "User 456", "1.2.3.4", 0), "1.2.3.4", connectionManager));
     }
-
-    @Test
-    public void testRateLimitingBypassedIpWithUser() {
-        List<Endpoint> endpoints = new ArrayList<>();
-        endpoints.add(new Endpoint("POST", "/login",
-                /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
-                false, false, true));
-
-        CloudConnectionManager connectionManager = createConnectionManager(endpoints, new HashSet<>(Arrays.asList("1.2.3.4")));
-
-        // All requests from the bypassed IP should not be blocked
-        RouteMetadata metadata = createRouteMetadata("POST", "/login");
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
-        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
-                ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "1.2.3.4", connectionManager));
-        }
-    }
+}
