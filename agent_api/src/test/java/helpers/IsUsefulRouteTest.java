@@ -44,4 +44,11 @@ public class IsUsefulRouteTest {
         assertFalse(IsUsefulRoute.isUsefulRoute(200, "/img/icons/favicon-16x16.png", "GET"));
         assertFalse(IsUsefulRoute.isUsefulRoute(200, "/fonts/icomoon.ttf", "GET"));
     }
+
+    @Test
+    void testWellKnownDirectory() {
+        assertFalse(IsUsefulRoute.isUsefulRoute(200, "/.well-known", "GET"));
+        assertTrue(IsUsefulRoute.isUsefulRoute(200, "/.well-known/change-password", "GET"));
+        assertFalse(IsUsefulRoute.isUsefulRoute(200, "/.well-known/security.txt", "GET"));
+    }
 }

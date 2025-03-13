@@ -1,30 +1,64 @@
-from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads
-from spring_boot_mysql.test_two_sql_attacks import test_two_sql_attacks
-from spring_boot_mysql.test_ip_blocking import test_ip_blocking
-from spring_boot_mysql.test_bot_blocking import test_bot_blocking
-from spring_boot_mysql.test_ratelimiting import test_ratelimiting_per_user, test_ratelimiting
-from utils.EventHandler import EventHandler
+from time import sleep
+from __init__ import events
+from utils import App, Request
 
-payloads = {
-    "safe": { "name": "Bobby" },
-    "unsafe": { "name": 'Malicious Pet", "Gru from the Minions") -- ' }
-}
-urls = {
-    "disabled": "http://localhost:8083/api/pets/create",
-    "enabled": "http://localhost:8082/api/pets/create"
-}
+spring_boot_mysql_app = App(8082)
 
-event_handler = EventHandler()
-event_handler.reset()
-test_safe_vs_unsafe_payloads(payloads, urls, user_id="123") # Test MySQL driver
-test_safe_vs_unsafe_payloads(payloads, urls, "/mariadb", user_id="456") # Also test MariaDB driver
+spring_boot_mysql_app.add_payload(
+    "sql_mysql",test_event=events["spring_mysql_boot_mysql_attack"],
+    safe_request=Request("/api/pets/create", headers={'user': '123'}, body={"name": "Bobby"}),
+    unsafe_request=Request(
+        "/api/pets/create", headers={'user': '123'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
+    )
+)
 
-# Test blocklists :
-test_ip_blocking("http://localhost:8082/")
-test_bot_blocking("http://localhost:8082/")
+spring_boot_mysql_app.add_payload(
+    "sql_mariadb",test_event=events["spring_mysql_boot_mariadb_attack"],
+    safe_request=Request("/api/pets/create/mariadb", headers={'user': '456'}, body={"name": "Bobby"}),
+    unsafe_request=Request(
+        "/api/pets/create/mariadb", headers={'user': '456'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
+    )
+)
 
-# Test ratelimiting (we can use a header to set user) :
-test_ratelimiting("http://localhost:8082/test_ratelimiting_1")
-test_ratelimiting_per_user("http://localhost:8082/test_ratelimiting_1")
+spring_boot_mysql_app.test_all_payloads()
+spring_boot_mysql_app.test_blocking()
+spring_boot_mysql_app.test_rate_limiting()
 
-test_two_sql_attacks(event_handler)
+# Testing forceProtectionOff 1/2
+# 1: True -> /api/pets/create
+# 2: False -> /api/*
+spring_boot_mysql_app.event_handler.set_protection(True, False)
+spring_boot_mysql_app.add_payload(
+    "sql_test_mysql_vs_mariadb_force_protection_off",
+    safe_request=Request(
+        "/api/pets/create", headers={'user': '123'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
+    ),
+    unsafe_request=Request(
+        "/api/pets/create/mariadb", headers={'user': '456'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
+    )
+)
+
+sleep(70) # Wait for config to be fetched
+spring_boot_mysql_app.test_payload("sql_test_mysql_vs_mariadb_force_protection_off")
+
+
+# Testing forceProtectionOff 2/2
+# 1: False -> /api/pets/create
+# 2: True -> /api/*
+spring_boot_mysql_app.event_handler.set_protection(False, True)
+spring_boot_mysql_app.add_payload(
+    "sql_test_force_protection_off_all_mysql",
+    safe_request=Request(
+        "/api/pets/create", headers={'user': '123'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
+    )
+)
+spring_boot_mysql_app.add_payload(
+    "sql_test_force_protection_off_all_mariadb",
+    safe_request=Request(
+        "/api/pets/create/mariadb", headers={'user': '456'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
+    )
+)
+
+sleep(70) # Wait for config to be fetched
+spring_boot_mysql_app.test_payload("sql_test_force_protection_off_all_mysql")
+spring_boot_mysql_app.test_payload("sql_test_force_protection_off_all_mariadb")
