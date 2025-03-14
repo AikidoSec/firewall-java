@@ -15,10 +15,22 @@ public class CommandController {
 
     @GetMapping(path = "/execute/{userCommand}")
     public Mono<String> executeCommand(@PathVariable String userCommand) {
-        System.out.println("Executing command: " + userCommand);
+        return executeCommandInternal(userCommand);
+    }
+
+    @GetMapping(path = "/executeFromCookie")
+    public Mono<String> executeCommandFromCookie(@CookieValue("command") String command) {
+        if (command == null) {
+            throw new RuntimeException("Command cannot be empty");
+        }
+        return executeCommandInternal(command);
+    }
+
+    private Mono<String> executeCommandInternal(String command) {
+        System.out.println("Executing command: " + command);
 
         return Mono.fromCallable(() -> {
-            Process process = Runtime.getRuntime().exec("echo " + userCommand);
+            Process process = Runtime.getRuntime().exec("echo " + command);
             StringBuilder output = new StringBuilder();
 
             // Read the output of the command
