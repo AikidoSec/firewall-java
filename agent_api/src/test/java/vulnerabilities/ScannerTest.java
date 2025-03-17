@@ -71,11 +71,9 @@ class ScannerTest {
         verifyNoMoreInteractions(mockDetector); // Verify no other methods are
     }
 
-    // Disable IPC :
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     void testScanSafeSQLCode() {
+        ConfigStore.updateBlocking(true);
         // Safe :
         Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgresql"});
         // Argument-mismatch, safe :
@@ -88,11 +86,24 @@ class ScannerTest {
         });
     }
 
-    // Disable IPC :
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @Test
+    void testScanSafeSQLCodeButBlockingFalse() {
+        ConfigStore.updateBlocking(false);
+        // Safe :
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgresql"});
+        // Argument-mismatch, safe :
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM"});
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
+
+        // Unsafe :
+        assertDoesNotThrow(() -> {
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+        });
+    }
+
     @Test
     void testForceProtectionOff() {
+        ConfigStore.updateBlocking(true);
         // Thread cache does not force any protection off :
         assertThrows(SQLInjectionException.class, () -> {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
@@ -114,22 +125,28 @@ class ScannerTest {
         });
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     void testDoesNotRunWithContextNull() {
+        ConfigStore.updateBlocking(true);
         Context.set(null);
         assertDoesNotThrow(() -> {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
-    void TestStillThrowsWithThreadCacheUndefined() {
+    void TestStillThrowsWithConfigStoreEmptyButBlockingEnabled() {
         ConfigStore.updateFromAPIResponse(emptyAPIResponse);
+        ConfigStore.updateBlocking(true);
         assertThrows(SQLInjectionException.class, () -> {
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+        });
+    }
+
+    @Test
+    void TestDoesNotThrowWithEmptyAPIResponse() {
+        ConfigStore.updateFromAPIResponse(emptyAPIResponse);
+        assertDoesNotThrow(() -> {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
