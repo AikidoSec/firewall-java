@@ -49,22 +49,5 @@ class BackgroundProcessTest {
         // Check that the connection manager is initialized
         CloudConnectionManager connectionManager = backgroundProcess.getCloudConnectionManager();
         assertNotNull(connectionManager);
-
-        // Check that the attack queue is initialized
-        BlockingQueue<APIEvent> attackQueue = backgroundProcess.getAttackQueue();
-        assertNotNull(attackQueue);
-    }
-
-    @Test
-    void testAttackQueueInitialization() throws InterruptedException {
-        // Start the background process
-        backgroundProcess.setDaemon(true);
-        backgroundProcess.start();
-        Thread.sleep(100); // Wait for a short time to allow the thread to start
-
-        // Check that the attack queue is initialized
-        BlockingQueue<APIEvent> attackQueue = backgroundProcess.getAttackQueue();
-        assertNotNull(attackQueue);
-        assertTrue(attackQueue.isEmpty());
     }
 }

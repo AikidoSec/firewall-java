@@ -21,29 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class HeartbeatEventTest {
-
-    private CloudConnectionManager connectionManager;
-    private GetManagerInfo.ManagerInfo managerInfo;
-
-    @BeforeEach
-    public void setUp() {
-        connectionManager = Mockito.mock(CloudConnectionManager.class);
-        managerInfo = new GetManagerInfo.ManagerInfo(
-                false, // dryMode
-                "localhost", // hostname
-                "1.0.0", // version
-                "firewall-java", // library
-                "127.0.0.1", // ipAddress
-                Collections.emptyMap(), // packages
-                "serverless", // serverless
-                Collections.emptyList(), // stack
-                new GetManagerInfo.OS("Linux", "5.4.0"), // os
-                false, // preventedPrototypePollution
-                "development", // nodeEnv
-                new GetManagerInfo.Platform("Java", "11") // platform
-        );
-    }
-
     @Test
     public void testGetHeartbeatEvent() {
         // Arrange
@@ -53,15 +30,13 @@ public class HeartbeatEventTest {
         RouteEntry[] routes = new RouteEntry[0]; // Replace with actual RouteEntry array if needed
         List<User> users = Collections.emptyList(); // Replace with actual User list if needed
 
-        when(connectionManager.getManagerInfo()).thenReturn(managerInfo);
         ConfigStore.setMiddlewareInstalled(false);
 
         // Act
-        Heartbeat.HeartbeatEvent event = Heartbeat.get(connectionManager, stats, hostnames.asArray(), routes, users);
+        Heartbeat.HeartbeatEvent event = Heartbeat.get(stats, hostnames.asArray(), routes, users);
 
         // Assert
         assertEquals("heartbeat", event.type());
-        assertEquals(managerInfo, event.agent());
         assertEquals(stats, event.stats());
         assertArrayEquals(hostnames.asArray(), event.hostnames());
         assertEquals(routes, event.routes());
@@ -70,7 +45,7 @@ public class HeartbeatEventTest {
 
         // Test middleware installed as well :
         ConfigStore.setMiddlewareInstalled(true);
-        Heartbeat.HeartbeatEvent event2 = Heartbeat.get(connectionManager, stats, hostnames.asArray(), routes, users);
+        Heartbeat.HeartbeatEvent event2 = Heartbeat.get(stats, hostnames.asArray(), routes, users);
         assertEquals(true, event2.middlewareInstalled());
 
 

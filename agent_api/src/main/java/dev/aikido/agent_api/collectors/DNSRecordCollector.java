@@ -1,7 +1,5 @@
 package dev.aikido.agent_api.collectors;
 
-import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
-import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.vulnerabilities.Attack;
@@ -14,8 +12,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
+import static dev.aikido.agent_api.vulnerabilities.AttackQueueStore.addAttackToQueue;
 
 public final class DNSRecordCollector {
     private DNSRecordCollector() {}
@@ -49,11 +47,7 @@ public final class DNSRecordCollector {
                 }
                 logger.debug("SSRF Attack detected due to: %s:%s", hostname, hostnameEntry.getPort());
 
-                ThreadIPCClient client = getDefaultThreadIPCClient();
-                AttackCommand.Req req = new AttackCommand.Req(attack, Context.get());
-                if (client != null) {
-                    AttackCommand.sendAttack(client, req);
-                }
+                addAttackToQueue(attack, Context.get()); // report attack in background
 
                 if (shouldBlock()) {
                     logger.debug("Blocking SSRF attack...");

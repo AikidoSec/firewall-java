@@ -6,22 +6,20 @@ import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 
+import static dev.aikido.agent_api.vulnerabilities.AttackQueueStore.getAttackFromQueue;
+
 public class AttackQueueConsumerTask extends TimerTask {
     private final CloudConnectionManager connectionManager;
-    private final BlockingQueue<APIEvent> queue;
-    public AttackQueueConsumerTask(CloudConnectionManager connectionManager, BlockingQueue<APIEvent> queue) {
+    public AttackQueueConsumerTask(CloudConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
-        this.queue = queue;
     }
 
     @Override
     public void run() {
-        // Check if queue contains events that need to be sent:
-        while (!queue.isEmpty()) {
-            try {
-                APIEvent event = queue.take();
-                this.connectionManager.reportEvent(event, false /* Should not update config */);
-            } catch (InterruptedException ignored) {}
+        APIEvent event = getAttackFromQueue();
+        while (event != null) {
+            this.connectionManager.reportEvent(event, false /* should not update config */);
+            event = getAttackFromQueue(); // refresh
         }
     }
 }

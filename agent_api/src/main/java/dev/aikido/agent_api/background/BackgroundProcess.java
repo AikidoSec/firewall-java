@@ -1,27 +1,17 @@
 package dev.aikido.agent_api.background;
 
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
-import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
-import dev.aikido.agent_api.background.utilities.UDSPath;
 import dev.aikido.agent_api.helpers.env.BlockingEnv;
 import dev.aikido.agent_api.helpers.env.Token;
-import dev.aikido.agent_api.helpers.logging.LogManager;
-import dev.aikido.agent_api.helpers.logging.Logger;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Timer;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static dev.aikido.agent_api.Config.heartbeatEveryXSeconds;
 import static dev.aikido.agent_api.Config.pollingEveryXSeconds;
 
 public class BackgroundProcess extends Thread {
-    private static final Logger logger = LogManager.getLogger(BackgroundProcess.class);
     private CloudConnectionManager connectionManager;
     private final Token token;
-    private BlockingQueue<APIEvent> attackQueue;
     public BackgroundProcess(String name, Token token) {
         super(name);
         this.token = token;
@@ -33,8 +23,6 @@ public class BackgroundProcess extends Thread {
         }
         // Create a cloud-connection manager:
         this.connectionManager = new CloudConnectionManager(new BlockingEnv().getValue(), token, null);
-        // Create a queue and a thread to handle attacks that need reporting in the background:
-        this.attackQueue = new LinkedBlockingQueue<>();
         this.connectionManager.onStart();
 
         Timer timer = new Timer();
@@ -49,7 +37,7 @@ public class BackgroundProcess extends Thread {
                 pollingEveryXSeconds * 1000 // Interval in milliseconds
         );
         timer.scheduleAtFixedRate(
-                new AttackQueueConsumerTask(connectionManager, attackQueue), // Consumes from the attack queue (so attacks are reported in background)
+                new AttackQueueConsumerTask(connectionManager), // Consumes from the attack queue (so attacks are reported in background)
                 /* delay: */ 0, /* interval: */ 2 * 1000 // Clear queue every 2 seconds
         );
         // Report initial statistics if those were not received
@@ -57,22 +45,9 @@ public class BackgroundProcess extends Thread {
                 new HeartbeatTask(connectionManager, true /* Check for initial statistics */), // Initial heartbeat task
                 60_000 // Delay in ms
         );
-        try {
-            File queueDir = UDSPath.getUDSPath(token);
-            if (!queueDir.getParentFile().canWrite()) {
-                logger.error("AIKIDO: Cannot write to socket %s, please verify access", queueDir.getPath());
-            }
-            BackgroundReceiver server = new BackgroundReceiver(queueDir, this);
-        } catch (IOException | InterruptedException e) {
-            logger.trace(e);
-        }
-        logger.debug("Background thread closing.");
     }
 
     public CloudConnectionManager getCloudConnectionManager() {
         return connectionManager;
-    }
-    public BlockingQueue<APIEvent> getAttackQueue() {
-        return attackQueue;
     }
 }

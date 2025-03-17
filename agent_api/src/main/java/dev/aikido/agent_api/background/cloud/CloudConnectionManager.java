@@ -41,10 +41,6 @@ public class CloudConnectionManager {
             ConfigStore.updateFromAPIResponse(res.get());
         }
     }
-
-    public GetManagerInfo.ManagerInfo getManagerInfo() {
-        return GetManagerInfo.getManagerInfo(this);
-    }
     public String getToken() {
         return token;
     }
