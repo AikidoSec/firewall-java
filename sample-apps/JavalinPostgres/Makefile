@@ -18,11 +18,12 @@ build:
 .PHONY: run
 run: build
 	@echo "Running JavalinPostgres with Zen & ENV (http://localhost:8088)"
+	AIKIDO_LOG_LEVEL="trace" \
 	AIKIDO_TOKEN="token" \
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCK=1 \
-	nohup java  -javaagent:$(JAVA_AGENT) -DportNumber=8088 -jar $(JAR_FILE) > output1.log &
+	java  -javaagent:$(JAVA_AGENT) -DportNumber=8089 -jar $(JAR_FILE)
 
 # Run the application without Zen
 .PHONY: runWithoutZen

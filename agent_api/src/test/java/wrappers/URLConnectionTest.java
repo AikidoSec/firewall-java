@@ -1,6 +1,7 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.ConfigStore;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
 import org.junit.jupiter.api.AfterAll;
@@ -31,14 +32,13 @@ public class URLConnectionTest {
     @BeforeEach
     void beforeEach() {
         cleanup();
+        ConfigStore.updateBlocking(true);
     }
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testNewUrlConnectionWithPort() throws IOException {
         setContextAndLifecycle("");
@@ -50,8 +50,6 @@ public class URLConnectionTest {
         assertEquals("localhost", hostnameArray[0].getHostname());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testNewUrlConnectionWithHttp() throws IOException {
         setContextAndLifecycle("");
@@ -63,8 +61,6 @@ public class URLConnectionTest {
         assertEquals("app.local.aikido.io", hostnameArray[0].getHostname());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testNewUrlConnectionWithHttpAsHttp() throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://app.local.aikido.io").openConnection();
@@ -74,8 +70,6 @@ public class URLConnectionTest {
         assertEquals("app.local.aikido.io", hostnameArray[0].getHostname());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testNewUrlConnectionHttps() throws IOException {
         setContextAndLifecycle("");
@@ -87,8 +81,6 @@ public class URLConnectionTest {
         assertEquals("aikido.dev", hostnameArray[0].getHostname());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testNewUrlConnectionFaultyProtocol() throws IOException {
         setContextAndLifecycle("");

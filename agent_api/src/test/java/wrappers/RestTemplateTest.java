@@ -1,6 +1,7 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.ConfigStore;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.junit.jupiter.api.AfterEach;
@@ -22,14 +23,13 @@ public class RestTemplateTest {
     @BeforeEach
     void clearThreadCache() {
         cleanup();
+        ConfigStore.updateBlocking(true);
     }
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFLocalhostValid() throws Exception {
         setContextAndLifecycle("http://localhost:5000");
@@ -56,8 +56,6 @@ public class RestTemplateTest {
                 exception3.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithoutPort() throws Exception {
         setContextAndLifecycle("http://localhost:80");
@@ -67,8 +65,6 @@ public class RestTemplateTest {
         assertEquals("Aikido Zen has blocked a server-side request forgery", exception.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithoutPortAndWithoutContext() throws Exception {
         setContextAndLifecycle("http://localhost:80");
