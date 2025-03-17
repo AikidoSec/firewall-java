@@ -7,7 +7,6 @@ import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.storage.ConfigStore;
 import dev.aikido.agent_api.helpers.env.Token;
-import dev.aikido.agent_api.ratelimiting.RateLimiter;
 
 import java.util.Optional;
 
@@ -31,7 +30,7 @@ public class CloudConnectionManager {
         ConfigStore.updateBlocking(block);
         this.api = api;
         this.token = token.get();
-        this.rateLimiter = new RateLimiter(
+        this.rateLimiter = new SlidingWindowRateLimiter(
                 /*maxItems:*/ 5000, /*TTL in ms:*/ 120 * 60 * 1000 // 120 minutes
         );
     }

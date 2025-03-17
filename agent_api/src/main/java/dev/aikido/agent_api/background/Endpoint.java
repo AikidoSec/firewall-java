@@ -43,10 +43,10 @@ public class Endpoint {
         return forceProtectionOff;
     }
 
-    // allowed ip addresses :
     public boolean allowedIpAddressesEmpty() {
         return allowedIPAddresses == null || allowedIPAddresses.size() == 0;
     }
+
     public boolean isIpAllowed(String ip) {
         return createIPList(allowedIPAddresses).matches(ip);
     }

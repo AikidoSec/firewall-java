@@ -1,6 +1,5 @@
 package dev.aikido.SpringWebfluxSampleApp;
 
-import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.ShouldBlockRequest;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;

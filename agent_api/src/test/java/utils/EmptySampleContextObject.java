@@ -22,4 +22,10 @@ public class EmptySampleContextObject extends ContextObject {
         this();
         this.query.put("arg", List.of(argument));
     }
+    public EmptySampleContextObject(String argument, String route, String method) {
+        this();
+        this.query.put("arg", List.of(argument));
+        this.route = route;
+        this.method = method;
+    }
 }

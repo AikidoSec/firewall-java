@@ -30,15 +30,15 @@ public final class WebRequestCollector {
         // Set new context :
         Context.reset();
 
-        if (config != null && config.isBypassedIP(newContext.getRemoteAddress())) {
+        if (config == null) {
+            Context.set(newContext); // Still set the context object, even when config does not exist.
+            return null;
+        } else if (config.isBypassedIP(newContext.getRemoteAddress())) {
             return null; // Do not set context if IP is bypassed.
-        } else {
-            Context.set(newContext);
         }
 
-        if (config == null) {
-            return null;
-        }
+        Context.set(newContext);
+
         // Increment total hits
         StatisticsStore.incrementHits();
 
