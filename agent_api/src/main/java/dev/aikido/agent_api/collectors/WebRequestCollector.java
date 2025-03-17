@@ -27,13 +27,9 @@ public final class WebRequestCollector {
      */
     public static Res report(ContextObject newContext) {
         Configuration config = getConfig();
-        // Set new context :
-        Context.reset();
+        Context.reset(); // clear context
 
-        if (config == null) {
-            Context.set(newContext); // Still set the context object, even when config does not exist.
-            return null;
-        } else if (config.isBypassedIP(newContext.getRemoteAddress())) {
+        if (config.isBypassedIP(newContext.getRemoteAddress())) {
             return null; // Do not set context if IP is bypassed.
         }
 

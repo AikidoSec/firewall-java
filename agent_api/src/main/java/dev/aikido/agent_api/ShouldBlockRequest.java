@@ -24,7 +24,7 @@ public final class ShouldBlockRequest {
     public static ShouldBlockRequestResult shouldBlockRequest() {
         ContextObject context = Context.get();
         Configuration config = getConfig();
-        if (context == null || config == null) {
+        if (context == null) {
             return new ShouldBlockRequestResult(false, null); // Blocking false
         }
         context.setExecutedMiddleware(true); // Mark middleware as executed.
