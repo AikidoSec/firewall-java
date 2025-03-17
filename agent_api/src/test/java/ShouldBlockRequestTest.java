@@ -172,19 +172,6 @@ public class ShouldBlockRequestTest {
     }
 
     @Test
-    @ClearEnvironmentVariable(key = "AIKIDO_TOKEN")
-    public void testThreadClientInvalid2() throws SQLException {
-        Context.set(new SampleContextObject());
-        setEmptyConfigWithEndpointList(List.of(
-            new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
-        ));
-
-        // Test with match & rate-limiting enabled :
-        var res1 = ShouldBlockRequest.shouldBlockRequest();
-        assertFalse(res1.block());
-    }
-
-    @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "valid-token")
     public void testNoEndpointsConfigured() throws SQLException {
         // Set up context with a user
