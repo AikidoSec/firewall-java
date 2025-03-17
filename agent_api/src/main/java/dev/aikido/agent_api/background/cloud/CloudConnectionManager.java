@@ -5,6 +5,8 @@ import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
+import dev.aikido.agent_api.ratelimiting.RateLimiter;
+import dev.aikido.agent_api.ratelimiting.SlidingWindowRateLimiter;
 import dev.aikido.agent_api.storage.ConfigStore;
 import dev.aikido.agent_api.helpers.env.Token;
 
