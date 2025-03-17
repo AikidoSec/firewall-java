@@ -9,7 +9,6 @@ import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.background.users.UsersStore;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.helpers.env.Token;
-import dev.aikido.agent_api.ratelimiting.RateLimiter;
 import dev.aikido.agent_api.storage.*;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.storage.routes.RoutesStore;
@@ -97,16 +96,6 @@ class CloudConnectionManagerTest {
         // Assert
         assertNotNull(routes);
     }
-
-    @Test
-    void testGetRateLimiterReturnsRateLimiterInstance() {
-        // Act
-        RateLimiter rateLimiter = cloudConnectionManager.getRateLimiter();
-
-        // Assert
-        assertNotNull(rateLimiter);
-    }
-
     @Test
     void testGetUsersReturnsUsersInstance() {
         // Act

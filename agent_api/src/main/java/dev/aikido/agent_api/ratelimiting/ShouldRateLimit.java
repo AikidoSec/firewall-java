@@ -1,7 +1,6 @@
 package dev.aikido.agent_api.ratelimiting;
 
 import dev.aikido.agent_api.background.Endpoint;
-import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
 
@@ -15,7 +14,7 @@ public final class ShouldRateLimit {
     private ShouldRateLimit() {}
     public record RateLimitDecision(boolean block, String trigger) {}
     public static RateLimitDecision shouldRateLimit(
-            RouteMetadata routeMetadata, User user, String remoteAddress, CloudConnectionManager connectionManager
+            RouteMetadata routeMetadata, User user, String remoteAddress
     ) {
         List<Endpoint> endpoints = getConfig().getEndpoints();
         List<Endpoint> matches = matchEndpoints(routeMetadata, endpoints);
@@ -28,7 +27,7 @@ public final class ShouldRateLimit {
         long maxRequests = rateLimitedEndpoint.getRateLimiting().maxRequests();
         if (user != null) {
             String key = rateLimitedEndpoint.getMethod() + ":" + rateLimitedEndpoint.getRoute() + ":user:" + user.id();
-            boolean allowed = connectionManager.getRateLimiter().isAllowed(key, windowSizeInMS, maxRequests);
+            boolean allowed = RateLimiterStore.isAllowed(key, windowSizeInMS, maxRequests);
             if (allowed) {
                 // Do not continue to check based on IP if user is present:
                 return new RateLimitDecision(/*block*/false, null);
@@ -37,7 +36,7 @@ public final class ShouldRateLimit {
         }
         if (remoteAddress != null && !remoteAddress.isEmpty()) {
             String key = rateLimitedEndpoint.getMethod() + ":" + rateLimitedEndpoint.getRoute() + ":ip:" + remoteAddress;
-            boolean allowed = connectionManager.getRateLimiter().isAllowed(key, windowSizeInMS, maxRequests);
+            boolean allowed = RateLimiterStore.isAllowed(key, windowSizeInMS, maxRequests);
             if (!allowed) {
                 return new RateLimitDecision(/*block*/ true, /*trigger*/ "ip");
             }
