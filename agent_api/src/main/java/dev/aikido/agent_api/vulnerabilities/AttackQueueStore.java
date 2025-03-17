@@ -24,6 +24,7 @@ public final class AttackQueueStore {
     public static void addAttackToQueue(Attack attack, ContextObject context) {
         // Generate an attack event :
         DetectedAttack.DetectedAttackEvent detectedAttack = DetectedAttack.createAPIEvent(attack, context);
+        logger.debug("Detected %s Attack", attack.kind);
 
         // Increment statistics :
         StatisticsStore.incrementAttacksDetected();
@@ -43,13 +44,12 @@ public final class AttackQueueStore {
     public static APIEvent getAttackFromQueue() {
         mutex.lock();
         try {
-            return queue.take();
-        } catch (Throwable e) {
-            logger.debug("Error occurred getting api event from queue: %s", e.getMessage());
+            if(queue.isEmpty()) {
+                return null;
+            }
+            return queue.poll();
         } finally {
             mutex.unlock();
         }
-
-        return null;
     }
 }
