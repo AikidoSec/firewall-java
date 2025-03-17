@@ -11,15 +11,12 @@ import java.net.URL;
 import static dev.aikido.agent_api.helpers.url.PortParser.getPortFromURL;
 
 public final class URLCollector {
-    private static final Logger logger = LogManager.getLogger(URLCollector.class);
-
     private URLCollector() {}
     public static void report(URL url) {
         if(url != null) {
             if (!url.getProtocol().startsWith("http")) {
                 return; // Non-HTTP(S) URL 
             }
-            logger.trace("Adding a new URL to the cache: %s", url);
             int port = getPortFromURL(url);
 
             // We store hostname and port in two places, HostnamesStore and Context. HostnamesStore is for reporting
