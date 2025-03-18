@@ -13,6 +13,11 @@ public class SlidingWindowRateLimiter implements RateLimiter {
     }
 
     @Override
+    public void clear() {
+        this.rateLimitedItems.clear();
+    }
+
+    @Override
     public boolean isAllowed(String key, long windowSizeInMs, long maxRequests) {
         long currentTime = getUnixTimeMS();
         List<Long> requestTimestamps = rateLimitedItems.get(key);

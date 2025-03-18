@@ -1,7 +1,7 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
+import dev.aikido.agent_api.storage.ConfigStore;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +16,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class InetAddressTest {
     private HttpClient httpClient;
@@ -24,20 +23,17 @@ public class InetAddressTest {
     @AfterEach
     void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
     }
     @BeforeEach
     void clearThreadCache() {
         httpClient = HttpClient.newHttpClient();
         cleanup();
+        ConfigStore.updateBlocking(true);
     }
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
-        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFLocalhostValid() throws Exception {
         setContextAndLifecycle("http://localhost:5000");
@@ -66,8 +62,6 @@ public class InetAddressTest {
 
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithoutPort() throws Exception {
         setContextAndLifecycle("http://localhost:80");
@@ -77,8 +71,6 @@ public class InetAddressTest {
         assertEquals("dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery", exception.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithoutPortAndWithoutContext() throws Exception {
         setContextAndLifecycle("http://localhost:80");
@@ -88,8 +80,6 @@ public class InetAddressTest {
         });
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithHttpClient() {
         setContextAndLifecycle("http://localhost:5000/");

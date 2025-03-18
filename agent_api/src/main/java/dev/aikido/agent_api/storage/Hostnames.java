@@ -1,10 +1,14 @@
 package dev.aikido.agent_api.storage;
 
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Hostnames {
     private final Map<String, HostnameEntry> map;
+    private static final Logger logger = LogManager.getLogger(Hostnames.class);
 
     public Hostnames(int maxEntries) {
         this.map = new LinkedHashMap<>(maxEntries, 0.75f, true) {
@@ -18,20 +22,10 @@ public class Hostnames {
     public void add(String hostname, int port) {
         String key = getKey(hostname, port);
         if (!map.containsKey(key)) {
+            logger.debug("New hostname, %s:%s", hostname, port);
             map.put(key, new HostnameEntry(hostname, port));
         }
         map.get(key).incrementHits();
-    }
-    public void addArray(HostnameEntry[] hostnameEntries) {
-        for (HostnameEntry entry: hostnameEntries) {
-            String key = getKey(entry.getHostname(), entry.getPort());
-            if (map.containsKey(key)) {
-                // Merge hits :
-                map.get(key).incrementHits(entry.getHits());
-            } else {
-                map.put(key, entry);
-            }
-        }
     }
     public HostnameEntry[] asArray() {
         return map.values().toArray(new HostnameEntry[0]);
@@ -59,10 +53,6 @@ public class Hostnames {
         public void incrementHits() {
             hits++;
         }
-        public void incrementHits(int delta) {
-            hits += delta;
-        }
-
 
         public String getHostname() {
             return hostname;

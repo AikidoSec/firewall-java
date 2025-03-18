@@ -19,8 +19,8 @@ public class Statistics {
         this(0, 0, 0);
     }
 
-    public void incrementTotalHits(int count) {
-        totalHits += count;
+    public void incrementHits() {
+        this.totalHits += 1;
     }
     public int getTotalHits() { return totalHits; }
     public int getAttacksDetected() { return attacksDetected; }

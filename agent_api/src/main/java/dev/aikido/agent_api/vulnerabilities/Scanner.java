@@ -1,7 +1,5 @@
 package dev.aikido.agent_api.vulnerabilities;
 
-import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
-import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
@@ -10,9 +8,9 @@ import dev.aikido.agent_api.helpers.logging.Logger;
 import java.util.Map;
 import java.util.Optional;
 
-import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
+import static dev.aikido.agent_api.vulnerabilities.AttackQueueStore.addAttackToQueue;
 import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
 
 public final class Scanner {
@@ -42,8 +40,8 @@ public final class Scanner {
                         continue;
                     }
                     exception = Optional.of(detectorResult.getException());
-                    // Report attack :
-                    reportAttack(
+                    // add attack to queue, so it's reported in the background
+                    addAttackToQueue(
                         new Attack(
                                 operation, vulnerability, source,
                                 path, detectorResult.getMetadata(), userInput,
@@ -58,13 +56,6 @@ public final class Scanner {
         // Run throw code here so it does not get caught :
         if (exception.isPresent() && shouldBlock()) {
             throw exception.get();
-        }
-    }
-    public static void reportAttack(Attack attack, ContextObject ctx) {
-        logger.debug("Attack detected: %s", attack);
-        ThreadIPCClient client = getDefaultThreadIPCClient();
-        if (client != null) {
-            AttackCommand.sendAttack(client, new AttackCommand.Req(attack, ctx));
         }
     }
 }
