@@ -1,6 +1,5 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
-import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 
 import java.util.Arrays;
@@ -9,35 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 public final class IsPrivateIP {
-    private IsPrivateIP() {}
-    public static boolean containsPrivateIP(List<String> ipAddresses) {
-        for (String ip : ipAddresses) {
-            if (isPrivateIp(ip)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isPrivateIp(String ip) {
-        for (String network : privateIpNetworks) {
-            if (isInRange(ip, network)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isInRange(String ipAddress, String range) {
-        try {
-            return new IPAddressString(range).toAddress()
-                    .toSequentialRange()
-                    .contains(new IPAddressString(ipAddress).toAddress());
-        } catch (Exception e) {
-            return false; // Handle any exceptions that may occur
-        }
-    }
-
     // Define private IP ranges
     private static final String[] PRIVATE_IP_RANGES = {
             "0.0.0.0/8", // "This" network (RFC 1122)
@@ -69,10 +39,60 @@ public final class IsPrivateIP {
             "2001:db8::/32", // Documentation prefix (RFC 3849)
             "3fff::/20", // Documentation prefix (RFC 9637)
     };
-
     private static final Set<String> privateIpNetworks = new HashSet<>();
+
     static {
         privateIpNetworks.addAll(Arrays.asList(PRIVATE_IP_RANGES));
         privateIpNetworks.addAll(Arrays.asList(PRIVATE_IPV6_RANGES));
+        // Add IPv4-mapped IPv6 addresses
+        privateIpNetworks.addAll(Arrays.stream(PRIVATE_IP_RANGES).map(IsPrivateIP::mapIPv4ToIPv6).toList());
+    }
+
+    private IsPrivateIP() {
+    }
+
+    public static boolean containsPrivateIP(List<String> ipAddresses) {
+        for (String ip : ipAddresses) {
+            if (isPrivateIp(ip)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isPrivateIp(String ip) {
+        for (String network : privateIpNetworks) {
+            if (isInRange(ip, network)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isInRange(String ipAddress, String range) {
+        try {
+            return new IPAddressString(range).toAddress()
+                    .toSequentialRange()
+                    .contains(new IPAddressString(ipAddress).toAddress());
+        } catch (Exception e) {
+            return false; // Handle any exceptions that may occur
+        }
+    }
+
+    /**
+     * Maps an IPv4 address to an IPv6 address.
+     * e.g. 127.0.0.0/8 -> ::ffff:127.0.0.0/104
+     */
+    public static String mapIPv4ToIPv6(String ip) {
+        if (!ip.contains("/")) {
+            // No CIDR suffix, assume /32
+            return "::ffff:" + ip + "/128";
+        }
+
+        String[] parts = ip.split("/");
+        int suffix = Integer.parseInt(parts[1]);
+        // We add 96 to the suffix, since ::ffff: already is 96 bits,
+        // so the 32 remaining bits are decided by the IPv4 address
+        return "::ffff:" + parts[0] + "/" + (suffix + 96);
     }
 }
