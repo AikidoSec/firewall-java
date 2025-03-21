@@ -3,10 +3,22 @@ package vulnerabilities.ssrf;
 import org.junit.jupiter.api.Test;
 
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.mapIPv4ToIPv6;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IsPrivateIPTest {
+
+    @Test
+    public void testMapIPv4ToIPv6() {
+        assertEquals("::ffff:127.0.0.0/128", mapIPv4ToIPv6("127.0.0.0"));
+        assertEquals("::ffff:127.0.0.0/104", mapIPv4ToIPv6("127.0.0.0/8"));
+        assertEquals("::ffff:10.0.0.0/128", mapIPv4ToIPv6("10.0.0.0"));
+        assertEquals("::ffff:10.0.0.0/104", mapIPv4ToIPv6("10.0.0.0/8"));
+        assertEquals("::ffff:10.0.0.1/128", mapIPv4ToIPv6("10.0.0.1"));
+        assertEquals("::ffff:10.0.0.1/104", mapIPv4ToIPv6("10.0.0.1/8"));
+        assertEquals("::ffff:192.168.0.0/112", mapIPv4ToIPv6("192.168.0.0/16"));
+        assertEquals("::ffff:172.16.0.0/108", mapIPv4ToIPv6("172.16.0.0/12"));
+    }
 
     @Test
     void testPrivateIPv4Addresses() {
