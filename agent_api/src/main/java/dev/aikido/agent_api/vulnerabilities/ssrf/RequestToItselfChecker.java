@@ -55,6 +55,9 @@ public final class RequestToItselfChecker {
         if (baseUrlPort == 80 && outboundPort == 443) {
             return true;
         }
-        return baseUrlPort == 443 && outboundPort == 80;
+        if (baseUrlPort == 443 && outboundPort == 80) {
+            return true;
+        }
+        return false;
     }
 }
