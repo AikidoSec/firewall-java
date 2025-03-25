@@ -17,21 +17,36 @@ public class ReportingAPITest {
     ReportingApiHTTP api;
     @BeforeEach
     public void setup() {
-        api = new ReportingApiHTTP("http://localhost:5000/");
+        api = new ReportingApiHTTP("http://localhost:5000/", 2);
+    }
+
+    @Test
+    public void testTimeoutValid() {
+        api = new ReportingApiHTTP("http://localhost:5000/delayed/2/", 3); // Allowed delay
+        Optional<APIResponse> res = api.fetchNewConfig("token");
+        assertTrue(res.isPresent());
+        assertTrue(res.get().block());
+        assertEquals(3, res.get().endpoints().size());
+    }
+    @Test
+    public void testTimeoutInvalid() {
+        api = new ReportingApiHTTP("http://localhost:5000/delayed/4/", 3); // Allowed delay
+        Optional<APIResponse> res = api.fetchNewConfig("token");
+        assertFalse(res.isPresent());
     }
 
     @Test
     public void testFetchNewConfig() {
-        Optional<APIResponse> res = api.fetchNewConfig("token", 2);
+        Optional<APIResponse> res = api.fetchNewConfig("token");
         assertTrue(res.isPresent());
         assertTrue(res.get().block());
-        assertEquals(1, res.get().endpoints().size());
+        assertEquals(3, res.get().endpoints().size());
     }
     @Test
     @StdIo
     public void testFetchNewConfigInvalidEndpoint(StdOut out) {
-        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/");
-        Optional<APIResponse> res = api.fetchNewConfig("token", 2);
+        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2);
+        Optional<APIResponse> res = api.fetchNewConfig("token");
         assertEquals(Optional.empty(), res);
         assertTrue(
                 out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Error while fetching new config from cloud"),
@@ -48,7 +63,7 @@ public class ReportingAPITest {
     @Test
     @StdIo
     public void testListsResponseWithWrongEndpoint(StdOut out) {
-        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/");
+        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2);
         Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");
         assertEquals(Optional.empty(), res);
         assertTrue(

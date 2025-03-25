@@ -63,7 +63,7 @@ public class ThreadCacheRenewalTest {
         assertNotNull(threadCacheObject);
 
         // Test the endpoints :
-        assertEquals(1, threadCacheObject.getEndpoints().size());
+        assertEquals(3, threadCacheObject.getEndpoints().size());
         Endpoint endpoint1 = threadCacheObject.getEndpoints().get(0);
         assertEquals("*", endpoint1.getMethod());
         assertEquals("/test_ratelimiting_1", endpoint1.getRoute());

@@ -13,6 +13,10 @@ spring_postgres_kotlin_app.add_payload("server-side request forgery",
     safe_request=Request("/api/requests/get", data_type='form', body={"url": "https://aikido.dev/"}),
     unsafe_request=Request("/api/requests/get", data_type='form', body={"url": "http://localhost:5000"})
 )
+spring_postgres_kotlin_app.add_payload("server-side request forgery, to itself",
+    safe_request=Request("/api/requests/get", data_type='form', body={"url": "http://localhost:8092/"}),
+    unsafe_request=Request("/api/requests/get", data_type='form', body={"url": "http://localhost:5000"})
+)
 spring_postgres_kotlin_app.add_payload("path traversal",
     safe_request=Request("/api/files/read", data_type='form', body={"fileName": "README.md"}),
     unsafe_request=Request("/api/files/read", data_type='form', body={"fileName": "./../databases/docker-compose.yml"})
