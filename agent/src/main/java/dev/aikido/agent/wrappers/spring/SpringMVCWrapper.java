@@ -18,6 +18,7 @@ import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.lang.reflect.Executable;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +74,11 @@ public class SpringMVCWrapper implements Wrapper {
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
-                    cookiesMap.put(cookie.getName(), List.of(cookie.getValue()));
+                    // If no entry exists, create a new empty entry
+                    if (!cookiesMap.containsKey(cookie.getName())) {
+                        cookiesMap.put(cookie.getName(), new ArrayList<>());
+                    }
+                    cookiesMap.get(cookie.getName()).add(cookie.getValue());
                 }
             }
 

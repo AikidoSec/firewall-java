@@ -11,6 +11,8 @@ import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.*;
 
+import java.util.*;
+
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
@@ -37,10 +39,27 @@ public class JavalinWrapper implements Wrapper {
             if (Context.get() != null) {
                 return; // Do not extract if context already exists.
             }
-            // Create a context object :
+
+            // cookieMap() returns the last value if the key is the same for the cookie, however cookie(str key) returns
+            // the first one (in accordance with IETF rules), We merge both values to ensure full coverage :
+            HashMap<String, List<String>> cookies = new HashMap<>();
+            for(Map.Entry<String, String> cookie: ctx.cookieMap().entrySet()) {
+                List<String> cookieValues = new ArrayList<>();
+                cookieValues.add(cookie.getValue()); // Add the value from ctx.cookieMap()
+                if (!ctx.cookie(cookie.getKey()).equals(cookie.getValue())) {
+                    cookieValues.add(ctx.cookie(cookie.getKey())); // Add the value from ctx.cookie(str key)
+                }
+                cookies.put(cookie.getKey(), cookieValues); // Store
+            }
+
+            // headerMap() returns the value for the last sent header if the key is the same, this is also how
+            // ctx.header(str key) operates so we don't have to change anything.
+            Map<String, String> headers = ctx.headerMap();
+
+            // Create a context object for Javalin
             ContextObject context = new JavalinContextObject(
                     ctx.method().name(), ctx.url(), ctx.ip(),
-                    ctx.queryParamMap(), ctx.cookieMap(), ctx.headerMap()
+                    ctx.queryParamMap(), cookies, headers
             );
             WebRequestCollector.Res response = WebRequestCollector.report(context);
 

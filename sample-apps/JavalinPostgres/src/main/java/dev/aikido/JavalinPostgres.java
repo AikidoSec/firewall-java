@@ -93,6 +93,16 @@ public class JavalinPostgres {
             String content = Helpers.readFile(filePath);
             ctx.result(content);
         });
+        app.get("/api/read_cookie", ctx -> {
+            String filePath = ctx.cookie("fpath");
+            String content = Helpers.readFile(filePath);
+            ctx.result(content);
+        });
+        app.get("/api/read_cookiemap", ctx -> {
+            String filePath = ctx.cookieMap().get("fpath");
+            String content = Helpers.readFile(filePath);
+            ctx.result(content);
+        });
     }
 
     private static String loadHtmlFromFile(String filePath) {
