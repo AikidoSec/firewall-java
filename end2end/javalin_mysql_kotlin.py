@@ -14,7 +14,11 @@ javalin_mysql_app.add_payload(
     safe_request=Request(route="/api/request", body={"url": "https://aikido.dev/"}),
     unsafe_request=Request(route="/api/request", body={"url": "http://localhost:5000"})
 )
-
+javalin_mysql_app.add_payload(
+    "ssrf, but to the app itself",
+    safe_request=Request(route="/api/request", body={"url": "http://localhost:8098/api/read?fileName=README.md"}),
+    unsafe_request=Request(route="/api/request", body={"url": "http://localhost:5000"})
+)
 javalin_mysql_app.add_payload(
     "path_traversal",
     safe_request=Request(route="/api/read", body={"fileName": "README.md"}),

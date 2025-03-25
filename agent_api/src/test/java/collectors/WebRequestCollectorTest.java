@@ -140,8 +140,12 @@ class WebRequestCollectorTest {
 
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
 
+        assertNull(response); // Private IP
+
+        contextObject.setIp("4.4.4.4");
+        response = WebRequestCollector.report(contextObject);
         assertNotNull(response);
-        assertEquals("Your IP address is not allowed to access this resource. (Your IP: 192.168.1.1)", response.msg());
+        assertEquals("Your IP address is not allowed to access this resource. (Your IP: 4.4.4.4)", response.msg());
         assertEquals(403, response.status());
     }
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
