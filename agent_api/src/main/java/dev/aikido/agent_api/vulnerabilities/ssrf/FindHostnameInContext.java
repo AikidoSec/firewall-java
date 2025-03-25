@@ -9,11 +9,19 @@ import java.util.Map;
 import java.util.Optional;
 
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrl;
+import static dev.aikido.agent_api.vulnerabilities.ssrf.RequestToItselfChecker.isRequestToItself;
 
 public final class FindHostnameInContext {
     private FindHostnameInContext() {}
     public record Res(String source, String pathToPayload, String payload) {}
+
     public static Res findHostnameInContext(String hostname, ContextObject context, int port) {
+        // We don't want to block outgoing requests to the same host as the server
+        // (often happens that we have a match on headers like `Host`, `Origin`, `Referer`, etc.)
+        if (isRequestToItself(context.getUrl(), hostname, port)) {
+            return null;
+        }
+
         Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(context).getAll();
         for (Map.Entry<String, Map<String, String>> sourceEntry : stringsFromContext.entrySet()) {
             String source = sourceEntry.getKey();
