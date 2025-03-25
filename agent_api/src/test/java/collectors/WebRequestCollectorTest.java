@@ -29,8 +29,8 @@ class WebRequestCollectorTest {
     @BeforeEach
     void setUp() {
         contextObject = new EmptySampleContextObject();
-        contextObject.getHeaders().put("content-type", "application/json");
-        contextObject.getHeaders().put("user-agent", "Mozilla/5.0 (compatible) AI2Bot (+https://www.allenai.org/crawler)");
+        contextObject.getHeaders().put("content-type", List.of("application/json"));
+        contextObject.getHeaders().put("user-agent", List.of("Mozilla/5.0 (compatible) AI2Bot (+https://www.allenai.org/crawler)"));
         threadCacheObject = mock(ThreadCacheObject.class);
     }
 

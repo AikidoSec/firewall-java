@@ -7,8 +7,7 @@ import java.util.Map;
 public class ProxyForwardedParser {
     private static final String X_FORWARDED_FOR = "x-forwarded-for";
 
-    public static String getIpFromRequest(String rawIp, Map<String, String> headers) {
-        String xForwardedForHeader = headers.get(X_FORWARDED_FOR);
+    public static String getIpFromRequest(String rawIp, String xForwardedForHeader) {
         if (xForwardedForHeader != null && !xForwardedForHeader.isEmpty() && trustProxy()) {
             // Parse X-Forwarded-For and return the correct IP :
             String xForwardedForIp = extractIpFromHeader(xForwardedForHeader);

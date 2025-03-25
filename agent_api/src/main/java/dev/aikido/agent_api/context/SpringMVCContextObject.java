@@ -8,7 +8,7 @@ import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromU
 public class SpringMVCContextObject extends SpringContextObject {
     public SpringMVCContextObject(
             String method, StringBuffer url, String rawIp, Map<String, String[]> queryParams,
-            HashMap<String, List<String>> cookies, HashMap<String, String> headers
+            HashMap<String, List<String>> cookies, HashMap<String, Enumeration<String>> headers
     ) {
         this.method = method;
         if (url != null) {
@@ -16,12 +16,30 @@ public class SpringMVCContextObject extends SpringContextObject {
         }
         this.query = extractQueryParameters(queryParams);
         this.cookies = cookies;
-        this.headers = headers;
+        this.headers = extractHeaders(headers);
         this.route = buildRouteFromUrl(this.url);
-        this.remoteAddress = getIpFromRequest(rawIp, this.headers);
+        this.remoteAddress = getIpFromRequest(rawIp, this.getHeader("x-forwarded-for"));
         this.source = "SpringFramework";
         this.redirectStartNodes = new ArrayList<>();
     }
+
+    private HashMap<String, List<String>> extractHeaders(HashMap<String, Enumeration<String>> headers) {
+        HashMap<String, List<String>> extractedHeaders = new HashMap<>();
+
+        for (Map.Entry<String, Enumeration<String>> entry : headers.entrySet()) {
+            Enumeration<String> valuesEnum = entry.getValue();
+            List<String> valuesList = new ArrayList<>();
+            while (valuesEnum.hasMoreElements()) {
+                valuesList.add(valuesEnum.nextElement()); // Add each value to the list
+            }
+
+            String key = entry.getKey().toLowerCase(); // Convert key to lowercase
+            extractedHeaders.put(key, valuesList);
+        }
+
+        return extractedHeaders;
+    }
+
     @Override
     public Object getBody() {
         if (this.body != null) {

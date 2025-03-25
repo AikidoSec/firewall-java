@@ -13,65 +13,47 @@ public class GetBodyDataTypeTest {
 
     @Test
     public void testJsonContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", "application/json");
-        assertEquals("json", getBodyDataType(headers));
+        assertEquals("json", getBodyDataType("application/json"));
     }
 
     @Test
     public void testVndApiJsonContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", "application/vnd.api+json");
-        assertEquals("json", getBodyDataType(headers));
+        assertEquals("json", getBodyDataType("application/vnd.api+json"));
     }
 
     @Test
     public void testCspReportContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", "application/csp-report");
-        assertEquals("json", getBodyDataType(headers));
+        assertEquals("json", getBodyDataType("application/csp-report"));
     }
 
     @Test
     public void testXJsonContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", "application/x-json");
-        assertEquals("json", getBodyDataType(headers));
+        assertEquals("json", getBodyDataType("application/x-json"));
     }
 
     @Test
     public void testFormUrlEncodedContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", "application/x-www-form-urlencoded");
-        assertEquals("form-urlencoded", getBodyDataType(headers));
+        assertEquals("form-urlencoded", getBodyDataType("application/x-www-form-urlencoded"));
     }
 
     @Test
     public void testMultipartFormDataContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", "multipart/form-data; boundary=---");
-        assertEquals("form-data", getBodyDataType(headers));
+        assertEquals("form-data", getBodyDataType("multipart/form-data; boundary=---"));
     }
 
     @Test
     public void testXmlContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", "application/xml");
-        assertEquals("xml", getBodyDataType(headers));
+        assertEquals("xml", getBodyDataType("application/xml"));
     }
 
     @Test
     public void testEmptyContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", "");
-        assertNull(getBodyDataType(headers));
+        assertNull(getBodyDataType(""));
     }
 
     @Test
     public void testNullContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", null);
-        assertNull(getBodyDataType(headers));
+        assertNull(getBodyDataType(null));
     }
 
     @Test
@@ -81,8 +63,6 @@ public class GetBodyDataTypeTest {
 
     @Test
     public void testUnknownContentType() {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("content-type", "text/plain");
-        assertNull(getBodyDataType(headers));
+        assertNull(getBodyDataType("text/plain"));
     }
 }
