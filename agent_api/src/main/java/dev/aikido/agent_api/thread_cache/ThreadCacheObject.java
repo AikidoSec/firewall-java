@@ -81,6 +81,7 @@ public class ThreadCacheObject {
             for (IPListEntry entry: allowedIps) {
                 if (entry.ipList.matches(ip)) {
                     ipAllowed = true; // We allow IP addresses as long as they match with one of the lists.
+                    break;
                 }
             }
             if (!ipAllowed) {
