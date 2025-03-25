@@ -23,7 +23,7 @@ import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 class WebRequestCollectorTest {
 
-    private ContextObject contextObject;
+    private EmptySampleContextObject contextObject;
     private ThreadCacheObject threadCacheObject;
 
     @BeforeEach
@@ -105,7 +105,7 @@ class WebRequestCollectorTest {
     void testReport_ipBlockedTwice() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
                 new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.1"))
-        ), "");
+        ), null, "");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(new Endpoint(
                 "GET", "/api/resource", 100, 100,
@@ -126,7 +126,7 @@ class WebRequestCollectorTest {
     void testReport_ipBlockedUsingLists() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
                 new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
-        ), "");
+        ), null, "");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
         ThreadCache.set(threadCacheObject);
@@ -138,13 +138,49 @@ class WebRequestCollectorTest {
         assertEquals("Your IP address is not allowed to access this resource. (Your IP: 192.168.1.1)", response.msg());
         assertEquals(403, response.status());
     }
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
+    @Test
+    void testReport_ipNotAllowedUsingLists() {
+        ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(null, List.of(
+                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.2.1"))
+        ), "");
+        // Mock ThreadCache
+        threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
+        ThreadCache.set(threadCacheObject);
+
+
+        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
+
+        assertNull(response); // Private IP
+
+        contextObject.setIp("4.4.4.4");
+        response = WebRequestCollector.report(contextObject);
+        assertNotNull(response);
+        assertEquals("Your IP address is not allowed to access this resource. (Your IP: 4.4.4.4)", response.msg());
+        assertEquals(403, response.status());
+    }
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
+    @Test
+    void testReport_ipInAllowlist() {
+        ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(null, List.of(
+                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.1", "10.0.0.0/24"))
+        ), "");
+        // Mock ThreadCache
+        threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
+        ThreadCache.set(threadCacheObject);
+
+
+        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
+
+        assertNull(response);
+    }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
     @Test
     void testReport_ipNotBlockedUsingListsNorUserAgent() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
                 new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
-        ), "Unrelated|random");
+        ), null, "Unrelated|random");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
         ThreadCache.set(threadCacheObject);
@@ -160,7 +196,7 @@ class WebRequestCollectorTest {
     void testReport_userAgentBlocked() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
                 new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
-        ), "AI2Bot|hacker");
+        ), null, "AI2Bot|hacker");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.of(blockedListsRes));
         ThreadCache.set(threadCacheObject);
@@ -178,7 +214,7 @@ class WebRequestCollectorTest {
     void testReport_userAgentBlocked_Ip_Bypassed() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
                 new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
-        ), "AI2Bot|hacker");
+        ), null, "AI2Bot|hacker");
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(),
                 /* bypassedIps : */ Set.of("192.168.1.1"), new Routes(), Optional.of(blockedListsRes));
@@ -196,7 +232,27 @@ class WebRequestCollectorTest {
     void testReport_ipBlockedUsingLists_Ip_Bypassed() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
                 new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
-        ), "");
+        ), null, "");
+        // Mock ThreadCache
+        threadCacheObject = new ThreadCacheObject(List.of(), Set.of(),
+                /* bypassedIps : */ Set.of("192.168.1.1"), new Routes(), Optional.of(blockedListsRes));
+        ThreadCache.set(threadCacheObject);
+
+
+        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
+
+        assertNull(response);
+        assertNull(Context.get());
+    }
+
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "test-token")
+    @Test
+    void testReport_ipNotAllowedUsingLists_Ip_Bypassed() {
+        ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(
+            null,
+            List.of(new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("1.2.3.4"))),
+            ""
+        );
         // Mock ThreadCache
         threadCacheObject = new ThreadCacheObject(List.of(), Set.of(),
                 /* bypassedIps : */ Set.of("192.168.1.1"), new Routes(), Optional.of(blockedListsRes));
