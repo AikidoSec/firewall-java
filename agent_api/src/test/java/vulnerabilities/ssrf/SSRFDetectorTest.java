@@ -16,8 +16,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class SSRFDetectorTest {
@@ -83,5 +82,26 @@ public class SSRFDetectorTest {
         assertEquals(".arg.[0]", attackData.pathToPayload);
         assertEquals("localhost", attackData.metadata.get("hostname"));
         assertEquals("80", attackData.metadata.get("port"));
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
+    public void testSsrfDetectorWithRedirectToLocalhostButIsRequestToItself() throws MalformedURLException {
+        // Setup context :
+        Context.set(new EmptySampleContextObject(
+                "http://ssrf-redirects.testssandbox.com/ssrf", // argument
+                "http://ssrf-redirects.testssandbox.com/examplesite")); // url
+        ThreadCache.set(getEmptyThreadCacheObject());
+
+
+        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
+        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"));
+        Attack attackData = new SSRFDetector().run(
+                "localhost", 80,
+                List.of("127.0.0.1"),
+                "test2nd_op"
+        );
+
+        assertNull(attackData);
     }
 }
