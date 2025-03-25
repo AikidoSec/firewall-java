@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
+import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
 
 public class ThreadCacheObject {
     private final List<Endpoint> endpoints;
@@ -73,11 +74,21 @@ public class ThreadCacheObject {
      * Check if the IP is blocked (e.g. Geo IP Restrictions)
      */
     public BlockedResult isIpBlocked(String ip) {
-        for (IPListEntry entry: allowedIps) {
-            if (!entry.ipList.matches(ip)) {
-                return new BlockedResult(true, entry.description);
+        // Check for allowed ip addresses (i.e. only one country is allowed to visit the site)
+        // Always allow access from private IP addresses (those include local IP addresses)
+        if(allowedIps != null && allowedIps.size() > 0 && !isPrivateIp(ip)) {
+            boolean ipAllowed = false;
+            for (IPListEntry entry: allowedIps) {
+                if (entry.ipList.matches(ip)) {
+                    ipAllowed = true; // We allow IP addresses as long as they match with one of the lists.
+                }
+            }
+            if (!ipAllowed) {
+                return new BlockedResult(true, "allowlist");
             }
         }
+
+        // Check for blocked ip addresses
         for (IPListEntry entry: blockedIps) {
             if (entry.ipList.matches(ip)) {
                 return new BlockedResult(true, entry.description);
