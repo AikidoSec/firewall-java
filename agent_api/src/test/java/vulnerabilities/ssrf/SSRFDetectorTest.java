@@ -87,7 +87,6 @@ public class SSRFDetectorTest {
         Context.set(new EmptySampleContextObject(
                 "http://ssrf-redirects.testssandbox.com/ssrf", // argument
                 "http://ssrf-redirects.testssandbox.com/examplesite")); // url
-        ThreadCache.set(getEmptyThreadCacheObject());
 
 
         URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));

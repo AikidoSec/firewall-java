@@ -11,7 +11,6 @@ import java.util.Map;
 
 import static dev.aikido.agent_api.background.cloud.GetManagerInfo.getManagerInfo;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
-import static dev.aikido.agent_api.helpers.extraction.UserAgentFromContext.getUserAgent;
 import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
 
 
