@@ -20,8 +20,8 @@ class JavalinContextObjectTest {
         String rawIp = "192.168.1.1";
         Map<String, List<String>> queryParams = new HashMap<>();
         queryParams.put("param1", List.of("value1"));
-        Map<String, String> cookies = new HashMap<>();
-        cookies.put("sessionId", "abc123");
+        HashMap<String, List<String>> cookies = new HashMap<>();
+        cookies.put("sessionId", List.of("abc123", "456"));
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
 
@@ -33,11 +33,13 @@ class JavalinContextObjectTest {
         assertEquals("GET", contextObject.getMethod());
         assertEquals("http://example.com/api/resource", contextObject.getUrl());
         assertEquals("192.168.1.1", contextObject.getRemoteAddress());
-        assertEquals("application/json", contextObject.getHeaders().get("content-type"));
+        assertEquals("application/json", contextObject.getHeader("content-type"));
         assertEquals(1, contextObject.getQuery().size());
         assertEquals("value1", contextObject.getQuery().get("param1").get(0));
         assertEquals(1, contextObject.getCookies().size());
         assertEquals("abc123", contextObject.getCookies().get("sessionId").get(0));
+        assertEquals("456", contextObject.getCookies().get("sessionId").get(1));
+
     }
 
     @Test
@@ -84,7 +86,7 @@ class JavalinContextObjectTest {
     @Test
     void testHeadersExtraction() {
         // Test headers extraction through the constructor
-        assertEquals("application/json", contextObject.getHeaders().get("content-type"));
+        assertEquals("application/json", contextObject.getHeader("content-type"));
         assertEquals(1, contextObject.getHeaders().size());
         assertTrue(contextObject.getHeaders().containsKey("content-type"));
     }
@@ -100,9 +102,9 @@ class JavalinContextObjectTest {
     @Test
     void testMultipleCookiesExtraction() {
         // Test with multiple cookies
-        Map<String, String> cookies = new HashMap<>();
-        cookies.put("sessionId", "abc123");
-        cookies.put("userId", "user456");
+        HashMap<String, List<String>> cookies = new HashMap<>();
+        cookies.put("sessionId", List.of("abc123"));
+        cookies.put("userId", List.of("user456"));
         contextObject = new JavalinContextObject("GET", "http://example.com", "192.168.1.1", new HashMap<>(), cookies, new HashMap<>());
 
         assertEquals("abc123", contextObject.getCookies().get("sessionId").get(0));

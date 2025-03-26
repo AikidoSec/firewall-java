@@ -22,4 +22,22 @@ public class EmptySampleContextObject extends ContextObject {
         this();
         this.query.put("arg", List.of(argument));
     }
+    public EmptySampleContextObject(HashMap<String, List<String>> headers) {
+        this();
+        this.headers = headers;
+    }
+    public EmptySampleContextObject(String argument, String url) {
+        this();
+        this.query.put("arg", List.of(argument));
+        this.url = url;
+    }
+    public EmptySampleContextObject(String argument, String route, String method) {
+        this();
+        this.query.put("arg", List.of(argument));
+        this.route = route;
+        this.method = method;
+    }
+    public void setIp(String ip) {
+        this.remoteAddress = ip;
+    }
 }

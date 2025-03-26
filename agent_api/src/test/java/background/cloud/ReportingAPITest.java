@@ -26,7 +26,7 @@ public class ReportingAPITest {
         Optional<APIResponse> res = api.fetchNewConfig("token");
         assertTrue(res.isPresent());
         assertTrue(res.get().block());
-        assertEquals(1, res.get().endpoints().size());
+        assertEquals(3, res.get().endpoints().size());
     }
     @Test
     public void testTimeoutInvalid() {
@@ -40,7 +40,7 @@ public class ReportingAPITest {
         Optional<APIResponse> res = api.fetchNewConfig("token");
         assertTrue(res.isPresent());
         assertTrue(res.get().block());
-        assertEquals(1, res.get().endpoints().size());
+        assertEquals(3, res.get().endpoints().size());
     }
     @Test
     @StdIo

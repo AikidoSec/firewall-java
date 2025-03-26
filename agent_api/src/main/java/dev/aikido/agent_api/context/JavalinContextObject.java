@@ -10,17 +10,17 @@ public class JavalinContextObject extends ContextObject {
     protected transient Map<String, Object> bodyMap = new HashMap<>();
     public JavalinContextObject(
             String method, String url, String rawIp, Map<String, List<String>> queryParams,
-            Map<String, String> cookies, Map<String, String> headers
+            HashMap<String, List<String>> cookies, Map<String, String> headers
     ) {
         this.method = method;
         if (url != null) {
             this.url = url.toString();
         }
         this.query = new HashMap<>(queryParams);
-        this.cookies = extractCookies(cookies);
+        this.cookies = cookies;
         this.headers = extractHeaders(headers);
         this.route = buildRouteFromUrl(this.url);
-        this.remoteAddress = getIpFromRequest(rawIp, this.headers);
+        this.remoteAddress = getIpFromRequest(rawIp, this.getHeader("x-forwarded-for"));
         this.source = "Javalin";
         this.redirectStartNodes = new ArrayList<>();
 
@@ -31,20 +31,11 @@ public class JavalinContextObject extends ContextObject {
         this.params = params;
         this.cache.remove("routeParams"); // Reset cache
     }
-
-    private static HashMap<String, List<String>> extractCookies(Map<String, String> cookieMap) {
-        HashMap<String, List<String>> cookies = new HashMap<>();
-
-        for (Map.Entry<String, String> entry : cookieMap.entrySet()) {
-            cookies.put(entry.getKey(), List.of(entry.getValue()));
-        }
-        return cookies;
-    }
-    private static HashMap<String, String> extractHeaders(Map<String, String> rawHeaders) {
-        HashMap<String, String> headers = new HashMap<>();
+    private static HashMap<String, List<String>> extractHeaders(Map<String, String> rawHeaders) {
+        HashMap<String, List<String>> headers = new HashMap<>();
         for (Map.Entry<String, String> entry: rawHeaders.entrySet()) {
             // Lower-case keys :
-            headers.put(entry.getKey().toLowerCase(), entry.getValue());
+            headers.put(entry.getKey().toLowerCase(), List.of(entry.getValue()));
         }
         return headers;
     }

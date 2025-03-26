@@ -1,43 +1,47 @@
-from utils.test_safe_vs_unsafe_payloads import test_safe_vs_unsafe_payloads, test_payloads_path_variables
-from javalin_postgres.test_sql_attacks import test_sql_attack
-from javalin_postgres.test_ip_blocking import test_ip_blocking
-from javalin_postgres.test_bot_blocking import test_bot_blocking
-from javalin_postgres.test_ratelimiting import test_ratelimiting_per_user, test_ratelimiting
-from utils.EventHandler import EventHandler
+from __init__ import events
+from utils import App, Request
 
-payloads = {
-    "safe": { "name": "Bobby" },
-    "unsafe": { "name": "Malicious Pet', 'Gru from the Minions') -- " }
-}
-payloads_exec = {
-    "safe": "Johhny",
-    "unsafe": "'; sleep 2; # "
-}
-urls = {
-    "disabled": "http://localhost:8089",
-    "enabled": "http://localhost:8088"
-}
+javalin_postgres_app = App(8088)
 
-event_handler = EventHandler()
-event_handler.reset()
-test_safe_vs_unsafe_payloads(payloads, urls, route="/api/create") # Test Postgres+Javalin compat
-print("✅ Tested safe/unsafe payloads on /api/create")
-
-# Test blocklists :
-test_ip_blocking("http://localhost:8088/")
-print("✅ Tested IP Blocking")
-test_bot_blocking("http://localhost:8088/")
-print("✅ Tested bot blocking")
-
-# Test ratelimiting (we can use a header to set user) :
-test_ratelimiting("http://localhost:8088/test_ratelimiting_1")
-print("✅ Tested rate-limiting")
-test_ratelimiting_per_user("http://localhost:8088/test_ratelimiting_1")
-print("✅ Tested rate-limiting per user")
-
-test_sql_attack(event_handler)
-print("✅ Tested accurate reporting of an attack")
-
-# Test path variables :
-test_payloads_path_variables(payloads_exec, urls, route="/api/execute/")
-print("✅ Tested attack using path variables.")
+javalin_postgres_app.add_payload(
+    "sql",
+    safe_request=Request(
+        route="/api/create", body={"name": "Bobby"}
+    ),
+    unsafe_request=Request(
+        route="/api/create", body={"name": "Malicious Pet', 'Gru from the Minions') -- "}
+    ),
+    test_event=events["javalin_postgres_attack"]
+)
+javalin_postgres_app.add_payload(
+    "exec",
+    safe_request=Request(route="/api/execute/Bobby", method='GET'),
+    unsafe_request=Request(route="/api/execute/Malicious%20Pet%27%2C%20%27Gru%20from%20the%20Minions%27%29%20--%20", method='GET')
+)
+javalin_postgres_app.add_payload(
+    "path_traversal_via_cookie",
+    # First fpath in Cookie list gets taken : ctx.cookie(str key)
+    safe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'fpath=home.txt;fpath=123;fpath=../secrets/key.txt'}),
+    unsafe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'fpath=../secrets/key.txt;fpath=home.txt'})
+)
+javalin_postgres_app.add_payload(
+    "path_traversal_via_cookiemap",
+    # Last fpath in Cookie list gets taken : ctx.cookieMap()
+    safe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=../secrets/key.txt;fpath=home.txt'}),
+    unsafe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=home.txt;fpath=123;fpath=../secrets/key.txt'}),
+)
+javalin_postgres_app.add_payload(
+    "path_traversal_via_cookie_all_same",
+    # Last fpath in Cookie list gets taken : ctx.cookieMap()
+    safe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'fpath=home.txt;fpath=../secrets/key.txt;fpath=home.txt'}),
+    unsafe_request=Request("/api/read_cookie", method='GET', headers={'Cookie': 'fpath=../secrets/key.txt;fpath=../secrets/key.txt'}),
+)
+javalin_postgres_app.add_payload(
+    "path_traversal_via_cookiemap_all_same",
+    # Last fpath in Cookie list gets taken : ctx.cookieMap()
+    safe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=home.txt;fpath=../secrets/key.txt;fpath=home.txt'}),
+    unsafe_request=Request("/api/read_cookiemap", method='GET', headers={'Cookie': 'fpath=../secrets/key.txt;fpath=../secrets/key.txt'}),
+)
+javalin_postgres_app.test_all_payloads()
+javalin_postgres_app.test_blocking()
+javalin_postgres_app.test_rate_limiting()

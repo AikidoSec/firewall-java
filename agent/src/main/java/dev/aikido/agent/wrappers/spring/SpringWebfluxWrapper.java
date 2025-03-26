@@ -66,7 +66,7 @@ public class SpringWebfluxWrapper implements Wrapper {
                 return null;
             }
             // Extract headers & query parameters :
-            Set<Map.Entry<String, List<String>>> headerEntries = req.getHeaders().entrySet();
+            Map<String, List<String>> headers = req.getHeaders();
             Map<String, List<String>> query = req.getQueryParams();
 
             // Extract cookies :
@@ -80,7 +80,7 @@ public class SpringWebfluxWrapper implements Wrapper {
             ContextObject context = new SpringWebfluxContextObject(
                     req.getMethod().toString(), req.getURI().toString(),
                     Objects.requireNonNull(req.getRemoteAddress()),
-                    cookieMap, query, req.getHeaders().toSingleValueMap()
+                    cookieMap, query, headers
             );
 
             // If the request gets blocked (e.g. IP Blocking), write a response here :

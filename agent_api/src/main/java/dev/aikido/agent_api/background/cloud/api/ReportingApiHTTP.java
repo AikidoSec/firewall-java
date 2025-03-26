@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.helpers.net.IPList;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 
 import java.io.InputStream;
@@ -107,8 +108,12 @@ public class ReportingApiHTTP extends ReportingApi {
         } else if (status == 401) {
             return getUnsuccessfulAPIResponse("invalid_token");
         } else if (status == 200) {
-            Gson gson = new Gson();
-            return gson.fromJson(res.body(), APIResponse.class);
+            try {
+                return new Gson().fromJson(res.body(), APIResponse.class);
+            } catch (Throwable e) {
+                logger.debug("json error: %s", e);
+                return getUnsuccessfulAPIResponse("json_deserialize");
+            }
         }
         return getUnsuccessfulAPIResponse("unknown_error");
     }

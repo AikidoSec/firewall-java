@@ -13,11 +13,7 @@ public final class GetBodyDataType {
             "application/x-json"
     );
 
-    public static String getBodyDataType(Map<String, String> headers) {
-        if (headers == null) {
-            return null;
-        }
-        String contentType = headers.get("content-type");
+    public static String getBodyDataType(String contentType) {
         if (contentType == null || contentType.isEmpty()) {
             return null;
         }
