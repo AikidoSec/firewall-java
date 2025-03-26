@@ -1,7 +1,16 @@
 # Setting up Spring
 > If you are looking for **Spring Webflux** [click here](./spring_webflux.md)
 
-To setup with Spring you just have to follow the normal installation instructions for the Java Agent.
+## Installation
+
+1. Follow the normal installation instructions for the Java Agent.
+
+2. Set your Aikido token as an environment variable:
+```sh
+AIKIDO_TOKEN="AIK_RUNTIME_YOUR_TOKEN_HERE"
+```
+
+You can get your token from the [Aikido Security Dashboard](https://help.aikido.dev/doc/creating-an-aikido-zen-firewall-token/doc6vRJNzC4u).
 ## Rate-limiting
 Adding rate-limiting and user blocking capabilities to your Spring app requires you to run `ShouldBlockRequest.shouldBlockRequest()`.
 

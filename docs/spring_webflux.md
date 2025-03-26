@@ -1,6 +1,15 @@
 # Setting up Spring Webflux
 
-To setup with Spring Webflux you just have to follow the normal installation instructions for the Java Agent.
+## Installation
+
+1. Follow the normal installation instructions for the Java Agent.
+
+2. Set your Aikido token as an environment variable:
+```sh
+AIKIDO_TOKEN="AIK_RUNTIME_YOUR_TOKEN_HERE"
+```
+
+You can get your token from the [Aikido Security Dashboard](https://help.aikido.dev/doc/creating-an-aikido-zen-firewall-token/doc6vRJNzC4u).
 
 ## Rate-limiting
 
