@@ -49,12 +49,12 @@ public final class WebRequestCollector {
         // Blocked IP lists (e.g. Geo restrictions)
         Configuration.BlockedResult ipBlocked = config.isIpBlocked(newContext.getRemoteAddress());
         if (ipBlocked.blocked()) {
-            String msg = "Your IP address is not allowed to access this resource.";
+            String msg = "Your IP address is not allowed.";
             msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
             return new Res(msg, 403);
         }
         // User-Agent blocking (e.g. blocking bots)
-        String userAgent = newContext.getHeaders().get("user-agent");
+        String userAgent = newContext.getHeader("user-agent");
         if (userAgent != null && !userAgent.isEmpty()) {
             if (config.isBlockedUserAgent(userAgent)) {
                 String msg = "You are not allowed to access this resource because you have been identified as a bot.";

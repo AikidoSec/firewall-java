@@ -6,12 +6,14 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 
+import java.util.List;
 import java.util.Map;
 
 import static dev.aikido.agent_api.background.cloud.GetManagerInfo.getManagerInfo;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static dev.aikido.agent_api.helpers.extraction.UserAgentFromContext.getUserAgent;
 import static dev.aikido.agent_api.storage.ConfigStore.getConfig;
+
 
 public final class DetectedAttack {
     private DetectedAttack() {}
@@ -24,7 +26,7 @@ public final class DetectedAttack {
     ) implements APIEvent {}
     public record RequestData (
         String method,
-        Map<String, String> headers,
+        Map<String, List<String>> headers,
         String ipAddress,
         String userAgent,
         String url,
@@ -52,7 +54,7 @@ public final class DetectedAttack {
             context.getMethod(), // Method
             context.getHeaders(), // headers
             context.getRemoteAddress(), // ipAddress
-            getUserAgent(context), // userAgent
+            context.getHeader("user-agent"), // userAgent
             context.getUrl(), // url
             context.getJSONBody(), // body
             context.getSource(), // source

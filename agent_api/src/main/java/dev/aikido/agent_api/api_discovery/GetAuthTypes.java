@@ -21,13 +21,10 @@ public final class GetAuthTypes {
     };
 
     public static List<Map<String, String>> getAuthTypes(ContextObject context) {
-        if (context.getHeaders() == null) {
-            return null;
-        }
         List<Map<String, String>> result = new ArrayList<>();
 
         // Check the Authorization header
-        String authHeader = context.getHeaders().get("authorization");
+        String authHeader = context.getHeader("authorization");
         Map<String, String> authHeaderType = getAuthorizationHeaderType(authHeader);
         if (authHeaderType != null) {
             result.add(authHeaderType);
@@ -57,7 +54,7 @@ public final class GetAuthTypes {
         List<Map<String, String>> result = new ArrayList<>();
 
         for (String header : COMMON_API_KEY_HEADER_NAMES) {
-            if (context.getHeaders().containsKey(header)) {
+            if (context.getHeaders() != null && context.getHeaders().containsKey(header)) {
                 Map<String, String> apiKeyInfo = Map.of("type", "apiKey", "in", "header", "name", header);
                 result.add(apiKeyInfo);
             }
