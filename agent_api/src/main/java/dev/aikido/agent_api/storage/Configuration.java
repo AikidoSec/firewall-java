@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
+import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
 
 public class Configuration {
     private boolean blocking;
@@ -119,12 +120,23 @@ public class Configuration {
      * This first checks the global ip allowlist, and afterward the global ip blocklist.
      */
     public BlockedResult isIpBlocked(String ip) {
-        for (IPListEntry entry : allowedIps) {
-            if (!entry.ipList.matches(ip)) {
-                return new BlockedResult(true, entry.description);
+        // Check for allowed ip addresses (i.e. only one country is allowed to visit the site)
+        // Always allow access from private IP addresses (those include local IP addresses)
+        if(!allowedIps.isEmpty() && !isPrivateIp(ip)) {
+            boolean ipAllowed = false;
+            for (IPListEntry entry: allowedIps) {
+                if (entry.ipList.matches(ip)) {
+                    ipAllowed = true; // We allow IP addresses as long as they match with one of the lists.
+                    break;
+                }
+            }
+            if (!ipAllowed) {
+                return new BlockedResult(true, "allowlist");
             }
         }
-        for (IPListEntry entry : blockedIps) {
+
+        // Check for blocked ip addresses
+        for (IPListEntry entry: blockedIps) {
             if (entry.ipList.matches(ip)) {
                 return new BlockedResult(true, entry.description);
             }
