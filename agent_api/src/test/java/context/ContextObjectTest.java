@@ -90,5 +90,19 @@ class ContextObjectTest {
         String result = context.getHeader("Empty-Header");
         assertNull(result);
     }
+
+    @Test
+    public void testOptionalForcedProtectionOffIsEmpty() {
+        assertTrue(context.getForcedProtectionOff().isEmpty());
+    }
+
+    @Test
+    public void testSettingForcedProtectionOff() {
+        context.setForcedProtectionOff(true);
+        assertTrue(context.getForcedProtectionOff().get());
+
+        context.setForcedProtectionOff(false);
+        assertFalse(context.getForcedProtectionOff().get());
+    }
 }
 
