@@ -1,12 +1,8 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
 import dev.aikido.agent_api.helpers.net.IPList;
-import inet.ipaddr.IPAddressString;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public final class IsPrivateIP {
     // Define private IP ranges
