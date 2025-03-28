@@ -2,9 +2,7 @@ package vulnerabilities;
 
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.storage.routes.Routes;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
+import dev.aikido.agent_api.storage.ConfigStore;
 import dev.aikido.agent_api.vulnerabilities.Detector;
 import dev.aikido.agent_api.vulnerabilities.Scanner;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
@@ -19,6 +17,8 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static utils.EmptyAPIResponses.emptyAPIResponse;
+import static utils.EmptyAPIResponses.setEmptyConfigWithEndpointList;
 
 class ScannerTest {
     public static class SampleContextObject2 extends EmptySampleContextObject {
@@ -34,36 +34,28 @@ class ScannerTest {
             this.url = "http://localhost:5050" + route;
         }
     }
-    private ThreadCacheObject threadCacheObject;
     @BeforeEach
     void setUp() {
-        threadCacheObject = new ThreadCacheObject(
-            List.of(
-                    new Endpoint(
+        Context.set(new EmptySampleContextObject("SELECT * FRO"));
+        setEmptyConfigWithEndpointList(List.of(
+                new Endpoint(
                         /* method */ "*", /* route */ "/api2/*",
                         /* rlm params */ 0, 0,
                         /* Allowed IPs */ List.of(), /* graphql */ false,
                         /* forceProtectionOff */ true, /* rlm */ false
-                    ),
-                    new Endpoint(
+                ),
+                new Endpoint(
                         /* method */ "*", /* route */ "/api3/*",
                         /* rlm params */ 0, 0,
                         /* Allowed IPs */ List.of(), /* graphql */ false,
                         /* forceProtectionOff */ false, /* rlm */ false
-                    )
-            ),
-            Set.of(),
-            Set.of("1.1.1.1", "2.2.2.2", "3.3.3.3"),
-            new Routes(),
-            Optional.empty()
-        );
-        Context.set(new EmptySampleContextObject("SELECT * FRO"));
-        ThreadCache.set(threadCacheObject);
+                )
+        ));
     }
     @AfterEach
     void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
+        ConfigStore.updateFromAPIResponse(emptyAPIResponse);
     }
 
     @Test
@@ -79,11 +71,9 @@ class ScannerTest {
         verifyNoMoreInteractions(mockDetector); // Verify no other methods are
     }
 
-    // Disable IPC :
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     void testScanSafeSQLCode() {
+        ConfigStore.updateBlocking(true);
         // Safe :
         Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgresql"});
         // Argument-mismatch, safe :
@@ -96,11 +86,24 @@ class ScannerTest {
         });
     }
 
-    // Disable IPC :
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
+    @Test
+    void testScanSafeSQLCodeButBlockingFalse() {
+        ConfigStore.updateBlocking(false);
+        // Safe :
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgresql"});
+        // Argument-mismatch, safe :
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM"});
+        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
+
+        // Unsafe :
+        assertDoesNotThrow(() -> {
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+        });
+    }
+
     @Test
     void testForceProtectionOff() {
+        ConfigStore.updateBlocking(true);
         // Thread cache does not force any protection off :
         assertThrows(SQLInjectionException.class, () -> {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
@@ -122,22 +125,28 @@ class ScannerTest {
         });
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     void testDoesNotRunWithContextNull() {
+        ConfigStore.updateBlocking(true);
         Context.set(null);
         assertDoesNotThrow(() -> {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "improper-access-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
-    void TestStillThrowsWithThreadCacheUndefined() {
-        ThreadCache.set(null);
+    void TestStillThrowsWithConfigStoreEmptyButBlockingEnabled() {
+        ConfigStore.updateFromAPIResponse(emptyAPIResponse);
+        ConfigStore.updateBlocking(true);
         assertThrows(SQLInjectionException.class, () -> {
+            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+        });
+    }
+
+    @Test
+    void TestDoesNotThrowWithEmptyAPIResponse() {
+        ConfigStore.updateFromAPIResponse(emptyAPIResponse);
+        assertDoesNotThrow(() -> {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }

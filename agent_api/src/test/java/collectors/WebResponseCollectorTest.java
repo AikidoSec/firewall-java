@@ -4,21 +4,15 @@ import dev.aikido.agent_api.collectors.WebResponseCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
-import dev.aikido.agent_api.storage.routes.Routes;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
+import dev.aikido.agent_api.storage.routes.RoutesStore;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class WebResponseCollectorTest {
     public static class SampleContextObject extends ContextObject {
@@ -43,18 +37,12 @@ public class WebResponseCollectorTest {
     @BeforeAll
     public static void clean() {
         Context.set(null);
-        ThreadCache.set(null);
     };
-    @BeforeEach
-    public void setUp() throws SQLException {
-        // Connect to the MySQL database
-        ThreadCache.set(getEmptyThreadCacheObject());
-    }
 
     @AfterEach
     public void tearDown() throws SQLException {
         Context.set(null);
-        ThreadCache.set(null);
+        RoutesStore.clear();
     }
 
     @Test
@@ -63,26 +51,29 @@ public class WebResponseCollectorTest {
         // Test new route :
         Context.set(new SampleContextObject());
 
-        assertEquals(0, ThreadCache.get().getRoutes().size());
+        assertEquals(0, RoutesStore.getRoutesAsList().length);
         WebResponseCollector.report(200);
-        assertEquals(1, ThreadCache.get().getRoutes().size());
-        assertEquals(1, ThreadCache.get().getRoutes().get(routeMetadata1).getHits());
+        assertEquals(1, RoutesStore.getRoutesAsList().length);
+        assertEquals(1, RoutesStore.getRouteHits(routeMetadata1));
 
         // Test same route but incremented hits :
         WebResponseCollector.report(201);
-        assertEquals(1, ThreadCache.get().getRoutes().size());
-        assertEquals(2, ThreadCache.get().getRoutes().get(routeMetadata1).getHits());
+        assertEquals(1, RoutesStore.getRoutesAsList().length);
+        assertEquals(2, RoutesStore.getRouteHits(routeMetadata1));
 
         // Test same route but invalid status code
         WebResponseCollector.report(0);
-        assertEquals(1, ThreadCache.get().getRoutes().size());
-        assertEquals(2, ThreadCache.get().getRoutes().get(routeMetadata1).getHits());
+        assertEquals(1, RoutesStore.getRoutesAsList().length);
+        assertEquals(2, RoutesStore.getRouteHits(routeMetadata1));
 
         // Test same route but context not set :
         Context.set(null);
         WebResponseCollector.report(200);
-        assertEquals(1, ThreadCache.get().getRoutes().size());
-        assertEquals(2, ThreadCache.get().getRoutes().get(routeMetadata1).getHits());
+        assertEquals(1, RoutesStore.getRoutesAsList().length);
+        assertEquals(2, RoutesStore.getRouteHits(routeMetadata1));
+
+        RoutesStore.clear();
+        assertEquals(0, RoutesStore.getRoutesAsList().length);
     }
 
 
@@ -91,36 +82,16 @@ public class WebResponseCollectorTest {
     public void testResponseCollectorWithInvalidMethodOrStatusCode() throws SQLException {
         // Test with invalid method :
         Context.set(new SampleContextObject("OPTIONS"));
-        assertEquals(0, ThreadCache.get().getRoutes().size());
+        assertEquals(0, RoutesStore.getRoutesAsList().length);
         WebResponseCollector.report(200);
-        assertEquals(0, ThreadCache.get().getRoutes().size());
+        assertEquals(0, RoutesStore.getRoutesAsList().length);
 
         Context.set(new SampleContextObject());
         WebResponseCollector.report(400);
-        assertEquals(0, ThreadCache.get().getRoutes().size());
+        assertEquals(0, RoutesStore.getRoutesAsList().length);
         WebResponseCollector.report(199);
-        assertEquals(0, ThreadCache.get().getRoutes().size());
+        assertEquals(0, RoutesStore.getRoutesAsList().length);
         WebResponseCollector.report(-200);
-        assertEquals(0, ThreadCache.get().getRoutes().size());
+        assertEquals(0, RoutesStore.getRoutesAsList().length);
     }
-    @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    public void testNothingHappensWithEmptyThreadCache() throws SQLException {
-        // Test with emtpy thread cache :
-        Context.set(new SampleContextObject());
-        ThreadCacheObject threadCacheObject = ThreadCache.get();
-        ThreadCache.set(null);
-        assertEquals(0, threadCacheObject.getRoutes().size());
-        WebResponseCollector.report(200);
-        assertEquals(0, threadCacheObject.getRoutes().size());
-
-        // Test with emtpy thread cache getRoutes() :
-        Context.set(new SampleContextObject());
-        ThreadCache.set(new ThreadCacheObject(null, null, null, null, Optional.empty()));
-        assertNull(ThreadCache.get().getRoutes());
-        WebResponseCollector.report(200);
-        assertNull(ThreadCache.get().getRoutes());
-    }
-
-
 }
