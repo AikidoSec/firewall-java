@@ -1,5 +1,6 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
+import dev.aikido.agent_api.helpers.net.IPList;
 import inet.ipaddr.IPAddressString;
 
 import java.util.Arrays;
@@ -9,7 +10,7 @@ import java.util.Set;
 
 public final class IsPrivateIP {
     // Define private IP ranges
-    private static final String[] PRIVATE_IP_RANGES = {
+    private static final List<String> PRIVATE_IP_RANGES = List.of(
             "0.0.0.0/8", // "This" network (RFC 1122)
             "10.0.0.0/8", // Private-Use Networks (RFC 1918)
             "100.64.0.0/10", // Shared Address Space (RFC 6598)
@@ -29,23 +30,25 @@ public final class IsPrivateIP {
             "240.0.0.0/4", // Reserved for Future Use (RFC 1112)
             "224.0.0.0/4", // Multicast (RFC 3171)
             "255.255.255.255/32" // Limited Broadcast (RFC 919)
-    };
-    private static final String[] PRIVATE_IPV6_RANGES = {
+    );
+    private static final List<String> PRIVATE_IPV6_RANGES = List.of(
             "::/128", // Unspecified address (RFC 4291)
             "::1/128", // Loopback address (RFC 4291)
             "fc00::/7", // Unique local address (ULA) (RFC 4193)
             "fe80::/10", // Link-local address (LLA) (RFC 4291)
             "100::/64", // Discard prefix (RFC 6666)
             "2001:db8::/32", // Documentation prefix (RFC 3849)
-            "3fff::/20", // Documentation prefix (RFC 9637)
-    };
-    private static final Set<String> privateIpNetworks = new HashSet<>();
+            "3fff::/20" // Documentation prefix (RFC 9637)
+    );
+    private static final IPList privateIpNetworks = new IPList();
 
     static {
-        privateIpNetworks.addAll(Arrays.asList(PRIVATE_IP_RANGES));
-        privateIpNetworks.addAll(Arrays.asList(PRIVATE_IPV6_RANGES));
+        PRIVATE_IP_RANGES.stream().forEach(privateIpNetworks::add);
+        PRIVATE_IPV6_RANGES.stream().forEach(privateIpNetworks::add);
         // Add IPv4-mapped IPv6 addresses
-        privateIpNetworks.addAll(Arrays.stream(PRIVATE_IP_RANGES).map(IsPrivateIP::mapIPv4ToIPv6).toList());
+        for (String ipv4Ranges: PRIVATE_IP_RANGES) {
+            privateIpNetworks.add(mapIPv4ToIPv6(ipv4Ranges));
+        }
     }
 
     private IsPrivateIP() {
@@ -61,22 +64,7 @@ public final class IsPrivateIP {
     }
 
     public static boolean isPrivateIp(String ip) {
-        for (String network : privateIpNetworks) {
-            if (isInRange(ip, network)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isInRange(String ipAddress, String range) {
-        try {
-            return new IPAddressString(range).toAddress()
-                    .toSequentialRange()
-                    .contains(new IPAddressString(ipAddress).toAddress());
-        } catch (Exception e) {
-            return false; // Handle any exceptions that may occur
-        }
+        return privateIpNetworks.matches(ip);
     }
 
     /**
