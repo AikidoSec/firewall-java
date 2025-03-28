@@ -177,7 +177,7 @@ public class ThreadCacheObjectTest {
         /// Private IP :
         assertEquals(new ThreadCacheObject.BlockedResult(false, null), tCache.isIpBlocked("10.0.0.2"));
         /// Not in allowlist
-        assertEquals(new ThreadCacheObject.BlockedResult(true, "allowlist"), tCache.isIpBlocked("1.2.3.3"));
+        assertEquals(new ThreadCacheObject.BlockedResult(true, "not in allowlist"), tCache.isIpBlocked("1.2.3.3"));
     }
 
     @Test
@@ -194,7 +194,7 @@ public class ThreadCacheObjectTest {
         // Test a non-allowed private-IP
         assertEquals(new ThreadCacheObject.BlockedResult(false, null), tCache.isIpBlocked("10.0.0.2"));
         // Test a non-allowed IP
-        assertEquals(new ThreadCacheObject.BlockedResult(true, "allowlist"), tCache.isIpBlocked("1.2.3.4"));
+        assertEquals(new ThreadCacheObject.BlockedResult(true, "not in allowlist"), tCache.isIpBlocked("1.2.3.4"));
     }
 
     @Test
@@ -236,8 +236,8 @@ public class ThreadCacheObjectTest {
         assertEquals(new ThreadCacheObject.BlockedResult(false, null), tCache.isIpBlocked("8.8.8.1"));
 
         // Test a non-allowed IP
-        assertEquals(new ThreadCacheObject.BlockedResult(true, "allowlist"), tCache.isIpBlocked("4.4.4.1"));
-        assertEquals(new ThreadCacheObject.BlockedResult(true, "allowlist"), tCache.isIpBlocked("8.8.7.8"));
+        assertEquals(new ThreadCacheObject.BlockedResult(true, "not in allowlist"), tCache.isIpBlocked("4.4.4.1"));
+        assertEquals(new ThreadCacheObject.BlockedResult(true, "not in allowlist"), tCache.isIpBlocked("8.8.7.8"));
 
     }
 

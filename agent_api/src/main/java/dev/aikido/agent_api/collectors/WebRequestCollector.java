@@ -52,7 +52,7 @@ public final class WebRequestCollector {
         // Blocked IP lists (e.g. Geo restrictions)
         ThreadCacheObject.BlockedResult ipBlocked = threadCache.isIpBlocked(newContext.getRemoteAddress());
         if (ipBlocked.blocked()) {
-            String msg = "Your IP address is not allowed.";
+            String msg = "Your IP address is blocked. Reason: " + ipBlocked.description();
             msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
             return new Res(msg, 403);
         }
