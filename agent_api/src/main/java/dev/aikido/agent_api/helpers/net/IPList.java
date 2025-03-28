@@ -44,50 +44,56 @@ public class IPList {
         }
 
         try {
-            String[] parts = ipOrCIDR.split("/");
-            InetAddress address = InetAddress.getByName(parts[0]);
-            int prefixLength = getPrefixLength(parts, address);
-            if (prefixLength < 0) {
-                return;
+            // Pre-split the string to avoid multiple splits
+            int slashIndex = ipOrCIDR.indexOf('/');
+            String ipPart = slashIndex == -1 ? ipOrCIDR : ipOrCIDR.substring(0, slashIndex);
+            InetAddress address = InetAddress.getByName(ipPart);
+            int prefixLength;
+            
+            if (slashIndex == -1) {
+                prefixLength = address instanceof Inet4Address ? IPV4_LENGTH : IPV6_LENGTH;
+            } else {
+                prefixLength = Integer.parseInt(ipOrCIDR.substring(slashIndex + 1));
+                if ((address instanceof Inet4Address && prefixLength > IPV4_LENGTH) ||
+                    (address instanceof Inet6Address && prefixLength > IPV6_LENGTH)) {
+                    return;
+                }
             }
 
             byte[] addressBytes = address.getAddress();
-            if (address instanceof Inet4Address) {
-                insertIntoTrie(addressBytes, prefixLength, ipv4Root);
-            } else {
-                insertIntoTrie(addressBytes, prefixLength, ipv6Root);
+            
+            // Handle IPv4-mapped IPv6 addresses when adding
+            if (address instanceof Inet6Address && isIPv4MappedAddressFast(addressBytes)) {
+                byte[] ipv4Bytes = extractIPv4Bytes(addressBytes);
+                // Adjust prefix length for IPv4 part if needed
+                int ipv4PrefixLength = prefixLength > 96 ? prefixLength - 96 : 0;
+                if (ipv4PrefixLength > 0 && ipv4PrefixLength <= IPV4_LENGTH) {
+                    insertIntoTrie(ipv4Bytes, ipv4PrefixLength, ipv4Root);
+                }
             }
+            
+            insertIntoTrie(addressBytes, prefixLength, address instanceof Inet4Address ? ipv4Root : ipv6Root);
+            
         } catch (Exception e) {
             // Invalid IP format - silently ignore
         }
     }
 
-    private int getPrefixLength(String[] parts, InetAddress address) {
-        if (parts.length > 1) {
-            int prefixLength = Integer.parseInt(parts[1]);
-            if (address instanceof Inet4Address && prefixLength > IPV4_LENGTH) {
-                return -1;
-            }
-            if (address instanceof Inet6Address && prefixLength > IPV6_LENGTH) {
-                return -1;
-            }
-            return prefixLength;
-        }
-        return address instanceof Inet4Address ? IPV4_LENGTH : IPV6_LENGTH;
-    }
-
     private void insertIntoTrie(byte[] addressBytes, int prefixLength, TrieNode root) {
         TrieNode current = root;
+        int bitIndex = 0;
         
+        // Process bit by bit for more accurate prefix matching
         for (int i = 0; i < prefixLength; i++) {
-            int byteIndex = i / 8;
-            int bitIndex = 7 - (i % 8);
-            int bit = (addressBytes[byteIndex] >> bitIndex) & 1;
+            int bytePos = bitIndex / 8;
+            int bitPos = 7 - (bitIndex % 8);
+            int bit = (addressBytes[bytePos] >> bitPos) & 1;
             
             if (current.children[bit] == null) {
                 current.children[bit] = new TrieNode();
             }
             current = current.children[bit];
+            bitIndex++;
         }
         
         if (!current.isEndOfSubnet) {
@@ -110,28 +116,32 @@ public class IPList {
 
             if (address instanceof Inet4Address) {
                 return matchesInTrie(addressBytes, IPV4_LENGTH, ipv4Root);
-            } else {
-                // First try matching as IPv6
-                if (matchesInTrie(addressBytes, IPV6_LENGTH, ipv6Root)) {
+            }
+            
+            // For IPv6, first check if it's an IPv4-mapped address
+            if (isIPv4MappedAddressFast(addressBytes)) {
+                byte[] ipv4Bytes = extractIPv4Bytes(addressBytes);
+                if (matchesInTrie(ipv4Bytes, IPV4_LENGTH, ipv4Root)) {
                     return true;
                 }
-                // Then check if it's an IPv4-mapped address and try matching against IPv4 trie
-                if (isIPv4MappedAddress(addressBytes)) {
-                    byte[] ipv4Bytes = extractIPv4Bytes(addressBytes);
-                    return matchesInTrie(ipv4Bytes, IPV4_LENGTH, ipv4Root);
-                }
-                return false;
             }
+            
+            // Then check native IPv6 format
+            return matchesInTrie(addressBytes, IPV6_LENGTH, ipv6Root);
+            
         } catch (Exception e) {
             return false;
         }
     }
 
-    private boolean isIPv4MappedAddress(byte[] addressBytes) {
-        if (addressBytes.length != 16) {
-            return false;
+    private boolean isIPv4MappedAddressFast(byte[] addressBytes) {
+        if (addressBytes.length != 16) return false;
+        
+        // Check the first 10 bytes are zero and bytes 10-11 are 0xFF
+        for (int i = 0; i < 10; i++) {
+            if (addressBytes[i] != 0) return false;
         }
-        return Arrays.equals(Arrays.copyOfRange(addressBytes, 0, 12), IPV4_MAPPED_PREFIX);
+        return addressBytes[10] == (byte)0xff && addressBytes[11] == (byte)0xff;
     }
 
     private byte[] extractIPv4Bytes(byte[] ipv6Bytes) {
@@ -142,15 +152,19 @@ public class IPList {
 
     private boolean matchesInTrie(byte[] bytes, int maxBits, TrieNode root) {
         TrieNode current = root;
+        int bitIndex = 0;
         
-        for (int i = 0; i < maxBits && current != null; i++) {
+        while (bitIndex < maxBits && current != null) {
             if (current.isEndOfSubnet) {
                 return true;
             }
-            int byteIndex = i / 8;
-            int bitIndex = 7 - (i % 8);
-            int bit = (bytes[byteIndex] >> bitIndex) & 1;
+            
+            int bytePos = bitIndex / 8;
+            int bitPos = 7 - (bitIndex % 8);
+            int bit = (bytes[bytePos] >> bitPos) & 1;
+            
             current = current.children[bit];
+            bitIndex++;
         }
         
         return current != null && current.isEndOfSubnet;
