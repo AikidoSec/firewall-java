@@ -85,7 +85,7 @@ public class ThreadCacheObject {
                 }
             }
             if (!ipAllowed) {
-                return new BlockedResult(true, "allowlist");
+                return new BlockedResult(true, "not in allowlist");
             }
         }
 
