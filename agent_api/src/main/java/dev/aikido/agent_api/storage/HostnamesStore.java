@@ -15,15 +15,15 @@ public final class HostnamesStore {
     }
 
     public static Hostnames.HostnameEntry[] getHostnamesAsList() {
-        Hostnames.HostnameEntry[] result = new Hostnames.HostnameEntry[0];
         mutex.lock();
         try {
-            result = hostnames.asArray();
+            return hostnames.asArray();
         } catch (Throwable e) {
             logger.debug("An error occurred getting the hostnames as a list: %s", e.getMessage());
+            return null; // an error occurred, so we don't have hostnames list
+        } finally {
+            mutex.unlock();
         }
-        mutex.unlock();
-        return result;
     }
 
     public static void incrementHits(String hostname, int port) {
@@ -32,13 +32,17 @@ public final class HostnamesStore {
             hostnames.add(hostname, port);
         } catch (Throwable e) {
             logger.debug("An error occurred adding hits for hostname, error: %s", e.getMessage());
+        } finally {
+            mutex.unlock();
         }
-        mutex.unlock();
     }
 
     public static void clear() {
         mutex.lock();
-        hostnames.clear();
-        mutex.unlock();
+        try {
+            hostnames.clear();
+        } finally {
+            mutex.unlock();
+        }
     }
 }
