@@ -1,18 +1,10 @@
 package dev.aikido.agent_api;
 
-import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
-
-import java.util.List;
-
-import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
-import static dev.aikido.agent_api.storage.ServiceConfigStore.getConfig;
 
 public final class ShouldBlockRequest {
     private ShouldBlockRequest() {
@@ -20,8 +12,7 @@ public final class ShouldBlockRequest {
 
     public static ShouldBlockRequestResult shouldBlockRequest() {
         ContextObject context = Context.get();
-        ServiceConfiguration config = getConfig();
-        ThreadCacheObject threadCache = ThreadCache.get();
+        ServiceConfiguration config = ServiceConfigStore.getConfig();
         if (context == null) {
             return new ShouldBlockRequestResult(false, null); // Blocking false
         }
@@ -37,9 +28,6 @@ public final class ShouldBlockRequest {
                 ));
             }
         }
-
-        // Get matched endpoints:
-        List<Endpoint> matches = matchEndpoints(context.getRouteMetadata(), threadCache.getEndpoints());
 
         // Rate-limiting :
         ShouldRateLimit.RateLimitDecision rateLimitDecision = ShouldRateLimit.shouldRateLimit(
