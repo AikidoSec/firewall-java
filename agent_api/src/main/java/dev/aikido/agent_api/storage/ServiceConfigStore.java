@@ -59,7 +59,7 @@ public final class ServiceConfigStore {
     }
 
     public static void setMiddlewareInstalled(boolean middlewareInstalled) {
-        // We want to avoid a write lock if possible for performance reasons :
+        // To avoid write lock, we first take a read lock and see if the boolean would be updated (performance)
         boolean currentMiddlewareInstalled = getConfig().isMiddlewareInstalled();
         if (currentMiddlewareInstalled == middlewareInstalled) {
             return;
