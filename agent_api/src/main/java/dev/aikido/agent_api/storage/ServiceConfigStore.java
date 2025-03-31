@@ -27,8 +27,8 @@ public final class ServiceConfigStore {
     public static void updateFromAPIResponse(APIResponse apiResponse) {
         mutex.writeLock().lock();
         try {
-            logger.trace("Updating config from APIResponse");
             config.updateConfig(apiResponse);
+            logger.trace("Updated config from APIResponse");
         } catch (Throwable e) {
             logger.debug("An error occurred updating service config: %s", e.getMessage());
         } finally {
@@ -39,8 +39,8 @@ public final class ServiceConfigStore {
     public static void updateFromAPIListsResponse(Optional<ReportingApi.APIListsResponse> response) {
         mutex.writeLock().lock();
         try {
-            logger.trace("Updating config from APIListsResponse");
             config.updateBlockedLists(response);
+            logger.trace("Updated config from APIListsResponse");
         } catch (Throwable e) {
             logger.debug("An error occurred updating service config: %s", e.getMessage());
         } finally {
@@ -51,8 +51,8 @@ public final class ServiceConfigStore {
     public static void updateBlocking(boolean blocking) {
         mutex.writeLock().lock();
         try {
-            logger.trace("Blocking updated: %s", blocking);
             config.setBlocking(blocking);
+            logger.trace("Blocking updated: %s", blocking);
         } finally {
             mutex.writeLock().unlock();
         }
@@ -67,8 +67,8 @@ public final class ServiceConfigStore {
 
         mutex.writeLock().lock();
         try {
-            logger.debug("middlewareInstalled updated: %s", middlewareInstalled);
             config.setMiddlewareInstalled(middlewareInstalled);
+            logger.debug("middlewareInstalled updated: %s", middlewareInstalled);
         } finally {
             mutex.writeLock().unlock();
         }
