@@ -1,7 +1,7 @@
 package background;
 
 import dev.aikido.agent_api.background.Endpoint;
-import dev.aikido.agent_api.background.ServiceConfiguration;
+import dev.aikido.agent_api.storage.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,21 +17,13 @@ public class ServiceConfigurationTest {
 
     @BeforeEach
     void setUp() {
-        serviceConfiguration = new ServiceConfiguration(true, "someServerless");
-    }
-
-    @Test
-    void constructor_ShouldThrowException_WhenServerlessIsEmpty() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            new ServiceConfiguration(true, "");
-        });
-        assertEquals("Serverless cannot be an empty string", exception.getMessage());
+        serviceConfiguration = new ServiceConfiguration();
+        serviceConfiguration.setBlocking(true);
     }
 
     @Test
     void constructor_ShouldInitializeFieldsCorrectly() {
         assertTrue(serviceConfiguration.isBlockingEnabled());
-        assertEquals("someServerless", serviceConfiguration.getServerless());
         assertTrue(serviceConfiguration.getBypassedIPs().isEmpty());
         assertTrue(serviceConfiguration.getBlockedUserIDs().isEmpty());
         assertTrue(serviceConfiguration.getEndpoints().isEmpty());
@@ -114,9 +106,9 @@ public class ServiceConfigurationTest {
     @Test
     void testMiddlewareInstalled() {
         assertFalse(serviceConfiguration.isMiddlewareInstalled());
-        serviceConfiguration.setMiddlewareInstalled();
+        serviceConfiguration.setMiddlewareInstalled(true);
         assertTrue(serviceConfiguration.isMiddlewareInstalled());
-        serviceConfiguration.setMiddlewareInstalled();
-        assertTrue(serviceConfiguration.isMiddlewareInstalled());
+        serviceConfiguration.setMiddlewareInstalled(false);
+        assertFalse(serviceConfiguration.isMiddlewareInstalled());
     }
 }

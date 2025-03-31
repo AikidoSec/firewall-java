@@ -1,7 +1,7 @@
 package background.cloud.api;
 
 
-import dev.aikido.agent_api.background.ServiceConfiguration;
+import dev.aikido.agent_api.storage.ServiceConfiguration;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;

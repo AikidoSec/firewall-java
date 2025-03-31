@@ -59,7 +59,7 @@ public class UpdateAgentDataCommandTest {
 
     @Test
     void testNoUpdateIfMiddlewareInstalledIsFalse() {
-        connectionManager.getConfig().setMiddlewareInstalled();
+        connectionManager.getConfig().setMiddlewareInstalled(true);
         var res = new UpdateAgentDataCommand.Res(null, 500, false, null);
         command.execute(res, connectionManager);
 

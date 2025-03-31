@@ -35,7 +35,7 @@ public class ShouldRateLimitCommand extends Command<ShouldRateLimitCommand.Req, 
     @Override
     public Optional<ShouldRateLimit.RateLimitDecision> execute(Req request, CloudConnectionManager connectionManager) {
         ShouldRateLimit.RateLimitDecision response = shouldRateLimit(
-                request.routeMetadata(), request.user(), request.remoteAddress(), connectionManager
+                request.routeMetadata(), request.user(), request.remoteAddress()
         );
         return Optional.of(response);
     }
