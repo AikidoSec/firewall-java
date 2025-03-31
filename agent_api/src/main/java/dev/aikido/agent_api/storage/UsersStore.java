@@ -18,9 +18,11 @@ public final class UsersStore {
 
     public static List<User> getUsersAsList() {
         mutex.lock();
-        List<User> result = users.asList();
-        mutex.unlock();
-        return result;
+        try {
+            return users.asList();
+        } finally {
+            mutex.unlock();
+        }
     }
 
     public static void addUser(User user) {
@@ -29,13 +31,17 @@ public final class UsersStore {
             users.addUser(user);
         } catch (Throwable e) {
             logger.debug("Error occurred while adding user: %s", e.getMessage());
+        } finally {
+            mutex.unlock();
         }
-        mutex.unlock();
     }
 
     public static void clear() {
         mutex.lock();
-        users.clear();
-        mutex.unlock();
+        try {
+            users.clear();
+        } finally {
+            mutex.unlock();
+        }
     }
 }
