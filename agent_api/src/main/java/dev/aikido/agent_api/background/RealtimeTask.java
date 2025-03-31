@@ -1,9 +1,9 @@
 package dev.aikido.agent_api.background;
 
-import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.RealtimeAPI;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
+import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
@@ -19,27 +19,31 @@ import java.util.TimerTask;
  */
 public class RealtimeTask extends TimerTask {
     private static final Logger logger = LogManager.getLogger(RealtimeTask.class);
-    private final CloudConnectionManager connectionManager;
+    private final RealtimeAPI realtimeApi;
+    private final ReportingApiHTTP reportingApi;
     private Optional<Long> configLastUpdatedAt;
-    public RealtimeTask(CloudConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    public RealtimeTask(RealtimeAPI realtimeApi, ReportingApiHTTP reportingApi) {
+        this.realtimeApi = realtimeApi;
+        this.reportingApi = reportingApi;
         this.configLastUpdatedAt = Optional.empty();
     }
     @Override
     public void run() {
         logger.debug("Running realtime task, config last updated at: %s", configLastUpdatedAt);
-        Optional<RealtimeAPI.ConfigResponse> res = new RealtimeAPI().getConfig(connectionManager.getToken());
+        Optional<RealtimeAPI.ConfigResponse> res = realtimeApi.getConfig();
 
         if(res.isPresent()) {
             long configAccordingToCloudUpdatedAt = res.get().configUpdatedAt();
             if(configLastUpdatedAt.isEmpty() || configLastUpdatedAt.get() < configAccordingToCloudUpdatedAt) {
-                // Config was updated
-                configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt); // Store new time of last update
-                Optional<APIResponse> newConfig = connectionManager.getApi().fetchNewConfig(connectionManager.getToken());
+                // Store new time of last update
+                configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt);
+
+                // fetch the new config
+                Optional<APIResponse> newConfig = reportingApi.fetchNewConfig();
                 newConfig.ifPresent(ServiceConfigStore.getConfig()::updateConfig);
 
-                // Fetch blocked lists from separate API route :
-                Optional<ReportingApi.APIListsResponse> blockedListsRes = connectionManager.getApi().fetchBlockedLists(connectionManager.getToken());
+                // Fetch blocked lists from separate API route
+                Optional<ReportingApi.APIListsResponse> blockedListsRes = reportingApi.fetchBlockedLists();
                 blockedListsRes.ifPresent(ServiceConfigStore.getConfig()::updateBlockedLists);
 
                 logger.debug("Config updated");
