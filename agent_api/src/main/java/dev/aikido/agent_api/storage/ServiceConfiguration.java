@@ -72,16 +72,12 @@ public class ServiceConfiguration {
         this.middlewareInstalled = middlewareInstalled;
     }
 
-    public HashSet<String> getBypassedIPs() {
-        return bypassedIPs;
-    }
-
     public List<Endpoint> getEndpoints() {
         return endpoints;
     }
 
-    public HashSet<String> getBlockedUserIDs() {
-        return blockedUserIDs;
+    public boolean isUserBlocked(String userId) {
+        return this.blockedUserIDs.contains(userId);
     }
 
     /**
