@@ -6,6 +6,7 @@ import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 
 import java.util.Optional;
 import java.util.TimerTask;
@@ -35,11 +36,11 @@ public class RealtimeTask extends TimerTask {
                 // Config was updated
                 configLastUpdatedAt = Optional.of(configAccordingToCloudUpdatedAt); // Store new time of last update
                 Optional<APIResponse> newConfig = connectionManager.getApi().fetchNewConfig(connectionManager.getToken());
-                newConfig.ifPresent(connectionManager.getConfig()::updateConfig);
+                newConfig.ifPresent(ServiceConfigStore.getConfig()::updateConfig);
 
                 // Fetch blocked lists from separate API route :
                 Optional<ReportingApi.APIListsResponse> blockedListsRes = connectionManager.getApi().fetchBlockedLists(connectionManager.getToken());
-                connectionManager.getConfig().storeBlockedListsRes(blockedListsRes);
+                blockedListsRes.ifPresent(ServiceConfigStore.getConfig()::updateBlockedLists);
 
                 logger.debug("Config updated");
             }
