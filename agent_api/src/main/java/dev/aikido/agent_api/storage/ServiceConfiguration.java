@@ -20,7 +20,6 @@ import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
 public class ServiceConfiguration {
     private final List<IPListEntry> blockedIps = new ArrayList<>();
     private final List<IPListEntry> allowedIps = new ArrayList<>();
-    public ReportingApi.APIListsResponse blockedListsRes = null;
     private boolean blockingEnabled;
     private boolean receivedAnyStats;
     private boolean middlewareInstalled;
