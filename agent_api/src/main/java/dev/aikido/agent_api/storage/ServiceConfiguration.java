@@ -23,7 +23,7 @@ public class ServiceConfiguration {
     private boolean blockingEnabled;
     private boolean receivedAnyStats;
     private boolean middlewareInstalled;
-    private HashSet<String> bypassedIPs = new HashSet<>();
+    private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
     // User-Agent Blocking (e.g. bot blocking) :
@@ -40,7 +40,7 @@ public class ServiceConfiguration {
         }
         this.blockingEnabled = apiResponse.block();
         if (apiResponse.allowedIPAddresses() != null) {
-            this.bypassedIPs = new HashSet<>(apiResponse.allowedIPAddresses());
+            this.bypassedIPs = createIPList(apiResponse.allowedIPAddresses());
         }
         if (apiResponse.blockedUserIds() != null) {
             this.blockedUserIDs = new HashSet<>(apiResponse.blockedUserIds());
@@ -77,6 +77,9 @@ public class ServiceConfiguration {
 
     public boolean isUserBlocked(String userId) {
         return this.blockedUserIDs.contains(userId);
+    }
+    public boolean isIpBypassed(String ip) {
+        return this.bypassedIPs.matches(ip);
     }
 
     /**
