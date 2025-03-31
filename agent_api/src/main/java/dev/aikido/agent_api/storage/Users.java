@@ -1,12 +1,10 @@
-package dev.aikido.agent_api.background.users;
+package dev.aikido.agent_api.storage;
 
 import dev.aikido.agent_api.context.User;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 /**
  * Class that holds users for the background process
