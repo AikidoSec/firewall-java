@@ -1,6 +1,6 @@
 package background;
 
-import dev.aikido.agent_api.background.users.Users;
+import dev.aikido.agent_api.storage.Users;
 import dev.aikido.agent_api.context.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

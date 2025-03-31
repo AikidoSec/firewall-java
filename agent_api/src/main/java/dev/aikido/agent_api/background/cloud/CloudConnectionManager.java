@@ -11,7 +11,7 @@ import dev.aikido.agent_api.ratelimiting.SlidingWindowRateLimiter;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.Routes;
-import dev.aikido.agent_api.background.users.Users;
+import dev.aikido.agent_api.storage.Users;
 import dev.aikido.agent_api.helpers.env.Token;
 
 import java.util.Optional;
