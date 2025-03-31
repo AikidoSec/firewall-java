@@ -15,38 +15,50 @@ public final class StatisticsStore {
     }
 
     public static Statistics.StatsRecord getStatsRecord() {
-        Statistics.StatsRecord result = null;
         mutex.lock();
         try {
-            result = stats.getRecord();
+            return stats.getRecord();
         } catch (Throwable e) {
             logger.debug("An error occurred getting the stats record: %s", e.getMessage());
+            return null; // error occurred, so we don't have a stats record
+        } finally {
+            mutex.unlock();
         }
-        mutex.unlock();
-        return result;
     }
 
     public static void incrementHits() {
         mutex.lock();
-        stats.incrementTotalHits(1);
-        mutex.unlock();
+        try {
+            stats.incrementTotalHits(1);
+        } finally {
+            mutex.unlock();
+        }
     }
 
     public static void incrementAttacksDetected() {
         mutex.lock();
-        stats.incrementAttacksDetected();
-        mutex.unlock();
+        try {
+            stats.incrementAttacksDetected();
+        } finally {
+            mutex.unlock();
+        }
     }
 
     public static void incrementAttacksBlocked() {
         mutex.lock();
-        stats.incrementAttacksBlocked();
-        mutex.unlock();
+        try {
+            stats.incrementAttacksBlocked();
+        } finally {
+            mutex.unlock();
+        }
     }
 
     public static void clear() {
         mutex.lock();
-        stats.clear();
-        mutex.unlock();
+        try {
+            stats.clear();
+        } finally {
+            mutex.unlock();
+        }
     }
 }

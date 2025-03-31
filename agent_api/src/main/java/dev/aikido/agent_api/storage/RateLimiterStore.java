@@ -13,6 +13,7 @@ public final class RateLimiterStore {
     private static final RateLimiter rateLimiter = new SlidingWindowRateLimiter(
             /*maxItems:*/ 5000, /*TTL in ms:*/ 120 * 60 * 1000 // 120 minutes
     );
+
     private RateLimiterStore() {
     }
 
@@ -23,10 +24,10 @@ public final class RateLimiterStore {
             return rateLimiter.isAllowed(key, windowSizeInMS, maxRequests);
         } catch (Throwable e) {
             logger.debug("Error occurred checking rate-limiting for %s, %s", key, e.getMessage());
+            return true;
         } finally {
             mutex.unlock();
         }
-        return true;
     }
 
     public static void clear() {
