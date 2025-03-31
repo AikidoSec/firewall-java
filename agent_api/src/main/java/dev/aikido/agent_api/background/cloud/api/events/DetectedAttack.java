@@ -9,6 +9,7 @@ import dev.aikido.agent_api.vulnerabilities.Attack;
 import java.util.List;
 import java.util.Map;
 
+import static dev.aikido.agent_api.background.cloud.GetManagerInfo.getManagerInfo;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static dev.aikido.agent_api.storage.ServiceConfigStore.getConfig;
 
@@ -46,7 +47,7 @@ public final class DetectedAttack {
             User user
     ) {};
 
-    public static DetectedAttackEvent createAPIEvent(Attack attack, ContextObject context, CloudConnectionManager connectionManager) {
+    public static DetectedAttackEvent createAPIEvent(Attack attack, ContextObject context) {
         boolean blocking = getConfig().isBlockingEnabled();
         RequestData requestData = new RequestData(
             context.getMethod(), // Method
@@ -66,7 +67,7 @@ public final class DetectedAttack {
         "detected_attack", // type
             requestData, // request
             attackData, // attack
-            connectionManager.getManagerInfo(), // agent
+            getManagerInfo(), // agent
             getUnixTimeMS() // time
         );
     }
