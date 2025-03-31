@@ -7,6 +7,9 @@ import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
 import dev.aikido.agent_api.ratelimiting.SlidingWindowRateLimiter;
+import dev.aikido.agent_api.storage.RateLimiterStore;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -19,6 +22,16 @@ public class ShouldRateLimitTest {
 
     private RouteMetadata createRouteMetadata(String method, String route) {
         return new RouteMetadata(route, route, method);
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        RateLimiterStore.clear();
+    }
+
+    @BeforeEach
+    public void clearRateLimiter() {
+        RateLimiterStore.clear();
     }
 
     private CloudConnectionManager createConnectionManager(List<Endpoint> endpoints, HashSet<String> bypassedIPs) {

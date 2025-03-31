@@ -4,6 +4,7 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
+import dev.aikido.agent_api.storage.RateLimiterStore;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public final class ShouldRateLimit {
         long maxRequests = rateLimitedEndpoint.getRateLimiting().maxRequests();
         if (user != null) {
             String key = rateLimitedEndpoint.getMethod() + ":" + rateLimitedEndpoint.getRoute() + ":user:" + user.id();
-            boolean allowed = connectionManager.getRateLimiter().isAllowed(key, windowSizeInMS, maxRequests);
+            boolean allowed = RateLimiterStore.isAllowed(key, windowSizeInMS, maxRequests);
             if (allowed) {
                 // Do not continue to check based on IP if user is present:
                 return new RateLimitDecision(/*block*/false, null);
@@ -36,7 +37,7 @@ public final class ShouldRateLimit {
         }
         if (remoteAddress != null && !remoteAddress.isEmpty()) {
             String key = rateLimitedEndpoint.getMethod() + ":" + rateLimitedEndpoint.getRoute() + ":ip:" + remoteAddress;
-            boolean allowed = connectionManager.getRateLimiter().isAllowed(key, windowSizeInMS, maxRequests);
+            boolean allowed = RateLimiterStore.isAllowed(key, windowSizeInMS, maxRequests);
             if (!allowed) {
                 return new RateLimitDecision(/*block*/ true, /*trigger*/ "ip");
             }
