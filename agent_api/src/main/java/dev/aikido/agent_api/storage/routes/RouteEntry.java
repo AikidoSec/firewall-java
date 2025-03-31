@@ -12,13 +12,7 @@ public class RouteEntry {
     final String method;
     final String path;
     private int hits;
-
-    // apispec field is transient because we do not send it over IPC.
-    // We created a RouteEntrySerializer so we can still send it over HTTP
-    public transient APISpec apispec;
-
-    // deltaHits field is transient because it's only meant to be local.
-    private transient int deltaHits = 0;
+    private APISpec apispec;
 
     public RouteEntry(String method, String path) {
         this.method = method;
@@ -32,10 +26,6 @@ public class RouteEntry {
 
     public void incrementHits() {
         hits++;
-        deltaHits++; // Also increment delta.
-    }
-    public void incrementHits(int count) {
-        hits += count;
     }
 
     public int getHits() {
@@ -44,28 +34,5 @@ public class RouteEntry {
 
     public void updateApiSpec(APISpec newApiSpec) {
         this.apispec = mergeAPISpecs(newApiSpec, this.apispec);
-    }
-
-    public int getDeltaHits() {
-        return deltaHits;
-    }
-
-    public static class RouteEntrySerializer implements JsonSerializer<RouteEntry> {
-        @Override
-        public JsonElement serialize(RouteEntry route, Type typeOfSrc, JsonSerializationContext context) {
-            // Initialize instances :
-            JsonObject jsonObject = new JsonObject();
-            Gson gson = new Gson();
-
-            jsonObject.addProperty("method", route.method);
-            jsonObject.addProperty("path", route.path);
-            jsonObject.addProperty("hits", route.hits);
-
-            // Add API Spec :
-            JsonElement apiSpecJson = gson.toJsonTree(route.apispec);
-            jsonObject.add("apispec", apiSpecJson);
-
-            return jsonObject;
-        }
     }
 }

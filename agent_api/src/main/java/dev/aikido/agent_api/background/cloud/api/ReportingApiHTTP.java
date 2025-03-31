@@ -124,10 +124,7 @@ public class ReportingApiHTTP extends ReportingApi {
             .header("Content-Type", "application/json") // Set Content-Type header
             .header("Authorization", token); // Set Authorization header
         if (event.isPresent()) {
-            Gson gson = new GsonBuilder()
-                    // Use a custom serializer because api spec is transient in RouteEntry :
-                    .registerTypeAdapter(RouteEntry.class, new RouteEntry.RouteEntrySerializer())
-                    .create();
+            Gson gson = new Gson();
             String requestPayload = gson.toJson(event.get());
             return requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
                 .build();

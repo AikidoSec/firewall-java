@@ -28,24 +28,11 @@ public class RouteEntryTest {
     }
 
     @Test
-    public void testGsonWithSerializer() {
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(RouteEntry.class, new RouteEntry.RouteEntrySerializer())
-                .create();
+    public void testGsonWithoutSerializer() throws IOException {
+        Gson gson = new Gson();
         String json = gson.toJson(route1);
         assertEquals(
                 "{\"method\":\"GET\",\"path\":\"/api/1\",\"hits\":0,\"apispec\":{\"body\":{\"schema\":{\"type\":\"object\",\"properties\":{\"oldProp\":{\"type\":\"string\",\"optional\":false}},\"optional\":false},\"type\":\"oldType\"},\"auth\":[{\"type\":\"apiKey\"}]}}",
-                json
-        );
-    }
-
-    @Test
-    public void testGsonWithoutSerializer() throws IOException {
-        Gson gson = new GsonBuilder()
-                .create();
-        String json = gson.toJson(route1);
-        assertEquals(
-                "{\"method\":\"GET\",\"path\":\"/api/1\",\"hits\":0}",
                 json
         );
     }

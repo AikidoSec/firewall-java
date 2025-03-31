@@ -33,10 +33,7 @@ public class InitRouteCommand extends Command<RouteMetadata, Command.EmptyResult
      */
     @Override
     public Optional<EmptyResult> execute(RouteMetadata routeMetadata, CloudConnectionManager connectionManager) {
-        if (connectionManager.getRoutes().get(routeMetadata) == null) {
-            connectionManager.getRoutes().initializeRoute(routeMetadata);
-        }
-        connectionManager.getRoutes().get(routeMetadata).incrementHits();
+        connectionManager.getRoutes().incrementRoute(routeMetadata);
         return Optional.empty();
     }
 }

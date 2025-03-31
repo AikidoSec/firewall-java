@@ -38,9 +38,6 @@ public class UpdateAgentDataCommand extends Command<UpdateAgentDataCommand.Res, 
         if (data.middlewareInstalled()) {
             connectionManager.getConfig().setMiddlewareInstalled();
         }
-        if (data.routeHitDeltas != null) {
-            connectionManager.getRoutes().importFromDeltaMap(data.routeHitDeltas);
-        }
         if (data.hostnames != null) {
             connectionManager.getHostnames().addArray(data.hostnames);
         }
