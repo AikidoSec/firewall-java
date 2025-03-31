@@ -7,6 +7,7 @@ import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.storage.Statistics;
+import dev.aikido.agent_api.storage.UsersStore;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.storage.routes.RoutesStore;
@@ -40,12 +41,13 @@ public class HeartbeatTask extends TimerTask {
         Statistics.StatsRecord stats = connectionManager.getStats().getRecord();
         Hostnames.HostnameEntry[] hostnames = HostnamesStore.getHostnamesAsList();
         RouteEntry[] routes = RoutesStore.getRoutesAsList();
-        List<User> users = connectionManager.getUsers().asList();
+        List<User> users = UsersStore.getUsersAsList();
+
         // Clear data :
-        RoutesStore.clear();
-        connectionManager.getUsers().clear();
         connectionManager.getStats().clear();
         HostnamesStore.clear();
+        RoutesStore.clear();
+        UsersStore.clear();
 
         // Create and send event :
         Heartbeat.HeartbeatEvent event = Heartbeat.get(connectionManager, stats, hostnames, routes, users);
