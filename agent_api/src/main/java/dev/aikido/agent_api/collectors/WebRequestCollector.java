@@ -3,6 +3,7 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.storage.StatisticsStore;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
 
@@ -39,7 +40,7 @@ public final class WebRequestCollector {
         Context.set(newContext);
 
         // Increment total hits :
-        threadCache.incrementTotalHits();
+        StatisticsStore.incrementHits();
 
         // Per-route IP allowlists :
         List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), threadCache.getEndpoints());

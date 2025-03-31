@@ -4,7 +4,7 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.storage.StatisticsStore;
 import dev.aikido.agent_api.storage.routes.Routes;
 import dev.aikido.agent_api.thread_cache.ThreadCache;
 import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
@@ -31,6 +31,7 @@ class WebRequestCollectorTest {
         contextObject = new EmptySampleContextObject();
         contextObject.getHeaders().put("content-type", List.of("application/json"));
         contextObject.getHeaders().put("user-agent", List.of("Mozilla/5.0 (compatible) AI2Bot (+https://www.allenai.org/crawler)"));
+        StatisticsStore.clear();
         threadCacheObject = mock(ThreadCacheObject.class);
     }
 
@@ -40,16 +41,15 @@ class WebRequestCollectorTest {
         // Mock ThreadCache
         threadCacheObject = getEmptyThreadCacheObject();
         ThreadCache.set(threadCacheObject);
-        assertEquals(0, threadCacheObject.getTotalHits());
 
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
 
         assertNull(response);
         assertEquals(Context.get(), contextObject);
-        assertEquals(1, threadCacheObject.getTotalHits());
+        assertEquals(1, StatisticsStore.getStatsRecord().requests().total());
         // Increment total hits with same context object :
         WebRequestCollector.report(contextObject);
-        assertEquals(2, threadCacheObject.getTotalHits());
+        assertEquals(2, StatisticsStore.getStatsRecord().requests().total());
 
     }
 
