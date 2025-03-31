@@ -1,6 +1,6 @@
 package dev.aikido.agent_api.background.cloud;
 
-import dev.aikido.agent_api.background.ServiceConfiguration;
+import dev.aikido.agent_api.storage.*;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
@@ -8,10 +8,7 @@ import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.ratelimiting.RateLimiter;
 import dev.aikido.agent_api.ratelimiting.SlidingWindowRateLimiter;
-import dev.aikido.agent_api.storage.Hostnames;
-import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.Routes;
-import dev.aikido.agent_api.storage.Users;
 import dev.aikido.agent_api.helpers.env.Token;
 
 import java.util.Optional;
@@ -25,7 +22,6 @@ public class CloudConnectionManager {
     // Constants:
     private static final int timeout = 10; // Timeout for HTTP requests to cloud
 
-    private final ServiceConfiguration config;
     private final ReportingApi api;
     private final String token;
     private final Routes routes;
@@ -38,7 +34,7 @@ public class CloudConnectionManager {
         this(block, token, serverless, new ReportingApiHTTP(getAikidoAPIEndpoint(), timeout));
     }
     public CloudConnectionManager(boolean block, Token token, String serverless, ReportingApi api) {
-        this.config = new ServiceConfiguration(block, serverless);
+        ServiceConfigStore.updateBlocking(block);
         this.api = api;
         this.token = token.get();
         this.routes = new Routes(200); // Max size is 200 routes.
@@ -52,20 +48,20 @@ public class CloudConnectionManager {
     public void onStart() {
         reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
         // Fetch blocked lists using separate API call : 
-        config.storeBlockedListsRes(api.fetchBlockedLists(token));
+        ServiceConfigStore.updateFromAPIListsResponse(api.fetchBlockedLists(token));
     }
     public void reportEvent(APIEvent event, boolean updateConfig) {
         Optional<APIResponse> res = this.api.report(this.token, event);
         if (res.isPresent() && updateConfig) {
-            config.updateConfig(res.get());
+            ServiceConfigStore.updateFromAPIResponse(res.get());
         }
     }
     public boolean shouldBlock() {
-        return this.config.isBlockingEnabled();
+        return ServiceConfigStore.getConfig().isBlockingEnabled();
     }
 
     public ServiceConfiguration getConfig() {
-        return this.config;
+        return ServiceConfigStore.getConfig();
     }
     public GetManagerInfo.ManagerInfo getManagerInfo() {
         return GetManagerInfo.getManagerInfo(this);

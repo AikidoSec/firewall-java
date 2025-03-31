@@ -1,7 +1,7 @@
 package dev.aikido.agent_api.background.cloud;
 
 import dev.aikido.agent_api.Config;
-import dev.aikido.agent_api.background.ServiceConfiguration;
+import dev.aikido.agent_api.storage.ServiceConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public final class GetManagerInfo {
             "firewall-java", // library
             getIpAddress(), // ipAddress
             Map.of(), // packages (FIX LATER)
-            serviceConfig.getServerless(), // serverless
+            null, // serverless is not supported for Java
             List.of(), // stack
             getOSInfo(), // os
             false, // preventedPrototypePollution, should be removed from API
