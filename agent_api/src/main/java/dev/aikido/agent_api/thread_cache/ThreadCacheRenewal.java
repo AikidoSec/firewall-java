@@ -25,7 +25,7 @@ public final class ThreadCacheRenewal {
         if (currentThreadCache != null) {
             // Send stored data from thread cache to background process: hit counts, middleware data, ... :
             var updateRes = new UpdateAgentDataCommand.Res(
-                    /* routeHitDeltas */ currentThreadCache.getRoutes().getDeltaMap(),
+                    /* routeHitDeltas */ null,
                     /* hitsDelta */ currentThreadCache.getTotalHits(),
                     /* middlewareInstalled */ currentThreadCache.isMiddlewareInstalled(),
                     /* hostnames */ currentThreadCache.getHostnames().asArray()
