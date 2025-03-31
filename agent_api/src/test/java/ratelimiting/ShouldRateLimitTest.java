@@ -28,6 +28,7 @@ public class ShouldRateLimitTest {
     public static void cleanup() {
         RateLimiterStore.clear();
     }
+
     @BeforeEach
     public void clearRateLimiter() {
         RateLimiterStore.clear();
