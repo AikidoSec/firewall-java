@@ -32,7 +32,7 @@ public class BackgroundProcess extends Thread {
             return; // Can only run if thread is daemon and token needs to be defined.
         }
         // Create a cloud-connection manager:
-        this.connectionManager = new CloudConnectionManager(new BlockingEnv().getValue(), token, null);
+        this.connectionManager = new CloudConnectionManager(new BlockingEnv().getValue(), token);
         // Create a queue and a thread to handle attacks that need reporting in the background:
         this.attackQueue = new LinkedBlockingQueue<>();
         this.connectionManager.onStart();

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
+import static dev.aikido.agent_api.storage.ServiceConfigStore.getConfig;
 
 public final class DetectedAttack {
     private DetectedAttack() {}
@@ -46,6 +47,7 @@ public final class DetectedAttack {
     ) {};
 
     public static DetectedAttackEvent createAPIEvent(Attack attack, ContextObject context, CloudConnectionManager connectionManager) {
+        boolean blocking = getConfig().isBlockingEnabled();
         RequestData requestData = new RequestData(
             context.getMethod(), // Method
             context.getHeaders(), // headers
@@ -58,7 +60,7 @@ public final class DetectedAttack {
         );
         AttackData attackData = new AttackData(
             attack.kind, attack.operation, attack.source, attack.pathToPayload, attack.payload, attack.metadata,
-            "module", connectionManager.shouldBlock(), attack.stack, attack.user
+            "module", blocking, attack.stack, attack.user
         );
         return new DetectedAttackEvent(
         "detected_attack", // type
