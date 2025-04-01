@@ -36,10 +36,10 @@ public final class ServiceConfigStore {
         }
     }
 
-    public static void updateFromAPIListsResponse(Optional<ReportingApi.APIListsResponse> response) {
+    public static void updateFromAPIListsResponse(ReportingApi.APIListsResponse response) {
         mutex.writeLock().lock();
         try {
-            config.storeBlockedListsRes(response);
+            config.updateBlockedLists(response);
             logger.trace("Updated config from APIListsResponse");
         } catch (Throwable e) {
             logger.debug("An error occurred updating service config: %s", e.getMessage());

@@ -38,12 +38,11 @@ public class SyncDataCommand extends Command<Command.EmptyResult, SyncDataComman
     @Override
     public Optional<Res> execute(EmptyResult data, CloudConnectionManager connectionManager) {
         List<Endpoint> endpoints = connectionManager.getConfig().getEndpoints();
-        Set<String> blockedUserIDs = connectionManager.getConfig().getBlockedUserIDs();
-        Set <String> bypassedIPs = connectionManager.getConfig().getBypassedIPs();
+        Set<String> blockedUserIDs = null;
+        Set <String> bypassedIPs = null;
         Routes routes = connectionManager.getRoutes();
-        ReportingApi.APIListsResponse blockedListsRes = connectionManager.getConfig().blockedListsRes;
 
-        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, blockedListsRes);
+        Res syncDataResult = new Res(endpoints, blockedUserIDs, bypassedIPs, routes, null);
         return Optional.of(syncDataResult);
     }
 }
