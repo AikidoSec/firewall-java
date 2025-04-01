@@ -36,7 +36,7 @@ public class UpdateAgentDataCommand extends Command<UpdateAgentDataCommand.Res, 
     public Optional<EmptyResult> execute(Res data, CloudConnectionManager connectionManager) {
         // Update middleware installed,
         if (data.middlewareInstalled()) {
-            connectionManager.getConfig().setMiddlewareInstalled();
+            connectionManager.getConfig().setMiddlewareInstalled(true);
         }
         if (data.hostnames != null) {
             connectionManager.getHostnames().addArray(data.hostnames);

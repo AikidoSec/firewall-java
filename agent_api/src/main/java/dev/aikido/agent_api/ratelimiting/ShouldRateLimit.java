@@ -5,6 +5,7 @@ import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.storage.RateLimiterStore;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 
 import java.util.List;
 
@@ -14,10 +15,8 @@ import static dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder.getRat
 public final class ShouldRateLimit {
     private ShouldRateLimit() {}
     public record RateLimitDecision(boolean block, String trigger) {}
-    public static RateLimitDecision shouldRateLimit(
-            RouteMetadata routeMetadata, User user, String remoteAddress, CloudConnectionManager connectionManager
-    ) {
-        List<Endpoint> endpoints = connectionManager.getConfig().getEndpoints();
+    public static RateLimitDecision shouldRateLimit(RouteMetadata routeMetadata, User user, String remoteAddress) {
+        List<Endpoint> endpoints = ServiceConfigStore.getConfig().getEndpoints();
         List<Endpoint> matches = matchEndpoints(routeMetadata, endpoints);
         Endpoint rateLimitedEndpoint = getRateLimitedEndpoint(matches, routeMetadata.route());
         if (rateLimitedEndpoint == null) {
