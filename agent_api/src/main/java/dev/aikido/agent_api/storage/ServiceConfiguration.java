@@ -78,6 +78,7 @@ public class ServiceConfiguration {
     public boolean isUserBlocked(String userId) {
         return this.blockedUserIDs.contains(userId);
     }
+
     public boolean isIpBypassed(String ip) {
         return this.bypassedIPs.matches(ip);
     }
