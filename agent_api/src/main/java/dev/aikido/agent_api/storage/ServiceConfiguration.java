@@ -112,6 +112,11 @@ public class ServiceConfiguration {
     }
 
     public void updateBlockedLists(ReportingApi.APIListsResponse res) {
+        // clear
+        blockedIps.clear();
+        allowedIps.clear();
+        blockedUserAgentRegex = null;
+
         // Update blocked IP addresses (e.g. for geo restrictions) :
         if (res.blockedIPAddresses() != null) {
             for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
