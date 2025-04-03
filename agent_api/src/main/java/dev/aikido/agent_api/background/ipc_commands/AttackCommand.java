@@ -7,6 +7,7 @@ import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 
@@ -57,7 +58,7 @@ public class AttackCommand extends Command<AttackCommand.Req, Command.EmptyResul
 
         // Increment statistics :
         StatisticsStore.incrementAttacksDetected();
-        if (connectionManager.shouldBlock()) {
+        if (ServiceConfigStore.getConfig().isBlockingEnabled()) {
             StatisticsStore.incrementAttacksBlocked(); // Also increment blocked attacks.
         }
 

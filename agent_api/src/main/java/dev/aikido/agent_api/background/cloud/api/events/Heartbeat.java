@@ -3,6 +3,7 @@ package dev.aikido.agent_api.background.cloud.api.events;
 import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.Statistics;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.context.User;
@@ -30,7 +31,7 @@ public final class Heartbeat {
     ) {
         long time = getUnixTimeMS(); // Get current time
         GetManagerInfo.ManagerInfo agent = connectionManager.getManagerInfo();
-        boolean middlewareInstalled = connectionManager.getConfig().isMiddlewareInstalled();
+        boolean middlewareInstalled = ServiceConfigStore.getConfig().isMiddlewareInstalled();
         return new HeartbeatEvent("heartbeat", agent, time, stats, hostnames, routes, users, middlewareInstalled);
     }
 }
