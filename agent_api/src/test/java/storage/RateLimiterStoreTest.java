@@ -39,7 +39,7 @@ public class RateLimiterStoreTest {
         assertFalse(RateLimiterStore.isAllowed(key, windowSizeInMS, maxRequests));
 
         // Wait for the window to expire
-        Thread.sleep(windowSizeInMS);
+        Thread.sleep(windowSizeInMS+100);
 
         // Should be allowed again after the window expires
         assertTrue(RateLimiterStore.isAllowed(key, windowSizeInMS, maxRequests));
