@@ -41,6 +41,7 @@ public class HtmlController {
     @GetMapping("/benchmark")
     @ResponseBody
     public String benchmark_route() throws InterruptedException {
+        Thread.sleep(1); // sleep 1ms
         return "OK";
     }
 }

@@ -5,6 +5,6 @@ from script import run_benchmark
 run_benchmark(
     "http://localhost:8080/benchmark", # Application with Zen
     "http://localhost:8081/benchmark", # Application without Zen
-    "An empty route",
+    "An empty route (1ms simulated delay)",
     percentage_limit=15, ms_limit=150
 )
