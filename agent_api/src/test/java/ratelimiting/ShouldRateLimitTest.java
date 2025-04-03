@@ -1,7 +1,6 @@
 package ratelimiting;
 
 import dev.aikido.agent_api.background.Endpoint;
-import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
@@ -19,8 +18,6 @@ import static utils.EmptyAPIResponses.setEmptyConfigWithEndpointList;
 
 
 public class ShouldRateLimitTest {
-    private CloudConnectionManager connectionManager;
-
     private RouteMetadata createRouteMetadata(String method, String route) {
         return new RouteMetadata(route, route, method);
     }
