@@ -1,7 +1,6 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,18 +13,15 @@ import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class FileWrapperTest {
     @AfterEach
     void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
     }
     @BeforeEach
     void clearThreadCache() {
         cleanup();
-        ThreadCache.set(getEmptyThreadCacheObject());
         String prop = System.getProperty("AIK_INTERNAL_coverage_run");
         Assumptions.assumeFalse(prop != null && prop.equals("1"), "With coverage enabled we skip File(...) test cases.");
     }

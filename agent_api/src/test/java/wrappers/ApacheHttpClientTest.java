@@ -1,7 +1,6 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -17,14 +16,12 @@ import java.net.ConnectException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class ApacheHttpClientTest {
     private CloseableHttpClient client;
     @AfterEach
     void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
     }
 
     @BeforeEach
@@ -35,7 +32,6 @@ public class ApacheHttpClientTest {
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
-        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")

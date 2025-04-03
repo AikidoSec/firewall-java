@@ -1,7 +1,6 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.junit.jupiter.api.AfterEach;
@@ -12,14 +11,12 @@ import utils.EmptySampleContextObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class RestTemplateTest {
 
     @AfterEach
     void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
     }
 
     @BeforeEach
@@ -29,7 +26,6 @@ public class RestTemplateTest {
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
-        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")

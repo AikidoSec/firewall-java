@@ -1,7 +1,6 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -16,7 +15,6 @@ import java.net.ConnectException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class OkHttpTest {
     private OkHttpClient client;
@@ -24,7 +22,6 @@ public class OkHttpTest {
     @AfterEach
     void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
     }
 
     @BeforeEach
@@ -35,7 +32,6 @@ public class OkHttpTest {
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
-        ThreadCache.set(getEmptyThreadCacheObject());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")

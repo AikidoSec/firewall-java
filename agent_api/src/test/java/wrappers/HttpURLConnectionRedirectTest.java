@@ -2,7 +2,6 @@ package wrappers;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.HostnamesStore;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class HttpURLConnectionRedirectTest {
 
