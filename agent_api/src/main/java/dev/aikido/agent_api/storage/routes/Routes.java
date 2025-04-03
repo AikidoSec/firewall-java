@@ -27,7 +27,7 @@ public class Routes {
 
     public void incrementRoute(RouteMetadata routeMetadata) {
         String key = routeToKey(routeMetadata);
-        if(!routes.containsKey(key)) {
+        if (!routes.containsKey(key)) {
             // if the route does not yet exist, create it.
             initializeRoute(routeMetadata);
         }

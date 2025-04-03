@@ -5,9 +5,9 @@ import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import org.junit.jupiter.api.*;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import java.net.InetAddress;
@@ -35,16 +35,14 @@ public class DNSRecordCollectorTest {
         Context.set(null);
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "token")
     @Test
-    public void testThreadCacheNull() {
+    public void testContextNull() {
         // Early return because of Context being null :
         DNSRecordCollector.report("dev.aikido", new InetAddress[]{
                 inetAddress1, inetAddress2
         });
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "token")
     @Test
     public void testThreadCacheHostnames() {
         ContextObject myContextObject = mock(ContextObject.class);
@@ -66,7 +64,6 @@ public class DNSRecordCollectorTest {
         verify(myContextObject, times(2)).getHostnames();
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "token")
     @Test
     public void testHostnameSame() {
         ContextObject myContextObject = mock(ContextObject.class);
@@ -90,10 +87,10 @@ public class DNSRecordCollectorTest {
         }
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "1")
     @Test
     public void testHostnameSameWithContextAsAttack() {
+        ServiceConfigStore.updateBlocking(true);
+
         ContextObject myContextObject = new SampleContextObject();
         myContextObject.getHostnames().add("dev.aikido.not", 80);
         myContextObject.getHostnames().add("dev.aikido", 80);

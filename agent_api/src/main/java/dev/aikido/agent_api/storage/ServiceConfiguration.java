@@ -78,6 +78,7 @@ public class ServiceConfiguration {
     public boolean isUserBlocked(String userId) {
         return this.blockedUserIDs.contains(userId);
     }
+
     public boolean isIpBypassed(String ip) {
         return this.bypassedIPs.matches(ip);
     }
@@ -112,20 +113,25 @@ public class ServiceConfiguration {
 
     public void updateBlockedLists(ReportingApi.APIListsResponse res) {
         // Update blocked IP addresses (e.g. for geo restrictions) :
+        blockedIps.clear();
         if (res.blockedIPAddresses() != null) {
             for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
                 IPList ipList = createIPList(entry.ips());
                 blockedIps.add(new IPListEntry(ipList, entry.description()));
             }
         }
+
         // Update allowed IP addresses (e.g. for geo restrictions) :
+        allowedIps.clear();
         if (res.allowedIPAddresses() != null) {
             for (ReportingApi.ListsResponseEntry entry : res.allowedIPAddresses()) {
                 IPList ipList = createIPList(entry.ips());
                 this.allowedIps.add(new IPListEntry(ipList, entry.description()));
             }
         }
+
         // Update Blocked User-Agents regex
+        blockedUserAgentRegex = null;
         if (res.blockedUserAgents() != null && !res.blockedUserAgents().isEmpty()) {
             this.blockedUserAgentRegex = Pattern.compile(res.blockedUserAgents(), Pattern.CASE_INSENSITIVE);
         }
