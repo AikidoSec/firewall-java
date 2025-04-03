@@ -1,10 +1,10 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import java.nio.file.Paths;
@@ -17,15 +17,14 @@ public class PathsWrapperTest {
         Context.set(null);
     }
     @BeforeEach
-    void clearThreadCache() {
+    void beforeEach() {
         cleanup();
+        ServiceConfigStore.updateBlocking(true);
     }
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalWithSinglePath() throws Exception {
         setContextAndLifecycle("../opt/");
@@ -38,8 +37,6 @@ public class PathsWrapperTest {
         assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalWithMultiplePaths() throws Exception {
         setContextAndLifecycle("../opt/");

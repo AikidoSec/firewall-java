@@ -1,12 +1,12 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import java.sql.*;
@@ -19,6 +19,7 @@ public class MysqlCJWrapperTest {
     @BeforeAll
     public static void clean() {
         Context.set(null);
+        ServiceConfigStore.updateBlocking(true);
     }
 
     @BeforeEach
@@ -36,8 +37,6 @@ public class MysqlCJWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testSelectSqlWithPrepareStatement() throws SQLException {
         assertDoesNotThrow(() -> {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
@@ -53,8 +52,6 @@ public class MysqlCJWrapperTest {
         assertEquals("Aikido Zen has blocked SQL Injection, Dialect: MySQL", exception.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSelectSqlSafeWithPrepareStatement() throws SQLException {
         Context.set(new EmptySampleContextObject("FROM"));
@@ -72,8 +69,6 @@ public class MysqlCJWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testSelectSqlWithPreparedStatementWithoutExecute() throws SQLException {
         Context.set(new EmptySampleContextObject("SELECT * FROM notpets;"));
         assertDoesNotThrow(() -> {
@@ -88,8 +83,6 @@ public class MysqlCJWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecute() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("SELECT * FROM notpets;"));
@@ -108,8 +101,6 @@ public class MysqlCJWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testAddBatch() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("Fluffy"));
@@ -130,8 +121,6 @@ public class MysqlCJWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecuteLargeUpdate() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("Buddy"));
@@ -150,8 +139,6 @@ public class MysqlCJWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecuteQuery() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("* FROM pets"));
@@ -169,8 +156,6 @@ public class MysqlCJWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecuteUpdate() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("UPDATE"));

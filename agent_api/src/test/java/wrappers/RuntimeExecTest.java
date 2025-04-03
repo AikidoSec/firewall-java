@@ -1,10 +1,10 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,15 +15,14 @@ public class RuntimeExecTest {
         Context.set(null);
     }
     @BeforeEach
-    void clearThreadCache() {
+    void beforeEach() {
         cleanup();
+        ServiceConfigStore.updateBlocking(true);
     }
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testShellInjection() {
         setContextAndLifecycle(" -la");
@@ -49,8 +48,6 @@ public class RuntimeExecTest {
         });
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testOnlyScansStrings() {
         setContextAndLifecycle("whoami");

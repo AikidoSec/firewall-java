@@ -1,13 +1,13 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import java.io.IOException;
@@ -25,17 +25,16 @@ public class OkHttpTest {
     }
 
     @BeforeEach
-    void clearThreadCache() {
-        client = new OkHttpClient();
+    void beforeEach() {
         cleanup();
+        client = new OkHttpClient();
+        ServiceConfigStore.updateBlocking(true);
     }
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFLocalhostValid() throws Exception {
         setContextAndLifecycle("http://localhost:5000");
@@ -62,8 +61,6 @@ public class OkHttpTest {
                 exception3.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithoutPort() throws Exception {
         setContextAndLifecycle("http://localhost:80");
@@ -73,8 +70,6 @@ public class OkHttpTest {
         assertEquals("Aikido Zen has blocked a server-side request forgery", exception.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSSRFWithoutPortAndWithoutContext() throws Exception {
         setContextAndLifecycle("http://localhost:80");
