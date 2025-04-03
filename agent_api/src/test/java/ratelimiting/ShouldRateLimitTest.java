@@ -27,6 +27,7 @@ public class ShouldRateLimitTest {
         ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
         RateLimiterStore.clear();
     }
+
     @BeforeEach
     public void clearRateLimiter() {
         RateLimiterStore.clear();
