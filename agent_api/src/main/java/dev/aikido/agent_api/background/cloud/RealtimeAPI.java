@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.background.cloud;
 
 import com.google.gson.Gson;
+import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
@@ -17,19 +18,20 @@ public class RealtimeAPI {
     private static final Logger logger = LogManager.getLogger(RealtimeAPI.class);
     private static final int timeoutInSec = 3; // 3 sec timeout for requests to the realtime endpoint
     private final String endpoint;
+    private final Token token;
 
-    public RealtimeAPI() {
-        // Create API :
+    public RealtimeAPI(Token token) {
         endpoint = getAikidoRealtimeEndpoint();
+        this.token = token;
     }
     public record ConfigResponse(long configUpdatedAt) {}
-    public Optional<ConfigResponse> getConfig(String token) {
+    public Optional<ConfigResponse> getConfig() {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
                     .build();
             URI uri = URI.create(endpoint + "config");
-            HttpRequest request = createConfigRequest(token, uri);
+            HttpRequest request = createConfigRequest(token.get(), uri);
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return toConfigResponse(httpResponse);

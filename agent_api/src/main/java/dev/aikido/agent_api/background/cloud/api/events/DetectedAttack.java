@@ -1,6 +1,5 @@
 package dev.aikido.agent_api.background.cloud.api.events;
 
-import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
