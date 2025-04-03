@@ -31,7 +31,7 @@ public class CloudConnectionManager {
         this.token = token.get();
     }
     public void onStart() {
-        reportEvent(/* event:*/ Started.get(this), /* update config:*/ true);
+        reportEvent(/* event:*/ Started.get(), /* update config:*/ true);
         // Fetch blocked lists using separate API call :
         Optional<ReportingApi.APIListsResponse> res = this.api.fetchBlockedLists(token);
         if (res.isPresent()) {
@@ -43,9 +43,6 @@ public class CloudConnectionManager {
         if (res.isPresent() && updateConfig) {
             ServiceConfigStore.updateFromAPIResponse(res.get());
         }
-    }
-    public GetManagerInfo.ManagerInfo getManagerInfo() {
-        return GetManagerInfo.getManagerInfo(this);
     }
     public String getToken() {
         return token;

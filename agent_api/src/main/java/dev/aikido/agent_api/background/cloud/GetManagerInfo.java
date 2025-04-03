@@ -33,7 +33,7 @@ public final class GetManagerInfo {
 
     public record Platform(String name, String version) {}
 
-    public static ManagerInfo getManagerInfo(CloudConnectionManager connectionManager) {
+    public static ManagerInfo getManagerInfo() {
         ServiceConfiguration serviceConfig = ServiceConfigStore.getConfig();
         return new ManagerInfo(
             !serviceConfig.isBlockingEnabled(), // dryMode
