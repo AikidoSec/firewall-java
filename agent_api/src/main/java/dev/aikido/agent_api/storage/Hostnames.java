@@ -22,17 +22,7 @@ public class Hostnames {
         }
         map.get(key).incrementHits();
     }
-    public void addArray(HostnameEntry[] hostnameEntries) {
-        for (HostnameEntry entry: hostnameEntries) {
-            String key = getKey(entry.getHostname(), entry.getPort());
-            if (map.containsKey(key)) {
-                // Merge hits :
-                map.get(key).incrementHits(entry.getHits());
-            } else {
-                map.put(key, entry);
-            }
-        }
-    }
+
     public HostnameEntry[] asArray() {
         return map.values().toArray(new HostnameEntry[0]);
     }
@@ -55,14 +45,10 @@ public class Hostnames {
             this.port = port;
             this.hits = 0;
         }
-        
+
         public void incrementHits() {
             hits++;
         }
-        public void incrementHits(int delta) {
-            hits += delta;
-        }
-
 
         public String getHostname() {
             return hostname;
