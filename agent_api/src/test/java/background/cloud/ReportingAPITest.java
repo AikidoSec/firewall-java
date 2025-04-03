@@ -2,6 +2,7 @@ package background.cloud;
 
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
+import dev.aikido.agent_api.helpers.env.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -17,27 +18,27 @@ public class ReportingAPITest {
     ReportingApiHTTP api;
     @BeforeEach
     public void setup() {
-        api = new ReportingApiHTTP("http://localhost:5000/", 2);
+        api = new ReportingApiHTTP("http://localhost:5000/", 2, new Token("token"));
     }
 
     @Test
     public void testTimeoutValid() {
-        api = new ReportingApiHTTP("http://localhost:5000/delayed/2/", 3); // Allowed delay
-        Optional<APIResponse> res = api.fetchNewConfig("token");
+        api = new ReportingApiHTTP("http://localhost:5000/delayed/2/", 3, new Token("token")); // Allowed delay
+        Optional<APIResponse> res = api.fetchNewConfig();
         assertTrue(res.isPresent());
         assertTrue(res.get().block());
         assertEquals(3, res.get().endpoints().size());
     }
     @Test
     public void testTimeoutInvalid() {
-        api = new ReportingApiHTTP("http://localhost:5000/delayed/4/", 3); // Allowed delay
-        Optional<APIResponse> res = api.fetchNewConfig("token");
+        api = new ReportingApiHTTP("http://localhost:5000/delayed/4/", 3, new Token("token")); // Allowed delay
+        Optional<APIResponse> res = api.fetchNewConfig();
         assertFalse(res.isPresent());
     }
 
     @Test
     public void testFetchNewConfig() {
-        Optional<APIResponse> res = api.fetchNewConfig("token");
+        Optional<APIResponse> res = api.fetchNewConfig();
         assertTrue(res.isPresent());
         assertTrue(res.get().block());
         assertEquals(3, res.get().endpoints().size());
@@ -45,8 +46,8 @@ public class ReportingAPITest {
     @Test
     @StdIo
     public void testFetchNewConfigInvalidEndpoint(StdOut out) {
-        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2);
-        Optional<APIResponse> res = api.fetchNewConfig("token");
+        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2, new Token("token"));
+        Optional<APIResponse> res = api.fetchNewConfig();
         assertEquals(Optional.empty(), res);
         assertTrue(
                 out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Error while fetching new config from cloud"),
@@ -55,16 +56,10 @@ public class ReportingAPITest {
     }
 
     @Test
-    public void testListsResponseWithTokenNull() {
-        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists(null);
-        assertTrue(res.isEmpty());
-    }
-
-    @Test
     @StdIo
     public void testListsResponseWithWrongEndpoint(StdOut out) {
-        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2);
-        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");
+        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2, new Token("token"));
+        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists();
         assertEquals(Optional.empty(), res);
         assertTrue(
                 out.capturedString().contains("DEBUG dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP: Failed to fetch blocked lists"),
@@ -73,7 +68,7 @@ public class ReportingAPITest {
     }
     @Test
     public void testListsResponse() {
-        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists("token");
+        Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists();
         assertTrue(res.isPresent());
         assertEquals(1, res.get().blockedIPAddresses().size());
         assertEquals("geoip", res.get().blockedIPAddresses().get(0).source());
@@ -81,5 +76,4 @@ public class ReportingAPITest {
         assertEquals("1.2.3.4", res.get().blockedIPAddresses().get(0).ips().get(0));
         assertEquals("AI2Bot|Bytespider", res.get().blockedUserAgents());
     }
-
 }

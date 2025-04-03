@@ -4,12 +4,10 @@ import dev.aikido.agent_api.collectors.URLCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import java.io.IOException;
@@ -37,8 +35,6 @@ public class URLCollectorTest {
         Context.set(new EmptySampleContextObject(url));
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testNewUrlConnectionWithPort() throws IOException {
         setContextAndLifecycle("");
@@ -50,8 +46,6 @@ public class URLCollectorTest {
         assertEquals("localhost", hostnameArray[0].getHostname());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testNewUrlConnectionWithHttp() throws IOException {
         setContextAndLifecycle("");
@@ -67,8 +61,6 @@ public class URLCollectorTest {
         assertEquals("app.local.aikido.io", hostnameArray2[0].getHostname());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testNewUrlConnectionHttps() throws IOException {
         setContextAndLifecycle("");
@@ -84,8 +76,6 @@ public class URLCollectorTest {
         assertEquals("aikido.dev", hostnameArray2[0].getHostname());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testNewUrlConnectionFaultyProtocol() throws IOException {
         setContextAndLifecycle("");
@@ -96,8 +86,6 @@ public class URLCollectorTest {
         assertEquals(0, hostnameArray2.length);
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testWithNullURL() throws IOException {
         setContextAndLifecycle("");
@@ -108,8 +96,6 @@ public class URLCollectorTest {
         assertEquals(0, hostnameArray2.length);
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testWithNullContext() throws IOException {
         setContextAndLifecycle("");
@@ -122,17 +108,14 @@ public class URLCollectorTest {
         assertNull(Context.get());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
-    public void testWithNullThreadCache() throws IOException {
+    public void testOnlyContext() throws IOException {
         setContextAndLifecycle("");
-        ThreadCache.reset();
+        HostnamesStore.clear();
         URLCollector.report(new URL("https://aikido.dev"));
         Hostnames.HostnameEntry[] hostnameArray = Context.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);
         assertEquals(443, hostnameArray[0].getPort());
         assertEquals("aikido.dev", hostnameArray[0].getHostname());
-        assertNull(ThreadCache.get());
     }
 }

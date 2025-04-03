@@ -1,6 +1,7 @@
 package background.cloud;
 
 import dev.aikido.agent_api.background.cloud.RealtimeAPI;
+import dev.aikido.agent_api.helpers.env.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -14,7 +15,7 @@ public class RealtimeAPITest {
 
     @BeforeEach
     public void setUp() {
-        realtimeAPI = new RealtimeAPI();
+        realtimeAPI = new RealtimeAPI(new Token("token"));
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localhost:5000/realtime")
@@ -22,7 +23,7 @@ public class RealtimeAPITest {
     public void testGetConfigSuccess() throws Exception {
         String token = "Bearer testToken";
 
-        Optional<RealtimeAPI.ConfigResponse> response = realtimeAPI.getConfig(token);
+        Optional<RealtimeAPI.ConfigResponse> response = realtimeAPI.getConfig();
 
         assertTrue(response.isPresent());
         assertEquals(0, response.get().configUpdatedAt());
@@ -33,7 +34,7 @@ public class RealtimeAPITest {
     public void testURLNotAvailable() throws Exception {
         String token = "Bearer testToken";
 
-        Optional<RealtimeAPI.ConfigResponse> response = realtimeAPI.getConfig(token);
+        Optional<RealtimeAPI.ConfigResponse> response = realtimeAPI.getConfig();
 
         assertFalse(response.isPresent());
     }
@@ -43,7 +44,7 @@ public class RealtimeAPITest {
     public void testNot200OK() throws Exception {
         String token = "Bearer testToken";
 
-        Optional<RealtimeAPI.ConfigResponse> response = realtimeAPI.getConfig(token);
+        Optional<RealtimeAPI.ConfigResponse> response = realtimeAPI.getConfig();
 
         assertFalse(response.isPresent());
     }

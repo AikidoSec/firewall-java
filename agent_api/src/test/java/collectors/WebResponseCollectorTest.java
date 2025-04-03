@@ -7,7 +7,6 @@ import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.storage.routes.RoutesStore;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -47,7 +46,6 @@ public class WebResponseCollectorTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     public void testResponseCollector1() throws SQLException {
         // Test new route :
         Context.set(new SampleContextObject());
@@ -79,7 +77,6 @@ public class WebResponseCollectorTest {
 
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
     public void testResponseCollectorWithInvalidMethodOrStatusCode() throws SQLException {
         // Test with invalid method :
         Context.set(new SampleContextObject("OPTIONS"));
