@@ -336,4 +336,152 @@ public class ServiceConfigurationTest {
 
         assertTrue(serviceConfiguration.getEndpoints().isEmpty());
     }
+
+    @Test
+    public void testIsIpBlockedWithSubnet() {
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.0/24"));
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+                List.of(blockedEntry),
+                List.of(),
+                null
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        ServiceConfiguration.BlockedResult result = serviceConfiguration.isIpBlocked("192.168.1.100");
+        assertTrue(result.blocked());
+        assertEquals("blocked", result.description());
+    }
+
+    @Test
+    public void testIsIpBlockedWithMixedSubnetAndSingleIP() {
+        ReportingApi.ListsResponseEntry blockedEntry1 = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.0/24"));
+        ReportingApi.ListsResponseEntry blockedEntry2 = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("10.0.0.1"));
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+                List.of(blockedEntry1, blockedEntry2),
+                List.of(),
+                null
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        ServiceConfiguration.BlockedResult result1 = serviceConfiguration.isIpBlocked("192.168.1.100");
+        ServiceConfiguration.BlockedResult result2 = serviceConfiguration.isIpBlocked("10.0.0.1");
+        assertTrue(result1.blocked());
+        assertTrue(result2.blocked());
+    }
+
+    @Test
+    public void testIsIpBlockedWithEmptyBlockedList() {
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+                List.of(),
+                List.of(),
+                null
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        ServiceConfiguration.BlockedResult result = serviceConfiguration.isIpBlocked("192.168.1.1");
+        assertFalse(result.blocked());
+    }
+
+    @Test
+    public void testIsBlockedUserAgentWithEmptyRegex() {
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+                List.of(),
+                List.of(),
+                ""
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        assertFalse(serviceConfiguration.isBlockedUserAgent("any-agent"));
+    }
+
+    @Test
+    public void testIsBlockedUserAgentWithComplexRegex() {
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+                List.of(),
+                List.of(),
+                "blocked.*agent|another.*pattern"
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        assertTrue(serviceConfiguration.isBlockedUserAgent("blocked-agent"));
+        assertTrue(serviceConfiguration.isBlockedUserAgent("another-pattern"));
+        assertFalse(serviceConfiguration.isBlockedUserAgent("allowed-agent"));
+    }
+
+    @Test
+    public void testIsIpBlockedWithAllowedAndBlockedIPs() {
+        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry("source", "allowed", List.of("10.0.0.1"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+                List.of(blockedEntry),
+                List.of(allowedEntry),
+                null
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        ServiceConfiguration.BlockedResult resultAllowed = serviceConfiguration.isIpBlocked("10.0.0.1");
+        ServiceConfiguration.BlockedResult resultBlocked = serviceConfiguration.isIpBlocked("192.168.1.1");
+        assertFalse(resultAllowed.blocked());
+        assertTrue(resultBlocked.blocked());
+    }
+
+    @Test
+    public void testIsIpBlockedWithOnlyAllowedIPs() {
+        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry("source", "allowed", List.of("10.0.0.1"));
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+                List.of(),
+                List.of(allowedEntry),
+                null
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        ServiceConfiguration.BlockedResult resultAllowed = serviceConfiguration.isIpBlocked("10.0.0.1");
+        ServiceConfiguration.BlockedResult resultNotAllowed = serviceConfiguration.isIpBlocked("2.2.2.2");
+        assertFalse(resultAllowed.blocked());
+        assertTrue(resultNotAllowed.blocked());
+    }
+
+    @Test
+    public void testIsIpBlockedWithOnlyBlockedIPs() {
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+                List.of(blockedEntry),
+                List.of(),
+                null
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        ServiceConfiguration.BlockedResult resultBlocked = serviceConfiguration.isIpBlocked("192.168.1.1");
+        ServiceConfiguration.BlockedResult resultNotBlocked = serviceConfiguration.isIpBlocked("10.0.0.1");
+        assertTrue(resultBlocked.blocked());
+        assertFalse(resultNotBlocked.blocked());
+    }
+
+    @Test
+    public void testIsIpBlockedWithAllowedIPsAndBlockedIPs() {
+        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry("source", "allowed", List.of("10.0.0.1"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+                List.of(blockedEntry),
+                List.of(allowedEntry),
+                null
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        ServiceConfiguration.BlockedResult resultAllowed = serviceConfiguration.isIpBlocked("10.0.0.1");
+        ServiceConfiguration.BlockedResult resultBlocked = serviceConfiguration.isIpBlocked("192.168.1.1");
+        ServiceConfiguration.BlockedResult resultNotAllowedLocal = serviceConfiguration.isIpBlocked("192.168.1.2");
+        assertFalse(resultAllowed.blocked());
+        assertTrue(resultBlocked.blocked());
+        assertFalse(resultNotAllowedLocal.blocked());
+    }
 }
