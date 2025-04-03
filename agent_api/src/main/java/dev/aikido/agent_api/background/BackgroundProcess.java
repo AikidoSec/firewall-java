@@ -10,20 +10,25 @@ import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 
 import java.util.Optional;
-import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static dev.aikido.agent_api.Config.heartbeatEveryXSeconds;
 import static dev.aikido.agent_api.Config.pollingEveryXSeconds;
 import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoAPIEndpoint;
 
 public class BackgroundProcess extends Thread {
-    private final Token token;
     private final static int API_TIMEOUT = 10; // 10 seconds
+    private final Token token;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
+
     public BackgroundProcess(String name, Token token) {
         super(name);
         this.token = token;
     }
 
+    @Override
     public void run() {
         if (!Thread.currentThread().isDaemon() && token == null) {
             return; // Can only run if thread is daemon and token needs to be defined.
@@ -39,25 +44,13 @@ public class BackgroundProcess extends Thread {
         Optional<ReportingApi.APIListsResponse> listsRes = api.fetchBlockedLists();
         listsRes.ifPresent(ServiceConfigStore::updateFromAPIListsResponse);
 
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(
-                new HeartbeatTask(api), // Heartbeat task: Sends statistics, route data, etc.
-                heartbeatEveryXSeconds * 1000, // Delay before first execution in milliseconds
-                heartbeatEveryXSeconds * 1000 // Interval in milliseconds
-        );
-        timer.scheduleAtFixedRate(
-                new RealtimeTask(realtimeApi, api), // Realtime task: makes sure config updates happen fast
-                pollingEveryXSeconds * 1000, // Delay before first execution in milliseconds
-                pollingEveryXSeconds * 1000 // Interval in milliseconds
-        );
-        timer.scheduleAtFixedRate(
-                new AttackQueueConsumerTask(api), // Consumes from the attack queue (so attacks are reported in background)
-                /* delay: */ 0, /* interval: */ 2 * 1000 // Clear queue every 2 seconds
-        );
-        // Report initial statistics if those were not received
-        timer.schedule(
-                new HeartbeatTask(api, true /* Check for initial statistics */), // Initial heartbeat task
-                60_000 // Delay in ms
-        );
+
+        // Schedule tasks using ScheduledExecutorService
+        scheduler.scheduleAtFixedRate(new HeartbeatTask(api), heartbeatEveryXSeconds, heartbeatEveryXSeconds, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(new RealtimeTask(realtimeApi, api), pollingEveryXSeconds, pollingEveryXSeconds, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(new AttackQueueConsumerTask(api), 0, 2, TimeUnit.SECONDS);
+
+        // one time check to report initial stats
+        scheduler.schedule(new HeartbeatTask(api, true), 60, TimeUnit.SECONDS);
     }
 }
