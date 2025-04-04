@@ -1,36 +1,31 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class PathWrapperTest {
     @AfterEach
     void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
     }
     @BeforeEach
-    void clearThreadCache() {
+    void beforeEach() {
         cleanup();
-        ThreadCache.set(getEmptyThreadCacheObject());
+        ServiceConfigStore.updateBlocking(true);
     }
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInResolve() throws Exception {
         setContextAndLifecycle("../opt/");
@@ -44,8 +39,6 @@ public class PathWrapperTest {
         assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInResolveWithPath() throws Exception {
         Path maliciousPath = Paths.get("/../opt/test.txt");
@@ -62,8 +55,6 @@ public class PathWrapperTest {
         assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInResolveSibling() throws Exception {
         setContextAndLifecycle("../opt/");
@@ -77,8 +68,6 @@ public class PathWrapperTest {
         assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInResolveSiblingWithPath() throws Exception {
         Path basePath = Paths.get("/var/");
@@ -95,8 +84,6 @@ public class PathWrapperTest {
         assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testPathTraversalInRelativize() throws Exception {
         Path basePath = Paths.get("/var/opt/");
