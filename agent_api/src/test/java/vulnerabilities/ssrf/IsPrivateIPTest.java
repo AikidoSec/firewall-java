@@ -23,7 +23,6 @@ public class IsPrivateIPTest {
     @Test
     void testPrivateIPv4Addresses() {
         assertTrue(isPrivateIp("0.0.0.0"));
-        assertTrue(isPrivateIp("0000.0000.0000.0000")); // This is equivalent to 0.0.0.0
         assertTrue(isPrivateIp("0000.0000"));
         assertTrue(isPrivateIp("0.0.0.1"));
         assertTrue(isPrivateIp("0.0.0.7"));

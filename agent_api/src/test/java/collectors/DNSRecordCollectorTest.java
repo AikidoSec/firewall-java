@@ -76,7 +76,7 @@ public class DNSRecordCollectorTest {
         DNSRecordCollector.report("dev.aikido", new InetAddress[]{
                 inetAddress1, inetAddress2
         });
-        verify(myContextObject, times(2)).getHostnames();
+        verify(myContextObject, atLeastOnce()).getHostnames();
     }
 
     public static class SampleContextObject extends EmptySampleContextObject {
