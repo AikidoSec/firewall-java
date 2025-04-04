@@ -13,6 +13,8 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static utils.EmptyAPIResponses.emptyAPIListsResponse;
+import static utils.EmptyAPIResponses.emptyAPIResponse;
 
 public class HttpURLConnectionRedirectTest {
 
@@ -27,6 +29,8 @@ public class HttpURLConnectionRedirectTest {
     static void cleanup() {
         Context.set(null);
         HostnamesStore.clear();
+        ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
+        ServiceConfigStore.updateFromAPIListsResponse(emptyAPIListsResponse);
         ServiceConfigStore.updateBlocking(true);
     }
     @AfterAll
