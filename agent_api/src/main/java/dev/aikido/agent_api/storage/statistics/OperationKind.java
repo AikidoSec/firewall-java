@@ -15,9 +15,6 @@ public enum OperationKind {
     @SerializedName("fs_op")
     FS_OP,
 
-    @SerializedName("path_op")
-    PATH_OP,
-
     @SerializedName("exec_op")
     EXEC_OP,
 
