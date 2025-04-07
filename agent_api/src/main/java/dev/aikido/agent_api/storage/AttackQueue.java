@@ -22,9 +22,9 @@ public final class AttackQueue {
 
     public static void attackDetected(Attack attack, ContextObject context) {
         // increment statistics
-        StatisticsStore.incrementAttacksDetected();
+        StatisticsStore.incrementAttacksDetected(attack.operation);
         if (ServiceConfigStore.getConfig().isBlockingEnabled()) {
-            StatisticsStore.incrementAttacksBlocked(); // Also increment blocked attacks.
+            StatisticsStore.incrementAttacksBlocked(attack.operation); // Also increment blocked attacks.
         }
 
         // generate attack API event

@@ -1,7 +1,38 @@
 package dev.aikido.agent_api.storage.statistics;
 
-public record OperationRecord(
-        OperationKind kind,
-        long total
-) {
+import java.util.HashMap;
+import java.util.Map;
+
+public final class OperationRecord {
+    private final OperationKind kind;
+    private long total;
+    private final Map<String, Integer> attacksDetected = new HashMap<>();
+
+    public OperationRecord(OperationKind kind) {
+        this.kind = kind;
+        this.total = 0;
+        this.attacksDetected.put("total", 0);
+        this.attacksDetected.put("blocked", 0);
+    }
+
+    public void incrementTotal() {
+        this.total += 1;
+    }
+
+    public long total() {
+        return this.total;
+    }
+
+    public void incrementAttacksBlocked() {
+        incrementAttacksDetected();
+        this.attacksDetected.compute("blocked", (k, currentBlocked) -> currentBlocked + 1);
+    }
+
+    public void incrementAttacksDetected() {
+        this.attacksDetected.compute("total", (k, currentTotal) -> currentTotal + 1);
+    }
+
+    public Map<String, Integer> getAttacksDetected() {
+        return this.attacksDetected;
+    }
 }

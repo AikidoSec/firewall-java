@@ -9,7 +9,7 @@ public class Statistics {
     private int totalHits;
     private int attacksDetected;
     private int attacksBlocked;
-    private long startedAt; 
+    private long startedAt;
     private final Map<String, OperationRecord> operations = new HashMap<>();
     public Statistics(int totalHits, int attacksDetected, int attacksBlocked) {
         this.totalHits = totalHits;
@@ -26,24 +26,28 @@ public class Statistics {
     }
     public int getTotalHits() { return totalHits; }
 
-    public void incrementAttacksDetected() {
+    public void incrementAttacksDetected(String operation) {
         this.attacksDetected += 1;
+        if (this.operations.containsKey(operation)) {
+            this.operations.get(operation).incrementAttacksDetected();
+        }
     }
     public int getAttacksDetected() { return attacksDetected; }
 
-    public void incrementAttacksBlocked() {
+    public void incrementAttacksBlocked(String operation) {
         this.attacksBlocked += 1;
+        if (this.operations.containsKey(operation)) {
+            this.operations.get(operation).incrementAttacksBlocked();
+        }
     }
     public int getAttacksBlocked() { return attacksBlocked; }
 
-    public void registerCall(String sink, OperationKind kind) {
-        if (!this.operations.containsKey(sink)) {
-            this.operations.put(sink, new OperationRecord(kind, 1));
-            return;
+    public void registerCall(String operation, OperationKind kind) {
+        if (!this.operations.containsKey(operation)) {
+            this.operations.put(operation, new OperationRecord(kind));
         }
-        OperationRecord currentOp = this.operations.get(sink);
         // increase total count by 1
-        this.operations.put(sink, new OperationRecord(kind, currentOp.total() + 1));
+        this.operations.get(operation).incrementTotal();
     }
     public Map<String, OperationRecord> getOperations() {
         return new HashMap<>(this.operations);

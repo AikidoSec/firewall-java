@@ -29,11 +29,11 @@ public class StatisticsTest {
     @Test
     public void testClear() {
         stats.incrementTotalHits(20);
-        stats.incrementAttacksBlocked();
-        stats.incrementAttacksBlocked();
-        stats.incrementAttacksDetected();
-        stats.incrementAttacksDetected();
-        stats.incrementAttacksDetected();
+        stats.incrementAttacksBlocked("test1");
+        stats.incrementAttacksBlocked("test2");
+        stats.incrementAttacksDetected("test2");
+        stats.incrementAttacksDetected("test1");
+        stats.incrementAttacksDetected("test1");
         assertEquals(3, stats.getAttacksDetected());
         assertEquals(2, stats.getAttacksBlocked());
         assertEquals(20, stats.getTotalHits());
@@ -89,7 +89,7 @@ public class StatisticsTest {
         Map<String, OperationRecord> operations = stats.getOperations();
 
         // Ensure that the returned map is not modifiable
-        operations.put("operation2", new OperationRecord(OperationKind.EXEC_OP, 1));
+        operations.put("operation2", new OperationRecord(OperationKind.EXEC_OP));
         assertEquals(1, stats.getOperations().size()); // Should still only have operation1
     }
 }
