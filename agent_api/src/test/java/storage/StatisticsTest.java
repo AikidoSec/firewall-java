@@ -1,6 +1,6 @@
 package storage;
 
-import dev.aikido.agent_api.storage.Statistics;
+import dev.aikido.agent_api.storage.statistics.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

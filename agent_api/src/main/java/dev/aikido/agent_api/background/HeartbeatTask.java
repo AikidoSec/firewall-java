@@ -9,6 +9,8 @@ import dev.aikido.agent_api.storage.*;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.storage.routes.RoutesStore;
+import dev.aikido.agent_api.storage.statistics.Statistics;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 import java.util.List;
 import java.util.Optional;

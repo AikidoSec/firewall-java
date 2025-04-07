@@ -6,7 +6,7 @@ import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
-import dev.aikido.agent_api.storage.StatisticsStore;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.EmptySampleContextObject;

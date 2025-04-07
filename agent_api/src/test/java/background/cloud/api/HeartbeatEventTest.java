@@ -4,7 +4,7 @@ import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
 import dev.aikido.agent_api.storage.Hostnames;
-import dev.aikido.agent_api.storage.Statistics;
+import dev.aikido.agent_api.storage.statistics.Statistics;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.context.User;
 import org.junit.jupiter.api.BeforeEach;

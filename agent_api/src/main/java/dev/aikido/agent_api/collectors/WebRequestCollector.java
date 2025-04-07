@@ -4,7 +4,7 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
-import dev.aikido.agent_api.storage.StatisticsStore;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 import java.util.List;
 

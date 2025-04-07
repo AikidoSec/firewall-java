@@ -4,6 +4,7 @@ import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 
 import java.util.concurrent.BlockingQueue;

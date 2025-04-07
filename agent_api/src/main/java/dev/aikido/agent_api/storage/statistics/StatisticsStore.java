@@ -1,4 +1,4 @@
-package dev.aikido.agent_api.storage;
+package dev.aikido.agent_api.storage.statistics;
 
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
