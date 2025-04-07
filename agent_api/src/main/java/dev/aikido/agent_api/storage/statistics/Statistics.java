@@ -9,7 +9,7 @@ public class Statistics {
     private int totalHits;
     private int attacksDetected;
     private int attacksBlocked;
-    private long startedAt;
+    private long startedAt; 
     private final Map<String, OperationRecord> operations = new HashMap<>();
     public Statistics(int totalHits, int attacksDetected, int attacksBlocked) {
         this.totalHits = totalHits;
