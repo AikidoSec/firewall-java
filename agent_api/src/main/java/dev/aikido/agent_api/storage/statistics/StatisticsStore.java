@@ -53,6 +53,15 @@ public final class StatisticsStore {
         }
     }
 
+    public static void registerCall(String sink, OperationKind kind) {
+        mutex.lock();
+        try {
+            stats.registerCall(sink, kind);
+        } finally {
+            mutex.unlock();
+        }
+    }
+
     public static void clear() {
         mutex.lock();
         try {
