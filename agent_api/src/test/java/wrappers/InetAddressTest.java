@@ -2,6 +2,8 @@ package wrappers;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
+import dev.aikido.agent_api.storage.statistics.OperationKind;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class InetAddressTest {
     @AfterEach
     void cleanup() {
+        StatisticsStore.clear();
         Context.set(null);
     }
     @BeforeEach
@@ -55,6 +58,10 @@ public class InetAddressTest {
         assertEquals(
             "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
             exception3.getMessage());
+        assertEquals(3, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").total());
+        assertEquals(3, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getAttacksDetected().get("blocked"));
+        assertEquals(3, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getAttacksDetected().get("total"));
+        assertEquals(OperationKind.OUTGOING_HTTP_OP, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getKind());
 
     }
 
@@ -65,6 +72,8 @@ public class InetAddressTest {
             fetchResponse("http://localhost/api/test");
         });
         assertEquals("dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery", exception.getMessage());
+        assertEquals(1, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").total());
+        assertEquals(1, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getAttacksDetected().get("blocked"));
     }
 
     @Test
@@ -74,6 +83,8 @@ public class InetAddressTest {
         assertThrows(ConnectException.class, () -> {
             fetchResponse("http://localhost/api/test");
         });
+        assertEquals(1, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").total());
+        assertEquals(0, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getAttacksDetected().get("total"));
     }
 
     @Test

@@ -5,8 +5,8 @@ import java.util.Map;
 
 public final class OperationRecord {
     private final OperationKind kind;
-    private long total;
     private final Map<String, Integer> attacksDetected = new HashMap<>();
+    private long total;
 
     public OperationRecord(OperationKind kind) {
         this.kind = kind;
@@ -24,7 +24,6 @@ public final class OperationRecord {
     }
 
     public void incrementAttacksBlocked() {
-        incrementAttacksDetected();
         this.attacksDetected.compute("blocked", (k, currentBlocked) -> currentBlocked + 1);
     }
 
@@ -34,5 +33,9 @@ public final class OperationRecord {
 
     public Map<String, Integer> getAttacksDetected() {
         return this.attacksDetected;
+    }
+
+    public OperationKind getKind() {
+        return this.kind;
     }
 }
