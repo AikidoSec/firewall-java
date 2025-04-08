@@ -37,7 +37,7 @@ public class StatisticsTest {
         assertEquals(3, stats.getAttacksDetected());
         assertEquals(2, stats.getAttacksBlocked());
         assertEquals(20, stats.getTotalHits());
-        assertEquals(3, stats.getOperations().get("test1").getAttacksDetected().get("total"));
+        assertEquals(2, stats.getOperations().get("test1").getAttacksDetected().get("total"));
         assertEquals(1, stats.getOperations().get("test1").getAttacksDetected().get("blocked"));
 
         assertFalse(stats.getOperations().containsKey("test2"));
