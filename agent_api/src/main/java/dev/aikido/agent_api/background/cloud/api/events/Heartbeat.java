@@ -10,6 +10,7 @@ import dev.aikido.agent_api.context.User;
 
 import java.util.List;
 
+import static dev.aikido.agent_api.background.cloud.GetManagerInfo.getManagerInfo;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public final class Heartbeat {
@@ -26,11 +27,10 @@ public final class Heartbeat {
     ) implements APIEvent {}
     
     public static HeartbeatEvent get(
-            CloudConnectionManager connectionManager,
             Statistics.StatsRecord stats, Hostnames.HostnameEntry[] hostnames, RouteEntry[] routes, List<User> users
     ) {
         long time = getUnixTimeMS(); // Get current time
-        GetManagerInfo.ManagerInfo agent = connectionManager.getManagerInfo();
+        GetManagerInfo.ManagerInfo agent = getManagerInfo();
         boolean middlewareInstalled = ServiceConfigStore.getConfig().isMiddlewareInstalled();
         return new HeartbeatEvent("heartbeat", agent, time, stats, hostnames, routes, users, middlewareInstalled);
     }
