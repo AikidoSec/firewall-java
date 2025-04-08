@@ -1,0 +1,14 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+# Ensure files end with a newline
+insert_final_newline = true
+
+# Other common settings can be added here
+indent_style = space
+indent_size = 4
+charset = utf-8
+trim_trailing_whitespace = true
