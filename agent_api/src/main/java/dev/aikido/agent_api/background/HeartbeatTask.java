@@ -27,7 +27,7 @@ public class HeartbeatTask extends TimerTask {
 
     @Override
     public void run() {
-        if (shouldCheckForInitialStats && connectionManager.getConfig().hasReceivedAnyStats()) {
+        if (shouldCheckForInitialStats && ServiceConfigStore.getConfig().hasReceivedAnyStats()) {
             // Stats were already sent, so return :
             return;
         }

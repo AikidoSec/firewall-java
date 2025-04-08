@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.background.cloud;
 
 import dev.aikido.agent_api.Config;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
 
 import java.util.List;
@@ -33,9 +34,9 @@ public final class GetManagerInfo {
     public record Platform(String name, String version) {}
 
     public static ManagerInfo getManagerInfo(CloudConnectionManager connectionManager) {
-        ServiceConfiguration serviceConfig = connectionManager.getConfig();
+        ServiceConfiguration serviceConfig = ServiceConfigStore.getConfig();
         return new ManagerInfo(
-            !connectionManager.shouldBlock(), // dryMode
+            !serviceConfig.isBlockingEnabled(), // dryMode
             getHostname(), // hostname
             Config.pkgVersion, // version
             "firewall-java", // library
