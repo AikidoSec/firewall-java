@@ -5,10 +5,7 @@ import com.google.gson.GsonBuilder;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.RedirectNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 
 public class ContextObject {
     protected String method;
@@ -26,6 +23,7 @@ public class ContextObject {
     protected boolean executedMiddleware;
     protected transient ArrayList<RedirectNode> redirectStartNodes;
     protected transient Map<String, Map<String, String>> cache = new HashMap<>();
+    protected transient Optional<Boolean> forcedProtectionOff = Optional.empty();
 
     // We store hostnames in the context object so we can match a given hostname (by DNS request)
     // with its port number (which we know by instrumenting the URLs that get requested).
@@ -98,6 +96,13 @@ public class ContextObject {
     public String getJSONBody() {
         Gson gson = new Gson();
         return gson.toJson(this.body);
+    }
+
+    public void setForcedProtectionOff(boolean forcedProtectionOff) {
+        this.forcedProtectionOff = Optional.of(forcedProtectionOff);
+    }
+    public Optional<Boolean> getForcedProtectionOff() {
+        return this.forcedProtectionOff;
     }
 
     public RouteMetadata getRouteMetadata() {
