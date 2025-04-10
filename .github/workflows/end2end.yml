@@ -37,7 +37,6 @@ jobs:
       matrix:
         app:
           - { name: SpringBootPostgres, test_file: end2end/spring_boot_postgres.py }
-          - { name: SpringBootPostgres, test_file: end2end/spring_boot_postgres.py }
           - { name: SpringBootMySQL, test_file: end2end/spring_boot_mysql.py }
           - { name: SpringBootMSSQL, test_file: end2end/spring_boot_mssql.py }
           - { name: SpringWebfluxSampleApp, test_file: end2end/spring_webflux_postgres.py }
