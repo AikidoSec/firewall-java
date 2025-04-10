@@ -54,8 +54,6 @@ jobs:
         run: |
           docker build -t mock_core .
           docker run --name mock_core -d -p 5000:5000 mock_core
-      - name: Setup IPC Folder
-        run: mkdir /opt/aikido && chmod a+rw /opt/aikido
       - name: Start databases
         working-directory: ./sample-apps/databases
         run: |
@@ -70,7 +68,7 @@ jobs:
         working-directory: ./sample-apps/${{ matrix.app.name }}
         run: |
           make runWithoutZen
-          AIKIDO_TMP_DIR="/opt/aikido" make runWithDdTrace
+          make runWithDdTrace
 
       - name: Run End-to-End tests
         working-directory: ./

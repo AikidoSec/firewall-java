@@ -1,7 +1,7 @@
 import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
+import dev.aikido.agent_api.storage.UsersStore;
 import org.junit.jupiter.api.*;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.junitpioneer.jupiter.StdIo;
@@ -12,7 +12,6 @@ import java.sql.*;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 @SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "trace")
 @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
@@ -35,17 +34,13 @@ public class SetUserTest {
     @BeforeAll
     public static void clean() {
         Context.set(null);
-        ThreadCache.set(null);
+        UsersStore.clear();
     };
-    @BeforeEach
-    public void setUp() throws SQLException {
-        ThreadCache.set(getEmptyThreadCacheObject());
-    }
 
     @AfterEach
     public void tearDown() throws SQLException {
         Context.set(null);
-        ThreadCache.set(null);
+        UsersStore.clear();
     }
 
     @Test
@@ -137,5 +132,6 @@ public class SetUserTest {
 
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
         assertFalse(out.capturedString().contains("SetUser")); // Should not contain SetUser class
+        assertEquals(1, UsersStore.getUsersAsList().size());
     }
 }

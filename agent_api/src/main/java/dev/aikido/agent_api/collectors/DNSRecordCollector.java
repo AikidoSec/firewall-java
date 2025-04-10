@@ -1,9 +1,9 @@
 package dev.aikido.agent_api.collectors;
 
-import dev.aikido.agent_api.background.ipc_commands.AttackCommand;
-import dev.aikido.agent_api.background.utilities.ThreadIPCClient;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.statistics.OperationKind;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
@@ -14,8 +14,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.aikido.agent_api.background.utilities.ThreadIPCClientFactory.getDefaultThreadIPCClient;
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
+import static dev.aikido.agent_api.storage.AttackQueue.attackDetected;
 
 public final class DNSRecordCollector {
     private DNSRecordCollector() {}
@@ -23,6 +23,9 @@ public final class DNSRecordCollector {
     public static void report(String hostname, InetAddress[] inetAddresses) {
         try {
             logger.trace("DNSRecordCollector called with %s & inet addresses: %s", hostname, List.of(inetAddresses));
+
+            // store stats
+            StatisticsStore.registerCall("java.net.InetAddress.getAllByName", OperationKind.OUTGOING_HTTP_OP);
 
             // Convert inetAddresses array to a List of IP strings :
             List<String> ipAddresses = new ArrayList<>();
@@ -47,13 +50,9 @@ public final class DNSRecordCollector {
                 if (attack == null) {
                     continue;
                 }
-                logger.debug("SSRF Attack detected due to: %s:%s", hostname, hostnameEntry.getPort());
 
-                ThreadIPCClient client = getDefaultThreadIPCClient();
-                AttackCommand.Req req = new AttackCommand.Req(attack, Context.get());
-                if (client != null) {
-                    AttackCommand.sendAttack(client, req);
-                }
+                logger.debug("SSRF Attack detected due to: %s:%s", hostname, hostnameEntry.getPort());
+                attackDetected(attack, Context.get());
 
                 if (shouldBlock()) {
                     logger.debug("Blocking SSRF attack...");

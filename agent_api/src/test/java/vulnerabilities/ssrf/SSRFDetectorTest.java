@@ -3,7 +3,7 @@ package vulnerabilities.ssrf;
 import dev.aikido.agent_api.collectors.RedirectCollector;
 import dev.aikido.agent_api.collectors.URLCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
 import org.junit.jupiter.api.AfterAll;
@@ -17,13 +17,13 @@ import java.net.URL;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
+import static utils.EmptyAPIResponses.emptyAPIResponse;
 
 public class SSRFDetectorTest {
     @BeforeAll
     static void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
+        ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
     }
     @AfterAll
     static void afterAll() {
@@ -32,7 +32,7 @@ public class SSRFDetectorTest {
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
-        ThreadCache.set(getEmptyThreadCacheObject());
+        ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
     }
 
 
@@ -91,7 +91,6 @@ public class SSRFDetectorTest {
         Context.set(new EmptySampleContextObject(
                 "http://ssrf-redirects.testssandbox.com/ssrf", // argument
                 "http://ssrf-redirects.testssandbox.com/examplesite")); // url
-        ThreadCache.set(getEmptyThreadCacheObject());
 
 
         URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));

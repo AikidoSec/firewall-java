@@ -1,5 +1,7 @@
 package dev.aikido.agent_api.collectors;
 
+import dev.aikido.agent_api.storage.statistics.OperationKind;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.Scanner;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
 
@@ -17,6 +19,9 @@ public final class FileCollector {
         if (filePath == null) {
             return; // Make sure filePath is defined
         }
+
+        StatisticsStore.registerCall(operation, OperationKind.FS_OP);
+
         Vulnerabilities.Vulnerability vulnerability = new Vulnerabilities.PathTraversalVulnerability();
         if (filePath instanceof String filePathString) {
             Scanner.scanForGivenVulnerability(vulnerability, operation, new String[]{filePathString});

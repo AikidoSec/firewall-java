@@ -1,24 +1,20 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.storage.routes.Routes;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
-import dev.aikido.agent_api.thread_cache.ThreadCacheObject;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
+import dev.aikido.agent_api.storage.statistics.OperationKind;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +24,7 @@ public class MSSQLWrapperTest {
     @BeforeAll
     public static void clean() {
         Context.set(null);
-        ThreadCache.set(null);
+        ServiceConfigStore.updateBlocking(true);
     }
 
     @BeforeEach
@@ -38,7 +34,7 @@ public class MSSQLWrapperTest {
         String user = "sa"; // Change to your username
         String password = "Strong!Passw0rd"; // Change to your password
         connection = DriverManager.getConnection(url, user, password);
-        ThreadCache.set(new ThreadCacheObject(List.of(), Set.of(), Set.of(), new Routes(), Optional.empty()));
+        StatisticsStore.clear();
     }
 
     @AfterEach
@@ -47,15 +43,11 @@ public class MSSQLWrapperTest {
             connection.close();
         }
         Context.set(null);
-        ThreadCache.set(null);
+        StatisticsStore.clear();
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testSelectSqlWithPrepareStatement() throws SQLException {
-        ThreadCache.set(null);
-
         assertDoesNotThrow(() -> {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
         });
@@ -68,14 +60,15 @@ public class MSSQLWrapperTest {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
         });
         assertEquals("Aikido Zen has blocked SQL Injection, Dialect: Microsoft SQL", exception.getMessage());
+        var operation = StatisticsStore.getStatsRecord().operations().get("(Microsoft JDBC Driver 10.2 for SQL Server) java.sql.Connection.prepareStatement");
+        assertEquals(5, operation.total());
+        assertEquals(1, operation.getAttacksDetected().get("blocked"));
+        assertEquals(1, operation.getAttacksDetected().get("total"));
+        assertEquals(OperationKind.SQL_OP, operation.getKind());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSelectSqlSafeWithPrepareStatement() throws SQLException {
-        ThreadCache.set(null);
-
         Context.set(new EmptySampleContextObject("FROM"));
         assertDoesNotThrow(() -> {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
@@ -91,11 +84,7 @@ public class MSSQLWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testSelectSqlWithPreparedStatementWithoutExecute() throws SQLException {
-        ThreadCache.set(null);
-
         Context.set(new EmptySampleContextObject("SELECT * FROM notpets;"));
         assertDoesNotThrow(() -> {
             connection.prepareStatement("SELECT pet_name FROM pets;");
@@ -109,8 +98,6 @@ public class MSSQLWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecute() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("SELECT * FROM notpets;"));
@@ -129,8 +116,6 @@ public class MSSQLWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testAddBatch() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("Fluffy"));
@@ -151,8 +136,6 @@ public class MSSQLWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecuteLargeUpdate() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("Buddy"));
@@ -171,8 +154,6 @@ public class MSSQLWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecuteQuery() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("* FROM pets"));
@@ -190,8 +171,6 @@ public class MSSQLWrapperTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     public void testExecuteUpdate() throws SQLException {
         Statement stmt = connection.createStatement();
         Context.set(new EmptySampleContextObject("UPDATE"));

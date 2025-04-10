@@ -1,12 +1,10 @@
 package dev.aikido.agent_api.background.cloud.api;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
+import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
-import dev.aikido.agent_api.helpers.net.IPList;
-import dev.aikido.agent_api.storage.routes.RouteEntry;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,21 +21,23 @@ import java.util.zip.GZIPInputStream;
 public class ReportingApiHTTP extends ReportingApi {
     private final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
     private final String reportingUrl;
+    private final Token token;
     private final Gson gson = new Gson();
-    public ReportingApiHTTP(String reportingUrl, int timeoutInSec) {
+    public ReportingApiHTTP(String reportingUrl, int timeoutInSec, Token token) {
         // Reporting URL should end with trailing slash for now.
         super(timeoutInSec);
         this.reportingUrl = reportingUrl;
+        this.token = token;
     }
 
-    public Optional<APIResponse> fetchNewConfig(String token) {
+    public Optional<APIResponse> fetchNewConfig() {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
                     .build();
 
             URI uri = URI.create(reportingUrl + "api/runtime/config");
-            HttpRequest request = createHttpRequest(Optional.empty(), token, uri);
+            HttpRequest request = createHttpRequest(Optional.empty(), uri);
 
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -49,14 +49,14 @@ public class ReportingApiHTTP extends ReportingApi {
     }
 
     @Override
-    public Optional<APIResponse> report(String token, APIEvent event) {
+    public Optional<APIResponse> report(APIEvent event) {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(timeoutInSec))
                 .build();
 
             URI uri = URI.create(reportingUrl + "api/runtime/events");
-            HttpRequest request = createHttpRequest(Optional.of(event), token, uri);
+            HttpRequest request = createHttpRequest(Optional.of(event), uri);
 
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -68,7 +68,7 @@ public class ReportingApiHTTP extends ReportingApi {
     }
 
     @Override
-    public Optional<APIListsResponse> fetchBlockedLists(String token) {
+    public Optional<APIListsResponse> fetchBlockedLists() {
         if (token == null) {
             return Optional.empty();
         }
@@ -80,7 +80,7 @@ public class ReportingApiHTTP extends ReportingApi {
 
             // Set the Accept-Encoding header to gzip
             connection.setRequestProperty("Accept-Encoding", "gzip");
-            connection.setRequestProperty("Authorization", token);
+            connection.setRequestProperty("Authorization", token.get());
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 return Optional.empty();
@@ -117,17 +117,14 @@ public class ReportingApiHTTP extends ReportingApi {
         }
         return getUnsuccessfulAPIResponse("unknown_error");
     }
-    private HttpRequest createHttpRequest(Optional<APIEvent> event, String token, URI uri) {
+    private HttpRequest createHttpRequest(Optional<APIEvent> event, URI uri) {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(uri) // Change to your target URL
             .timeout(Duration.ofSeconds(timeoutInSec))
             .header("Content-Type", "application/json") // Set Content-Type header
-            .header("Authorization", token); // Set Authorization header
+            .header("Authorization", token.get()); // Set Authorization header
         if (event.isPresent()) {
-            Gson gson = new GsonBuilder()
-                    // Use a custom serializer because api spec is transient in RouteEntry :
-                    .registerTypeAdapter(RouteEntry.class, new RouteEntry.RouteEntrySerializer())
-                    .create();
+            Gson gson = new Gson();
             String requestPayload = gson.toJson(event.get());
             return requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
                 .build();

@@ -1,11 +1,11 @@
 package wrappers;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.thread_cache.ThreadCache;
+import dev.aikido.agent_api.storage.HostnamesStore;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import utils.EmptySampleContextObject;
 
 import java.net.HttpURLConnection;
@@ -13,7 +13,6 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static utils.EmtpyThreadCacheObject.getEmptyThreadCacheObject;
 
 public class HttpURLConnectionRedirectTest {
 
@@ -27,7 +26,8 @@ public class HttpURLConnectionRedirectTest {
     @BeforeAll
     static void cleanup() {
         Context.set(null);
-        ThreadCache.set(null);
+        HostnamesStore.clear();
+        ServiceConfigStore.updateBlocking(true);
     }
     @AfterAll
     static void afterAll() {
@@ -36,11 +36,9 @@ public class HttpURLConnectionRedirectTest {
 
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
-        ThreadCache.set(getEmptyThreadCacheObject());
+        HostnamesStore.clear();
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSrrfTest() {
         setContextAndLifecycle(SSRF_TEST);
@@ -59,8 +57,6 @@ public class HttpURLConnectionRedirectTest {
                 exception1.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSrrfTestTwice() {
         setContextAndLifecycle(SSRF_TEST_TWICE);
@@ -78,8 +74,6 @@ public class HttpURLConnectionRedirectTest {
                 exception1.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSrrfTestDomain() {
         setContextAndLifecycle(SSRF_TEST_DOMAIN);
@@ -97,8 +91,6 @@ public class HttpURLConnectionRedirectTest {
                 exception1.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSrrfTestDomainTwice() {
         setContextAndLifecycle(SSRF_TEST_DOMAIN_TWICE);
@@ -116,8 +108,6 @@ public class HttpURLConnectionRedirectTest {
                 exception1.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSsrfCrossDomain() {
         setContextAndLifecycle(CROSS_DOMAIN_TEST);
@@ -135,8 +125,6 @@ public class HttpURLConnectionRedirectTest {
                 exception1.getMessage());
     }
 
-    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
-    @SetEnvironmentVariable(key = "AIKIDO_BLOCK", value = "true")
     @Test
     public void testSsrfCrossDomainTwice() {
         setContextAndLifecycle(CROSS_DOMAIN_TEST_DOMAIN_TWICE);
