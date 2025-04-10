@@ -2,6 +2,8 @@ package wrappers;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
+import dev.aikido.agent_api.storage.statistics.OperationKind;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class InetAddressTest {
     @AfterEach
     void cleanup() {
+        StatisticsStore.clear();
         Context.set(null);
     }
     @BeforeEach
@@ -55,6 +58,10 @@ public class InetAddressTest {
         assertEquals(
             "dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery",
             exception3.getMessage());
+        assertEquals(3, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").total());
+        assertEquals(3, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getAttacksDetected().get("blocked"));
+        assertEquals(3, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getAttacksDetected().get("total"));
+        assertEquals(OperationKind.OUTGOING_HTTP_OP, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getKind());
 
     }
 
@@ -65,37 +72,31 @@ public class InetAddressTest {
             fetchResponse("http://localhost/api/test");
         });
         assertEquals("dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException: Aikido Zen has blocked a server-side request forgery", exception.getMessage());
+        assertEquals(1, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").total());
+        assertEquals(1, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getAttacksDetected().get("blocked"));
     }
 
     @Test
-    public void testSSRFWithoutPortAndWithoutContext() throws Exception {
+    public void testSSRFWithoutPortAndWithoutContext() {
         setContextAndLifecycle("http://localhost:80");
         Context.set(null);
-        assertThrows(ConnectException.class, () -> {
-            fetchResponse("http://localhost/api/test");
-        });
+        assertThrows(ConnectException.class, () -> fetchResponse("http://localhost/api/test"));
+        assertTrue(StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").total() >= 1);
+        assertEquals(0, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getAttacksDetected().get("total"));
     }
 
     @Test
     public void testSSRFWithHttpClient() {
         setContextAndLifecycle("http://localhost:5000/");
 
-        Exception exception1 = assertThrows(Exception.class, () -> {
-            fetchResponseHttpClient("http://localhost:5000/config");
-        });
+        Exception exception1 = assertThrows(Exception.class, () -> fetchResponseHttpClient("http://localhost:5000/config"));
         assertTrue(exception1.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
 
-        Exception exception2 = assertThrows(Exception.class, () -> {
-            fetchResponseHttpClient("http://localhost:5000/mock/events");
-        });
+        Exception exception2 = assertThrows(Exception.class, () -> fetchResponseHttpClient("http://localhost:5000/mock/events"));
         assertTrue(exception2.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
-        
-        Exception exception3 = assertThrows(Exception.class, () -> {
-            fetchResponseHttpClient("https://localhost:5000/api/runtime/config");
-        });
+
+        Exception exception3 = assertThrows(Exception.class, () -> fetchResponseHttpClient("https://localhost:5000/api/runtime/config"));
         assertTrue(exception3.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
-
-
     }
 
     private void fetchResponse(String urlString) throws IOException, SSRFException {

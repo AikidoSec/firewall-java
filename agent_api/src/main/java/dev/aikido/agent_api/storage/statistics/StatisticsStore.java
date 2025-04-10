@@ -1,4 +1,4 @@
-package dev.aikido.agent_api.storage;
+package dev.aikido.agent_api.storage.statistics;
 
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
@@ -35,19 +35,28 @@ public final class StatisticsStore {
         }
     }
 
-    public static void incrementAttacksDetected() {
+    public static void incrementAttacksDetected(String operation) {
         mutex.lock();
         try {
-            stats.incrementAttacksDetected();
+            stats.incrementAttacksDetected(operation);
         } finally {
             mutex.unlock();
         }
     }
 
-    public static void incrementAttacksBlocked() {
+    public static void incrementAttacksBlocked(String operation) {
         mutex.lock();
         try {
-            stats.incrementAttacksBlocked();
+            stats.incrementAttacksBlocked(operation);
+        } finally {
+            mutex.unlock();
+        }
+    }
+
+    public static void registerCall(String sink, OperationKind kind) {
+        mutex.lock();
+        try {
+            stats.registerCall(sink, kind);
         } finally {
             mutex.unlock();
         }

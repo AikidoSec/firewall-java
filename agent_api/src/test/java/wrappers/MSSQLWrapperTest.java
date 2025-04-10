@@ -2,6 +2,8 @@ package wrappers;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
+import dev.aikido.agent_api.storage.statistics.OperationKind;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,6 +34,7 @@ public class MSSQLWrapperTest {
         String user = "sa"; // Change to your username
         String password = "Strong!Passw0rd"; // Change to your password
         connection = DriverManager.getConnection(url, user, password);
+        StatisticsStore.clear();
     }
 
     @AfterEach
@@ -40,6 +43,7 @@ public class MSSQLWrapperTest {
             connection.close();
         }
         Context.set(null);
+        StatisticsStore.clear();
     }
 
     @Test
@@ -56,6 +60,11 @@ public class MSSQLWrapperTest {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
         });
         assertEquals("Aikido Zen has blocked SQL Injection, Dialect: Microsoft SQL", exception.getMessage());
+        var operation = StatisticsStore.getStatsRecord().operations().get("(Microsoft JDBC Driver 10.2 for SQL Server) java.sql.Connection.prepareStatement");
+        assertEquals(5, operation.total());
+        assertEquals(1, operation.getAttacksDetected().get("blocked"));
+        assertEquals(1, operation.getAttacksDetected().get("total"));
+        assertEquals(OperationKind.SQL_OP, operation.getKind());
     }
 
     @Test

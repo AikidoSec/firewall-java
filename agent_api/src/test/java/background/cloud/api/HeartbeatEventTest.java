@@ -4,7 +4,7 @@ import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
 import dev.aikido.agent_api.storage.Hostnames;
-import dev.aikido.agent_api.storage.Statistics;
+import dev.aikido.agent_api.storage.statistics.Statistics;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.context.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +45,7 @@ public class HeartbeatEventTest {
     @Test
     public void testGetHeartbeatEvent() {
         // Arrange
-        Statistics.StatsRecord stats = new Statistics.StatsRecord(0, 1, null);
+        Statistics.StatsRecord stats = new Statistics.StatsRecord(0, 1, null, null);
         var hostnames = new Hostnames(5000);
         hostnames.add("aikido.dev", 8080);
         RouteEntry[] routes = new RouteEntry[0]; // Replace with actual RouteEntry array if needed
