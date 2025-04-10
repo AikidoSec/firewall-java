@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.background;
 
-import dev.aikido.agent_api.background.cloud.CloudConnectionManager;
+import dev.aikido.agent_api.background.cloud.api.APIResponse;
+import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
@@ -10,18 +11,19 @@ import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.storage.routes.RoutesStore;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.TimerTask;
 
 public class HeartbeatTask extends TimerTask {
     private static final Logger logger = LogManager.getLogger(HeartbeatTask.class);
-    private final CloudConnectionManager connectionManager;
+    private final ReportingApiHTTP api;
     private final boolean shouldCheckForInitialStats;
 
-    public HeartbeatTask(CloudConnectionManager connectionManager) {
-        this(connectionManager, false);
+    public HeartbeatTask(ReportingApiHTTP api) {
+        this(api, false);
     }
-    public HeartbeatTask(CloudConnectionManager connectionManager, boolean shouldCheckForInitialStats) {
-        this.connectionManager = connectionManager;
+    public HeartbeatTask(ReportingApiHTTP api, boolean shouldCheckForInitialStats) {
+        this.api = api;
         this.shouldCheckForInitialStats = shouldCheckForInitialStats;
     }
 
@@ -48,6 +50,7 @@ public class HeartbeatTask extends TimerTask {
 
         // Create and send event :
         Heartbeat.HeartbeatEvent event = Heartbeat.get(stats, hostnames, routes, users);
-        connectionManager.reportEvent(event, true /* Update config */);
+        Optional<APIResponse> res = api.report(event);
+        res.ifPresent(ServiceConfigStore::updateFromAPIResponse);
     }
 }

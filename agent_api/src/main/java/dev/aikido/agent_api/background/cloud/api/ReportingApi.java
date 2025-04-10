@@ -24,10 +24,9 @@ public abstract class ReportingApi {
     /**
      * Report event to the Aikido server.
      *
-     * @param token        The authentication token.
      * @param event        The event to report.
      */
-    public abstract Optional<APIResponse> report(String token, APIEvent event);
+    public abstract Optional<APIResponse> report(APIEvent event);
 
     public record APIListsResponse(
             List<ListsResponseEntry> blockedIPAddresses,
@@ -40,7 +39,6 @@ public abstract class ReportingApi {
      * -> blocked IP Addresses (e.g. geo restrictions)
      * -> allowed IP Addresses (e.g. geo restrictions)
      * -> blocked User-Agents (e.g. bot blocking)
-     * @param token the authentication token
      */
-    public abstract Optional<APIListsResponse> fetchBlockedLists(String token);
+    public abstract Optional<APIListsResponse> fetchBlockedLists();
 }
