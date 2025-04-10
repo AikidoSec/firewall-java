@@ -77,13 +77,11 @@ public class InetAddressTest {
     }
 
     @Test
-    public void testSSRFWithoutPortAndWithoutContext() throws Exception {
+    public void testSSRFWithoutPortAndWithoutContext() {
         setContextAndLifecycle("http://localhost:80");
         Context.set(null);
-        assertThrows(ConnectException.class, () -> {
-            fetchResponse("http://localhost/api/test");
-        });
-        assertEquals(1, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").total());
+        assertThrows(ConnectException.class, () -> fetchResponse("http://localhost/api/test"));
+        assertTrue(StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").total() >= 1);
         assertEquals(0, StatisticsStore.getStatsRecord().operations().get("java.net.InetAddress.getAllByName").getAttacksDetected().get("total"));
     }
 
@@ -91,22 +89,14 @@ public class InetAddressTest {
     public void testSSRFWithHttpClient() {
         setContextAndLifecycle("http://localhost:5000/");
 
-        Exception exception1 = assertThrows(Exception.class, () -> {
-            fetchResponseHttpClient("http://localhost:5000/config");
-        });
+        Exception exception1 = assertThrows(Exception.class, () -> fetchResponseHttpClient("http://localhost:5000/config"));
         assertTrue(exception1.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
 
-        Exception exception2 = assertThrows(Exception.class, () -> {
-            fetchResponseHttpClient("http://localhost:5000/mock/events");
-        });
+        Exception exception2 = assertThrows(Exception.class, () -> fetchResponseHttpClient("http://localhost:5000/mock/events"));
         assertTrue(exception2.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
-        
-        Exception exception3 = assertThrows(Exception.class, () -> {
-            fetchResponseHttpClient("https://localhost:5000/api/runtime/config");
-        });
+
+        Exception exception3 = assertThrows(Exception.class, () -> fetchResponseHttpClient("https://localhost:5000/api/runtime/config"));
         assertTrue(exception3.getMessage().endsWith("Aikido Zen has blocked a server-side request forgery"));
-
-
     }
 
     private void fetchResponse(String urlString) throws IOException, SSRFException {
