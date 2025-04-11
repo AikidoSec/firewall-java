@@ -30,7 +30,7 @@ jobs:
         run: chmod +x gradlew && make binaries && make build
       - name: Create a zip file of the build
         run:
-          zip -r zen.zip dist/*
+          mv dist/ zen/ && zip -r zen.zip zen/*
       - name: Generate SHA checksum
         run: |
           shasum -a 256 zen.zip > zen.zip.sha256sum
