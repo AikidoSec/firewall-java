@@ -29,11 +29,9 @@ jobs:
         working-directory: ./
         run: chmod +x gradlew && make binaries && make build
       - name: Create a zip file of the build
-        working-directory: ./dist/
         run:
-          zip -r ../zen.zip *
+          zip -r zen.zip dist/*
       - name: Generate SHA checksum
-        working-directory: ./
         run: |
           shasum -a 256 zen.zip > zen.zip.sha256sum
 
