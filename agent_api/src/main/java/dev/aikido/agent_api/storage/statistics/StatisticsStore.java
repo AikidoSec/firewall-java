@@ -62,6 +62,24 @@ public final class StatisticsStore {
         }
     }
 
+    public static void incrementIpHits(String key, boolean blocked) {
+        mutex.lock();
+        try {
+            stats.incrementIpHits(key, blocked);
+        } finally {
+            mutex.unlock();
+        }
+    }
+
+    public static void incrementUAHits(String key, boolean blocked) {
+        mutex.lock();
+        try {
+            stats.incrementUAHits(key, blocked);
+        } finally {
+            mutex.unlock();
+        }
+    }
+
     public static void clear() {
         mutex.lock();
         try {
