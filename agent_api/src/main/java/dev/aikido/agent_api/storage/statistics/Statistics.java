@@ -75,36 +75,29 @@ public class Statistics {
 
 
     // firewall lists
-    public void incrementIpTotal(String key) {
+    public void incrementIpHits(String key, boolean blocked) {
         if (!this.ipAddresses.containsKey(key)) {
             this.ipAddresses.put(key, new FirewallListsRecord());
         }
-        this.ipAddresses.get(key).incrementTotal();
-    }
 
-    public void incrementIpBlocked(String key) {
-        if (!this.ipAddresses.containsKey(key)) {
-            this.ipAddresses.put(key, new FirewallListsRecord());
+        this.ipAddresses.get(key).incrementTotal();
+        if (blocked) {
+            this.ipAddresses.get(key).incrementBlocked();
         }
-        this.ipAddresses.get(key).incrementBlocked();
     }
 
     public Map<String, FirewallListsRecord> getIpAddresses() {
         return this.ipAddresses;
     }
 
-    public void incrementUATotal(String key) {
+    public void incrementUAHits(String key, boolean blocked) {
         if (!this.ipAddresses.containsKey(key)) {
             this.ipAddresses.put(key, new FirewallListsRecord());
         }
         this.ipAddresses.get(key).incrementTotal();
-    }
-
-    public void incrementUABlocked(String key) {
-        if (!this.ipAddresses.containsKey(key)) {
-            this.ipAddresses.put(key, new FirewallListsRecord());
+        if (blocked) {
+            this.ipAddresses.get(key).incrementBlocked();
         }
-        this.ipAddresses.get(key).incrementBlocked();
     }
 
     public Map<String, FirewallListsRecord> getUserAgents() {
