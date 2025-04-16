@@ -124,6 +124,8 @@ public class Statistics {
         this.attacksDetected = 0;
         this.startedAt = UnixTimeMS.getUnixTimeMS();
         this.operations.clear();
+        this.ipAddresses.clear();
+        this.userAgents.clear();
     }
 
     // Stats records for sending out the heartbeat :
