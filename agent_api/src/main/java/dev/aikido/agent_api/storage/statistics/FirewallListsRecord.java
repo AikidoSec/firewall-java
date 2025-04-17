@@ -49,6 +49,10 @@ public class FirewallListsRecord {
         this.breakdown.clear();
     }
 
-    record BreakdownEntry(int total, int blocked) {
+    public int size() {
+        return this.breakdown.size();
+    }
+
+    public record BreakdownEntry(int total, int blocked) {
     }
 }
