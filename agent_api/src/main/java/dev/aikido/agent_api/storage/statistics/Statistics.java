@@ -7,8 +7,8 @@ import java.util.Map;
 
 public class Statistics {
     private final Map<String, OperationRecord> operations = new HashMap<>();
-    private final Map<String, FirewallListsRecord> ipAddresses = new HashMap<>();
-    private final Map<String, FirewallListsRecord> userAgents = new HashMap<>();
+    private final FirewallListsRecord ipAddresses = new FirewallListsRecord();
+    private final FirewallListsRecord userAgents = new FirewallListsRecord();
     private int totalHits;
     private int attacksDetected;
     private int attacksBlocked;
@@ -75,33 +75,11 @@ public class Statistics {
 
 
     // firewall lists
-    public void incrementIpHits(String key, boolean blocked) {
-        if (!this.ipAddresses.containsKey(key)) {
-            this.ipAddresses.put(key, new FirewallListsRecord());
-        }
-
-        this.ipAddresses.get(key).incrementTotal();
-        if (blocked) {
-            this.ipAddresses.get(key).incrementBlocked();
-        }
-    }
-
-    public Map<String, FirewallListsRecord> getIpAddresses() {
+    public FirewallListsRecord getIpAddresses() {
         return this.ipAddresses;
     }
-
-    public void incrementUAHits(String key, boolean blocked) {
-        if (!this.ipAddresses.containsKey(key)) {
-            this.ipAddresses.put(key, new FirewallListsRecord());
-        }
-        this.ipAddresses.get(key).incrementTotal();
-        if (blocked) {
-            this.ipAddresses.get(key).incrementBlocked();
-        }
-    }
-
-    public Map<String, FirewallListsRecord> getUserAgents() {
-        return this.ipAddresses;
+    public FirewallListsRecord getUserAgents() {
+        return this.userAgents;
     }
 
 
@@ -134,7 +112,7 @@ public class Statistics {
 
     public record StatsRecord(long startedAt, long endedAt, StatsRequestsRecord requests,
                               Map<String, OperationRecord> operations,
-                              Map<String, FirewallListsRecord> ipAddresses,
-                              Map<String, FirewallListsRecord> userAgents) {
+                              FirewallListsRecord ipAddresses,
+                              FirewallListsRecord userAgents) {
     }
 }
