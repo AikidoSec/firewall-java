@@ -81,6 +81,8 @@ public class ReportingApiHTTP extends ReportingApi {
             // Set the Accept-Encoding header to gzip
             connection.setRequestProperty("Accept-Encoding", "gzip");
             connection.setRequestProperty("Authorization", token.get());
+            // Indicates to the server that this agent supports the new format with monitoring
+            connection.setRequestProperty("x-supports-monitoring", "true");
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 return Optional.empty();
