@@ -44,7 +44,7 @@ public class RealtimeTask extends TimerTask {
 
                 // Fetch blocked lists from separate API route
                 Optional<ReportingApi.APIListsResponse> blockedListsRes = reportingApi.fetchBlockedLists();
-                blockedListsRes.ifPresent(ServiceConfigStore.getConfig()::updateBlockedLists);
+                blockedListsRes.ifPresent(ServiceConfigStore::updateFromAPIListsResponse);
 
                 logger.debug("Config updated");
             }
