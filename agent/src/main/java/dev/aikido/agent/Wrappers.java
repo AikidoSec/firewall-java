@@ -4,10 +4,7 @@ import dev.aikido.agent.wrappers.*;
 import dev.aikido.agent.wrappers.file.FileConstructorMultiArgumentWrapper;
 import dev.aikido.agent.wrappers.file.FileConstructorSingleArgumentWrapper;
 import dev.aikido.agent.wrappers.javalin.*;
-import dev.aikido.agent.wrappers.jdbc.MSSQLWrapper;
-import dev.aikido.agent.wrappers.jdbc.MariaDBWrapper;
-import dev.aikido.agent.wrappers.jdbc.MysqlCJWrapper;
-import dev.aikido.agent.wrappers.jdbc.PostgresWrapper;
+import dev.aikido.agent.wrappers.jdbc.*;
 import dev.aikido.agent.wrappers.spring.SpringWebfluxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringControllerWrapper;
 import dev.aikido.agent.wrappers.spring.SpringMVCWrapper;
@@ -39,6 +36,7 @@ public final class Wrappers {
             new PathsWrapper(),
             new JavalinWrapper(),
             new JavalinDataWrapper(),
-            new JavalinContextClearWrapper()
+            new JavalinContextClearWrapper(),
+            new SQLiteWrapper()
     );
 }
