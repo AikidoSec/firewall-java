@@ -4,6 +4,7 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.net.IPList;
+import dev.aikido.agent_api.storage.service_configuration.ParsedFirewallLists;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,16 +19,13 @@ import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
  * It is essential for e.g. rate limiting
  */
 public class ServiceConfiguration {
-    private final List<IPListEntry> blockedIps = new ArrayList<>();
-    private final List<IPListEntry> allowedIps = new ArrayList<>();
+    private final ParsedFirewallLists firewallLists = new ParsedFirewallLists();
     private boolean blockingEnabled;
     private boolean receivedAnyStats;
     private boolean middlewareInstalled;
     private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
-    // User-Agent Blocking (e.g. bot blocking) :
-    private Pattern blockedUserAgentRegex;
 
     public ServiceConfiguration() {
         this.receivedAnyStats = true; // true by default, waiting for the startup event
@@ -112,29 +110,7 @@ public class ServiceConfiguration {
     }
 
     public void updateBlockedLists(ReportingApi.APIListsResponse res) {
-        // Update blocked IP addresses (e.g. for geo restrictions) :
-        blockedIps.clear();
-        if (res.blockedIPAddresses() != null) {
-            for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
-                IPList ipList = createIPList(entry.ips());
-                blockedIps.add(new IPListEntry(ipList, entry.description()));
-            }
-        }
-
-        // Update allowed IP addresses (e.g. for geo restrictions) :
-        allowedIps.clear();
-        if (res.allowedIPAddresses() != null) {
-            for (ReportingApi.ListsResponseEntry entry : res.allowedIPAddresses()) {
-                IPList ipList = createIPList(entry.ips());
-                this.allowedIps.add(new IPListEntry(ipList, entry.description()));
-            }
-        }
-
-        // Update Blocked User-Agents regex
-        blockedUserAgentRegex = null;
-        if (res.blockedUserAgents() != null && !res.blockedUserAgents().isEmpty()) {
-            this.blockedUserAgentRegex = Pattern.compile(res.blockedUserAgents(), Pattern.CASE_INSENSITIVE);
-        }
+        this.firewallLists.update(res);
     }
 
     /**
@@ -148,7 +124,7 @@ public class ServiceConfiguration {
     }
 
     // IP restrictions (e.g. Geo-IP Restrictions) :
-    public record IPListEntry(IPList ipList, String description) {
+    public record IPListEntry(IPList ipList, String description, boolean monitor, String key) {
     }
 
     public record BlockedResult(boolean blocked, String description) {

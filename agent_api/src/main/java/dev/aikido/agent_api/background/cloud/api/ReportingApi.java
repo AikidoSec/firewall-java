@@ -31,7 +31,7 @@ public abstract class ReportingApi {
     public record APIListsResponse(
             List<ListsResponseEntry> blockedIPAddresses,
             List<ListsResponseEntry> allowedIPAddresses,
-            BotBlocklist blockedUserAgents
+            List<BotBlocklist> blockedUserAgents
     ) {}
 
     public record ListsResponseEntry(boolean monitor, String key, String source, String description, List<String> ips) {
