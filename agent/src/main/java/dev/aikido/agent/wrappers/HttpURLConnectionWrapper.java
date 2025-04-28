@@ -11,27 +11,19 @@ import java.net.*;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
-public class URLConnectionWrapper implements Wrapper {
+public class HttpURLConnectionWrapper implements Wrapper {
     public String getName() {
-        // Wrap Constructor of URLConnection
-        // https://docs.oracle.com/javase/8/docs/api/java/net/URLConnection.html
+        // Wrap Constructor of HttpURLConnection
+        // https://docs.oracle.com/javase/8/docs/api/java/net/HttpURLConnection.html
         return ConstructorAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return isConstructor().and(isDeclaredBy(isSubTypeOf(HttpURLConnection.class).or(nameContainsIgnoreCase("URLConnection"))));
+        return isConstructor().and(isDeclaredBy(is(HttpURLConnection.class)));
     }
 
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
-        return ElementMatchers.isSubTypeOf(URLConnection.class).and(not(
-                // Names to be ignored :
-                nameContains("JarURLConnection")
-                .or(nameContains("FileURLConnection"))
-                .or(nameContains("JavaRuntimeURLConnection"))
-                // Spring boot names to  be ignored :
-                .or(nameContains("JarUrlConnection"))
-                .or(nameContains("NestedUrlConnection"))
-        ));
+        return ElementMatchers.is(HttpURLConnection.class);
     }
 
     public static class ConstructorAdvice {
