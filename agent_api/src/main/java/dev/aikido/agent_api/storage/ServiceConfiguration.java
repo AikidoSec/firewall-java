@@ -9,7 +9,6 @@ import dev.aikido.agent_api.storage.service_configuration.ParsedFirewallLists;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
@@ -94,7 +93,7 @@ public class ServiceConfiguration {
         }
 
         // Check for blocked ip addresses
-        for (ParsedFirewallLists.Match match: firewallLists.matchBlockedIps(ip)) {
+        for (ParsedFirewallLists.Match match : firewallLists.matchBlockedIps(ip)) {
             // when a blocking match is found, set blocked result if it hasn't been set already.
             if (match.block() && !blockedResult.blocked()) {
                 blockedResult = new BlockedResult(true, match.description());
@@ -113,9 +112,10 @@ public class ServiceConfiguration {
      */
     public boolean isBlockedUserAgent(String userAgent) {
         boolean blocked = false;
-        for(ParsedFirewallLists.Match match: this.firewallLists.matchBlockedUserAgents(userAgent)) {
+        for (ParsedFirewallLists.Match match : this.firewallLists.matchBlockedUserAgents(userAgent)) {
             if (match.block()) {
                 blocked = true;
+                break;
             }
         }
 
