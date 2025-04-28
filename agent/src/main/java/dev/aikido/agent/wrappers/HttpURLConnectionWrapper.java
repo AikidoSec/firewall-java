@@ -18,7 +18,7 @@ public class HttpURLConnectionWrapper implements Wrapper {
         return ConstructorAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return isConstructor().and(isDeclaredBy(isSubTypeOf(HttpURLConnection.class)));
+        return isConstructor().and(isDeclaredBy(is(HttpURLConnection.class)));
     }
 
     @Override

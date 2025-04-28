@@ -11,6 +11,7 @@ import org.springframework.web.client.ResourceAccessException;
 import utils.EmptySampleContextObject;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
@@ -133,7 +134,7 @@ public class HttpURLConnectionTest {
         setContextAndLifecycle("http://localhost:80");
         assertEquals(0, getHits("localhost", 80));
         Context.set(null);
-        assertThrows(ResourceAccessException.class, () -> {
+        assertThrows(ConnectException.class, () -> {
             fetchResponse("http://localhost/api/test");
         });
         assertEquals(1, getHits("localhost", 80));
