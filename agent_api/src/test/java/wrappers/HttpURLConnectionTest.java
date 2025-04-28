@@ -37,6 +37,57 @@ public class HttpURLConnectionTest {
     }
 
     @Test
+    public void testNewUrlConnectionWithPort() throws Exception {
+        setContextAndLifecycle("http://localhost:8080");
+        assertEquals(0, getHits("localhost", 8080));
+
+        assertThrows(RuntimeException.class, () -> {
+            fetchResponse("http://localhost:8080");
+        });
+        assertEquals(1, getHits("localhost", 8080));
+    }
+
+    @Test
+    public void testNewUrlConnectionWithHttp() throws Exception {
+        setContextAndLifecycle("http://app.local.aikido.io");
+        assertEquals(0, getHits("app.local.aikido.io", 80));
+        assertThrows(RuntimeException.class, () -> {
+            fetchResponse("http://app.local.aikido.io");
+        });
+        assertEquals(1, getHits("app.local.aikido.io", 80));
+    }
+
+    @Test
+    public void testNewUrlConnectionWithHttpAsHttp() throws Exception {
+        setContextAndLifecycle("http://app.local.aikido.io");
+        assertEquals(0, getHits("app.local.aikido.io", 80));
+        assertThrows(RuntimeException.class, () -> {
+            fetchResponse("http://app.local.aikido.io");
+        });
+        assertEquals(1, getHits("app.local.aikido.io", 80));
+    }
+
+    @Test
+    public void testNewUrlConnectionHttps() throws Exception {
+        setContextAndLifecycle("https://aikido.dev");
+        assertEquals(0, getHits("aikido.dev", 443));
+
+        fetchResponse("https://aikido.dev");
+        assertEquals(1, getHits("aikido.dev", 443));
+    }
+
+    @Test
+    public void testNewUrlConnectionFaultyProtocol() throws Exception {
+        setContextAndLifecycle("ftp://localhost:8080");
+        assertEquals(0, getHits("localhost", 8080));
+
+        assertThrows(ClassCastException.class, () -> {
+            fetchResponse("ftp://localhost:8080");
+        });
+        assertEquals(0, getHits("localhost", 8080));
+    }
+
+    @Test
     public void testSSRFLocalhostValid() throws Exception {
         assertEquals(0, getHits("localhost", 5000));
         setContextAndLifecycle("http://localhost:5000");
