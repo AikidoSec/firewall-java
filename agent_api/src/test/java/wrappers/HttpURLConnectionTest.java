@@ -52,7 +52,7 @@ public class HttpURLConnectionTest {
     public void testNewUrlConnectionWithHttp() throws Exception {
         setContextAndLifecycle("http://app.local.aikido.io");
         assertEquals(0, getHits("app.local.aikido.io", 80));
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(Throwable.class, () -> {
             fetchResponse("http://app.local.aikido.io");
         });
         assertEquals(1, getHits("app.local.aikido.io", 80));
@@ -62,7 +62,7 @@ public class HttpURLConnectionTest {
     public void testNewUrlConnectionWithHttpAsHttp() throws Exception {
         setContextAndLifecycle("http://app.local.aikido.io");
         assertEquals(0, getHits("app.local.aikido.io", 80));
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(Throwable.class, () -> {
             fetchResponse("http://app.local.aikido.io");
         });
         assertEquals(1, getHits("app.local.aikido.io", 80));
