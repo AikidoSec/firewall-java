@@ -29,11 +29,23 @@ public class ParsedFirewallLists {
     }
 
     public List<Match> matchBlockedIps(String ip) {
-        return matchIpEntries(ip, this.blockedIps);
+        List<Match> matches = new ArrayList<>();
+        for (IPEntry entry : this.blockedIps) {
+            if (entry.ips().matches(ip)) {
+                matches.add(new Match(entry.key(), !entry.monitor(), entry.description()));
+            }
+        }
+        return matches;
     }
 
-    public List<Match> matchAllowedIps(String ip) {
-        return matchIpEntries(ip, this.allowedIps);
+    // returns true if one or more matches has been found with allowlist.
+    public boolean matchesAllowedIps(String ip) {
+        for (IPEntry entry : this.allowedIps) {
+            if (entry.ips().matches(ip)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Match> matchBlockedUserAgents(String userAgent) {

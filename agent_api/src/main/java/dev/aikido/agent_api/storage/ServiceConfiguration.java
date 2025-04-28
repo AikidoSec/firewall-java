@@ -85,28 +85,23 @@ public class ServiceConfiguration {
      * Check if the IP is blocked (e.g. Geo IP Restrictions)
      */
     public BlockedResult isIpBlocked(String ip) {
+        BlockedResult blockedResult = new BlockedResult(false, null);
+
         // Check for allowed ip addresses (i.e. only one country is allowed to visit the site)
         // Always allow access from private IP addresses (those include local IP addresses)
-        if (!allowedIps.isEmpty() && !isPrivateIp(ip)) {
-            boolean ipAllowed = false;
-            for (IPListEntry entry : allowedIps) {
-                if (entry.ipList.matches(ip)) {
-                    ipAllowed = true; // We allow IP addresses as long as they match with one of the lists.
-                    break;
-                }
-            }
-            if (!ipAllowed) {
-                return new BlockedResult(true, "not in allowlist");
-            }
+        if (!isPrivateIp(ip) && firewallLists.matchesAllowedIps(ip)) {
+            blockedResult = new BlockedResult(true, "not in allowlist");
         }
 
         // Check for blocked ip addresses
-        for (IPListEntry entry : blockedIps) {
-            if (entry.ipList.matches(ip)) {
-                return new BlockedResult(true, entry.description);
+        for (ParsedFirewallLists.Match match: firewallLists.matchBlockedIps(ip)) {
+            // when a blocking match is found, set blocked result if it hasn't been set already.
+            if (match.block() && !blockedResult.blocked()) {
+                blockedResult = new BlockedResult(true, match.description());
             }
         }
-        return new BlockedResult(false, null);
+
+        return blockedResult;
     }
 
     public void updateBlockedLists(ReportingApi.APIListsResponse res) {
@@ -117,10 +112,14 @@ public class ServiceConfiguration {
      * Check if a given User-Agent is blocked or not :
      */
     public boolean isBlockedUserAgent(String userAgent) {
-        if (blockedUserAgentRegex != null) {
-            return blockedUserAgentRegex.matcher(userAgent).find();
+        boolean blocked = false;
+        for(ParsedFirewallLists.Match match: this.firewallLists.matchBlockedUserAgents(userAgent)) {
+            if (match.block()) {
+                blocked = true;
+            }
         }
-        return false;
+
+        return blocked;
     }
 
     // IP restrictions (e.g. Geo-IP Restrictions) :
