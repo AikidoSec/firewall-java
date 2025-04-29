@@ -5,6 +5,7 @@ import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.net.IPList;
 import dev.aikido.agent_api.storage.service_configuration.ParsedFirewallLists;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -88,12 +89,13 @@ public class ServiceConfiguration {
 
         // Check for allowed ip addresses (i.e. only one country is allowed to visit the site)
         // Always allow access from private IP addresses (those include local IP addresses)
-        if (!isPrivateIp(ip) && firewallLists.matchesAllowedIps(ip)) {
+        if (!isPrivateIp(ip) && !firewallLists.matchesAllowedIps(ip)) {
             blockedResult = new BlockedResult(true, "not in allowlist");
         }
 
         // Check for blocked ip addresses
         for (ParsedFirewallLists.Match match : firewallLists.matchBlockedIps(ip)) {
+            StatisticsStore.incrementIpHits(match.key(), match.block());
             // when a blocking match is found, set blocked result if it hasn't been set already.
             if (match.block() && !blockedResult.blocked()) {
                 blockedResult = new BlockedResult(true, match.description());
@@ -113,6 +115,7 @@ public class ServiceConfiguration {
     public boolean isBlockedUserAgent(String userAgent) {
         boolean blocked = false;
         for (ParsedFirewallLists.Match match : this.firewallLists.matchBlockedUserAgents(userAgent)) {
+            StatisticsStore.incrementUAHits(match.key(), match.block());
             if (match.block()) {
                 blocked = true;
                 break;

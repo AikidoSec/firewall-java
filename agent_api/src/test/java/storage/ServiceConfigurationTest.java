@@ -390,7 +390,7 @@ public class ServiceConfigurationTest {
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(),
                 List.of(),
-                List.of(new ReportingApi.BotBlocklist(false, "empty", ""))
+                List.of()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
