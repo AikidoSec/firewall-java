@@ -239,24 +239,6 @@ public class StatisticsStoreTest {
     }
 
     @Test
-    public void testIncrementTotalIpHits() {
-        StatisticsStore.incrementTotalIpHits(false);
-        Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
-        assertNotNull(record);
-        assertEquals(1, record.ipAddresses().getTotal());
-        assertEquals(0, record.ipAddresses().getBlocked());
-    }
-
-    @Test
-    public void testIncrementTotalUAHits() {
-        StatisticsStore.incrementTotalUAHits(true);
-        Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
-        assertNotNull(record);
-        assertEquals(1, record.userAgents().getTotal());
-        assertEquals(1, record.userAgents().getBlocked());
-    }
-
-    @Test
     public void testConcurrentIncrementHitsAndClear() throws InterruptedException {
         Runnable incrementHitsTask = () -> {
             for (int i = 0; i < 50; i++) {

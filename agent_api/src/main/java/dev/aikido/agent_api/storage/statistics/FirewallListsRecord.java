@@ -5,8 +5,6 @@ import java.util.Map;
 
 public class FirewallListsRecord {
     private final Map<String, BreakdownEntry> breakdown = new HashMap<>();
-    private int total = 0;
-    private int blocked = 0;
 
     public FirewallListsRecord() {
     }
@@ -27,25 +25,7 @@ public class FirewallListsRecord {
         return this.breakdown.get(key);
     }
 
-    public void incrementTotal() {
-        this.total += 1;
-    }
-
-    public int getTotal() {
-        return this.total;
-    }
-
-    public void incrementBlocked() {
-        this.blocked += 1;
-    }
-
-    public int getBlocked() {
-        return this.blocked;
-    }
-
     public void clear() {
-        this.total = 0;
-        this.blocked = 0;
         this.breakdown.clear();
     }
 

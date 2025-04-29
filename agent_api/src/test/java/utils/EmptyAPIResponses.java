@@ -15,7 +15,7 @@ public class EmptyAPIResponses {
             true, "", UnixTimeMS.getUnixTimeMS(), List.of(), List.of(), List.of(), true, false
     );
     public final static ReportingApi.APIListsResponse emptyAPIListsResponse = new ReportingApi.APIListsResponse(
-            List.of(), List.of(), ""
+            List.of(), List.of(), List.of()
     );
     public static void setEmptyConfigWithEndpointList(List<Endpoint> endpoints) {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(

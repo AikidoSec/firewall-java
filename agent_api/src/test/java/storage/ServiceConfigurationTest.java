@@ -69,11 +69,11 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlocked() {
-        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.1"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry),
                 Collections.emptyList(),
-                null
+                Collections.emptyList()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -85,11 +85,11 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpAllowed() {
-        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry("source", "allowed", List.of("192.168.1.1"));
+        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "allowed", List.of("192.168.1.1"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 Collections.emptyList(),
                 List.of(allowedEntry),
-                null
+                Collections.emptyList()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -103,7 +103,7 @@ public class ServiceConfigurationTest {
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 Collections.emptyList(),
                 Collections.emptyList(),
-                "blocked-agent"
+                List.of(new ReportingApi.BotBlocklist(false, "blocked-bots", "blocked-agent"))
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -133,7 +133,7 @@ public class ServiceConfigurationTest {
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 Collections.emptyList(),
                 Collections.emptyList(),
-                null
+                Collections.emptyList()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -144,12 +144,12 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlockedWithMultipleBlockedEntries() {
-        ReportingApi.ListsResponseEntry blockedEntry1 = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.1"));
-        ReportingApi.ListsResponseEntry blockedEntry2 = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.2"));
+        ReportingApi.ListsResponseEntry blockedEntry1 = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.ListsResponseEntry blockedEntry2 = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.2"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry1, blockedEntry2),
                 Collections.emptyList(),
-                null
+                Collections.emptyList()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -162,12 +162,12 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlockedWithMixedAllowedAndBlockedEntries() {
-        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry("source", "allowed", List.of("192.168.1.1"));
-        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.2"));
+        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "allowed", List.of("192.168.1.1"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.2"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry),
                 List.of(allowedEntry),
-                null
+                Collections.emptyList()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -183,7 +183,7 @@ public class ServiceConfigurationTest {
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 Collections.emptyList(),
                 Collections.emptyList(),
-                null
+                Collections.emptyList()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -196,7 +196,7 @@ public class ServiceConfigurationTest {
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 Collections.emptyList(),
                 Collections.emptyList(),
-                "blocked-agent"
+            List.of(new ReportingApi.BotBlocklist(false, "blocked-bots", "blocked-agent"))
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -339,11 +339,11 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlockedWithSubnet() {
-        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.0/24"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.0/24"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry),
-                List.of(),
-                null
+                Collections.emptyList(),
+                Collections.emptyList()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -355,12 +355,12 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlockedWithMixedSubnetAndSingleIP() {
-        ReportingApi.ListsResponseEntry blockedEntry1 = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.0/24"));
-        ReportingApi.ListsResponseEntry blockedEntry2 = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("10.0.0.1"));
+        ReportingApi.ListsResponseEntry blockedEntry1 = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.0/24"));
+        ReportingApi.ListsResponseEntry blockedEntry2 = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("10.0.0.1"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry1, blockedEntry2),
-                List.of(),
-                null
+                Collections.emptyList(),
+                Collections.emptyList()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -376,7 +376,7 @@ public class ServiceConfigurationTest {
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(),
                 List.of(),
-                null
+                Collections.emptyList()
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -390,7 +390,7 @@ public class ServiceConfigurationTest {
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(),
                 List.of(),
-                ""
+                List.of(new ReportingApi.BotBlocklist(false, "empty", ""))
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -403,7 +403,10 @@ public class ServiceConfigurationTest {
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(),
                 List.of(),
-                "blocked.*agent|another.*pattern"
+                List.of(
+                    new ReportingApi.BotBlocklist(false, "block1", "blocked.*agent"),
+                    new ReportingApi.BotBlocklist(false, "block2", "another.*pattern")
+                )
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
@@ -415,8 +418,8 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlockedWithAllowedAndBlockedIPs() {
-        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry("source", "allowed", List.of("10.0.0.1"));
-        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "allowed", List.of("10.0.0.1"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.1"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry),
                 List.of(allowedEntry),
@@ -433,7 +436,7 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlockedWithOnlyAllowedIPs() {
-        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry("source", "allowed", List.of("10.0.0.1"));
+        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "allowed", List.of("10.0.0.1"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(),
                 List.of(allowedEntry),
@@ -450,7 +453,7 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlockedWithOnlyBlockedIPs() {
-        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.1"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry),
                 List.of(),
@@ -467,8 +470,8 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlockedWithAllowedIPsAndBlockedIPs() {
-        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry("source", "allowed", List.of("10.0.0.1"));
-        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry("source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "allowed", List.of("10.0.0.1"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.1"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry),
                 List.of(allowedEntry),

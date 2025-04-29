@@ -84,8 +84,8 @@ class WebRequestCollectorTest {
     @Test
     void testReport_ipBlockedTwice() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.1"))
-        ), null, "");
+                new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("192.168.1.1"))
+        ), null, List.of());
         setEmptyConfigWithEndpointList(List.of(
                 new Endpoint(
                         "GET", "/api/resource", 100, 100,
@@ -105,8 +105,8 @@ class WebRequestCollectorTest {
     @Test
     void testReport_ipBlockedUsingLists() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
-        ), null, "");
+                new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
+        ), null, List.of());
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
 
 
@@ -120,8 +120,8 @@ class WebRequestCollectorTest {
     @Test
     void testReport_ipNotAllowedUsingLists() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(null, List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.2.1"))
-        ), "");
+                new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("192.168.2.1"))
+        ), List.of());
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
 
 
@@ -139,8 +139,8 @@ class WebRequestCollectorTest {
     @Test
     void testReport_ipInAllowlist() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(null, List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.1", "10.0.0.0/24"))
-        ), "");
+                new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("192.168.1.1", "10.0.0.0/24"))
+        ), List.of());
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
 
 
@@ -152,8 +152,8 @@ class WebRequestCollectorTest {
     @Test
     void testReport_ipNotBlockedUsingListsNorUserAgent() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
-        ), null, "Unrelated|random");
+                new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
+        ), null, List.of(new ReportingApi.BotBlocklist(false, "block", "Unrelated|random")));
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
 
 
@@ -165,8 +165,8 @@ class WebRequestCollectorTest {
     @Test
     void testReport_userAgentBlocked() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
-        ), null, "AI2Bot|hacker");
+                new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
+        ), null, List.of(new ReportingApi.BotBlocklist(false, "block", "AI2Bot|hacker")));
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
 
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
@@ -179,8 +179,8 @@ class WebRequestCollectorTest {
     @Test
     void testReport_userAgentBlocked_Ip_Bypassed() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
-        ), null, "AI2Bot|hacker");
+                new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("192.168.1.2", "192.168.1.3"))
+        ), null, List.of(new ReportingApi.BotBlocklist(false, "block", "AI2Bot|hacker")));
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
 
         List<String> bypassedIps = List.of("192.168.1.1");
@@ -198,8 +198,8 @@ class WebRequestCollectorTest {
     @Test
     void testReport_ipBlockedUsingLists_Ip_Bypassed() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
-                new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
-        ), null, "");
+                new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
+        ), null, List.of());
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
 
         List<String> bypassedIps = List.of("192.168.1.1");
@@ -217,8 +217,8 @@ class WebRequestCollectorTest {
     void testReport_ipNotAllowedUsingLists_Ip_Bypassed() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(
                 null,
-                List.of(new ReportingApi.ListsResponseEntry("geoip", "geoip restrictions", List.of("1.2.3.4"))),
-                ""
+                List.of(new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("1.2.3.4"))),
+                List.of()
         );
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
 

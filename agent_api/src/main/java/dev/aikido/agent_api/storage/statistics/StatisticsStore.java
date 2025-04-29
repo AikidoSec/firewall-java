@@ -71,34 +71,10 @@ public final class StatisticsStore {
         }
     }
 
-    public static void incrementTotalIpHits(boolean blocked) {
-        mutex.lock();
-        try {
-            stats.getIpAddresses().incrementTotal();
-            if (blocked) {
-                stats.getIpAddresses().incrementBlocked();
-            }
-        } finally {
-            mutex.unlock();
-        }
-    }
-
     public static void incrementUAHits(String key, boolean blocked) {
         mutex.lock();
         try {
             stats.getUserAgents().increment(key, blocked);
-        } finally {
-            mutex.unlock();
-        }
-    }
-
-    public static void incrementTotalUAHits(boolean blocked) {
-        mutex.lock();
-        try {
-            stats.getUserAgents().incrementTotal();
-            if (blocked) {
-                stats.getUserAgents().incrementBlocked();
-            }
         } finally {
             mutex.unlock();
         }
