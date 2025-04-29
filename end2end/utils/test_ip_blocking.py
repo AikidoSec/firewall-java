@@ -39,3 +39,9 @@ def test_ip_blocking(url):
         'X-Forwarded-For': ""
     })
     assert_eq(res.status_code, equals=200)
+
+    # Monitored IP
+    res = requests.get(url, headers={
+        'X-Forwarded-For': "5.6.7.8"
+    })
+    assert_eq(res.status_code, equals=200)

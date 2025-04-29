@@ -34,3 +34,20 @@ def test_bot_blocking(url):
     })
     assert_eq(res.status_code, equals=403)
     assert_eq(res.text, equals="You are not allowed to access this resource because you have been identified as a bot.")
+
+    # Monitored User-Agent :
+    res = requests.get(url, headers={
+        'User-Agent': "Mozilla/5.0 ClaudeUser 2025"
+    })
+    assert_eq(res.status_code, equals=200)
+    res = requests.get(url, headers={
+        'User-Agent': "ClaudeUser"
+    })
+    assert_eq(res.status_code, equals=200)
+
+    # Still blocks if 2 matches are found :
+    res = requests.get(url, headers={
+        'User-Agent': "BYTESPIDER and ClaudeUser"
+    })
+    assert_eq(res.status_code, equals=403)
+    assert_eq(res.text, equals="You are not allowed to access this resource because you have been identified as a bot.")

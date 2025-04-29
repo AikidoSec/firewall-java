@@ -55,6 +55,13 @@ responses = {
                 "source": "geoip",
                 "description": "geo restrictions",
                 "ips": ["1.2.3.4"]
+            },
+            {
+                "monitor": True,
+                "key": "geo-2",
+                "source": "geoip",
+                "description": "should not be blocked",
+                "ips": ["5.6.7.8"]
             }
         ],
         "blockedUserAgents": [
@@ -67,6 +74,11 @@ responses = {
                 "monitor": False,
                 "key": "crawlers",
                 "pattern": "Bytespider"
+            },
+            {
+                "monitor": True,
+                "key": "crawlers-monitor",
+                "pattern": "ClaudeUser"
             }
         ],
     },
