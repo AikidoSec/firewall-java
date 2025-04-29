@@ -89,7 +89,7 @@ class WebRequestCollectorTest {
         setEmptyConfigWithEndpointList(List.of(
                 new Endpoint(
                         "GET", "/api/resource", 100, 100,
-                        List.of("192.168.0.1"), false, false, false
+                        List.of("192.168.0.1", "5.6.7.8"), false, false, false
                 )
         ));
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
@@ -100,6 +100,11 @@ class WebRequestCollectorTest {
         assertNotNull(response);
         assertEquals("Your IP address is not allowed to access this resource. (Your IP: 192.168.1.1)", response.msg());
         assertEquals(403, response.status());
+
+        contextObject.setIp("5.6.7.8");
+        WebRequestCollector.Res response2 = WebRequestCollector.report(contextObject);
+        assertNull(response2);
+
     }
 
     @Test
@@ -116,6 +121,21 @@ class WebRequestCollectorTest {
         assertEquals("Your IP address is blocked. Reason: geoip restrictions (Your IP: 192.168.1.1)", response.msg());
         assertEquals(403, response.status());
     }
+    @Test
+    void testReport_publicIpBlockedUsingLists() {
+        ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
+            new ReportingApi.ListsResponseEntry(false, "key", "geoip", "geoip restrictions", List.of("bullshit.ip", "2.2.2.0/24"))
+        ), null, List.of());
+        ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
+
+        contextObject.setIp("2.2.2.7");
+        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
+
+        assertNotNull(response);
+        assertEquals("Your IP address is blocked. Reason: geoip restrictions (Your IP: 2.2.2.7)", response.msg());
+        assertEquals(403, response.status());
+    }
+
 
     @Test
     void testReport_ipNotAllowedUsingLists() {

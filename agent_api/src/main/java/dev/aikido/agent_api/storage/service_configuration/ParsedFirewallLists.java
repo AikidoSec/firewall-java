@@ -40,6 +40,9 @@ public class ParsedFirewallLists {
 
     // returns true if one or more matches has been found with allowlist.
     public boolean matchesAllowedIps(String ip) {
+        if (this.allowedIps.isEmpty()) {
+            return true; // Empty allowed is means all ips match
+        }
         for (IPEntry entry : this.allowedIps) {
             if (entry.ips().matches(ip)) {
                 return true;
