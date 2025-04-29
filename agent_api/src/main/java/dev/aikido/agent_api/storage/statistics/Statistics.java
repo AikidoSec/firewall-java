@@ -92,7 +92,9 @@ public class Statistics {
             "total", attacksDetected,
             "blocked", attacksBlocked
         )),
-            getOperations(), getIpAddresses(), getUserAgents()
+            getOperations(),
+            new FirewallListsRecord(getIpAddresses()),
+            new FirewallListsRecord(getUserAgents())
         );
     }
 

@@ -9,6 +9,10 @@ public class FirewallListsRecord {
     public FirewallListsRecord() {
     }
 
+    public FirewallListsRecord(FirewallListsRecord previous) {
+        this.breakdown.putAll(previous.breakdown);
+    }
+
     public void increment(String key, boolean blocked) {
         breakdown.computeIfAbsent(key, k -> new BreakdownEntry(0, 0));
 
