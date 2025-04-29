@@ -118,7 +118,6 @@ public class ServiceConfiguration {
             StatisticsStore.incrementUAHits(match.key(), match.block());
             if (match.block()) {
                 blocked = true;
-                break;
             }
         }
 

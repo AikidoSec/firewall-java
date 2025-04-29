@@ -4,6 +4,7 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +21,7 @@ public class ServiceConfigurationTest {
     @BeforeEach
     public void setUp() {
         serviceConfiguration = new ServiceConfiguration();
+        StatisticsStore.clear();
     }
 
     @Test
@@ -69,7 +71,7 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlocked() {
-        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "my-key", "source", "blocked", List.of("192.168.1.1"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry),
                 Collections.emptyList(),
@@ -81,6 +83,39 @@ public class ServiceConfigurationTest {
         ServiceConfiguration.BlockedResult result = serviceConfiguration.isIpBlocked("192.168.1.1");
         assertTrue(result.blocked());
         assertEquals("blocked", result.description());
+        assertEquals(1, StatisticsStore.getStatsRecord().ipAddresses().get("my-key").total());
+        assertEquals(1, StatisticsStore.getStatsRecord().ipAddresses().get("my-key").blocked());
+    }
+
+    @Test
+    public void testIsIpBlockedOrMonitored() {
+        var blockedEntry = new ReportingApi.ListsResponseEntry(false, "blocked-key", "source", "blocked", List.of("192.168.1.1"));
+        var monitoredEntry = new ReportingApi.ListsResponseEntry(true, "monitored-key", "source", "blocked", List.of("192.168.2.*"));
+
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+            List.of(blockedEntry, monitoredEntry),
+            Collections.emptyList(),
+            Collections.emptyList()
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        ServiceConfiguration.BlockedResult result = serviceConfiguration.isIpBlocked("192.168.1.1");
+        assertTrue(result.blocked());
+        assertEquals("blocked", result.description());
+        assertEquals(1, StatisticsStore.getStatsRecord().ipAddresses().get("blocked-key").total());
+        assertEquals(1, StatisticsStore.getStatsRecord().ipAddresses().get("blocked-key").blocked());
+        assertNull(StatisticsStore.getStatsRecord().ipAddresses().get("monitored-key"));
+
+        // now test with multiple ip that are only monitored
+        assertFalse(serviceConfiguration.isIpBlocked("192.168.2.20").blocked());
+        assertFalse(serviceConfiguration.isIpBlocked("192.168.2.128").blocked());
+        assertFalse(serviceConfiguration.isIpBlocked("192.168.3.20").blocked());
+        assertFalse(serviceConfiguration.isIpBlocked("192.168.2.5").blocked());
+        assertEquals(1, StatisticsStore.getStatsRecord().ipAddresses().get("blocked-key").total());
+        assertEquals(1, StatisticsStore.getStatsRecord().ipAddresses().get("blocked-key").blocked());
+        assertEquals(3, StatisticsStore.getStatsRecord().ipAddresses().get("monitored-key").total());
+        assertEquals(0, StatisticsStore.getStatsRecord().ipAddresses().get("monitored-key").blocked());
     }
 
     @Test
@@ -110,6 +145,38 @@ public class ServiceConfigurationTest {
 
         assertTrue(serviceConfiguration.isBlockedUserAgent("blocked-agent"));
         assertFalse(serviceConfiguration.isBlockedUserAgent("allowed-agent"));
+        assertEquals(1, StatisticsStore.getStatsRecord().userAgents().get("blocked-bots").total());
+        assertEquals(1, StatisticsStore.getStatsRecord().userAgents().get("blocked-bots").blocked());
+    }
+
+    @Test
+    public void testMonitoredAndBlockedUserAgents() {
+        var monitoring1 = new ReportingApi.BotBlocklist(true, "monitoring1", "blocked-agent");
+        var blocking1 = new ReportingApi.BotBlocklist(false, "blocking1", "blocked-agent");
+        var monitoring2 = new ReportingApi.BotBlocklist(true, "monitoring2", "allowed*");
+        var blocking2 = new ReportingApi.BotBlocklist(false, "blocking2", "blocked*");
+
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+            Collections.emptyList(),
+            Collections.emptyList(),
+            List.of(monitoring1, blocking1, monitoring2, blocking2)
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+
+        assertTrue(serviceConfiguration.isBlockedUserAgent("blocked-agent"));
+        assertTrue(serviceConfiguration.isBlockedUserAgent("blocked-a2"));
+        assertFalse(serviceConfiguration.isBlockedUserAgent("allowed-agent"));
+        assertFalse(serviceConfiguration.isBlockedUserAgent("allowed-a2"));
+        assertFalse(serviceConfiguration.isBlockedUserAgent("allowed-a3"));
+        assertEquals(1, StatisticsStore.getStatsRecord().userAgents().get("blocking1").total());
+        assertEquals(1, StatisticsStore.getStatsRecord().userAgents().get("blocking1").blocked());
+        assertEquals(2, StatisticsStore.getStatsRecord().userAgents().get("blocking2").total());
+        assertEquals(2, StatisticsStore.getStatsRecord().userAgents().get("blocking2").blocked());
+        assertEquals(1, StatisticsStore.getStatsRecord().userAgents().get("monitoring1").total());
+        assertEquals(0, StatisticsStore.getStatsRecord().userAgents().get("monitoring1").blocked());
+        assertEquals(3, StatisticsStore.getStatsRecord().userAgents().get("monitoring2").total());
+        assertEquals(0, StatisticsStore.getStatsRecord().userAgents().get("monitoring2").blocked());
     }
 
     @Test
