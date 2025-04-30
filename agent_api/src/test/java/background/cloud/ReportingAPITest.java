@@ -70,10 +70,13 @@ public class ReportingAPITest {
     public void testListsResponse() {
         Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists();
         assertTrue(res.isPresent());
-        assertEquals(1, res.get().blockedIPAddresses().size());
+        assertEquals(2, res.get().blockedIPAddresses().size());
         assertEquals("geoip", res.get().blockedIPAddresses().get(0).source());
         assertEquals("geo restrictions", res.get().blockedIPAddresses().get(0).description());
         assertEquals("1.2.3.4", res.get().blockedIPAddresses().get(0).ips().get(0));
-        assertEquals("AI2Bot|Bytespider", res.get().blockedUserAgents());
+        assertEquals(3, res.get().blockedUserAgents().size());
+        assertEquals("AI2Bot", res.get().blockedUserAgents().get(0).pattern());
+        assertEquals("Bytespider", res.get().blockedUserAgents().get(1).pattern());
+
     }
 }
