@@ -18,16 +18,6 @@ public class ParsedFirewallLists {
 
     }
 
-    private static List<Match> matchIpEntries(String ip, List<IPEntry> ipEntries) {
-        List<Match> matches = new ArrayList<>();
-        for (IPEntry entry : ipEntries) {
-            if (entry.ips().matches(ip)) {
-                matches.add(new Match(entry.key(), !entry.monitor(), entry.description()));
-            }
-        }
-        return matches;
-    }
-
     public List<Match> matchBlockedIps(String ip) {
         List<Match> matches = new ArrayList<>();
         for (IPEntry entry : this.blockedIps) {
