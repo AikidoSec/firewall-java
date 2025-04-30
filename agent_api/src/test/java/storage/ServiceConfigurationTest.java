@@ -537,20 +537,24 @@ public class ServiceConfigurationTest {
 
     @Test
     public void testIsIpBlockedWithAllowedIPsAndBlockedIPs() {
-        ReportingApi.ListsResponseEntry allowedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "allowed", List.of("10.0.0.1"));
-        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("192.168.1.1"));
+        ReportingApi.ListsResponseEntry allowedEntry1 = new ReportingApi.ListsResponseEntry(false, "key", "source", "allowed", List.of("10.0.0.1"));
+        ReportingApi.ListsResponseEntry allowedEntry2 = new ReportingApi.ListsResponseEntry(false, "key", "source", "allowed", List.of("10.0.0.2"));
+        ReportingApi.ListsResponseEntry allowedEntry3 = new ReportingApi.ListsResponseEntry(false, "key", "source", "allowed", List.of("10.0.0.3"));
+        ReportingApi.ListsResponseEntry blockedEntry = new ReportingApi.ListsResponseEntry(false, "key", "source", "blocked", List.of("10.0.0.2"));
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
                 List.of(blockedEntry),
-                List.of(allowedEntry),
+                List.of(allowedEntry1, allowedEntry2, allowedEntry3),
                 null
         );
 
         serviceConfiguration.updateBlockedLists(listsResponse);
 
         ServiceConfiguration.BlockedResult resultAllowed = serviceConfiguration.isIpBlocked("10.0.0.1");
-        ServiceConfiguration.BlockedResult resultBlocked = serviceConfiguration.isIpBlocked("192.168.1.1");
+        ServiceConfiguration.BlockedResult resultAllowed2 = serviceConfiguration.isIpBlocked("10.0.0.3");
+        ServiceConfiguration.BlockedResult resultBlocked = serviceConfiguration.isIpBlocked("10.0.0.2");
         ServiceConfiguration.BlockedResult resultNotAllowedLocal = serviceConfiguration.isIpBlocked("192.168.1.2");
         assertFalse(resultAllowed.blocked());
+        assertFalse(resultAllowed2.blocked());
         assertTrue(resultBlocked.blocked());
         assertFalse(resultNotAllowedLocal.blocked());
     }
