@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add a New Pet</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: linear-gradient(to bottom, #A68BF7, #D1C6F9);
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #24104F;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 15px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #6551F3;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #24104F;
+        }
+                code {
+            display: block;
+            width: auto;
+            background-color: #6551F3;
+            color: whitesmoke;
+            padding: 5px;
+            margin: 2.5px 0px;
+            border-radius: 5px;
+            font-weight: 700;
+        }
+        details {
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            padding: 0.5em 0.5em 0;
+            margin-bottom: 5px;
+        }
+
+        summary {
+            font-weight: bold;
+            margin: -0.5em -0.5em 0;
+            padding: 0.5em;
+        }
+
+        details[open] {
+            padding: 0.5em;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            font-family: sans-serif;
+            font-size: 0.7em;
+        }
+        .pet-id {
+            background:  #6551F3;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 900;
+        }
+        .pet-info {
+            font-weight: 500;
+        }
+        .pet-owned-by {
+            font-weight: 300;
+        }
+        .pet-owner {
+            font-weight: 500;
+        }
+        ul li {
+            background: #e9ecef;
+            margin: 5px 0;
+            padding: 10px 5px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Add a New Pet</h1>
+    <details>
+        <summary>Examples</summary>
+        <code>Good Pet</code>
+        <code>Malicious Pet', 'Gru from the Minions') -- </code>
+    </details>
+    <form id="petForm">
+        <label for="petName">Pet's Name:</label>
+        <input type="text" id="petName" name="petName" required>
+        <button type="submit">Add Pet</button>
+    </form>
+</div>
+
+<div class="container">
+    <h1>Existing Pets</h1>
+    <div>
+        <ul id="petsList">
+
+        </ul>
+    </div>
+</div>
+
+<script>
+    document.getElementById('petForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const petName = document.getElementById('petName').value;
+
+        // Here you would typically send the data to your server
+        // For example, using fetch:
+        fetch('/api/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: petName })
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Pet added successfully!');
+                window.location.reload()
+            } else {
+                alert('Error adding pet. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    fetch('/api/pets/')
+        .then(response => response.json())
+        .then(pets => {
+            const petsList = document.getElementById('petsList');
+            pets.forEach(pet => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="pet-id">${pet.pet_id}</span>
+                    <span class="pet-info">${pet.name}</span>
+                    <span class="pet-owned-by">Owned by: </span>
+                    <span class="pet-owner">${pet.owner}</span>
+                `;
+                petsList.appendChild(li);
+            });
+        })
+        .catch(error => console.error('Error fetching pets:', error));
+</script>
+</body>
+</html>
