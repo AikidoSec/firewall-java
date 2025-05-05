@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.vulnerabilities;
 
 import dev.aikido.agent_api.context.User;
+import dev.aikido.agent_api.helpers.EnhancedStackTrace;
 
 import java.util.Map;
 
@@ -11,9 +12,9 @@ public class Attack {
     public final String pathToPayload;
     public final Map<String, String> metadata;
     public final String payload;
-    public final String stack;
+    public final EnhancedStackTrace stack;
     public final User user;
-    public Attack(String op, Vulnerabilities.Vulnerability vulnerability, String source, String pathToPayload, Map<String, String> metadata, String payload, String stack, User user) {
+    public Attack(String op, Vulnerabilities.Vulnerability vulnerability, String source, String pathToPayload, Map<String, String> metadata, String payload, EnhancedStackTrace stack, User user) {
         this.operation = op;
         this.kind = vulnerability.getKind();
         this.source = source;
@@ -33,7 +34,7 @@ public class Attack {
                 ", pathToPayload='" + pathToPayload + '\'' +
                 ", metadata=" + metadata +
                 ", payload='" + payload + '\'' +
-                ", stack='" + stack + '\'' +
+                ", stack='" + stack.getStackTrace() + '\'' +
                 ", user=" + user.id() + '}';
     }
 }

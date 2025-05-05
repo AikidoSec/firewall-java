@@ -3,6 +3,7 @@ package dev.aikido.agent_api.background.cloud.api.events;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
+import dev.aikido.agent_api.helpers.EnhancedStackTrace;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public final class DetectedAttack {
             String module,
             boolean blocked,
             String stack,
+            List<EnhancedStackTrace.Item> enhancedStack,
             User user
     ) {};
 
@@ -60,7 +62,7 @@ public final class DetectedAttack {
         );
         AttackData attackData = new AttackData(
             attack.kind, attack.operation, attack.source, attack.pathToPayload, attack.payload, attack.metadata,
-            "module", blocking, attack.stack, attack.user
+            "module", blocking, attack.stack.getStackTrace(), attack.stack.getEnhancedStackTrace(), attack.user
         );
         return new DetectedAttackEvent(
         "detected_attack", // type

@@ -2,6 +2,7 @@ package dev.aikido.agent_api.vulnerabilities;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.helpers.EnhancedStackTrace;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
@@ -9,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
-import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
 import static dev.aikido.agent_api.storage.AttackQueue.attackDetected;
 import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
 
@@ -45,7 +45,7 @@ public final class Scanner {
                         new Attack(
                                 operation, vulnerability, source,
                                 path, detectorResult.getMetadata(), userInput,
-                                getCurrentStackTrace(), ctx.getUser()), ctx
+                                new EnhancedStackTrace(), ctx.getUser()), ctx
                     );
                     break;
                 }
