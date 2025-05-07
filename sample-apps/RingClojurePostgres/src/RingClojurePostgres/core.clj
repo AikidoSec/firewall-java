@@ -34,17 +34,20 @@
     (response result)))
 
 (defn make-http-request-handler [request]
-  (let [url (:url (:body request)) ; Accessing the parsed JSON body directly
-        response (helpers/make-http-request url)]
-    (response response)))
+  (let [url (:url (:body request))] ; Accessing the parsed JSON body directly
+    (if url
+      (let [response-body (helpers/make-http-request url)] ; Call the helper function
+        {:body response-body}) ; Return the response body
+      {:status 400
+       :body {:error "Missing URL"}}))) ; Handle missing URL case
 
-"""
-(defn make-http-request-okhttp-handler [request]
-  (let [body (json/parse-string (slurp (:body request)) true)
-        url (:url body)
-        response (helpers/make-http-request-with-okhttp url)]
-    (response response)))
-"""
+(defn make-http-request-clj-client-handler [request]
+  (let [url (:url (:body request))] ; Accessing the parsed JSON body directly
+    (if url
+      (let [response-body (helpers/make-http-request-with-clj-client url)] ; Call the helper function
+        {:body response-body}) ; Return the response body
+      {:status 400
+       :body {:error "Missing URL"}}))) ; Handle missing URL case
 
 (defn read-file-handler [request]
   (let [file-path (get-in request [:query-params "path"])
@@ -74,7 +77,7 @@
             "/api/execute" (execute-command-handler request)
             (re-find #"/api/execute/.*" (:uri request)) (execute-command-path-handler request)
             "/api/request" (make-http-request-handler request)
-            ;"/api/request2" (make-http-request-okhttp-handler request)
+            "/api/request2" (make-http-request-clj-client-handler request)
             "/api/read" (read-file-handler request)
             "/api/read_cookie" (read-cookie-handler request)
             "/api/read_cookiemap" (read-cookie-map-handler request)

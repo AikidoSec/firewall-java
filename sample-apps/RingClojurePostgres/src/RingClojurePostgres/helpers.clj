@@ -34,13 +34,14 @@
           (.append content "\n")))
       (str content)))
 
-"""
-(defn make-http-request-with-okhttp [url-string]
-  (let [response (StringBuilder.)
-        client (client/make-client)]
+
+(defn make-http-request-with-clj-client [url-string]
+  (let [response (StringBuilder.)]
     (try
       (let [resp (client/get url-string)]
         (when (:body resp)
           (.append response (:body resp)))
-        (str response))
-"""
+        (str response)) ; Return the response as a string
+      (catch Exception e
+        (str "Error occurred: " (.getMessage e))) ; Handle exceptions
+      )))
