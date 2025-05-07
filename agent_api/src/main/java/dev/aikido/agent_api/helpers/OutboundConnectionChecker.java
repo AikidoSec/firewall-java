@@ -18,7 +18,7 @@ public final class OutboundConnectionChecker {
 
         boolean blocked = true;
         if (blocked) {
-            HostnamesStore.incrementBlockedHits();
+            //HostnamesStore.incrementBlockedHits();
             throw new BlockedOutboundConnection("Connection not allowed to " + hostname + ":" + port);
         }
     }
