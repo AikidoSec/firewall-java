@@ -3,6 +3,7 @@
     "blocked": true,
     "kind": "sql_injection",
     "metadata": {
+      "dialect": "MySQL",
       "sql": "INSERT INTO pets (pet_name, owner) VALUES (\"Malicious Pet\", \"Gru from the Minions\") -- \", \"Aikido Security\")"
     },
     "path": ".name",
@@ -14,6 +15,7 @@
     "blocked": true,
     "kind": "sql_injection",
     "metadata": {
+      "dialect": "PostgreSQL",
       "sql": "INSERT INTO pets (pet_name, owner) VALUES ('Malicious Pet', 'Gru from the Minions') -- ', 'Aikido Security')"
     },
     "path": ".name",
@@ -25,6 +27,7 @@
     "blocked": true,
     "kind": "sql_injection",
     "metadata": {
+      "dialect": "MySQL",
       "sql": "INSERT INTO pets (pet_name, owner) VALUES (\"Malicious Pet\", \"Gru from the Minions\") -- \", \"Aikido Security\")"
     },
     "path": ".name",
@@ -37,6 +40,7 @@
     "blocked": true,
     "kind": "sql_injection",
     "metadata": {
+      "dialect": "MySQL",
       "sql": "INSERT INTO pets (pet_name, owner) VALUES (\"Malicious Pet\", \"Gru from the Minions\") -- \", \"Aikido Security\")"
     },
     "path": ".name",
