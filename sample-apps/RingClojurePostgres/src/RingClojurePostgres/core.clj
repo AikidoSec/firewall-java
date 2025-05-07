@@ -11,12 +11,9 @@
     (let [html-content (slurp file)]
         (response html-content)))
 
-"""
 (defn get-all-pets-handler [request]
   (let [pets (db/get-all-pets)]
-    (json-response pets)))
-"""
-
+    (response pets)))
 
 (defn create-pet-handler [request]
   (let [pet-name (:name (:body request)) ; Accessing the parsed JSON body directly
@@ -72,7 +69,7 @@
             "/pages/execute" (html-handler "resources/execute_command.html")
             "/pages/request" (html-handler "resources/request.html")
             "/pages/read" (html-handler "resources/read_file.html")
-            ;"/api/pets" (get-all-pets-handler request)
+            "/api/pets/" (get-all-pets-handler request)
             "/api/create" (create-pet-handler request)
             "/api/execute" (execute-command-handler request)
             (re-find #"/api/execute/.*" (:uri request)) (execute-command-path-handler request)
