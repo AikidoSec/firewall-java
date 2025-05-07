@@ -41,4 +41,8 @@ public final class AttackQueue {
     public static APIEvent get() throws InterruptedException {
         return queue.take();
     }
+
+    public static void clear() {
+        queue.clear();
+    }
 }
