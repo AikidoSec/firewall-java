@@ -1,7 +1,9 @@
 package vulnerabilities;
 
 import dev.aikido.agent_api.background.Endpoint;
+import dev.aikido.agent_api.background.cloud.api.events.DetectedAttack;
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.AttackQueue;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.vulnerabilities.Detector;
 import dev.aikido.agent_api.vulnerabilities.Scanner;
@@ -34,7 +36,8 @@ class ScannerTest {
         }
     }
     @BeforeEach
-    void setUp() {
+    void setUp() throws InterruptedException {
+        AttackQueue.clear();
         Context.set(new EmptySampleContextObject("SELECT * FRO"));
         setEmptyConfigWithEndpointList(List.of(
                 new Endpoint(
@@ -54,6 +57,7 @@ class ScannerTest {
     @AfterEach
     void cleanup() {
         Context.set(null);
+        AttackQueue.clear();
         ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
     }
 
@@ -71,7 +75,7 @@ class ScannerTest {
     }
 
     @Test
-    void testScanSafeSQLCode() {
+    void testScanSafeSQLCode() throws InterruptedException {
         ServiceConfigStore.updateBlocking(true);
         // Safe :
         Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgresql"});
@@ -80,9 +84,14 @@ class ScannerTest {
         Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
 
         // Unsafe :
+        AttackQueue.clear();
         assertThrows(SQLInjectionException.class, () -> {
             Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
+        DetectedAttack.DetectedAttackEvent attackEvent = (DetectedAttack.DetectedAttackEvent) AttackQueue.get();
+        assertEquals("SELECT * FRO", attackEvent.attack().payload());
+        assertEquals("PostgreSQL", attackEvent.attack().metadata().get("dialect"));
+        assertEquals("SELECT * FROM", attackEvent.attack().metadata().get("sql"));
     }
 
     @Test

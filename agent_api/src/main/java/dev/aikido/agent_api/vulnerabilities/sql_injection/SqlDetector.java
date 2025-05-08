@@ -23,7 +23,10 @@ public class SqlDetector implements Detector {
         Dialect dialect = new Dialect(arguments[1]);
         boolean detectedAttack = detectSqlInjection(query, userInput, dialect);
         if (detectedAttack) {
-            Map<String, String> metadata = Map.of("sql", query);
+            Map<String, String> metadata = Map.of(
+                "sql", query,
+                "dialect", dialect.getHumanName()
+            );
             return new DetectorResult(/* detectedAttack*/ true, metadata, SQLInjectionException.get(dialect));
         }
         return new DetectorResult();
