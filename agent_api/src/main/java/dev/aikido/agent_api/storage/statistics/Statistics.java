@@ -7,8 +7,8 @@ import java.util.Map;
 
 public class Statistics {
     private final Map<String, OperationRecord> operations = new HashMap<>();
-    private final FirewallListsRecord ipAddresses = new FirewallListsRecord();
-    private final FirewallListsRecord userAgents = new FirewallListsRecord();
+    private final Map<String, Integer> ipAddressMatches = new HashMap<>();
+    private final Map<String, Integer> userAgentMatches = new HashMap<>();
     private int totalHits;
     private int attacksDetected;
     private int attacksBlocked;
@@ -75,13 +75,31 @@ public class Statistics {
 
 
     // firewall lists
-    public FirewallListsRecord getIpAddresses() {
-        return this.ipAddresses;
-    }
-    public FirewallListsRecord getUserAgents() {
-        return this.userAgents;
+    public Map<String, Integer> getIpAddresses() {
+        return new HashMap<>(this.ipAddressMatches);
     }
 
+    public Map<String, Integer> getUserAgents() {
+        return new HashMap<>(this.userAgentMatches);
+    }
+
+    public void addMatchToIpAddresses(String key) {
+        if (this.ipAddressMatches.containsKey(key)) {
+            int currentHitCount = this.ipAddressMatches.get(key);
+            this.ipAddressMatches.put(key, currentHitCount + 1);
+        } else {
+            this.ipAddressMatches.put(key, 0);
+        }
+    }
+
+    public void addMatchToUserAgents(String key) {
+        if (this.userAgentMatches.containsKey(key)) {
+            int currentHitCount = this.userAgentMatches.get(key);
+            this.userAgentMatches.put(key, currentHitCount + 1);
+        } else {
+            this.userAgentMatches.put(key, 0);
+        }
+    }
 
     public StatsRecord getRecord() {
         long endedAt = UnixTimeMS.getUnixTimeMS();
@@ -93,8 +111,8 @@ public class Statistics {
             "blocked", attacksBlocked
         )),
             getOperations(),
-            new FirewallListsRecord(getIpAddresses()),
-            new FirewallListsRecord(getUserAgents())
+            Map.of("breakdown", getIpAddresses()),
+            Map.of("breakdown", getUserAgents())
         );
     }
 
@@ -104,8 +122,8 @@ public class Statistics {
         this.attacksDetected = 0;
         this.startedAt = UnixTimeMS.getUnixTimeMS();
         this.operations.clear();
-        this.ipAddresses.clear();
-        this.userAgents.clear();
+        this.ipAddressMatches.clear();
+        this.userAgentMatches.clear();
     }
 
     // Stats records for sending out the heartbeat :
@@ -114,7 +132,7 @@ public class Statistics {
 
     public record StatsRecord(long startedAt, long endedAt, StatsRequestsRecord requests,
                               Map<String, OperationRecord> operations,
-                              FirewallListsRecord ipAddresses,
-                              FirewallListsRecord userAgents) {
+                              Map<String, Map<String, Integer>> ipAddresses,
+                              Map<String, Map<String, Integer>> userAgents) {
     }
 }

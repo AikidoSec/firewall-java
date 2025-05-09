@@ -62,19 +62,19 @@ public final class StatisticsStore {
         }
     }
 
-    public static void incrementIpHits(String key, boolean blocked) {
+    public static void incrementIpHits(String key) {
         mutex.lock();
         try {
-            stats.getIpAddresses().increment(key, blocked);
+            stats.addMatchToIpAddresses(key);
         } finally {
             mutex.unlock();
         }
     }
 
-    public static void incrementUAHits(String key, boolean blocked) {
+    public static void incrementUAHits(String key) {
         mutex.lock();
         try {
-            stats.getUserAgents().increment(key, blocked);
+            stats.addMatchToUserAgents(key);
         } finally {
             mutex.unlock();
         }
