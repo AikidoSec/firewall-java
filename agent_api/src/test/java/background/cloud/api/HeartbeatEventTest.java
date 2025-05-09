@@ -45,7 +45,7 @@ public class HeartbeatEventTest {
     @Test
     public void testGetHeartbeatEvent() {
         // Arrange
-        Statistics.StatsRecord stats = new Statistics.StatsRecord(0, 1, null, null);
+        Statistics.StatsRecord stats = new Statistics.StatsRecord(0, 1, null, null, null, null);
         var hostnames = new Hostnames(5000);
         hostnames.add("aikido.dev", 8080);
         RouteEntry[] routes = new RouteEntry[0]; // Replace with actual RouteEntry array if needed

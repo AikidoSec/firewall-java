@@ -50,12 +50,36 @@ responses = {
         "success": True,
         "blockedIPAddresses": [
             {
+                "key": "geo-1",
                 "source": "geoip",
                 "description": "geo restrictions",
                 "ips": ["1.2.3.4"]
+            },
+        ],
+        "monitoredIPAddresses": [
+            {
+                "key": "geo-2",
+                "source": "geoip",
+                "description": "should not be blocked",
+                "ips": ["5.6.7.8"]
             }
         ],
         "blockedUserAgents": "AI2Bot|Bytespider",
+        "monitoredUserAgents": "ClaudeUser",
+        "userAgentDetails": [
+            {
+                "key": "ai-agents",
+                "pattern": "AI2Bot"
+            },
+            {
+                "key": "crawlers",
+                "pattern": "Bytespider"
+            },
+            {
+                "key": "crawlers-monitor",
+                "pattern": "ClaudeUser"
+            }
+        ],
     },
     "configUpdatedAt": 0,
 }
@@ -145,5 +169,5 @@ if __name__ == '__main__':
         else:
             print(f"Error: File {config_file} not found")
             sys.exit(1)
-    
+
     app.run(host='0.0.0.0', port=port)

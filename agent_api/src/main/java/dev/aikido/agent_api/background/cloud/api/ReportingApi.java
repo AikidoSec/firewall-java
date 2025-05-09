@@ -30,10 +30,18 @@ public abstract class ReportingApi {
 
     public record APIListsResponse(
             List<ListsResponseEntry> blockedIPAddresses,
+            List<ListsResponseEntry> monitoredIPAddresses,
             List<ListsResponseEntry> allowedIPAddresses,
-            String blockedUserAgents
+            String blockedUserAgents,
+            String monitoredUserAgents,
+            List<UserAgentDetail> userAgentDetails
     ) {}
-    public record ListsResponseEntry(String source, String description, List<String> ips) {}
+
+    public record ListsResponseEntry(String key, String source, String description, List<String> ips) {
+    }
+
+    public record UserAgentDetail(String key, String pattern) {
+    }
     /**
      * Fetch blocked lists using a separate API call, these can include :
      * -> blocked IP Addresses (e.g. geo restrictions)
