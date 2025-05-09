@@ -95,7 +95,7 @@ public class ServiceConfiguration {
 
         // Check for blocked ip addresses
         for (ParsedFirewallLists.Match match : firewallLists.matchBlockedIps(ip)) {
-            StatisticsStore.incrementIpHits(match.key(), match.block());
+            StatisticsStore.incrementIpHits(match.key());
             // when a blocking match is found, set blocked result if it hasn't been set already.
             if (match.block() && !blockedResult.blocked()) {
                 blockedResult = new BlockedResult(true, match.description());
@@ -113,19 +113,11 @@ public class ServiceConfiguration {
      * Check if a given User-Agent is blocked or not :
      */
     public boolean isBlockedUserAgent(String userAgent) {
-        boolean blocked = false;
-        for (ParsedFirewallLists.Match match : this.firewallLists.matchBlockedUserAgents(userAgent)) {
-            StatisticsStore.incrementUAHits(match.key(), match.block());
-            if (match.block()) {
-                blocked = true;
-            }
+        ParsedFirewallLists.UABlockedResult result = this.firewallLists.matchBlockedUserAgents(userAgent);
+        for (String matchedKey : result.matchedKeys()) {
+            StatisticsStore.incrementUAHits(matchedKey);
         }
-
-        return blocked;
-    }
-
-    // IP restrictions (e.g. Geo-IP Restrictions) :
-    public record IPListEntry(IPList ipList, String description, boolean monitor, String key) {
+        return result.block();
     }
 
     public record BlockedResult(boolean blocked, String description) {
