@@ -55,29 +55,26 @@ public class StatisticsStoreTest {
     @Test
     public void testIncrementIpHits() {
         String ip = "192.168.1.1";
-        StatisticsStore.incrementIpHits(ip, false);
+        StatisticsStore.incrementIpHits(ip);
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertNotNull(record.ipAddresses().get(ip));
-        assertEquals(1, record.ipAddresses().get(ip).total());
+        assertEquals(1, record.ipAddresses().get("breakdown").get(ip));
     }
 
     @Test
     public void testIncrementUAHits() {
         String userAgent = "Mozilla/5.0";
-        StatisticsStore.incrementUAHits(userAgent, true);
+        StatisticsStore.incrementUAHits(userAgent);
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertNotNull(record.userAgents().get(userAgent));
-        assertEquals(1, record.userAgents().get(userAgent).total());
-        assertEquals(1, record.userAgents().get(userAgent).blocked());
+        assertEquals(1, record.userAgents().get("breakdown").get(userAgent));
     }
 
     @Test
     public void testClear() {
         StatisticsStore.incrementHits();
-        StatisticsStore.incrementIpHits("ip", false);
-        StatisticsStore.incrementUAHits("ip", false);
+        StatisticsStore.incrementIpHits("ip");
+        StatisticsStore.incrementUAHits("ip");
         String operation = "testOperation";
         StatisticsStore.registerCall(operation, OperationKind.FS_OP);
 
@@ -87,8 +84,8 @@ public class StatisticsStoreTest {
         assertNotNull(record);
         assertEquals(0, record.requests().total());
         assertEquals(0, record.operations().size());
-        assertEquals(0, record.ipAddresses().size());
-        assertEquals(0, record.userAgents().size());
+        assertEquals(0, record.ipAddresses().get("breakdown").size());
+        assertEquals(0, record.userAgents().get("breakdown").size());
 
     }
 
@@ -135,32 +132,28 @@ public class StatisticsStoreTest {
     @Test
     public void testIncrementIpHitsMultipleTimes() {
         String ip = "192.168.1.1";
-        StatisticsStore.incrementIpHits(ip, false);
-        StatisticsStore.incrementIpHits(ip, true);
+        StatisticsStore.incrementIpHits(ip);
+        StatisticsStore.incrementIpHits(ip);
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertNotNull(record.ipAddresses().get(ip));
-        assertEquals(2, record.ipAddresses().get(ip).total());
-        assertEquals(1, record.ipAddresses().get(ip).blocked());
+        assertEquals(2, record.ipAddresses().get("breakdown").get(ip));
     }
 
     @Test
     public void testIncrementUAHitsMultipleTimes() {
         String userAgent = "Mozilla/5.0";
-        StatisticsStore.incrementUAHits(userAgent, true);
-        StatisticsStore.incrementUAHits(userAgent, false);
+        StatisticsStore.incrementUAHits(userAgent);
+        StatisticsStore.incrementUAHits(userAgent);
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertNotNull(record.userAgents().get(userAgent));
-        assertEquals(2, record.userAgents().get(userAgent).total());
-        assertEquals(1, record.userAgents().get(userAgent).blocked());
+        assertEquals(2, record.userAgents().get("breakdown").get(userAgent));
     }
 
     @Test
     public void testClearAfterMultipleIncrements() {
         StatisticsStore.incrementHits();
-        StatisticsStore.incrementIpHits("192.168.1.1", false);
-        StatisticsStore.incrementUAHits("Mozilla/5.0", true);
+        StatisticsStore.incrementIpHits("192.168.1.1");
+        StatisticsStore.incrementUAHits("Mozilla/5.0");
         String operation = "testOperation";
         StatisticsStore.registerCall(operation, OperationKind.FS_OP);
 
@@ -170,8 +163,8 @@ public class StatisticsStoreTest {
         assertNotNull(record);
         assertEquals(0, record.requests().total());
         assertEquals(0, record.operations().size());
-        assertEquals(0, record.ipAddresses().size());
-        assertEquals(0, record.userAgents().size());
+        assertEquals(0, record.ipAddresses().get("breakdown").size());
+        assertEquals(0, record.userAgents().get("breakdown").size());
     }
 
     @Test
@@ -196,27 +189,23 @@ public class StatisticsStoreTest {
 
     @Test
     public void testIncrementIpHitsWithDifferentIPs() {
-        StatisticsStore.incrementIpHits("192.168.1.1", false);
-        StatisticsStore.incrementIpHits("192.168.1.2", true);
+        StatisticsStore.incrementIpHits("192.168.1.1");
+        StatisticsStore.incrementIpHits("192.168.1.2");
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertEquals(1, record.ipAddresses().get("192.168.1.1").total());
-        assertEquals(0, record.ipAddresses().get("192.168.1.1").blocked());
-        assertEquals(1, record.ipAddresses().get("192.168.1.2").total());
-        assertEquals(1, record.ipAddresses().get("192.168.1.2").blocked());
+        assertEquals(1, record.ipAddresses().get("breakdown").get("192.168.1.1"));
+        assertEquals(1, record.ipAddresses().get("breakdown").get("192.168.1.2"));
     }
 
     @Test
     public void testIncrementUAHitsWithDifferentUserAgents() {
-        StatisticsStore.incrementUAHits("Mozilla/5.0", true);
-        StatisticsStore.incrementUAHits("Chrome/91.0", false);
+        StatisticsStore.incrementUAHits("Mozilla/5.0");
+        StatisticsStore.incrementUAHits("Chrome/91.0");
 
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertEquals(1, record.userAgents().get("Mozilla/5.0").total());
-        assertEquals(1, record.userAgents().get("Mozilla/5.0").blocked());
-        assertEquals(1, record.userAgents().get("Chrome/91.0").total());
-        assertEquals(0, record.userAgents().get("Chrome/91.0").blocked());
+        assertEquals(1, record.userAgents().get("breakdown").get("Mozilla/5.0"));
+        assertEquals(1, record.userAgents().get("breakdown").get("Chrome/91.0"));
     }
 
     @Test
@@ -224,8 +213,8 @@ public class StatisticsStoreTest {
         StatisticsStore.incrementHits();
         StatisticsStore.incrementAttacksDetected("operation1");
         StatisticsStore.incrementAttacksBlocked("operation1");
-        StatisticsStore.incrementIpHits("192.168.1.1", false);
-        StatisticsStore.incrementUAHits("Mozilla/5.0", true);
+        StatisticsStore.incrementIpHits("192.168.1.1");
+        StatisticsStore.incrementUAHits("Mozilla/5.0");
 
         StatisticsStore.clear();
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
@@ -234,8 +223,8 @@ public class StatisticsStoreTest {
         assertEquals(0, record.requests().total());
         assertEquals(0, record.requests().attacksDetected().get("total"));
         assertEquals(0, record.requests().attacksDetected().get("blocked"));
-        assertEquals(0, record.ipAddresses().size());
-        assertEquals(0, record.userAgents().size());
+        assertEquals(0, record.ipAddresses().get("breakdown").size());
+        assertEquals(0, record.userAgents().get("breakdown").size());
     }
 
     @Test
@@ -275,19 +264,17 @@ public class StatisticsStoreTest {
         StatisticsStore.incrementHits();
         StatisticsStore.incrementAttacksDetected(operation);
         StatisticsStore.incrementAttacksBlocked(operation);
-        StatisticsStore.incrementIpHits(ip, false);
-        StatisticsStore.incrementUAHits(userAgent, true);
+        StatisticsStore.incrementIpHits(ip);
+        StatisticsStore.incrementUAHits(userAgent);
 
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
         assertEquals(1, record.requests().total());
         assertEquals(1, record.requests().attacksDetected().get("total"));
         assertEquals(1, record.requests().attacksDetected().get("blocked"));
-        assertNotNull(record.ipAddresses().get(ip));
-        assertEquals(1, record.ipAddresses().get(ip).total());
-        assertEquals(0, record.ipAddresses().get(ip).blocked());
-        assertNotNull(record.userAgents().get(userAgent));
-        assertEquals(1, record.userAgents().get(userAgent).total());
-        assertEquals(1, record.userAgents().get(userAgent).blocked());
+        assertNotNull(record.ipAddresses().get("breakdown").get(ip));
+        assertEquals(1, record.ipAddresses().get("breakdown").get(ip));
+        assertNotNull(record.userAgents().get("breakdown").get(userAgent));
+        assertEquals(1, record.userAgents().get("breakdown").get(userAgent));
     }
 }
