@@ -50,33 +50,32 @@ responses = {
         "success": True,
         "blockedIPAddresses": [
             {
-                "monitor": False,
                 "key": "geo-1",
                 "source": "geoip",
                 "description": "geo restrictions",
                 "ips": ["1.2.3.4"]
             },
+        ],
+        "monitoredIPAddresses": [
             {
-                "monitor": True,
                 "key": "geo-2",
                 "source": "geoip",
                 "description": "should not be blocked",
                 "ips": ["5.6.7.8"]
             }
         ],
-        "blockedUserAgents": [
+        "blockedUserAgents": "AI2Bot|Bytespider",
+        "monitoredUserAgents": "ClaudeUser",
+        "userAgentDetails": [
             {
-                "monitor": False,
                 "key": "ai-agents",
                 "pattern": "AI2Bot"
             },
             {
-                "monitor": False,
                 "key": "crawlers",
                 "pattern": "Bytespider"
             },
             {
-                "monitor": True,
                 "key": "crawlers-monitor",
                 "pattern": "ClaudeUser"
             }
