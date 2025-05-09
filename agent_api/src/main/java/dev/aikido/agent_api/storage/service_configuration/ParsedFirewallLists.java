@@ -12,7 +12,9 @@ import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 public class ParsedFirewallLists {
     private final List<IPEntry> blockedIps = new ArrayList<>();
     private final List<IPEntry> allowedIps = new ArrayList<>();
-    private final List<BlockedUAEntry> blockedUserAgents = new ArrayList<>();
+    private final List<UADetailsEntry> uaDetails = new ArrayList<>();
+    private Pattern blockedUserAgents = null;
+    private Pattern monitoredUserAgents = null;
 
     public ParsedFirewallLists() {
 
@@ -41,20 +43,35 @@ public class ParsedFirewallLists {
         return false;
     }
 
-    public List<Match> matchBlockedUserAgents(String userAgent) {
-        List<Match> matches = new ArrayList<>();
-        for (BlockedUAEntry entry : this.blockedUserAgents) {
+    public UABlockedResult matchBlockedUserAgents(String userAgent) {
+        boolean isBlocked = false;
+        if (blockedUserAgents != null)
+            isBlocked = blockedUserAgents.matcher(userAgent).find();
+
+        boolean isMonitored = false;
+        if (monitoredUserAgents != null)
+            isMonitored = monitoredUserAgents.matcher(userAgent).find();
+
+        if (!isMonitored && !isBlocked)
+            // only run the more detailed matches if it's an actual attack/monitored.
+            return new UABlockedResult(false, List.of());
+
+        List<String> matchedUAKeys = new ArrayList<>();
+        for (UADetailsEntry entry : this.uaDetails) {
             if (entry.pattern().matcher(userAgent).find()) {
-                matches.add(new Match(entry.key(), !entry.monitor(), null));
+                matchedUAKeys.add(entry.key());
             }
         }
-        return matches;
+        return new UABlockedResult(isBlocked, matchedUAKeys);
     }
 
     public void update(ReportingApi.APIListsResponse response) {
         updateBlockedIps(response.blockedIPAddresses());
+        updateMonitoredIps(response.monitoredIPAddresses());
         updateAllowedIps(response.allowedIPAddresses());
-        updateBlockedUserAgents(response.blockedUserAgents());
+
+        updateBlockedAndMonitoredUAs(response.blockedUserAgents(), response.monitoredUserAgents());
+        updateUADetails(response.userAgentDetails());
     }
 
     public void updateBlockedIps(List<ReportingApi.ListsResponseEntry> blockedIpsList) {
@@ -63,7 +80,16 @@ public class ParsedFirewallLists {
             return;
         for (ReportingApi.ListsResponseEntry entry : blockedIpsList) {
             IPList ipList = createIPList(entry.ips());
-            blockedIps.add(new IPEntry(entry.monitor(), entry.key(), entry.source(), entry.description(), ipList));
+            blockedIps.add(new IPEntry(/* monitor */ false, entry.key(), entry.source(), entry.description(), ipList));
+        }
+    }
+
+    public void updateMonitoredIps(List<ReportingApi.ListsResponseEntry> monitoredIpsList) {
+        if (monitoredIpsList == null)
+            return;
+        for (ReportingApi.ListsResponseEntry entry : monitoredIpsList) {
+            IPList ipList = createIPList(entry.ips());
+            blockedIps.add(new IPEntry(/* monitor */ true, entry.key(), entry.source(), entry.description(), ipList));
         }
     }
 
@@ -73,26 +99,43 @@ public class ParsedFirewallLists {
             return;
         for (ReportingApi.ListsResponseEntry entry : allowedIpsList) {
             IPList ipList = createIPList(entry.ips());
-            allowedIps.add(new IPEntry(entry.monitor(), entry.key(), entry.source(), entry.description(), ipList));
+            boolean shouldMonitor = false; // we don't monitor allowed ips
+            allowedIps.add(new IPEntry(shouldMonitor, entry.key(), entry.source(), entry.description(), ipList));
         }
     }
 
-    public void updateBlockedUserAgents(List<ReportingApi.BotBlocklist> blockedUserAgentsList) {
-        blockedUserAgents.clear();
-        if (blockedUserAgentsList == null)
+    public void updateUADetails(List<ReportingApi.UserAgentDetail> userAgentDetails) {
+        this.uaDetails.clear();
+        if (userAgentDetails == null)
             return;
-        for (ReportingApi.BotBlocklist entry : blockedUserAgentsList) {
+        for (ReportingApi.UserAgentDetail entry : userAgentDetails) {
             Pattern pattern = Pattern.compile(entry.pattern(), Pattern.CASE_INSENSITIVE);
-            blockedUserAgents.add(new BlockedUAEntry(entry.monitor(), entry.key(), pattern));
+            this.uaDetails.add(new UADetailsEntry(entry.key(), pattern));
         }
     }
+
+    public void updateBlockedAndMonitoredUAs(String blockedUAs, String monitoredUAs) {
+        this.blockedUserAgents = null;
+        if (blockedUAs != null && !blockedUAs.isEmpty()) {
+            this.blockedUserAgents = Pattern.compile(blockedUAs, Pattern.CASE_INSENSITIVE);
+        }
+
+        this.monitoredUserAgents = null;
+        if (monitoredUAs != null && !monitoredUAs.isEmpty()) {
+            this.monitoredUserAgents = Pattern.compile(monitoredUAs, Pattern.CASE_INSENSITIVE);
+        }
+    }
+
 
     public record Match(String key, boolean block, String description) {
+    }
+
+    public record UABlockedResult(boolean block, List<String> matchedKeys) {
     }
 
     private record IPEntry(boolean monitor, String key, String source, String description, IPList ips) {
     }
 
-    private record BlockedUAEntry(boolean monitor, String key, Pattern pattern) {
+    private record UADetailsEntry(String key, Pattern pattern) {
     }
 }
