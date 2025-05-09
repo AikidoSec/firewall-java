@@ -88,7 +88,7 @@ public class Statistics {
             int currentHitCount = this.ipAddressMatches.get(key);
             this.ipAddressMatches.put(key, currentHitCount + 1);
         } else {
-            this.ipAddressMatches.put(key, 0);
+            this.ipAddressMatches.put(key, 1);
         }
     }
 
@@ -97,7 +97,7 @@ public class Statistics {
             int currentHitCount = this.userAgentMatches.get(key);
             this.userAgentMatches.put(key, currentHitCount + 1);
         } else {
-            this.userAgentMatches.put(key, 0);
+            this.userAgentMatches.put(key, 1);
         }
     }
 
