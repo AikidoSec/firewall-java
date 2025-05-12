@@ -75,11 +75,11 @@ public class ParsedFirewallLists {
         updateUADetails(response.userAgentDetails());
     }
 
-    public void updateBlockedIps(List<ReportingApi.ListsResponseEntry> blockedIpsList) {
+    public void updateBlockedIps(List<ReportingApi.ListsResponseEntry> blockedIpLists) {
         blockedIps.clear();
-        if (blockedIpsList == null)
+        if (blockedIpLists == null)
             return;
-        for (ReportingApi.ListsResponseEntry entry : blockedIpsList) {
+        for (ReportingApi.ListsResponseEntry entry : blockedIpLists) {
             IPList ipList = createIPList(entry.ips());
             blockedIps.add(new IPEntry(/* monitor */ false, entry.key(), entry.source(), entry.description(), ipList));
         }
@@ -94,11 +94,11 @@ public class ParsedFirewallLists {
         }
     }
 
-    public void updateAllowedIps(List<ReportingApi.ListsResponseEntry> allowedIpsList) {
+    public void updateAllowedIps(List<ReportingApi.ListsResponseEntry> allowedIpLists) {
         allowedIps.clear();
-        if (allowedIpsList == null)
+        if (allowedIpLists == null)
             return;
-        for (ReportingApi.ListsResponseEntry entry : allowedIpsList) {
+        for (ReportingApi.ListsResponseEntry entry : allowedIpLists) {
             IPList ipList = createIPList(entry.ips());
             boolean shouldMonitor = false; // we don't monitor allowed ips
             allowedIps.add(new IPEntry(shouldMonitor, entry.key(), entry.source(), entry.description(), ipList));
