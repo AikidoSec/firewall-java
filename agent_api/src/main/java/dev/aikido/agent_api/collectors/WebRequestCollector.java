@@ -40,15 +40,14 @@ public final class WebRequestCollector {
         StatisticsStore.incrementHits();
 
         Res endpointAllowlistRes = checkEndpointAllowlist(newContext.getRouteMetadata(), newContext.getRemoteAddress(), config);
-        Res blockedIpsRes = checkBlockedIps(newContext.getRemoteAddress(), config);
-        Res blockedUserAgentsRes = checkBlockedUserAgents(newContext.getHeader("user-agent"), config);
-
-        // make sure to follow a certain order when giving error messages.
         if (endpointAllowlistRes != null)
             return endpointAllowlistRes;
-        else if (blockedIpsRes != null)
+
+        Res blockedIpsRes = checkBlockedIps(newContext.getRemoteAddress(), config);
+        if (blockedIpsRes != null)
             return blockedIpsRes;
-        else return blockedUserAgentsRes;
+
+        return checkBlockedUserAgents(newContext.getHeader("user-agent"), config);
     }
 
     private static Res checkEndpointAllowlist(RouteMetadata routeMetadata, String remoteAddress, ServiceConfiguration config) {
