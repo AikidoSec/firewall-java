@@ -67,8 +67,10 @@ public class ParsedFirewallLists {
     }
 
     public void update(ReportingApi.APIListsResponse response) {
+        blockedIps.clear();
         updateBlockedIps(response.blockedIPAddresses());
         updateMonitoredIps(response.monitoredIPAddresses());
+
         updateAllowedIps(response.allowedIPAddresses());
 
         updateBlockedAndMonitoredUAs(response.blockedUserAgents(), response.monitoredUserAgents());
@@ -76,7 +78,6 @@ public class ParsedFirewallLists {
     }
 
     public void updateBlockedIps(List<ReportingApi.ListsResponseEntry> blockedIpLists) {
-        blockedIps.clear();
         if (blockedIpLists == null)
             return;
         for (ReportingApi.ListsResponseEntry entry : blockedIpLists) {
