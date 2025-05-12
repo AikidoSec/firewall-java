@@ -249,6 +249,28 @@ public class ServiceConfigurationTest {
     }
 
     @Test
+    public void testIsBlockedUserAgentWithInvalidRegex() {
+        ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
+            List.of(), List.of(), List.of(),
+            "valid", "a{2,1}", List.of(
+            new ReportingApi.UserAgentDetail("invalid-pattern-1", "a{2,1}"),
+            new ReportingApi.UserAgentDetail("invalid-pattern-2", "[abc"),
+            new ReportingApi.UserAgentDetail("valid-pattern", "valid")
+        )
+        );
+
+        serviceConfiguration.updateBlockedLists(listsResponse);
+        assertFalse(serviceConfiguration.isBlockedUserAgent("[abc"));
+        assertFalse(serviceConfiguration.isBlockedUserAgent("a"));
+        assertFalse(serviceConfiguration.isBlockedUserAgent("a{2,1}"));
+        assertNull(StatisticsStore.getStatsRecord().ipAddresses().get("invalid-pattern-1"));
+        assertNull(StatisticsStore.getStatsRecord().ipAddresses().get("invalid-pattern-2z"));
+
+        assertTrue(serviceConfiguration.isBlockedUserAgent("valid pattern matches"));
+
+    }
+
+    @Test
     public void testIsBlockedUserAgentWithCaseInsensitiveMatch() {
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
             List.of(), List.of(), List.of(),

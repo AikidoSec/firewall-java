@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
+import static dev.aikido.agent_api.helpers.patterns.SafePatternCompiler.compilePatternSafely;
 
 public class ParsedFirewallLists {
     private final List<IPEntry> blockedIps = new ArrayList<>();
@@ -109,21 +110,16 @@ public class ParsedFirewallLists {
         if (userAgentDetails == null)
             return;
         for (ReportingApi.UserAgentDetail entry : userAgentDetails) {
-            Pattern pattern = Pattern.compile(entry.pattern(), Pattern.CASE_INSENSITIVE);
-            this.uaDetails.add(new UADetailsEntry(entry.key(), pattern));
+            Pattern pattern = compilePatternSafely(entry.pattern(), Pattern.CASE_INSENSITIVE);
+            if (pattern != null) {
+                this.uaDetails.add(new UADetailsEntry(entry.key(), pattern));
+            }
         }
     }
 
     public void updateBlockedAndMonitoredUAs(String blockedUAs, String monitoredUAs) {
-        this.blockedUserAgents = null;
-        if (blockedUAs != null && !blockedUAs.isEmpty()) {
-            this.blockedUserAgents = Pattern.compile(blockedUAs, Pattern.CASE_INSENSITIVE);
-        }
-
-        this.monitoredUserAgents = null;
-        if (monitoredUAs != null && !monitoredUAs.isEmpty()) {
-            this.monitoredUserAgents = Pattern.compile(monitoredUAs, Pattern.CASE_INSENSITIVE);
-        }
+        this.blockedUserAgents = compilePatternSafely(blockedUAs, Pattern.CASE_INSENSITIVE);
+        this.monitoredUserAgents = compilePatternSafely(monitoredUAs, Pattern.CASE_INSENSITIVE);
     }
 
 
