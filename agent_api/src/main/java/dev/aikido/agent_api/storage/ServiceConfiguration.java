@@ -85,24 +85,24 @@ public class ServiceConfiguration {
      * Check if the IP is blocked (e.g. Geo IP Restrictions)
      */
     public BlockedResult isIpBlocked(String ip) {
-        BlockedResult blockedResult = new BlockedResult(false, null);
-
         // Check for allowed ip addresses (i.e. only one country is allowed to visit the site)
         // Always allow access from private IP addresses (those include local IP addresses)
         if (!isPrivateIp(ip) && !firewallLists.matchesAllowedIps(ip)) {
-            blockedResult = new BlockedResult(true, "not in allowlist");
+            return new BlockedResult(true, "not in allowlist");
         }
 
         // Check for blocked ip addresses
-        for (ParsedFirewallLists.Match match : firewallLists.matchBlockedIps(ip)) {
+        List<ParsedFirewallLists.Match> blockedIpMatches = firewallLists.matchBlockedIps(ip);
+        for (ParsedFirewallLists.Match match : blockedIpMatches) {
             StatisticsStore.incrementIpHits(match.key());
-            // when a blocking match is found, set blocked result if it hasn't been set already.
-            if (match.block() && !blockedResult.blocked()) {
-                blockedResult = new BlockedResult(true, match.description());
+        }
+        for (ParsedFirewallLists.Match match : firewallLists.matchBlockedIps(ip)) {
+            if (match.block()) {
+                return new BlockedResult(true, match.description());
             }
         }
 
-        return blockedResult;
+        return new BlockedResult(false, null);
     }
 
     public void updateBlockedLists(ReportingApi.APIListsResponse res) {
