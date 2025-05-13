@@ -4,11 +4,12 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.net.IPList;
+import dev.aikido.agent_api.storage.service_configuration.ParsedFirewallLists;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
@@ -18,16 +19,13 @@ import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
  * It is essential for e.g. rate limiting
  */
 public class ServiceConfiguration {
-    private final List<IPListEntry> blockedIps = new ArrayList<>();
-    private final List<IPListEntry> allowedIps = new ArrayList<>();
+    private final ParsedFirewallLists firewallLists = new ParsedFirewallLists();
     private boolean blockingEnabled;
     private boolean receivedAnyStats;
     private boolean middlewareInstalled;
     private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
-    // User-Agent Blocking (e.g. bot blocking) :
-    private Pattern blockedUserAgentRegex;
 
     public ServiceConfiguration() {
         this.receivedAnyStats = true; // true by default, waiting for the startup event
@@ -89,66 +87,37 @@ public class ServiceConfiguration {
     public BlockedResult isIpBlocked(String ip) {
         // Check for allowed ip addresses (i.e. only one country is allowed to visit the site)
         // Always allow access from private IP addresses (those include local IP addresses)
-        if (!allowedIps.isEmpty() && !isPrivateIp(ip)) {
-            boolean ipAllowed = false;
-            for (IPListEntry entry : allowedIps) {
-                if (entry.ipList.matches(ip)) {
-                    ipAllowed = true; // We allow IP addresses as long as they match with one of the lists.
-                    break;
-                }
-            }
-            if (!ipAllowed) {
-                return new BlockedResult(true, "not in allowlist");
-            }
+        if (!isPrivateIp(ip) && !firewallLists.matchesAllowedIps(ip)) {
+            return new BlockedResult(true, "not in allowlist");
         }
 
         // Check for blocked ip addresses
-        for (IPListEntry entry : blockedIps) {
-            if (entry.ipList.matches(ip)) {
-                return new BlockedResult(true, entry.description);
+        List<ParsedFirewallLists.Match> blockedIpMatches = firewallLists.matchBlockedIps(ip);
+        for (ParsedFirewallLists.Match match : blockedIpMatches) {
+            StatisticsStore.incrementIpHits(match.key());
+        }
+        for (ParsedFirewallLists.Match match : firewallLists.matchBlockedIps(ip)) {
+            if (match.block()) {
+                return new BlockedResult(true, match.description());
             }
         }
+
         return new BlockedResult(false, null);
     }
 
     public void updateBlockedLists(ReportingApi.APIListsResponse res) {
-        // Update blocked IP addresses (e.g. for geo restrictions) :
-        blockedIps.clear();
-        if (res.blockedIPAddresses() != null) {
-            for (ReportingApi.ListsResponseEntry entry : res.blockedIPAddresses()) {
-                IPList ipList = createIPList(entry.ips());
-                blockedIps.add(new IPListEntry(ipList, entry.description()));
-            }
-        }
-
-        // Update allowed IP addresses (e.g. for geo restrictions) :
-        allowedIps.clear();
-        if (res.allowedIPAddresses() != null) {
-            for (ReportingApi.ListsResponseEntry entry : res.allowedIPAddresses()) {
-                IPList ipList = createIPList(entry.ips());
-                this.allowedIps.add(new IPListEntry(ipList, entry.description()));
-            }
-        }
-
-        // Update Blocked User-Agents regex
-        blockedUserAgentRegex = null;
-        if (res.blockedUserAgents() != null && !res.blockedUserAgents().isEmpty()) {
-            this.blockedUserAgentRegex = Pattern.compile(res.blockedUserAgents(), Pattern.CASE_INSENSITIVE);
-        }
+        this.firewallLists.update(res);
     }
 
     /**
      * Check if a given User-Agent is blocked or not :
      */
     public boolean isBlockedUserAgent(String userAgent) {
-        if (blockedUserAgentRegex != null) {
-            return blockedUserAgentRegex.matcher(userAgent).find();
+        ParsedFirewallLists.UABlockedResult result = this.firewallLists.matchBlockedUserAgents(userAgent);
+        for (String matchedKey : result.matchedKeys()) {
+            StatisticsStore.incrementUAHits(matchedKey);
         }
-        return false;
-    }
-
-    // IP restrictions (e.g. Geo-IP Restrictions) :
-    public record IPListEntry(IPList ipList, String description) {
+        return result.block();
     }
 
     public record BlockedResult(boolean blocked, String description) {

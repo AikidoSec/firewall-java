@@ -62,6 +62,24 @@ public final class StatisticsStore {
         }
     }
 
+    public static void incrementIpHits(String key) {
+        mutex.lock();
+        try {
+            stats.addMatchToIpAddresses(key);
+        } finally {
+            mutex.unlock();
+        }
+    }
+
+    public static void incrementUAHits(String key) {
+        mutex.lock();
+        try {
+            stats.addMatchToUserAgents(key);
+        } finally {
+            mutex.unlock();
+        }
+    }
+
     public static void clear() {
         mutex.lock();
         try {

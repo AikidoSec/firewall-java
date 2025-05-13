@@ -3,6 +3,7 @@ package dev.aikido.agent_api.collectors;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
@@ -38,31 +39,46 @@ public final class WebRequestCollector {
         // Increment total hits :
         StatisticsStore.incrementHits();
 
-        // Per-route IP allowlists :
-        List<Endpoint> matchedEndpoints = matchEndpoints(newContext.getRouteMetadata(), config.getEndpoints());
-        if (!ipAllowedToAccessRoute(newContext.getRemoteAddress(), matchedEndpoints)) {
+        Res endpointAllowlistRes = checkEndpointAllowlist(newContext.getRouteMetadata(), newContext.getRemoteAddress(), config);
+        if (endpointAllowlistRes != null)
+            return endpointAllowlistRes;
+
+        Res blockedIpsRes = checkBlockedIps(newContext.getRemoteAddress(), config);
+        if (blockedIpsRes != null)
+            return blockedIpsRes;
+
+        return checkBlockedUserAgents(newContext.getHeader("user-agent"), config);
+    }
+
+    private static Res checkEndpointAllowlist(RouteMetadata routeMetadata, String remoteAddress, ServiceConfiguration config) {
+        List<Endpoint> matchedEndpoints = matchEndpoints(routeMetadata, config.getEndpoints());
+        if (!ipAllowedToAccessRoute(remoteAddress, matchedEndpoints)) {
             String msg = "Your IP address is not allowed to access this resource.";
-            msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
+            msg += " (Your IP: " + remoteAddress + ")";
             return new Res(msg, 403);
         }
+        return null; // not blocked
+    }
 
-        // Blocked IP lists (e.g. Geo restrictions)
-        ServiceConfiguration.BlockedResult ipBlocked = config.isIpBlocked(newContext.getRemoteAddress());
+    private static Res checkBlockedIps(String remoteAddress, ServiceConfiguration config) {
+        ServiceConfiguration.BlockedResult ipBlocked = config.isIpBlocked(remoteAddress);
         if (ipBlocked.blocked()) {
             String msg = "Your IP address is blocked. Reason: " + ipBlocked.description();
-            msg += " (Your IP: " + newContext.getRemoteAddress() + ")";
+            msg += " (Your IP: " + remoteAddress + ")";
             return new Res(msg, 403);
         }
+        return null; // not blocked
+    }
 
-        // User-Agent blocking (e.g. blocking bots)
-        String userAgent = newContext.getHeader("user-agent");
-        if (userAgent != null && !userAgent.isEmpty()) {
-            if (config.isBlockedUserAgent(userAgent)) {
-                String msg = "You are not allowed to access this resource because you have been identified as a bot.";
-                return new Res(msg, 403);
-            }
+    private static Res checkBlockedUserAgents(String userAgent, ServiceConfiguration config) {
+        if (userAgent == null || userAgent.isEmpty()) {
+            return null; // not blocked
         }
-        return null;
+        if (config.isBlockedUserAgent(userAgent)) {
+            String msg = "You are not allowed to access this resource because you have been identified as a bot.";
+            return new Res(msg, 403);
+        }
+        return null; // not blocked
     }
 
     public record Res(String msg, Integer status) {
