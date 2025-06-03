@@ -87,7 +87,7 @@ responses = {
 events = []
 
 # Realtime
-@app.route('/realtime/config', methods=["GET"])
+@app.route('/config', methods=["GET"])
 def get_realtime_config():
     return jsonify({"configUpdatedAt": responses["configUpdatedAt"]})
 
