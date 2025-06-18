@@ -109,13 +109,14 @@ public class ReportingAPITest {
         assertEquals(1, matches.size());
         assertEquals("geo-1", matches.get(0).key());
         assertEquals("geo restrictions", matches.get(0).description());
-        assertTrue(matches.get(0).block());
 
         matches = parsed.matchBlockedIps("5.6.7.8");
+        assertEquals(0, matches.size());
+
+        matches = parsed.matchMonitoredIps("5.6.7.8");
         assertEquals(1, matches.size());
         assertEquals("geo-2", matches.get(0).key());
         assertEquals("should not be blocked", matches.get(0).description());
-        assertFalse(matches.get(0).block());
 
         matches = parsed.matchBlockedIps("2.3.4.5");
         assertEquals(0, matches.size());

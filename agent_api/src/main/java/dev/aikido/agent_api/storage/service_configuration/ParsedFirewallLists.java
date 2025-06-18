@@ -12,6 +12,7 @@ import static dev.aikido.agent_api.helpers.patterns.SafePatternCompiler.compileP
 
 public class ParsedFirewallLists {
     private final List<IPEntry> blockedIps = new ArrayList<>();
+    private final List<IPEntry> monitoredIps = new ArrayList<>();
     private final List<IPEntry> allowedIps = new ArrayList<>();
     private final List<UADetailsEntry> uaDetails = new ArrayList<>();
     private Pattern blockedUserAgents = null;
@@ -25,11 +26,22 @@ public class ParsedFirewallLists {
         List<Match> matches = new ArrayList<>();
         for (IPEntry entry : this.blockedIps) {
             if (entry.ips().matches(ip)) {
-                matches.add(new Match(entry.key(), !entry.monitor(), entry.description()));
+                matches.add(new Match(entry.key(), entry.description()));
             }
         }
         return matches;
     }
+
+    public List<Match> matchMonitoredIps(String ip) {
+        List<Match> matches = new ArrayList<>();
+        for (IPEntry entry : this.monitoredIps) {
+            if (entry.ips().matches(ip)) {
+                matches.add(new Match(entry.key(), entry.description()));
+            }
+        }
+        return matches;
+    }
+
 
     // returns true if one or more matches has been found with allowlist.
     public boolean matchesAllowedIps(String ip) {
@@ -67,31 +79,30 @@ public class ParsedFirewallLists {
     }
 
     public void update(ReportingApi.APIListsResponse response) {
-        blockedIps.clear();
         updateBlockedIps(response.blockedIPAddresses());
         updateMonitoredIps(response.monitoredIPAddresses());
-
         updateAllowedIps(response.allowedIPAddresses());
-
         updateBlockedAndMonitoredUAs(response.blockedUserAgents(), response.monitoredUserAgents());
         updateUADetails(response.userAgentDetails());
     }
 
     public void updateBlockedIps(List<ReportingApi.ListsResponseEntry> blockedIpLists) {
+        this.blockedIps.clear();
         if (blockedIpLists == null)
             return;
         for (ReportingApi.ListsResponseEntry entry : blockedIpLists) {
             IPList ipList = createIPList(entry.ips());
-            blockedIps.add(new IPEntry(/* monitor */ false, entry.key(), entry.source(), entry.description(), ipList));
+            this.blockedIps.add(new IPEntry(entry.key(), entry.source(), entry.description(), ipList));
         }
     }
 
     public void updateMonitoredIps(List<ReportingApi.ListsResponseEntry> monitoredIpsList) {
+        this.monitoredIps.clear();
         if (monitoredIpsList == null)
             return;
         for (ReportingApi.ListsResponseEntry entry : monitoredIpsList) {
             IPList ipList = createIPList(entry.ips());
-            blockedIps.add(new IPEntry(/* monitor */ true, entry.key(), entry.source(), entry.description(), ipList));
+            this.monitoredIps.add(new IPEntry(entry.key(), entry.source(), entry.description(), ipList));
         }
     }
 
@@ -101,8 +112,7 @@ public class ParsedFirewallLists {
             return;
         for (ReportingApi.ListsResponseEntry entry : allowedIpLists) {
             IPList ipList = createIPList(entry.ips());
-            boolean shouldMonitor = false; // we don't monitor allowed ips
-            allowedIps.add(new IPEntry(shouldMonitor, entry.key(), entry.source(), entry.description(), ipList));
+            allowedIps.add(new IPEntry(entry.key(), entry.source(), entry.description(), ipList));
         }
     }
 
@@ -124,13 +134,13 @@ public class ParsedFirewallLists {
     }
 
 
-    public record Match(String key, boolean block, String description) {
+    public record Match(String key, String description) {
     }
 
     public record UABlockedResult(boolean block, List<String> matchedKeys) {
     }
 
-    private record IPEntry(boolean monitor, String key, String source, String description, IPList ips) {
+    private record IPEntry(String key, String source, String description, IPList ips) {
     }
 
     private record UADetailsEntry(String key, Pattern pattern) {
