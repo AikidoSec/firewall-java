@@ -91,15 +91,20 @@ public class ServiceConfiguration {
             return new BlockedResult(true, "not in allowlist");
         }
 
-        // Check for blocked ip addresses
-        List<ParsedFirewallLists.Match> blockedIpMatches = firewallLists.matchBlockedIps(ip);
-        for (ParsedFirewallLists.Match match : blockedIpMatches) {
-            StatisticsStore.incrementIpHits(match.key());
+        // Check for monitored IP addresses
+        List<ParsedFirewallLists.Match> monitoredIpMatches = firewallLists.matchMonitoredIps(ip);
+        for (ParsedFirewallLists.Match monitoredMatch: monitoredIpMatches) {
+            StatisticsStore.incrementIpHits(monitoredMatch.key());
         }
-        for (ParsedFirewallLists.Match match : firewallLists.matchBlockedIps(ip)) {
-            if (match.block()) {
-                return new BlockedResult(true, match.description());
-            }
+
+        // Check for blocked IP addresses
+        List<ParsedFirewallLists.Match> blockedIpMatches = firewallLists.matchBlockedIps(ip);
+        for (ParsedFirewallLists.Match blockedMatch : blockedIpMatches) {
+            StatisticsStore.incrementIpHits(blockedMatch.key());
+        }
+        if (!blockedIpMatches.isEmpty()) {
+            String description = blockedIpMatches.get(0).description();
+            return new BlockedResult(true, description);
         }
 
         return new BlockedResult(false, null);

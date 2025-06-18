@@ -5,7 +5,6 @@ import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
-import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public final class ServiceConfigStore {
@@ -19,6 +18,24 @@ public final class ServiceConfigStore {
         mutex.readLock().lock();
         try {
             return config;
+        } finally {
+            mutex.readLock().unlock();
+        }
+    }
+
+    public static ServiceConfiguration.BlockedResult isIpBlocked(String ip) {
+        mutex.readLock().lock();
+        try {
+            return config.isIpBlocked(ip);
+        } finally {
+            mutex.readLock().unlock();
+        }
+    }
+
+    public static boolean isBlockedUserAgent(String userAgent) {
+        mutex.readLock().lock();
+        try {
+            return config.isBlockedUserAgent(userAgent);
         } finally {
             mutex.readLock().unlock();
         }
