@@ -4,6 +4,7 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
@@ -43,11 +44,11 @@ public final class WebRequestCollector {
         if (endpointAllowlistRes != null)
             return endpointAllowlistRes;
 
-        Res blockedIpsRes = checkBlockedIps(newContext.getRemoteAddress(), config);
+        Res blockedIpsRes = checkBlockedIps(newContext.getRemoteAddress());
         if (blockedIpsRes != null)
             return blockedIpsRes;
 
-        return checkBlockedUserAgents(newContext.getHeader("user-agent"), config);
+        return checkBlockedUserAgents(newContext.getHeader("user-agent"));
     }
 
     private static Res checkEndpointAllowlist(RouteMetadata routeMetadata, String remoteAddress, ServiceConfiguration config) {
@@ -60,8 +61,8 @@ public final class WebRequestCollector {
         return null; // not blocked
     }
 
-    private static Res checkBlockedIps(String remoteAddress, ServiceConfiguration config) {
-        ServiceConfiguration.BlockedResult ipBlocked = config.isIpBlocked(remoteAddress);
+    private static Res checkBlockedIps(String remoteAddress) {
+        ServiceConfiguration.BlockedResult ipBlocked = ServiceConfigStore.isIpBlocked(remoteAddress);
         if (ipBlocked.blocked()) {
             String msg = "Your IP address is blocked. Reason: " + ipBlocked.description();
             msg += " (Your IP: " + remoteAddress + ")";
@@ -70,11 +71,11 @@ public final class WebRequestCollector {
         return null; // not blocked
     }
 
-    private static Res checkBlockedUserAgents(String userAgent, ServiceConfiguration config) {
+    private static Res checkBlockedUserAgents(String userAgent) {
         if (userAgent == null || userAgent.isEmpty()) {
             return null; // not blocked
         }
-        if (config.isBlockedUserAgent(userAgent)) {
+        if (ServiceConfigStore.isBlockedUserAgent(userAgent)) {
             String msg = "You are not allowed to access this resource because you have been identified as a bot.";
             return new Res(msg, 403);
         }
