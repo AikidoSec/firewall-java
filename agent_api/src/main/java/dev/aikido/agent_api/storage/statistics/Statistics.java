@@ -10,19 +10,19 @@ public class Statistics {
     private final Map<String, Integer> ipAddressMatches = new HashMap<>();
     private final Map<String, Integer> userAgentMatches = new HashMap<>();
     private int totalHits;
+    private final int aborted; // We don't use the "aborted" field right now
+    private int rateLimited;
     private int attacksDetected;
     private int attacksBlocked;
     private long startedAt;
 
-    public Statistics(int totalHits, int attacksDetected, int attacksBlocked) {
-        this.totalHits = totalHits;
-        this.attacksDetected = attacksDetected;
-        this.attacksBlocked = attacksBlocked;
-        this.startedAt = UnixTimeMS.getUnixTimeMS();
-    }
-
     public Statistics() {
-        this(0, 0, 0);
+        this.totalHits = 0;
+        this.rateLimited = 0;
+        this.aborted = 0;
+        this.attacksDetected = 0;
+        this.attacksBlocked = 0;
+        this.startedAt = UnixTimeMS.getUnixTimeMS();
     }
 
 
@@ -33,6 +33,14 @@ public class Statistics {
 
     public int getTotalHits() {
         return totalHits;
+    }
+
+    public void incrementRateLimited() {
+        rateLimited += 1;
+    }
+
+    public int getRateLimited() {
+        return rateLimited;
     }
 
 
@@ -104,8 +112,7 @@ public class Statistics {
     public StatsRecord getRecord() {
         long endedAt = UnixTimeMS.getUnixTimeMS();
         return new StatsRecord(this.startedAt, endedAt, new StatsRequestsRecord(
-            /* total */ totalHits,
-            /* aborted */ 0, // Unknown statistic, default to 0,
+            totalHits, aborted, rateLimited,
             /* attacksDetected */ Map.of(
             "total", attacksDetected,
             "blocked", attacksBlocked
@@ -118,6 +125,7 @@ public class Statistics {
 
     public void clear() {
         this.totalHits = 0;
+        this.rateLimited = 0;
         this.attacksBlocked = 0;
         this.attacksDetected = 0;
         this.startedAt = UnixTimeMS.getUnixTimeMS();
@@ -127,7 +135,8 @@ public class Statistics {
     }
 
     // Stats records for sending out the heartbeat :
-    public record StatsRequestsRecord(long total, long aborted, Map<String, Integer> attacksDetected) {
+    public record StatsRequestsRecord(long total, long aborted, long rateLimited,
+                                      Map<String, Integer> attacksDetected) {
     }
 
     public record StatsRecord(long startedAt, long endedAt, StatsRequestsRecord requests,
