@@ -37,4 +37,17 @@ public class RouteEntryTest {
         );
     }
 
+    @Test
+    public void testIncrementRateLimitedCount() {
+        // Initial count should be 0
+        assertEquals(0, route1.getRateLimitCount());
+
+        // Increment the rate limited count
+        route1.incrementRateLimitCount();
+        assertEquals(1, route1.getRateLimitCount());
+
+        // Increment again
+        route1.incrementRateLimitCount();
+        assertEquals(2, route1.getRateLimitCount());
+    }
 }
