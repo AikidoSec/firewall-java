@@ -7,7 +7,8 @@ dependencies {
     implementation project(':agent_api')
     implementation 'net.bytebuddy:byte-buddy:1.15.11'
     // Compile only for interface types :
-    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0' // For Context object (Spring Boot)
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0' // spring 3 -> jakarta
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1' // spring 2 -> javax
     compileOnly 'io.projectreactor.netty:reactor-netty-http:1.2.1' // For Spring Webflux
     compileOnly 'io.javalin:javalin:6.4.0'
     compileOnly 'org.springframework:spring-web:5.3.20'
