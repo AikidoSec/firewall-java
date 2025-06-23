@@ -45,6 +45,7 @@ jobs:
           - { name: JavalinPostgres, test_file: end2end/javalin_postgres.py }
           - { name: JavalinMySQLKotlin, test_file: end2end/javalin_mysql_kotlin.py }
         java-version: [17, 18, 19, 20, 21]
+        distribution: ['adopt', 'corretto', 'graalvm', 'oracle']
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -52,10 +53,10 @@ jobs:
           name: pkg-build
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: 'adopt'
+          distribution: ${{ matrix.distribution }}
 
       - name: Start mock server
         working-directory: ./end2end/server
