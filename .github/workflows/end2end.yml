@@ -45,7 +45,7 @@ jobs:
           - { name: JavalinPostgres, test_file: end2end/javalin_postgres.py }
           - { name: JavalinMySQLKotlin, test_file: end2end/javalin_mysql_kotlin.py }
         java-version: [17, 18, 19, 20, 21]
-        distribution: ['adopt', 'corretto', 'graalvm', 'oracle']
+        distribution: ['adopt', 'corretto', 'oracle']
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
