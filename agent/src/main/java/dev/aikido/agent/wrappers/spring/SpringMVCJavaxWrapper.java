@@ -27,7 +27,7 @@ import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAM
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 
 public class SpringMVCJavaxWrapper implements Wrapper {
-    public static final Logger logger = LogManager.getLogger(SpringMVCJakartaWrapper.class);
+    public static final Logger logger = LogManager.getLogger(SpringMVCJavaxWrapper.class);
 
     @Override
     public String getName() {
@@ -35,7 +35,7 @@ public class SpringMVCJavaxWrapper implements Wrapper {
         // HttpServletRequest request, HttpServletResponse response
         // And is part of org.springframework.web.filter.RequestContextFilter
         // See: https://github.com/spring-projects/spring-framework/blob/4749d810db0261ce16ae5f32da6d375bb8087430/spring-web/src/main/java/org/springframework/web/filter/RequestContextFilter.java#L92
-        return SpringMVCJakartaWrapper.SpringMVCAdvice.class.getName();
+        return SpringMVCAdvice.class.getName();
     }
     @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
