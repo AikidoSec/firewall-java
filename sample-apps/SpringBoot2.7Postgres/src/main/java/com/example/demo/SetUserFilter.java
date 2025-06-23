@@ -1,16 +1,11 @@
 package com.example.demo;
 
-import dev.aikido.agent_api.SetUser;
-import dev.aikido.agent_api.ShouldBlockRequest;
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.*;
 import java.io.IOException;
-import java.io.PrintWriter;
 
-import static dev.aikido.agent_api.SetUser.setUser;
 
 @Component
 @Order(0)
