@@ -36,8 +36,7 @@ public final class SpringAnnotationCollector {
         if (context == null) {
             logger.error(
                 "Received Spring Annotations, but no context set." +
-                "This is likely because of incompatibility with your current Spring version or " +
-                "because of a bug in the Spring wrapper.");
+                "This is likely because of an incompatibility with your current Spring setup.");
             return;
         }
 
