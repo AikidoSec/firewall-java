@@ -106,4 +106,7 @@ public class Logger {
     public void fatal(Object message, Object... args) {
         log(LogLevel.FATAL, message, args);
     }
+    public boolean logsTraceLogs() {
+        return LogLevel.TRACE.getLevel() >= logLevel.getLevel();
+    }
 }

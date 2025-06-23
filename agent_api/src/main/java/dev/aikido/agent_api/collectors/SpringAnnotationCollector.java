@@ -2,6 +2,8 @@ package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.SpringContextObject;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
@@ -10,6 +12,7 @@ import java.util.Optional;
 
 public final class SpringAnnotationCollector {
     private SpringAnnotationCollector() {}
+    public static final Logger logger = LogManager.getLogger(SpringAnnotationCollector.class);
     private static String REQUEST_BODY = "org.springframework.web.bind.annotation.RequestBody";
     private static String REQUEST_PARAM = "org.springframework.web.bind.annotation.RequestParam";
     private static String REQUEST_PART = "org.springframework.web.bind.annotation.RequestPart";
@@ -31,6 +34,9 @@ public final class SpringAnnotationCollector {
     public static void report(Parameter parameter, Object value) {
         SpringContextObject context = (SpringContextObject) Context.get();
         if (context == null) {
+            logger.error(
+                "Received Spring Annotations, but no context set." +
+                "This is likely because of an incompatibility with your current Spring setup.");
             return;
         }
 
