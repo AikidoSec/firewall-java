@@ -105,6 +105,29 @@ public class LoggingTest {
         assertFalse(out.capturedString().contains("TEST2"));
         assertFalse(out.capturedString().contains("TEST3"));
     }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "ekjflos")
+    @StdIo
+    public void testLoggerUsesProvidedLevel1GivenInvalidEnv(StdOut out) {
+        // Check it reads environment variable
+        Logger logger = new Logger(FileCollector.class);
+        logger.info("TEST1");
+        logger.trace("TEST2");
+        logger.debug("TEST3");
+        logger.error("TEST4");
+        logger.fatal("TEST5");
+        logger.warn("TEST6");
+
+        assertTrue(out.capturedString().contains("INFO dev.aikido.agent_api.collectors.FileCollector: TEST1"));
+        assertTrue(out.capturedString().contains("ERROR dev.aikido.agent_api.collectors.FileCollector: TEST4"));
+        assertTrue(out.capturedString().contains("FATAL dev.aikido.agent_api.collectors.FileCollector: TEST5"));
+        assertTrue(out.capturedString().contains("WARN dev.aikido.agent_api.collectors.FileCollector: TEST6"));
+        assertFalse(out.capturedString().contains("TEST2"));
+        assertFalse(out.capturedString().contains("TEST3"));
+        assertTrue(out.capturedString().contains("Unknown log level `ekjflos`"));
+    }
+
     @Test
     @StdIo
     public void testLoggerUsesProvidedLevel2(StdOut out) {
