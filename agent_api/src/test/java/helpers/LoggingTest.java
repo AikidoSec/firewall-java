@@ -6,6 +6,7 @@ import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.junitpioneer.jupiter.StdIo;
 import org.junitpioneer.jupiter.StdOut;
@@ -89,6 +90,7 @@ public class LoggingTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_DEBUG", value = "true")
+    @ClearEnvironmentVariable(key = "AIKIDO_LOG_LEVEL")
     @StdIo
     public void testLoggerIsAikidoDebug(StdOut out) {
         // Check it reads environment variable
@@ -132,6 +134,7 @@ public class LoggingTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "fatal")
+    @ClearEnvironmentVariable(key = "AIKIDO_DEBUG")
     @StdIo
     public void testLoggerReadsEnv2(StdOut out) {
         // Check it reads environment variable
