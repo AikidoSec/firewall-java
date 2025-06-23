@@ -1,5 +1,7 @@
 package dev.aikido.agent_api.helpers.logging;
 
+import dev.aikido.agent_api.helpers.env.BooleanEnv;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -17,6 +19,12 @@ public class Logger {
         this.logLevel = DEFAULT_LOG_LEVEL;
         this.logClass = logClass;
 
+        // We first check "AIKIDO_DEBUG", because "AIKIDO_LOG_LEVEL" takes precedent.
+        BooleanEnv aikidoDebug = new BooleanEnv("AIKIDO_DEBUG", false);
+        if (aikidoDebug.getValue()) {
+            this.logLevel = LogLevel.DEBUG;
+        }
+        // "AIKIDO_LOG_LEVEL"
         String logLevelString = System.getenv("AIKIDO_LOG_LEVEL");
         if (logLevelString != null) {
             try {
