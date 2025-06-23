@@ -8,18 +8,23 @@ import java.util.Collection;
 import java.util.List;
 
 public class Logger {
-    private final LogLevel logLevel;
+    private LogLevel logLevel;
     private final Class<?> logClass;
     private static final int MAX_ARGUMENT_LENGTH = 300;
+    private static final LogLevel DEFAULT_LOG_LEVEL = LogLevel.INFO;
 
     public Logger(Class<?> logClass) {
+        this.logLevel = DEFAULT_LOG_LEVEL;
+        this.logClass = logClass;
+
         String logLevelString = System.getenv("AIKIDO_LOG_LEVEL");
         if (logLevelString != null) {
-            this.logLevel = LogLevel.valueOf(logLevelString.toUpperCase());
-        } else {
-            this.logLevel = LogLevel.INFO; // Default loglevel
+            try {
+                this.logLevel = LogLevel.valueOf(logLevelString.toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                this.error("Unknown log level `%s`", logLevelString);
+            }
         }
-        this.logClass = logClass;
     }
     public Logger(Class<?> logClass, LogLevel logLevel) {
         this.logLevel = logLevel;
