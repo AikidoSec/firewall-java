@@ -104,7 +104,7 @@ public class LoggingTest {
         assertTrue(out.capturedString().contains("ERROR dev.aikido.agent_api.collectors.FileCollector: TEST4"));
         assertTrue(out.capturedString().contains("FATAL dev.aikido.agent_api.collectors.FileCollector: TEST5"));
         assertTrue(out.capturedString().contains("WARN dev.aikido.agent_api.collectors.FileCollector: TEST6"));
-        assertFalse(out.capturedString().contains("TEST2"));
+        assertTrue(out.capturedString().contains("TEST2"));
         assertTrue(out.capturedString().contains("TEST3"));
     }
 
