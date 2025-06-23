@@ -39,6 +39,7 @@ jobs:
     strategy:
       matrix:
         java-version: [17, 18, 19, 20, 21]
+        distribution: ['adopt', 'corretto', 'graalvm', 'oracle']
 
     steps:
       - name: Download build artifacts
@@ -50,7 +51,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: 'adopt'
+          distribution: ${{ matrix.distribution }}
 
       - name: Add local.aikido.io to /etc/hosts
         run: |
