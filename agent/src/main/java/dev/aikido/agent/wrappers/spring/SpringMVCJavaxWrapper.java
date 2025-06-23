@@ -25,6 +25,7 @@ import java.util.List;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
+import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 
 public class SpringMVCJavaxWrapper implements Wrapper {
     public static final Logger logger = LogManager.getLogger(SpringMVCJavaxWrapper.class);
@@ -39,7 +40,9 @@ public class SpringMVCJavaxWrapper implements Wrapper {
     }
     @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.nameContainsIgnoreCase("doFilterInternal");
+        return ElementMatchers.nameContainsIgnoreCase("doFilterInternal")
+            .and(takesArgument(0, nameContains("javax")))
+            .and(takesArgument(1, nameContains("javax")));
     }
 
     @Override
