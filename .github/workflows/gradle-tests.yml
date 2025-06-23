@@ -39,7 +39,7 @@ jobs:
     strategy:
       matrix:
         java-version: [17, 18, 19, 20, 21]
-        distribution: ['adopt', 'corretto', 'oracle']
+        distribution: ['adopt', 'corretto', 'oracle', 'zulu']
 
     steps:
       - name: Download build artifacts
