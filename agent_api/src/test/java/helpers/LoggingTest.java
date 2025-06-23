@@ -109,10 +109,10 @@ public class LoggingTest {
     }
 
     @Test
-    @SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "trace")
+    @SetEnvironmentVariable(key = "AIKIDO_LOG_LEVEL", value = "error")
     @SetEnvironmentVariable(key = "AIKIDO_DEBUG", value = "true")
     @StdIo
-    public void testLogLevelTakesPrecedentOverAikidoDebug(StdOut out) {
+    public void testDebugEnvTakesPrecedent(StdOut out) {
         // Check it reads environment variable
         Logger logger = new Logger(FileCollector.class);
         logger.info("TEST1");

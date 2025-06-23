@@ -19,12 +19,7 @@ public class Logger {
         this.logLevel = DEFAULT_LOG_LEVEL;
         this.logClass = logClass;
 
-        // We first check "AIKIDO_DEBUG", because "AIKIDO_LOG_LEVEL" takes precedent.
-        BooleanEnv aikidoDebug = new BooleanEnv("AIKIDO_DEBUG", false);
-        if (aikidoDebug.getValue()) {
-            this.logLevel = LogLevel.DEBUG;
-        }
-        // "AIKIDO_LOG_LEVEL"
+        // We first check "AIKIDO_LOG_LEVEL", because "AIKIDO_DEBUG" takes precedent.
         String logLevelString = System.getenv("AIKIDO_LOG_LEVEL");
         if (logLevelString != null) {
             try {
@@ -32,6 +27,11 @@ public class Logger {
             } catch (IllegalArgumentException ignored) {
                 this.error("Unknown log level `%s`", logLevelString);
             }
+        }
+        // "AIKIDO_DEBUG"
+        BooleanEnv aikidoDebug = new BooleanEnv("AIKIDO_DEBUG", false);
+        if (aikidoDebug.getValue()) {
+            this.logLevel = LogLevel.TRACE;
         }
     }
     public Logger(Class<?> logClass, LogLevel logLevel) {
