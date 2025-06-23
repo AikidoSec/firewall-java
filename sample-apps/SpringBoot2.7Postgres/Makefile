@@ -39,7 +39,7 @@ runWithDdTrace: build
 # Run the application without Zen
 .PHONY: runWithoutZen
 runWithoutZen: build
-	@echo "Running SpringBootPostgres without Zen & ENV (http://localhost:8105)"
+	@echo "Running SpringBoot2.7Postgres without Zen & ENV (http://localhost:8105)"
 	AIKIDO_TOKEN="random-invalid-token" \
 	nohup java -jar $(JAR_FILE) --server.port=8105 > output2.log &
 
