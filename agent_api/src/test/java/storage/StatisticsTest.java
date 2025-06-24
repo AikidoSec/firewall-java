@@ -34,9 +34,11 @@ public class StatisticsTest {
         stats.incrementAttacksDetected("test2");
         stats.incrementAttacksDetected("test1");
         stats.incrementAttacksDetected("test1");
+        stats.incrementRateLimited();
         assertEquals(3, stats.getAttacksDetected());
         assertEquals(2, stats.getAttacksBlocked());
         assertEquals(20, stats.getTotalHits());
+        assertEquals(1, stats.getRateLimited());
         assertEquals(2, stats.getOperations().get("test1").getAttacksDetected().get("total"));
         assertEquals(1, stats.getOperations().get("test1").getAttacksDetected().get("blocked"));
 
@@ -47,7 +49,7 @@ public class StatisticsTest {
         assertEquals(0, stats.getAttacksBlocked());
         assertEquals(0, stats.getAttacksDetected());
         assertEquals(0, stats.getTotalHits());
-
+        assertEquals(0, stats.getRateLimited());
     }
 
     @Test
