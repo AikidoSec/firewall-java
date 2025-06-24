@@ -32,7 +32,7 @@ public class RouteEntryTest {
         Gson gson = new Gson();
         String json = gson.toJson(route1);
         assertEquals(
-                "{\"method\":\"GET\",\"path\":\"/api/1\",\"hits\":0,\"apispec\":{\"body\":{\"schema\":{\"type\":\"object\",\"properties\":{\"oldProp\":{\"type\":\"string\",\"optional\":false}},\"optional\":false},\"type\":\"oldType\"},\"auth\":[{\"type\":\"apiKey\"}]}}",
+                "{\"method\":\"GET\",\"path\":\"/api/1\",\"hits\":0,\"rateLimitedCount\":0,\"apispec\":{\"body\":{\"schema\":{\"type\":\"object\",\"properties\":{\"oldProp\":{\"type\":\"string\",\"optional\":false}},\"optional\":false},\"type\":\"oldType\"},\"auth\":[{\"type\":\"apiKey\"}]}}",
                 json
         );
     }
