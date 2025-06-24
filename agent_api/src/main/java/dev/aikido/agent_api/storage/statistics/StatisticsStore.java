@@ -35,6 +35,15 @@ public final class StatisticsStore {
         }
     }
 
+    public static void incrementRateLimited() {
+        mutex.lock();
+        try {
+            stats.incrementRateLimited();
+        } finally {
+            mutex.unlock();
+        }
+    }
+
     public static void incrementAttacksDetected(String operation) {
         mutex.lock();
         try {
