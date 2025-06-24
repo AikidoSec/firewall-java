@@ -52,6 +52,20 @@ class RoutesTest {
     }
 
     @Test
+    void testIncrementRouteRateLimitCount() {
+        routes.incrementRateLimitCount(routeMetadata1);
+        RouteEntry entry = routes.get(routeMetadata1);
+        assertNotNull(entry);
+        assertEquals(1, entry.getRateLimitCount());
+    }
+
+    @Test
+    void testIncrementNonExistentRouteRateLimit() {
+        routes.incrementRateLimitCount(routeMetadata1);
+        assertEquals(1, routes.size());
+    }
+
+    @Test
     void testManageRoutesSize() {
         routes.incrementRoute(routeMetadata1);
         routes.incrementRoute(routeMetadata2);

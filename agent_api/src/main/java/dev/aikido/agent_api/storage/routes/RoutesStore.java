@@ -59,6 +59,17 @@ public final class RoutesStore {
         }
     }
 
+    public static void addRouteRateLimitedCount(RouteMetadata routeMetadata) {
+        mutex.lock();
+        try {
+            routes.incrementRateLimitCount(routeMetadata);
+        } catch (Throwable e) {
+            logger.debug("Error occurred incrementing route rate limit count: %s", e.getMessage());
+        } finally {
+            mutex.unlock();
+        }
+    }
+
     public static void clear() {
         mutex.lock();
         try {
