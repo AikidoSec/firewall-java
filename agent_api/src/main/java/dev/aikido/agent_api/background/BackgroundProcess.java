@@ -7,6 +7,8 @@ import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.helpers.env.BlockingEnv;
 import dev.aikido.agent_api.helpers.env.Token;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 
 import java.util.Optional;
@@ -22,6 +24,7 @@ public class BackgroundProcess extends Thread {
     private final static int API_TIMEOUT = 10; // 10 seconds
     private final Token token;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
+    private static final Logger logger = LogManager.getLogger(BackgroundProcess.class);
 
     public BackgroundProcess(String name, Token token) {
         super(name);
@@ -33,6 +36,8 @@ public class BackgroundProcess extends Thread {
         if (!Thread.currentThread().isDaemon() && token == null) {
             return; // Can only run if thread is daemon and token needs to be defined.
         }
+        logger.trace("Starting agent thread: %s", Thread.currentThread());
+
         ServiceConfigStore.updateBlocking(new BlockingEnv().getValue());
         ReportingApiHTTP api = new ReportingApiHTTP(getAikidoAPIEndpoint(), API_TIMEOUT, token);
         RealtimeAPI realtimeApi = new RealtimeAPI(token);
