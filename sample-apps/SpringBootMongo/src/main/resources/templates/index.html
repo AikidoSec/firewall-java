@@ -63,29 +63,8 @@
 </head>
 <body>
 <div class="container">
-    <h1>Pets Overview</h1>
-    <a href="/create">Add a New Dog</a> <!-- Link to create page -->
-    <ul id="petsList"></ul>
+    <h1>Homepage</h1>
+    <a href="/create">Register</a>
 </div>
-
-<script>
-    fetch('/api/pets/')
-        .then(response => response.json())
-        .then(pets => {
-            const petsList = document.getElementById('petsList');
-            pets.forEach(pet => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <a href="/pet_page/${pet.pet_id}">
-                    <span class="pet-id">${pet.pet_id}</span>
-                    <span class="pet-info">${pet.name}</span>
-                    <span class="pet-owner">Owned by: ${pet.owner}</span>
-                    </a>
-                `;
-                petsList.appendChild(li);
-            });
-        })
-        .catch(error => console.error('Error fetching pets:', error));
-</script>
 </body>
 </html>

@@ -40,8 +40,20 @@ services:
       - "1433:1433"
     volumes:
       - mssql_db_data:/var/opt/mssql
-
+  mongo_database:
+      image: mongo:latest
+      container_name: sample_mongo_db_java
+      restart: always
+      environment:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: example
+          MONGO_INITDB_DATABASE: my_database
+      ports:
+          - "27017:27017"
+      volumes:
+          - mongo_db_data:/data/db
 volumes:
   postgres_db_data:
   mysql_db_data:
   mssql_db_data:
+  mongo_db_data:

@@ -12,11 +12,6 @@ public class HtmlController {
         return "index"; // This will resolve to src/main/resources/templates/index.html
     }
 
-    @GetMapping("/create")
-    public String create(Model model) {
-        return "create"; // This will resolve to src/main/resources/templates/create.html
-    }
-
     @GetMapping("/test_ratelimiting_1")
     public String test_ratelimiting_1() {
         // This route is used in end2end tests
