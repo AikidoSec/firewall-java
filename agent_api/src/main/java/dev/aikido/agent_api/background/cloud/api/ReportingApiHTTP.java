@@ -128,6 +128,7 @@ public class ReportingApiHTTP extends ReportingApi {
         if (event.isPresent()) {
             Gson gson = new Gson();
             String requestPayload = gson.toJson(event.get());
+            logger.trace("New request payload: %s", requestPayload);
             return requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
                 .build();
         }
