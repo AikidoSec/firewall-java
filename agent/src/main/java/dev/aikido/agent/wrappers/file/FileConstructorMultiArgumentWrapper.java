@@ -84,6 +84,7 @@ public class FileConstructorMultiArgumentWrapper implements Wrapper {
                 }
                 // Ignore non-aikido throwables.
             } catch (Throwable e) {
+                System.out.println("AIKIDO: " + e.getMessage());
             }
         }
     }
