@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sample Mongo App</title>
+    <title>User Overview</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,7 +16,7 @@
             height: 100vh;
         }
 
-        .container {
+        .overview-container {
             text-align: center;
             background-color: white;
             padding: 40px;
@@ -31,11 +31,17 @@
             margin-bottom: 30px;
         }
 
-        a {
+        .user-info {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .logout-button {
             display: inline-block;
-            margin: 10px;
+            margin-top: 20px;
             padding: 10px 20px;
-            background-color: #007bff;
+            background-color: #dc3545;
             color: white;
             text-decoration: none;
             border-radius: 5px;
@@ -43,16 +49,18 @@
             transition: background-color 0.3s;
         }
 
-        a:hover {
-            background-color: #0056b3;
+        .logout-button:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Homepage</h1>
-    <a href="/create">Register</a>
-    <a href="/vulnerableLogin">Login</a>
+<div class="overview-container">
+    <h1>User Overview</h1>
+    <div class="user-info">
+        <p>Name: <span th:text="${userDetails.name}"></span></p>
+        <p>Email: <span th:text="${userDetails.email}"></span></p>
+    </div>
 </div>
 </body>
 </html>

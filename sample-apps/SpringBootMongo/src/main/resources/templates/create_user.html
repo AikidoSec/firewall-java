@@ -41,7 +41,8 @@
         }
 
         input[type="text"],
-        input[type="email"] {
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -85,6 +86,10 @@
         <div class="form-group">
             <label for="email">Email:</label>
             <input type="email" id="email" th:field="*{email}" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" th:field="*{password}" required>
         </div>
         <button type="submit">Create User</button>
     </form>

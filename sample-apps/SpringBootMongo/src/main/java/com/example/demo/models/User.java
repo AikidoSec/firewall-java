@@ -2,6 +2,7 @@ package com.example.demo.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Document(collection = "users")
 public class User {
@@ -9,13 +10,15 @@ public class User {
     private String id;
     private String name;
     private String email;
+    private String password;
 
     // Constructors
     public User() {}
 
-    public User(String name, String email) {
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
+        this.setPassword(password); // Use setter to hash the password
     }
 
     // Getters and Setters
@@ -42,4 +45,13 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
+
