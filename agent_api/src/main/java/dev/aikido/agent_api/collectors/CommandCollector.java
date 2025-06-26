@@ -6,11 +6,8 @@ import dev.aikido.agent_api.storage.statistics.OperationKind;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.Scanner;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
-import org.slf4j.LoggerFactory;
 
 public final class CommandCollector {
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(CommandCollector.class);
-
     private CommandCollector() {}
     private static final Logger logger = LogManager.getLogger(CommandCollector.class);
     public static void report(Object command) {
