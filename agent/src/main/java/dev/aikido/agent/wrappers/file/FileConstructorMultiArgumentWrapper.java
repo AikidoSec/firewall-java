@@ -83,6 +83,7 @@ public class FileConstructorMultiArgumentWrapper implements Wrapper {
                     throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
+                System.out.println("AIKIDO: " + invocationTargetException.getTargetException().getMessage());
             } catch (Throwable e) {
                 System.out.println("AIKIDO: " + e.getMessage());
             }
