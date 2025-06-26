@@ -1,4 +1,5 @@
 package dev.aikido.agent.wrappers;
+import dev.aikido.agent_bootstrap.AikidoBootstrapClass;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -6,15 +7,8 @@ import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.reflect.Executable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Path;
 
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
-import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.of;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
@@ -40,42 +34,13 @@ public class PathWrapper implements Wrapper {
     }
 
     public static class PathAdvice {
-        // Since we have to wrap a native Java Class stuff gets more complicated
-        // The classpath is not the same anymore, and we can't import our modules directly.
-        // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodEnter
         public static void before(
                 @Advice.Origin Executable method,
                 @Advice.Argument(value = 0, optional = true) Object argument
         ) throws Throwable {
-            String jarFilePath = System.getProperty("AIK_agent_api_jar");
-            URLClassLoader classLoader = null;
-            try {
-                URL[] urls = { new URL(jarFilePath) };
-                classLoader = new URLClassLoader(urls);
-            } catch (MalformedURLException ignored) {}
-            if (classLoader == null) {
-                return;
-            }
-
-            try {
-                // Load the class from the JAR
-                Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.FileCollector");
-
-                // Run report with "argument"
-                Method reportMethod = clazz.getMethod("report", Object.class, String.class);
-                String op = "java.nio.file.Path." + method.getName();
-                reportMethod.invoke(null, argument, op);
-            } catch (InvocationTargetException invocationTargetException) {
-                if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
-                    throw invocationTargetException.getCause();
-                }
-                // Ignore non-aikido throwables.
-                System.out.println("AIKIDO: " + invocationTargetException.getTargetException().getMessage());
-            } catch(Throwable e) {
-                System.out.println("AIKIDO: " + e.getMessage());
-            }
-            classLoader.close(); // Close the class loader
+            String op = "java.nio.file.Path." + method.getName();
+            AikidoBootstrapClass.invoke(AikidoBootstrapClass.FILE_COLLECTOR_REPORT, argument, op);
         }
     }
 }

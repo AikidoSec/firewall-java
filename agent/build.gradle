@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     implementation project(':agent_api')
+    compileOnly project(':agent_bootstrap')
     implementation 'net.bytebuddy:byte-buddy:1.15.11'
     // Compile only for interface types :
     compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0' // spring 3 -> jakarta
