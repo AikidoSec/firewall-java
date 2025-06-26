@@ -41,6 +41,7 @@ public class ReportingApiHTTP extends ReportingApi {
 
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            logger.trace("Got response for %s: %s", uri.toString(), httpResponse.body());
             return Optional.of(toApiResponse(httpResponse));
         } catch (Exception e) {
             logger.debug("Error while fetching new config from cloud: %s", e.getMessage());
@@ -60,6 +61,7 @@ public class ReportingApiHTTP extends ReportingApi {
 
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            logger.trace("Got response for %s: %s", uri.toString(), httpResponse.body());
             return Optional.of(toApiResponse(httpResponse));
         } catch (Exception e) {
             logger.debug("Error while communicating with cloud: %s", e.getMessage());
@@ -126,6 +128,7 @@ public class ReportingApiHTTP extends ReportingApi {
         if (event.isPresent()) {
             Gson gson = new Gson();
             String requestPayload = gson.toJson(event.get());
+            logger.trace("New request payload: %s", requestPayload);
             return requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
                 .build();
         }
