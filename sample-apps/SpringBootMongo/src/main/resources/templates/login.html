@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Vulnerable Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+        }
+
+        .success {
+            color: green;
+            text-align: center;
+        }
+
+
+        .attack-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .attack-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+    <script>
+        function triggerInjection() {
+            document.getElementById('password').value = '{ "$ne": "" }';
+        }
+    </script>
+</head>
+<body>
+<div class="form-container">
+    <h1>Vulnerable Login</h1>
+    <form id="loginForm" onsubmit="submitForm(event)">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+        <button type="button" class="attack-button" onclick="triggerInjection()">Trigger NoSQL Injection</button>
+    </form>
+    <p id="error" class="error"></p>
+    <p id="success" class="success"></p>
+</div>
+
+<script>
+    function submitForm(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = {
+            email: form.email.value,
+            password: form.password.value
+        };
+
+        fetch('/vulnerableLogin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('error').textContent = data.error;
+            } else {
+                document.getElementById('success').textContent = `${data["userDetails"]["name"]} authenticated.`;
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    function triggerInjection() {
+        event.preventDefault();
+        const formData = {
+            email: document.getElementById("email").value,
+            password:  {"$ne": "" }
+        };
+
+        fetch('/vulnerableLogin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('error').textContent = data.error;
+            } else {
+                document.getElementById('success').textContent = `${data["userDetails"]["name"]} authenticated.`;
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+</body>
+</html>
