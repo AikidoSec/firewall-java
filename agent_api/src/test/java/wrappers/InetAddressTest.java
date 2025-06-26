@@ -77,6 +77,13 @@ public class InetAddressTest {
     }
 
     @Test
+    public void testCanHandleNullInput() {
+        assertDoesNotThrow(() -> {
+            InetAddress.getAllByName(null);
+        });
+    }
+
+    @Test
     public void testSSRFWithoutPortAndWithoutContext() {
         setContextAndLifecycle("http://localhost:80");
         Context.set(null);

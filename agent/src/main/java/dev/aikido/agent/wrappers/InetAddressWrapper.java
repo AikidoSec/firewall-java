@@ -34,7 +34,7 @@ public class InetAddressWrapper implements Wrapper {
         // To bypass this issue we load collectors from a .jar file
         @Advice.OnMethodExit
         public static void after(
-                @Advice.Enter String hostname,
+                @Advice.Argument(0) String hostname,
                 @Advice.Return InetAddress[] inetAddresses
         ) throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
@@ -64,15 +64,9 @@ public class InetAddressWrapper implements Wrapper {
                     throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            } catch(Throwable e) {}
-        }
-        @Advice.OnMethodEnter
-        public static String before(
-                @Advice.This(typing = DYNAMIC, optional = true) Object target,
-                @Advice.Origin Executable method,
-                @Advice.Argument(0) Object argument
-        ) {
-            return argument.toString();
+            } catch(Throwable e) {
+                System.out.println("AIKIDO: " + e.getMessage());
+            }
         }
     }
 }
