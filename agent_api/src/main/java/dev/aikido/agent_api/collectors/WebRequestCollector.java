@@ -4,6 +4,8 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
@@ -17,6 +19,7 @@ import static dev.aikido.agent_api.storage.ServiceConfigStore.getConfig;
 public final class WebRequestCollector {
     private WebRequestCollector() {
     }
+    private static final Logger logger = LogManager.getLogger(WebRequestCollector.class);
 
     /**
      * This function gets called in the initial phases of a request.
@@ -36,6 +39,8 @@ public final class WebRequestCollector {
         }
 
         Context.set(newContext);
+
+        logger.debug("New context: %s", newContext);
 
         // Increment total hits :
         StatisticsStore.incrementHits();
