@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpRequest;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
@@ -73,7 +74,7 @@ public class ReportingApiHTTP extends ReportingApi {
             connection.setDoOutput(true);
 
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = gson.toJson(event).getBytes("utf-8");
+                byte[] input = gson.toJson(event).getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
 
