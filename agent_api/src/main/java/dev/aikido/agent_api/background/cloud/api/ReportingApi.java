@@ -16,10 +16,9 @@ public abstract class ReportingApi {
     /**
      * Converts results into an API response object.
      *
-     * @param res The response object containing status code and body.
      * @return A map representing the API response.
      */
-    public abstract APIResponse toApiResponse(HttpResponse<String> res);
+    public abstract APIResponse toApiResponse(int status, String responseBody);
 
     /**
      * Report event to the Aikido server.

@@ -6,14 +6,15 @@ import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
@@ -32,17 +33,26 @@ public class ReportingApiHTTP extends ReportingApi {
 
     public Optional<APIResponse> fetchNewConfig() {
         try {
-            HttpClient httpClient = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(timeoutInSec))
-                    .build();
-
             URI uri = URI.create(reportingUrl + "api/runtime/config");
-            HttpRequest request = createHttpRequest(Optional.empty(), uri);
+            URL url = uri.toURL();
 
-            // Send the request and get the response
-            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.trace("Got response for %s: %s", uri.toString(), httpResponse.body());
-            return Optional.of(toApiResponse(httpResponse));
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Authorization", token.get());
+            connection.setConnectTimeout((int) Duration.ofSeconds(timeoutInSec).toMillis());
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (InputStream inputStream = connection.getInputStream();
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                    String responseBody = reader.lines().collect(java.util.stream.Collectors.joining());
+                    logger.trace("Got response for %s: %s", uri.toString(), responseBody);
+                    return Optional.of(toApiResponse(responseCode, responseBody));
+                }
+            } else {
+                logger.debug("Error response code: %s", responseCode);
+            }
         } catch (Exception e) {
             logger.debug("Error while fetching new config from cloud: %s", e.getMessage());
         }
@@ -52,17 +62,32 @@ public class ReportingApiHTTP extends ReportingApi {
     @Override
     public Optional<APIResponse> report(APIEvent event) {
         try {
-            HttpClient httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(timeoutInSec))
-                .build();
-
             URI uri = URI.create(reportingUrl + "api/runtime/events");
-            HttpRequest request = createHttpRequest(Optional.of(event), uri);
+            URL url = uri.toURL();
 
-            // Send the request and get the response
-            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.trace("Got response for %s: %s", uri.toString(), httpResponse.body());
-            return Optional.of(toApiResponse(httpResponse));
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Authorization", token.get());
+            connection.setConnectTimeout((int) Duration.ofSeconds(timeoutInSec).toMillis());
+            connection.setDoOutput(true);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = gson.toJson(event).getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (InputStream inputStream = connection.getInputStream();
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                    String responseBody = reader.lines().collect(java.util.stream.Collectors.joining());
+                    logger.trace("Got response for %s: %s", uri.toString(), responseBody);
+                    return Optional.of(toApiResponse(responseCode, responseBody));
+                }
+            } else {
+                logger.debug("Error response code: %s", responseCode);
+            }
         } catch (Exception e) {
             logger.debug("Error while communicating with cloud: %s", e.getMessage());
         }
@@ -103,15 +128,14 @@ public class ReportingApiHTTP extends ReportingApi {
     }
 
     @Override
-    public APIResponse toApiResponse(HttpResponse<String> res) {
-        int status = res.statusCode();
+    public APIResponse toApiResponse(int status, String responseBody) {
         if (status == 429) {
             return getUnsuccessfulAPIResponse("rate_limited");
         } else if (status == 401) {
             return getUnsuccessfulAPIResponse("invalid_token");
         } else if (status == 200) {
             try {
-                return new Gson().fromJson(res.body(), APIResponse.class);
+                return new Gson().fromJson(responseBody, APIResponse.class);
             } catch (Throwable e) {
                 logger.debug("json error: %s", e);
                 return getUnsuccessfulAPIResponse("json_deserialize");
@@ -119,6 +143,7 @@ public class ReportingApiHTTP extends ReportingApi {
         }
         return getUnsuccessfulAPIResponse("unknown_error");
     }
+
     private HttpRequest createHttpRequest(Optional<APIEvent> event, URI uri) {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(uri) // Change to your target URL
