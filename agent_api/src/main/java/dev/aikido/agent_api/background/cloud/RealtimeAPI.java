@@ -15,6 +15,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.security.KeyStore;
 
+import static dev.aikido.agent_api.background.cloud.SSLContextHelper.createDefaultSSLContext;
 import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoRealtimeEndpoint;
 
 public class RealtimeAPI {
@@ -28,18 +29,6 @@ public class RealtimeAPI {
         this.token = token;
     }
     public record ConfigResponse(long configUpdatedAt) {}
-
-    private SSLContext createDefaultSSLContext() throws Exception {
-        // Get the default TrustManagerFactory
-        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustManagerFactory.init((KeyStore) null); // Use the default trust store
-
-        // Create an SSLContext with the default TrustManager
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
-
-        return sslContext;
-    }
 
     public Optional<ConfigResponse> getConfig() {
         try {
