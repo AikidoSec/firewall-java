@@ -17,6 +17,9 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.security.KeyStore;
 
 public class ReportingApiHTTP extends ReportingApi {
     private final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
@@ -30,10 +33,23 @@ public class ReportingApiHTTP extends ReportingApi {
         this.token = token;
     }
 
+    private SSLContext createDefaultSSLContext() throws Exception {
+        // Get the default TrustManagerFactory
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init((KeyStore) null); // Use the default trust store
+
+        // Create an SSLContext with the default TrustManager
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+
+        return sslContext;
+    }
+
     public Optional<APIResponse> fetchNewConfig() {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                    .sslContext(createDefaultSSLContext())
                     .build();
 
             URI uri = URI.create(reportingUrl + "api/runtime/config");
@@ -54,6 +70,7 @@ public class ReportingApiHTTP extends ReportingApi {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                .sslContext(createDefaultSSLContext())
                 .build();
 
             URI uri = URI.create(reportingUrl + "api/runtime/events");
@@ -75,25 +92,32 @@ public class ReportingApiHTTP extends ReportingApi {
             return Optional.empty();
         }
         try {
-            // Make a GET request to api/runtime/firewall/lists
-            URL url = new URL(reportingUrl + "api/runtime/firewall/lists");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+            HttpClient httpClient = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                    .sslContext(createDefaultSSLContext())
+                    .build();
 
-            // Set the Accept-Encoding header to gzip
-            connection.setRequestProperty("Accept-Encoding", "gzip");
-            connection.setRequestProperty("Authorization", token.get());
+            URI uri = URI.create(reportingUrl + "api/runtime/firewall/lists");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(uri)
+                    .timeout(Duration.ofSeconds(timeoutInSec))
+                    .header("Accept-Encoding", "gzip")
+                    .header("Authorization", token.get())
+                    .build();
 
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            // Send the request and get the response
+            HttpResponse<InputStream> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            if (httpResponse.statusCode() != HttpURLConnection.HTTP_OK) {
                 return Optional.empty();
             }
-            InputStream inputStream = connection.getInputStream();
+
+            InputStream inputStream = httpResponse.body();
             // Check if the response is gzipped
-            if ("gzip".equalsIgnoreCase(connection.getContentEncoding())) {
+            if ("gzip".equalsIgnoreCase(httpResponse.headers().firstValue("Content-Encoding").orElse(""))) {
                 inputStream = new GZIPInputStream(inputStream);
             }
 
-            // Read the response :
+            // Read the response
             APIListsResponse res = gson.fromJson(new InputStreamReader(inputStream), APIListsResponse.class);
             return Optional.of(res);
         } catch (Exception e) {
