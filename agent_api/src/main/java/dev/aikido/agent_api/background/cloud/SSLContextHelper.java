@@ -12,7 +12,7 @@ public final class SSLContextHelper {
         trustManagerFactory.init((KeyStore) null); // Use the default trust store
 
         // Create an SSLContext with the default TrustManager
-        SSLContext sslContext = SSLContext.getInstance("TLS");
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
         sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
 
         return sslContext;
