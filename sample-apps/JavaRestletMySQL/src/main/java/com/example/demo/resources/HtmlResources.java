@@ -8,42 +8,54 @@ public final class HtmlResources {
     public static class HomeResource extends ServerResource {
         @Get
         public String represent() {
-            return "index"; // You can return HTML or JSON as needed
+            // Redirect to a static HTML page
+            getResponse().redirectSeeOther("/static/index.html");
+            return "Redirecting to index page";
         }
     }
 
     public static class CreateResource extends ServerResource {
         @Get
         public String represent() {
-            return "create";
+            // Redirect to a static HTML page
+            getResponse().redirectSeeOther("/static/create.html");
+            return "Redirecting to create page";
         }
     }
 
     public static class CreateMariaDBResource extends ServerResource {
         @Get
         public String represent() {
-            return "create_mariadb";
+            // Redirect to a static HTML page
+            getResponse().redirectSeeOther("/static/create_mariadb.html");
+            return "Redirecting to create MariaDB page";
         }
     }
 
     public static class ReadFileResource extends ServerResource {
         @Get
         public String represent() {
-            return "read";
+            // Redirect to a static HTML page
+            getResponse().redirectSeeOther("/static/read.html");
+            return "Redirecting to read file page";
         }
     }
 
     public static class RequestResource extends ServerResource {
         @Get
         public String represent() {
-            return "request";
+            // Redirect to a static HTML page
+            getResponse().redirectSeeOther("/static/request.html");
+            return "Redirecting to request page";
         }
     }
 
     public static class ExecResource extends ServerResource {
         @Get
         public String represent() {
-            return "execute";
+            // Redirect to a static HTML page
+            getResponse().redirectSeeOther("/static/execute.html");
+            return "Redirecting to execute page";
         }
     }
 
@@ -51,15 +63,18 @@ public final class HtmlResources {
         @Get
         public String represent() {
             String id = getAttribute("id");
-            return "pet_page with id: " + id;
+            // Redirect to a static HTML page with the ID as a parameter
+            getResponse().redirectSeeOther("/static/pet_page.html?id=" + id);
+            return "Redirecting to pet page with id: " + id;
         }
     }
 
     public static class TestRateLimitingResource extends ServerResource {
         @Get
         public String represent() {
-            return "index"; // Used in end2end tests
+            // Redirect to a static HTML page
+            getResponse().redirectSeeOther("/static/index.html");
+            return "Redirecting to index page for end-to-end tests";
         }
     }
-
 }

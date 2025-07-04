@@ -10,6 +10,9 @@ public class RestletApplication extends Application {
     @Override
     public Restlet createInboundRoot() {
         Router router = new Router(getContext());
+
+        router.attach("/static/{fileName}", ClasspathFileResources.class);
+
         router.attach("/", HtmlResources.HomeResource.class);
         router.attach("/create", HtmlResources.CreateResource.class);
         router.attach("/create/mariadb", HtmlResources.CreateMariaDBResource.class);

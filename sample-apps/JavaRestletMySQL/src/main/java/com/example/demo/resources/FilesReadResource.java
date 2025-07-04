@@ -1,16 +1,14 @@
 package com.example.demo.resources;
 
-import org.restlet.data.MediaType;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
-import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class FilesResources extends ServerResource {
+public class FilesReadResource extends ServerResource {
 
     private static class FileRead {
         public String fileName;
@@ -29,29 +27,7 @@ public class FilesResources extends ServerResource {
         return readFile(fileData.fileName);
     }
 
-    @Get("json")
-    public String readCookie() {
-        String filePath = getCookieValue("fpath", "");
-        return readFile(filePath);
-    }
-
-    @Get("json")
-    public String readHeaders() {
-        String xpath = getRequest().getHeaders().getFirstValue("x-path", "");
-        return readFile(xpath);
-    }
-
-    @Get("json")
-    public String readHeaders2() {
-        String[] xpath = getRequest().getHeaders().getValuesArray("x-path");
-        return readFile(xpath.length > 0 ? xpath[0] : "");
-    }
-
-    private String getCookieValue(String cookieName, String defaultValue) {
-        return getRequest().getCookies().getFirstValue(cookieName, defaultValue);
-    }
-
-    private static String readFile(String fileName) {
+    static String readFile(String fileName) {
         System.out.println("Reading file: " + fileName);
         File specifiedFile = new File(fileName);
         StringBuilder stringBuilder = new StringBuilder();
