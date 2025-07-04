@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.restlet:org.restlet:2.6.0'
+    //implementation 'org.restlet:org.restlet.ext.json:2.3.12'
+    //implementation 'org.restlet:org.restlet.ext.servlet:2.3.12'
+    implementation files('../../dist/agent_api.jar')
+    //compileOnly 'org.projectlombok:lombok'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    //annotationProcessor 'org.projectlombok:lombok'
+}
