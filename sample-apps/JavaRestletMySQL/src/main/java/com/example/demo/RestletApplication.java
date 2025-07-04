@@ -21,9 +21,16 @@ public class RestletApplication extends Application {
         router.attach("/exec", HtmlResources.ExecResource.class);
         router.attach("/pet_page/{id}", HtmlResources.PetPageResource.class);
         router.attach("/test_ratelimiting_1", HtmlResources.TestRateLimitingResource.class);
+
         router.attach("/api/requests/get", RequestsResources.class);
+
         router.attach("/api/pets", PetsResources.class);
-        router.attach("/api/files", FilesResources.class);
+
+        router.attach("/api/files/read", FilesReadResource.class);
+        router.attach("/api/files/read_cookie", FilesReadCookieResource.class);
+        router.attach("/api/files/read_first_header", FilesReadFirstHeaderResource.class);
+        router.attach("/api/files/read_last_header", FilesReadLastHeader.class);
+
         router.attach("/api/commands/execute", CommandResources.class);
         return router;
     }

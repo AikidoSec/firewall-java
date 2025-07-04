@@ -1,6 +1,5 @@
 package com.example.demo.resources;
 
-import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
