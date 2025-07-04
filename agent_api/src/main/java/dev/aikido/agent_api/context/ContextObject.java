@@ -108,4 +108,13 @@ public class ContextObject {
     public RouteMetadata getRouteMetadata() {
         return new RouteMetadata(route, url, method);
     }
+
+    @Override
+    public String toString() {
+        return "ContextObject{" +
+            "method='" + method + '\'' +
+            ", url='" + url + '\'' +
+            ", source='" + source + '\'' +
+            '}';
+    }
 }
