@@ -49,13 +49,6 @@ public class PetsResources extends ServerResource {
         return new Rows(rowsCreated);
     }
 
-    @Post("json")
-    public Rows createMariaDB(String jsonInput) {
-        PetCreate petData = parseJson(jsonInput);
-        Integer rowsCreated = DatabaseHelper.createPetByName(petData.name, "mariadb");
-        return new Rows(rowsCreated);
-    }
-
     private PetCreate parseJson(String jsonInput) {
         // Simple JSON parsing (you can use a library like Jackson or Gson for more complex cases)
         String name = jsonInput.replaceAll(".*\"name\":\"([^\"]+)\".*", "$1");
