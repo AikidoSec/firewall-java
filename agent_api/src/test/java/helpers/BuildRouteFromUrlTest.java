@@ -6,8 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BuildRouteFromUrlTest {
 
@@ -125,5 +124,24 @@ public class BuildRouteFromUrlTest {
     @Test
     public void testReplaceSecrets() {
         assertEquals("/confirm/:secret", buildRouteFromUrl("/confirm/CnJ4DunhYfv2db6T1FRfciRBHtlNKOYrjoz"));
+    }
+
+    @Test
+    public void testReplacesBsonObjectIds() {
+        assertEquals("/posts/:objectId", buildRouteFromUrl("/posts/66ec29159d00113616fc7184"));
+        // 25 characters :
+        assertNotEquals("/posts/:objectId", buildRouteFromUrl("/posts/66ec29159d00113616fc71845"));
+        // 23 characters :
+        assertNotEquals("/posts/:objectId", buildRouteFromUrl("/posts/66ec29159d00113616fc718"));
+    }
+
+    @Test
+    public void testReplacesUlidStrings() {
+        assertEquals("/posts/:ulid", buildRouteFromUrl("/posts/01ARZ3NDEKTSV4RRFFQ69G5FAV"));
+        assertEquals("/posts/:ulid", buildRouteFromUrl("/posts/01arz3ndektsv4rrffq69g5fav"));
+        // 27 characters :
+        assertNotEquals("/posts/:ulid", buildRouteFromUrl("/posts/01arz3ndektsv4rrffq69g5favv"));
+        // 25 characters :
+        assertNotEquals("/posts/:ulid", buildRouteFromUrl("/posts/01arz3ndektsv4rrffq69g5fa"));
     }
 }
