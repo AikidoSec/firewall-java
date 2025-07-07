@@ -44,4 +44,10 @@ public class HtmlController {
         Thread.sleep(1); // sleep 1ms
         return "OK";
     }
+
+    @GetMapping("/test_ratelimiting_1")
+    @ResponseBody
+    public String test_ratelimiting_route() throws InterruptedException {
+        return "OK";
+    }
 }

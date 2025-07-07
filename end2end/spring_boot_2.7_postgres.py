@@ -20,3 +20,5 @@ spring_boot_postgres_app.add_payload("path traversal",
 )
 
 spring_boot_postgres_app.test_all_payloads()
+spring_boot_postgres_app.test_blocking()
+spring_boot_postgres_app.test_rate_limiting()
