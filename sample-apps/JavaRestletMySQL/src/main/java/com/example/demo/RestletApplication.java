@@ -15,7 +15,6 @@ public class RestletApplication extends Application {
 
         router.attach("/", HtmlResources.HomeResource.class);
         router.attach("/create", HtmlResources.CreateResource.class);
-        router.attach("/create/mariadb", HtmlResources.CreateMariaDBResource.class);
         router.attach("/read_file", HtmlResources.ReadFileResource.class);
         router.attach("/request", HtmlResources.RequestResource.class);
         router.attach("/exec", HtmlResources.ExecResource.class);

@@ -23,15 +23,6 @@ public final class HtmlResources {
         }
     }
 
-    public static class CreateMariaDBResource extends ServerResource {
-        @Get
-        public String represent() {
-            // Redirect to a static HTML page
-            getResponse().redirectSeeOther("/static/create_mariadb.html");
-            return "Redirecting to create MariaDB page";
-        }
-    }
-
     public static class ReadFileResource extends ServerResource {
         @Get
         public String represent() {
