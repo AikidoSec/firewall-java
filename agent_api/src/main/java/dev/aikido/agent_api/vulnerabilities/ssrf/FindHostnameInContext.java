@@ -50,7 +50,7 @@ public final class FindHostnameInContext {
             if (userInputUrl == null || userInputUrl.getHost() == null) {
                 continue;
             }
-            if (userInputUrl.getHost().equals(hostnameUrl.getHost())) {
+            if (userInputUrl.getHost().equalsIgnoreCase(hostnameUrl.getHost())) {
                 if (userInputUrl.getPort() == -1 || port == -1) {
                     return true;
                 }
