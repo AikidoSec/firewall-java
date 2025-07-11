@@ -32,9 +32,22 @@ public class RouteEntryTest {
         Gson gson = new Gson();
         String json = gson.toJson(route1);
         assertEquals(
-                "{\"method\":\"GET\",\"path\":\"/api/1\",\"hits\":0,\"apispec\":{\"body\":{\"schema\":{\"type\":\"object\",\"properties\":{\"oldProp\":{\"type\":\"string\",\"optional\":false}},\"optional\":false},\"type\":\"oldType\"},\"auth\":[{\"type\":\"apiKey\"}]}}",
+                "{\"method\":\"GET\",\"path\":\"/api/1\",\"hits\":0,\"rateLimitedCount\":0,\"apispec\":{\"body\":{\"schema\":{\"type\":\"object\",\"properties\":{\"oldProp\":{\"type\":\"string\",\"optional\":false}},\"optional\":false},\"type\":\"oldType\"},\"auth\":[{\"type\":\"apiKey\"}]}}",
                 json
         );
     }
 
+    @Test
+    public void testIncrementRateLimitedCount() {
+        // Initial count should be 0
+        assertEquals(0, route1.getRateLimitCount());
+
+        // Increment the rate limited count
+        route1.incrementRateLimitCount();
+        assertEquals(1, route1.getRateLimitCount());
+
+        // Increment again
+        route1.incrementRateLimitCount();
+        assertEquals(2, route1.getRateLimitCount());
+    }
 }
