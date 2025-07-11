@@ -38,6 +38,17 @@ public class FindHostnameInContextTest {
         }
 
         @Test
+        void testHostnameCapitalizationIsNotImportant() {
+            assertTrue(hostnameInUserInput("http://Localhost/path", "localhost", 80));
+        }
+
+        @Test
+        void testHostnameCapitalizationIsNotImportant2() {
+            assertTrue(hostnameInUserInput("http://localhost/path", "LOCALHOST", 80));
+        }
+
+
+        @Test
         void testItDoesNotParseHostnameFromUserInputWithMisspelledProtocol() {
             assertFalse(hostnameInUserInput("http:/localhost", "localhost", 80));
         }
