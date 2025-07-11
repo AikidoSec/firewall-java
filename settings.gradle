@@ -1,2 +1,2 @@
 rootProject.name = 'firewall-java'
-include 'agent', 'agent_api'
+include 'agent', 'agent_api', 'agent_bootstrap'
