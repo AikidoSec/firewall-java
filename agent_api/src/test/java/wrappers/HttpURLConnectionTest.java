@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.client.ResourceAccessException;
 import utils.EmptySampleContextObject;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -78,6 +79,15 @@ public class HttpURLConnectionTest {
     }
 
     @Test
+    public void testNewUrlConnectionHttps2() throws Exception {
+        setContextAndLifecycle("https://aikido.dev");
+        assertEquals(0, getHits("aikido.dev", 443));
+
+        fetchResponseHttps("https://aikido.dev");
+        assertEquals(1, getHits("aikido.dev", 443));
+    }
+
+    @Test
     public void testNewUrlConnectionFaultyProtocol() throws Exception {
         setContextAndLifecycle("ftp://localhost:8080");
         assertEquals(0, getHits("localhost", 8080));
@@ -118,6 +128,7 @@ public class HttpURLConnectionTest {
         assertEquals(3, getHits("localhost", 5000));
     }
 
+
     @Test
     public void testSSRFWithoutPort() throws Exception {
         setContextAndLifecycle("http://localhost:80");
@@ -143,6 +154,14 @@ public class HttpURLConnectionTest {
     private void fetchResponse(String urlString) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setInstanceFollowRedirects(true);
+        connection.getResponseCode();
+    }
+
+    private void fetchResponseHttps(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setInstanceFollowRedirects(true);
         connection.getResponseCode();
