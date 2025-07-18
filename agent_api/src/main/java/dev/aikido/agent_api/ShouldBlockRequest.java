@@ -38,7 +38,11 @@ public final class ShouldBlockRequest {
         if (rateLimitDecision.block()) {
             // increment rate-limiting stats both globally and on the route :
             StatisticsStore.incrementRateLimited();
-            RoutesStore.addRouteRateLimitedCount(context.getRouteMetadata());
+            // increment routes stats using method & route from the endpoint (store stats for wildcards, in wildcard route)
+            RoutesStore.addRouteRateLimitedCount(
+                rateLimitDecision.rateLimitedEndpoint().getMethod(),
+                rateLimitDecision.rateLimitedEndpoint().getRoute()
+            );
 
             BlockedRequestResult blockedRequestResult = new BlockedRequestResult(
                     "ratelimited", rateLimitDecision.trigger(), context.getRemoteAddress()
