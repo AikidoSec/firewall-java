@@ -19,32 +19,32 @@ public class Routes {
         this(1000); // Default max size
     }
 
-    private void ensureRoute(RouteMetadata routeMetadata) {
+    private void ensureRoute(String method, String route) {
         manageRoutesSize();
-        String key = routeToKey(routeMetadata);
+        String key = routeToKey(method, route);
         if(!routes.containsKey(key)) {
-            routes.put(key, new RouteEntry(routeMetadata));
+            routes.put(key, new RouteEntry(method, route));
         }
     }
 
-    public void incrementRoute(RouteMetadata routeMetadata) {
-        ensureRoute(routeMetadata);
-        RouteEntry route = this.get(routeMetadata);
-        if (route != null) {
-            route.incrementHits();
+    public void incrementRoute(String method, String route) {
+        ensureRoute(method, route);
+        RouteEntry routeEntry = this.get(method, route);
+        if (routeEntry != null) {
+            routeEntry.incrementHits();
         }
     }
 
-    public void incrementRateLimitCount(RouteMetadata routeMetadata) {
-        ensureRoute(routeMetadata);
-        RouteEntry route = this.get(routeMetadata);
-        if (route != null) {
-            route.incrementRateLimitCount();
+    public void incrementRateLimitCount(String method, String route) {
+        ensureRoute(method, route);
+        RouteEntry routeEntry = this.get(method, route);
+        if (routeEntry != null) {
+            routeEntry.incrementRateLimitCount();
         }
     }
 
-    public RouteEntry get(RouteMetadata routeMetadata) {
-        String key = routeToKey(routeMetadata);
+    public RouteEntry get(String method, String route) {
+        String key = routeToKey(method, route);
         return routes.get(key);
     }
 

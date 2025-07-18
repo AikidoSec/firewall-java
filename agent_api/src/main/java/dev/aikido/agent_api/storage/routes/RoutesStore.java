@@ -16,10 +16,10 @@ public final class RoutesStore {
 
     }
 
-    public static int getRouteHits(RouteMetadata routeMetadata) {
+    public static int getRouteHits(String method, String route) {
         mutex.lock();
         try {
-            return routes.get(routeMetadata).getHits();
+            return routes.get(method, route).getHits();
         } finally {
             mutex.unlock();
         }
@@ -34,12 +34,12 @@ public final class RoutesStore {
         }
     }
 
-    public static void updateApiSpec(RouteMetadata routeMetadata, APISpec apiSpec) {
+    public static void updateApiSpec(String method, String route, APISpec apiSpec) {
         mutex.lock();
         try {
-            RouteEntry route = routes.get(routeMetadata);
-            if (route != null) {
-                route.updateApiSpec(apiSpec);
+            RouteEntry routeEntry = routes.get(method, route);
+            if (routeEntry != null) {
+                routeEntry.updateApiSpec(apiSpec);
             }
         } catch (Throwable e) {
             logger.debug("Error occurred updating api specs: %s", e.getMessage());
@@ -48,10 +48,10 @@ public final class RoutesStore {
         }
     }
 
-    public static void addRouteHits(RouteMetadata routeMetadata) {
+    public static void addRouteHits(String method, String route) {
         mutex.lock();
         try {
-            routes.incrementRoute(routeMetadata);
+            routes.incrementRoute(method, route);
         } catch (Throwable e) {
             logger.debug("Error occurred incrementing route hits: %s", e.getMessage());
         } finally {
@@ -59,10 +59,10 @@ public final class RoutesStore {
         }
     }
 
-    public static void addRouteRateLimitedCount(RouteMetadata routeMetadata) {
+    public static void addRouteRateLimitedCount(String method, String route) {
         mutex.lock();
         try {
-            routes.incrementRateLimitCount(routeMetadata);
+            routes.incrementRateLimitCount(method, route);
         } catch (Throwable e) {
             logger.debug("Error occurred incrementing route rate limit count: %s", e.getMessage());
         } finally {

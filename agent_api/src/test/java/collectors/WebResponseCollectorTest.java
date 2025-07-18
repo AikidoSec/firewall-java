@@ -32,7 +32,6 @@ public class WebResponseCollectorTest {
             this.executedMiddleware = true; // Start with "executed middleware" as true
         }
     }
-    public static RouteMetadata routeMetadata1 = new RouteMetadata("/api/resource", "https://example.com/api/resource", "GET");
 
     @BeforeAll
     public static void clean() {
@@ -53,23 +52,23 @@ public class WebResponseCollectorTest {
         assertEquals(0, RoutesStore.getRoutesAsList().length);
         WebResponseCollector.report(200);
         assertEquals(1, RoutesStore.getRoutesAsList().length);
-        assertEquals(1, RoutesStore.getRouteHits(routeMetadata1));
+        assertEquals(1, RoutesStore.getRouteHits("GET", "/api/resource"));
 
         // Test same route but incremented hits :
         WebResponseCollector.report(201);
         assertEquals(1, RoutesStore.getRoutesAsList().length);
-        assertEquals(2, RoutesStore.getRouteHits(routeMetadata1));
+        assertEquals(2, RoutesStore.getRouteHits("GET", "/api/resource"));
 
         // Test same route but invalid status code
         WebResponseCollector.report(0);
         assertEquals(1, RoutesStore.getRoutesAsList().length);
-        assertEquals(2, RoutesStore.getRouteHits(routeMetadata1));
+        assertEquals(2, RoutesStore.getRouteHits("GET", "/api/resource"));
 
         // Test same route but context not set :
         Context.set(null);
         WebResponseCollector.report(200);
         assertEquals(1, RoutesStore.getRoutesAsList().length);
-        assertEquals(2, RoutesStore.getRouteHits(routeMetadata1));
+        assertEquals(2, RoutesStore.getRouteHits("GET", "/api/resource"));
 
         RoutesStore.clear();
         assertEquals(0, RoutesStore.getRoutesAsList().length);
