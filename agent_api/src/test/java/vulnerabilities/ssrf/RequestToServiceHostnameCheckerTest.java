@@ -64,6 +64,13 @@ class RequestToServiceHostnameCheckerTest {
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("localhost.localdomain"));
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("LOCALHOST"));
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("LocalHost"));
+
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("Host.docker.Internal"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("host.docker.internal"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("kubernetes.docker.internal"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("KUBERNETES.DOCKER.INTERNAL"));
+
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("localdomain"));
     }
 
     @Test
