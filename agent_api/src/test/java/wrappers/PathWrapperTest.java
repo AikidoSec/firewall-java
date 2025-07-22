@@ -112,10 +112,10 @@ public class PathWrapperTest {
         setContextAndLifecycle(".././opt/test.txt");
         Path myPath = Paths.get("/var/");
         assertDoesNotThrow(() -> {
-            Path.of("/var" , "log", ".././etc/").toFile();
+            Path.of("/var" , "log", ".././etc/");
         });
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            Path.of("/var" , "user", "../.././opt/test.txt").toFile();
+            Path.of("/var" , "user", "../.././opt/test.txt");
         });
         assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
     }
@@ -125,10 +125,10 @@ public class PathWrapperTest {
         setContextAndLifecycle("..////./opt/");
         Path myPath = Paths.get("/var/");
         assertDoesNotThrow(() -> {
-            Path.of("/var" , "log", "..////./etc/").toFile();
+            Path.of("/var" , "log", "..////./etc/");
         });
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            Path.of("/var" , "user", "..////./opt/").toFile();
+            Path.of("/var" , "user", "..////./opt/");
         });
         assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
     }
