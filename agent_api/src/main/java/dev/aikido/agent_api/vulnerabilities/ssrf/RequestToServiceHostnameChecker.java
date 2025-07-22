@@ -7,7 +7,11 @@ public final class RequestToServiceHostnameChecker {
     // Pattern allows alpha input (case-insensitive), dashes (-) and underscores (_)
     private static final Pattern SERVICE_HOSTNAME_PATTERN = Pattern.compile("^[a-zA-Z-_]+$");
     private static final List ALLOWED_LOCALHOST_VARIANTS = List.of(
-        "localhost", "localdomain"
+        "localhost",
+        "localdomain",
+        // metadata is a hostname used by google, it gets automatically extended to metadata.goog
+        // https://stackoverflow.com/questions/23362887/can-you-get-external-ip-address-from-within-a-google-compute-vm-instance
+        "metadata"
     );
 
     public static boolean isRequestToServiceHostname(String hostname) {
