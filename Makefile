@@ -14,6 +14,10 @@ build: clean check_binaries
 	./gradlew agent_api:shadowJar
 	cp agent_api/build/libs/agent*-all.jar dist/agent_api.jar
 
+
+	./gradlew agent_bootstrap:shadowJar
+	cp agent_bootstrap/build/libs/agent*-all.jar dist/agent_bootstrap.jar
+
 mock_init:
 	docker kill mock_core && docker rm mock_core
 	cd end2end/server && docker build -t mock_core .
