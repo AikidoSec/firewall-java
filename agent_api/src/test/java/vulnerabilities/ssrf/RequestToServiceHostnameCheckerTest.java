@@ -70,6 +70,9 @@ class RequestToServiceHostnameCheckerTest {
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("kubernetes.docker.internal"));
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("KUBERNETES.DOCKER.INTERNAL"));
 
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("metadata.goog"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("metadata.google.internal"));
+
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("localdomain"));
     }
 
