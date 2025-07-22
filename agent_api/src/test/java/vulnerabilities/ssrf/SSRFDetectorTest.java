@@ -127,4 +127,21 @@ public class SSRFDetectorTest {
 
         assertNull(attackData);
     }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
+    public void testSsrfDetectorWithServiceHostnameInRedirect() throws MalformedURLException {
+        // Setup context :
+        setContextAndLifecycle("http://mysql-database/ssrf-test");
+
+        URLCollector.report(new URL("http://mysql-database/ssrf-test"));
+        RedirectCollector.report(new URL("http://mysql-database/ssrf-test"), new URL("http://127.0.0.1:8080"));
+        Attack attackData = new SSRFDetector().run(
+            "127.0.0.1", 8080,
+            List.of("127.0.0.1"),
+            "testop"
+        );
+
+        assertNull(attackData);
+    }
 }
