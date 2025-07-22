@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import static dev.aikido.agent_api.helpers.url.UrlParser.tryParseUrl;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.RequestToItselfChecker.isRequestToItself;
+import static dev.aikido.agent_api.vulnerabilities.ssrf.RequestToServiceHostnameChecker.isRequestToServiceHostname;
 
 public final class FindHostnameInContext {
     private FindHostnameInContext() {}
@@ -19,6 +20,11 @@ public final class FindHostnameInContext {
         // We don't want to block outgoing requests to the same host as the server
         // (often happens that we have a match on headers like `Host`, `Origin`, `Referer`, etc.)
         if (isRequestToItself(context.getUrl(), hostname, port)) {
+            return null;
+        }
+
+        // We don't want to block outgoing requests where the hostname is a service name, even if it's inside user input
+        if (isRequestToServiceHostname(hostname)) {
             return null;
         }
 
