@@ -31,7 +31,7 @@ public class PathWrapper implements Wrapper {
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.isDeclaredBy(ElementMatchers.isSubTypeOf(Path.class)).and(
-                named("resolve").or(named("resolveSibling").or(named("relativize"))));
+                named("resolve").or(named("resolveSibling").or(named("of")).or(named("relativize"))));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PathWrapper implements Wrapper {
         @Advice.OnMethodEnter
         public static void before(
                 @Advice.Origin Executable method,
-                @Advice.Argument(value = 0, optional = true) Object argument
+                @Advice.AllArguments(readOnly = true, typing = DYNAMIC) Object[] paths
         ) throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
@@ -65,7 +65,7 @@ public class PathWrapper implements Wrapper {
                 // Run report with "argument"
                 Method reportMethod = clazz.getMethod("report", Object.class, String.class);
                 String op = "java.nio.file.Path." + method.getName();
-                reportMethod.invoke(null, argument, op);
+                reportMethod.invoke(null, paths, op);
             } catch (InvocationTargetException invocationTargetException) {
                 if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
                     throw invocationTargetException.getCause();
