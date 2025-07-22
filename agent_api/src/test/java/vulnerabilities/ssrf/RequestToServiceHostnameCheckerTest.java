@@ -72,4 +72,25 @@ class RequestToServiceHostnameCheckerTest {
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("127.0.0.1"));
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("::1"));
     }
+
+    @Test
+    void testAllowedIPv4Addresses() {
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("192.168.1.1"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("255.255.255.255"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("0.0.0.0"));
+    }
+
+    @Test
+    void testAllowedIPv6Addresses() {
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("2001:0db8:85a3:0000:0000:8a2e:0370:7334"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("::1"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("::ffff:192.168.1.1"));
+    }
+
+    @Test
+    void testAllowedNormalHostnames() {
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("google.com"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("subdomain.example.com"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("example.com"));
+    }
 }
