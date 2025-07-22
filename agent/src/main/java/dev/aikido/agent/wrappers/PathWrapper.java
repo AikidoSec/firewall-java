@@ -23,6 +23,7 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  * - resolve(String|Path other)
  * - relativize(Path other)
  * - resolveSibling(String|Path other)
+ * - of(String path, String other1, String other2, ...)
  * See Oracle docs for more: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html
  */
 public class PathWrapper implements Wrapper {
