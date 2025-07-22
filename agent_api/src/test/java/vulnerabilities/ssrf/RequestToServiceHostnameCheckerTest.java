@@ -13,9 +13,9 @@ class RequestToServiceHostnameCheckerTest {
     void testValidHostnames() {
         assertTrue(RequestToServiceHostnameChecker.isRequestToServiceHostname("valid_hostname"));
         assertTrue(RequestToServiceHostnameChecker.isRequestToServiceHostname("valid-hostname"));
-        assertTrue(RequestToServiceHostnameChecker.isRequestToServiceHostname("valid123"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("valid123"));
         assertTrue(RequestToServiceHostnameChecker.isRequestToServiceHostname("hostname_with_underscores-and-dashes"));
-        assertTrue(RequestToServiceHostnameChecker.isRequestToServiceHostname("123456"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("123456"));
         assertTrue(RequestToServiceHostnameChecker.isRequestToServiceHostname("a-b_c"));
     }
 
@@ -92,6 +92,9 @@ class RequestToServiceHostnameCheckerTest {
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("2001:0db8:85a3:0000:0000:8a2e:0370:7334"));
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("::1"));
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("::ffff:192.168.1.1"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("2130706433"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("127.1"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("0"));
     }
 
     @Test
