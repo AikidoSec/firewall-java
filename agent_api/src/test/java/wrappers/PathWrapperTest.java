@@ -69,6 +69,72 @@ public class PathWrapperTest {
     }
 
     @Test
+    public void testPathTraversalInResolveSiblingWithDoubleSlashes() throws Exception {
+        setContextAndLifecycle("..//opt/");
+        Path myPath = Paths.get("/var/");
+        assertDoesNotThrow(() -> {
+            myPath.resolveSibling("..//etc/");
+        });
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            myPath.resolveSibling("..//opt/");
+        });
+        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+    }
+
+    @Test
+    public void testPathTraversalInResolveSiblingWithDoubleSlashesAndDotPaths() throws Exception {
+        setContextAndLifecycle("..////./opt/");
+        Path myPath = Paths.get("/var/");
+        assertDoesNotThrow(() -> {
+            myPath.resolveSibling("..////./etc/");
+        });
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            myPath.resolveSibling("..////./opt/");
+        });
+        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+    }
+
+    @Test
+    public void testWithPathOfGetFile() throws Exception {
+        setContextAndLifecycle("../opt/test.txt");
+        Path myPath = Paths.get("/var/");
+        assertDoesNotThrow(() -> {
+            Path.of("/var" , "log", ".././etc/").toFile();
+        });
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            Path.of("/var" , "user", "../../opt/test.txt").toFile();
+        });
+        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+    }
+
+    @Test
+    public void testWithPathOfGetFileButDotInBetween() throws Exception {
+        setContextAndLifecycle(".././opt/test.txt");
+        Path myPath = Paths.get("/var/");
+        assertDoesNotThrow(() -> {
+            Path.of("/var" , "log", ".././etc/").toFile();
+        });
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            Path.of("/var" , "user", "../.././opt/test.txt").toFile();
+        });
+        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+    }
+
+    @Test
+    public void testWithPathOfGetFileComplex() throws Exception {
+        setContextAndLifecycle("..////./opt/");
+        Path myPath = Paths.get("/var/");
+        assertDoesNotThrow(() -> {
+            Path.of("/var" , "log", "..////./etc/").toFile();
+        });
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            Path.of("/var" , "user", "..////./opt/").toFile();
+        });
+        assertEquals("Aikido Zen has blocked Path Traversal",  exception.getMessage());
+    }
+
+
+    @Test
     public void testPathTraversalInResolveSiblingWithPath() throws Exception {
         Path basePath = Paths.get("/var/");
         Path maliciousPath = Paths.get("../opt/");
