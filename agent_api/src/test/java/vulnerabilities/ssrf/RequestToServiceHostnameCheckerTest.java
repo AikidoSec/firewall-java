@@ -74,6 +74,7 @@ class RequestToServiceHostnameCheckerTest {
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("metadata.google.internal"));
 
         assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("localdomain"));
+        assertFalse(RequestToServiceHostnameChecker.isRequestToServiceHostname("metadata"));
     }
 
     @Test
