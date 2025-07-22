@@ -4,6 +4,7 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.vulnerabilities.StringsFromContext;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,9 @@ public final class FindHostnameInContext {
             return null;
         }
 
+        // get hostname options
+        List<String> hostnameOptions = getHostnameOptions(hostname);
+
         Map<String, Map<String, String>> stringsFromContext = new StringsFromContext(context).getAll();
         for (Map.Entry<String, Map<String, String>> sourceEntry : stringsFromContext.entrySet()) {
             String source = sourceEntry.getKey();
@@ -35,28 +39,28 @@ public final class FindHostnameInContext {
                 // Extract values :
                 String userInput = entry.getKey();
                 String path = entry.getValue();
-                if (hostnameInUserInput(userInput, hostname, port)) {
+                if (hostnameInUserInput(userInput, hostnameOptions, port)) {
                     return new Res(source, path, userInput);
                 }
             }
         }
         return null;
     }
-    public static boolean hostnameInUserInput(String userInput, String hostname, int port) {
+    public static boolean hostnameInUserInput(String userInput, List<String> hostnameOptions, int port) {
         if(userInput.length() <= 1) {
             return false;
         }
-        URI hostnameUrl = tryParseUrl("http://" + hostname);
-        if (hostnameUrl == null) {
-            return false;
-        }
+
         List<String> variants = List.of(userInput, "http://" + userInput, "https://" + userInput);
         for(String variant: variants) {
             URI userInputUrl = tryParseUrl(variant);
             if (userInputUrl == null || userInputUrl.getHost() == null) {
                 continue;
             }
-            if (userInputUrl.getHost().equalsIgnoreCase(hostnameUrl.getHost())) {
+
+            // the hostname options include different options for what the normalized hostname could be
+            // this is useful to also try to parse ::1 as http://[::1]/ (otherwise it would fail)
+            if (hostnameOptions.contains(userInputUrl.getHost().toLowerCase())) {
                 if (userInputUrl.getPort() == -1 || port == -1) {
                     return true;
                 }
@@ -66,5 +70,25 @@ public final class FindHostnameInContext {
             }
         }
         return false;
+    }
+
+    public static List<String> getHostnameOptions(String hostname) {
+        List<URI> uriOptions = new ArrayList<>();
+
+        // basic case to normalize hostname
+        uriOptions.add(tryParseUrl(String.format("http://%s", hostname)));
+
+        // Add a case for hostnames like ::1 or ::ffff:127.0.0.1, who need brackets to be parsed
+        uriOptions.add(tryParseUrl(String.format("http://[%s]", hostname)));
+
+        List<String> options = new ArrayList<>();
+        for (URI optionsUri : uriOptions) {
+            if (optionsUri != null && optionsUri.getHost() != null) {
+                // make sure to lowercase, so the match works
+                options.add(optionsUri.getHost().toLowerCase());
+            }
+        }
+
+        return options;
     }
 }
