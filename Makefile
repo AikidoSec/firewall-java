@@ -32,14 +32,14 @@ cov: check_binaries
 
 # Binaries :
 
-BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.37
+BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.39
 FILES = \
     libzen_internals_aarch64-apple-darwin.dylib \
     libzen_internals_aarch64-apple-darwin.dylib.sha256sum \
     libzen_internals_aarch64-unknown-linux-gnu.so \
     libzen_internals_aarch64-unknown-linux-gnu.so.sha256sum \
-	libzen_internals_aarch64-unknown-linux-musl.so \
-	libzen_internals_aarch64-unknown-linux-musl.so.sha256sum \
+    libzen_internals_aarch64-unknown-linux-musl.so \
+    libzen_internals_aarch64-unknown-linux-musl.so.sha256sum \
     libzen_internals_x86_64-apple-darwin.dylib \
     libzen_internals_x86_64-apple-darwin.dylib.sha256sum \
     libzen_internals_x86_64-pc-windows-gnu.dll \
@@ -47,7 +47,7 @@ FILES = \
     libzen_internals_x86_64-unknown-linux-gnu.so \
     libzen_internals_x86_64-unknown-linux-gnu.so.sha256sum \
     libzen_internals_x86_64-unknown-linux-musl.so \
-	libzen_internals_x86_64-unknown-linux-musl.so.sha256sum \
+    libzen_internals_x86_64-unknown-linux-musl.so.sha256sum \
 
 binaries: binaries_make_dir $(addprefix .cache/binaries/, $(FILES))
 binaries_make_dir:
