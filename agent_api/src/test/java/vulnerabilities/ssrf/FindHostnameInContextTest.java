@@ -1,12 +1,17 @@
 package vulnerabilities.ssrf;
 
+import dev.aikido.agent_api.vulnerabilities.ssrf.FindHostnameInContext;
 import org.junit.jupiter.api.Test;
 
-import static dev.aikido.agent_api.vulnerabilities.ssrf.FindHostnameInContext.hostnameInUserInput;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FindHostnameInContextTest {
+    public static boolean hostnameInUserInput(String userInput, String hostname, int port) {
+        return FindHostnameInContext.hostnameInUserInput(userInput, FindHostnameInContext.getHostnameOptions(hostname), port);
+    }
         @Test
         void testReturnsFalseIfUserInputAndHostnameAreEmpty() {
             assertFalse(hostnameInUserInput("", "", 80));
@@ -97,6 +102,17 @@ public class FindHostnameInContextTest {
         void testItFindsIpAddressWithStrangeNotationInsideUrl() {
             assertTrue(hostnameInUserInput("http://2130706433", "2130706433", 80));
             assertTrue(hostnameInUserInput("http://127.0.0.1", "127.0.0.1", 80));
+        }
+
+        @Test
+        void testMoreComplexIPv6RequiringBrackets() {
+            assertTrue(hostnameInUserInput("http://[0000:0000:0000:0000:0000:0000:0000:0001]:8081", "0000:0000:0000:0000:0000:0000:0000:0001", 8081));
+            assertTrue(hostnameInUserInput("http://[::ffff:127.0.0.1]", "::ffff:127.0.0.1", 80));
+            assertTrue(hostnameInUserInput("http://[::1]", "::1", 80));
+            assertTrue(hostnameInUserInput("http://[::ffff:127.0.0.1]", "::ffff:127.0.0.1", 80));
+            assertFalse(hostnameInUserInput("http://[::ffff:127.0.0.1]:81", "::ffff:127.0.0.1", 80));
+            assertFalse(hostnameInUserInput("http://[::ffff:127.0.0.1]:80", "::ffff:127.0.0.1", 443));
+            assertFalse(hostnameInUserInput("http://::1", "::1", 80));
         }
 
         @Test
