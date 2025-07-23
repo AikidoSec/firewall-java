@@ -46,8 +46,8 @@ FILES = \
     libzen_internals_x86_64-pc-windows-gnu.dll.sha256sum \
     libzen_internals_x86_64-unknown-linux-gnu.so \
     libzen_internals_x86_64-unknown-linux-gnu.so.sha256sum \
-    libzen_internals_x86-64-unknown-linux-musl.so \
-	libzen_internals_x86-64-unknown-linux-musl.so.sha256sum \
+    libzen_internals_x86_64-unknown-linux-musl.so \
+	libzen_internals_x86_64-unknown-linux-musl.so.sha256sum \
 
 binaries: binaries_make_dir $(addprefix .cache/binaries/, $(FILES))
 binaries_make_dir:
