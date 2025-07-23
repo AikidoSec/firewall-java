@@ -26,7 +26,7 @@ public final class RustSQLInterface {
             if (lib != null) {
                 return lib.detect_sql_injection(query, userInput, dialectInteger) != 0;
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.trace(e);
         }
         return false;
@@ -40,7 +40,17 @@ public final class RustSQLInterface {
         Map<LibraryOption, Object> libraryOptions = new HashMap<>();
         libraryOptions.put(LibraryOption.LoadNow, true); // load immediately instead of lazily (ie on first use)
         libraryOptions.put(LibraryOption.IgnoreError, true); // calls shouldn't save last errno after call
-        SqlLib library = LibraryLoader.loadLibrary(SqlLib.class, libraryOptions, path);
+
+        SqlLib library = null;
+        try {
+            library = LibraryLoader.loadLibrary(SqlLib.class, libraryOptions, path);
+        } catch (Throwable e) {
+            String os = System.getProperty("os.name").toLowerCase();
+            String architecture = System.getProperty("os.arch").toLowerCase();
+            logger.error("Failed to load Zen Internals (%s, %s)", os, architecture);
+            throw e;
+        }
+
         if (library == null) {
             logger.error("Failed to load zen binaries.");
         }
