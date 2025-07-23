@@ -26,8 +26,11 @@ public final class RustSQLInterface {
             if (lib != null) {
                 return lib.detect_sql_injection(query, userInput, dialectInteger) != 0;
             }
-        } catch (Exception e) {
-            logger.trace(e);
+        } catch (Throwable e) {
+            String os = System.getProperty("os.name").toLowerCase();
+            String architecture = System.getProperty("os.arch").toLowerCase();
+            logger.error("Failed to load Zen Internals (%s, %s)", os, architecture);
+            throw e;
         }
         return false;
     }
