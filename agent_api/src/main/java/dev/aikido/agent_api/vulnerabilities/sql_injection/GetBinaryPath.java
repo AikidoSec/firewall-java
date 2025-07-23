@@ -24,8 +24,6 @@ public final class GetBinaryPath {
         String os = System.getProperty("os.name").toLowerCase();
         String architecture = System.getProperty("os.arch").toLowerCase();
         StringBuilder fileName = new StringBuilder();
-        System.err.println(os);
-        System.err.println(architecture);
 
         fileName.append("libzen_internals_"); // Start of file
 
