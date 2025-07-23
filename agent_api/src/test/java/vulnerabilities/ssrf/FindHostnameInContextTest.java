@@ -110,6 +110,9 @@ public class FindHostnameInContextTest {
             assertTrue(hostnameInUserInput("http://[::ffff:127.0.0.1]", "::ffff:127.0.0.1", 80));
             assertTrue(hostnameInUserInput("http://[::1]", "::1", 80));
             assertTrue(hostnameInUserInput("http://[::ffff:127.0.0.1]", "::ffff:127.0.0.1", 80));
+            assertFalse(hostnameInUserInput("http://[::ffff:127.0.0.1]:81", "::ffff:127.0.0.1", 80));
+            assertFalse(hostnameInUserInput("http://[::ffff:127.0.0.1]:80", "::ffff:127.0.0.1", 443));
+            assertFalse(hostnameInUserInput("http://::1", "::1", 80));
         }
 
         @Test
