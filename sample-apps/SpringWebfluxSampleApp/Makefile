@@ -23,21 +23,16 @@ run: build
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCK=1 \
-	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8090 > output1.log &
+	java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8090
 
 # Run the application without Zen
 .PHONY: runWithoutZen
 runWithoutZen: build
 	@echo "Running SpringWebfluxPostgres without Zen & ENV (http://localhost:8091)"
-	AIKIDO_TOKEN="random-invalid-token" \
-	nohup java -jar $(JAR_FILE) --server.port=8091 > output2.log &
+	AIKIDO_TOKEN="random-invalid-token" java -jar $(JAR_FILE) --server.port=8091
 
 # Clean the project
 .PHONY: clean
 clean:
 	@echo "Cleaning the project..."
 	$(GRADLEW) clean
-
-.PHONY: kill
-kill:
-	pkill -f java

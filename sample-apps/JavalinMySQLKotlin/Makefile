@@ -17,15 +17,10 @@ run: build
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCK=1 \
-	PORT=8098 nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) > output1.log &
+	PORT=8098 java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE)
 
 # Run the application without Zen
 .PHONY: runWithoutZen
 runWithoutZen:
 	@echo "Running JavalinMySQLKotlin without Zen & ENV (http://localhost:8099)"
-	AIKIDO_TOKEN="random-invalid-token" \
-	PORT=8099 nohup java -jar $(JAR_FILE) > output2.log &
-
-.PHONY: kill
-kill:
-	pkill -f java
+	AIKIDO_TOKEN="random-invalid-token" PORT=8099 java -jar $(JAR_FILE)

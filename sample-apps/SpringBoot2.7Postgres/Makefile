@@ -23,7 +23,7 @@ run: build
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCK=1 \
-	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8104 > output1.log &
+	java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8104
 
 .PHONY: runWithDdTrace
 runWithDdTrace: build
@@ -34,21 +34,18 @@ runWithDdTrace: build
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCK=1 \
-	nohup java -javaagent:dd-java-agent.jar -Ddd.profiling.enabled=true -Ddd.logs.injection=true -Ddd.service=my-app -Ddd.env=staging -Ddd.version=1.0 -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8104 > output1.log &
+	java \
+		-javaagent:dd-java-agent.jar -Ddd.profiling.enabled=true -Ddd.logs.injection=true -Ddd.service=my-app -Ddd.env=staging -Ddd.version=1.0 \
+		-javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8104
 
 # Run the application without Zen
 .PHONY: runWithoutZen
 runWithoutZen: build
 	@echo "Running SpringBoot2.7Postgres without Zen & ENV (http://localhost:8105)"
-	AIKIDO_TOKEN="random-invalid-token" \
-	nohup java -jar $(JAR_FILE) --server.port=8105 > output2.log &
+	AIKIDO_TOKEN="random-invalid-token" java -jar $(JAR_FILE) --server.port=8105
 
 # Clean the project
 .PHONY: clean
 clean:
 	@echo "Cleaning the project..."
 	$(GRADLEW) clean
-
-.PHONY: kill
-kill:
-	pkill -f java
