@@ -66,9 +66,9 @@ jobs:
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/JavalinPostgres
         run: |
-          make runWithoutZen
-          make runWithOpentel
+          nohup make runWithoutZen > output_without_zen.log &
+          nohup make runWithOpentel > output.log &
 
       - name: Run End-to-End tests
         working-directory: ./
-        run: tail -f ./sample-apps/JavalinPostgres/output1.log & sleep 20 && python end2end/javalin_postgres.py
+        run: tail -f ./sample-apps/JavalinPostgres/output.log & sleep 20 && python end2end/javalin_postgres.py

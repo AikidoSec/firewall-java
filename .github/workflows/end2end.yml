@@ -73,8 +73,10 @@ jobs:
         run: python -m pip install -r end2end/requirements.txt
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/${{ matrix.app.name }}
-        run: make run && make runWithoutZen
+        run: |
+          nohup make run > output.log &
+          nohup make runWithoutZen > output_without_zen.log &
 
       - name: Run End-to-End tests
         working-directory: ./
-        run: tail -f ./sample-apps/${{ matrix.app.name }}/output1.log & sleep 20 && python ${{ matrix.app.test_file }}
+        run: tail -f ./sample-apps/${{ matrix.app.name }}/output.log & sleep 20 && python ${{ matrix.app.test_file }}

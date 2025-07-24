@@ -67,9 +67,9 @@ jobs:
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/${{ matrix.app.name }}
         run: |
-          make runWithoutZen
-          make runWithDdTrace
+          nohup make runWithoutZen > output_without_zen.log &
+          nohup make runWithDdTrace > output.log &
 
       - name: Run End-to-End tests
         working-directory: ./
-        run: tail -f ./sample-apps/${{ matrix.app.name }}/output1.log & sleep 20 && python ${{ matrix.app.test_file }}
+        run: tail -f ./sample-apps/${{ matrix.app.name }}/output.log & sleep 20 && python ${{ matrix.app.test_file }}
