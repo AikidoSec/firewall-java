@@ -5,6 +5,8 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
+import dev.aikido.agent_api.storage.routes.RoutesStore;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 public final class ShouldBlockRequest {
     private ShouldBlockRequest() {
@@ -34,6 +36,14 @@ public final class ShouldBlockRequest {
                 context.getRouteMetadata(), context.getUser(), context.getRemoteAddress()
         );
         if (rateLimitDecision.block()) {
+            // increment rate-limiting stats both globally and on the route :
+            StatisticsStore.incrementRateLimited();
+            // increment routes stats using method & route from the endpoint (store stats for wildcards, in wildcard route)
+            RoutesStore.addRouteRateLimitedCount(
+                rateLimitDecision.rateLimitedEndpoint().getMethod(),
+                rateLimitDecision.rateLimitedEndpoint().getRoute()
+            );
+
             BlockedRequestResult blockedRequestResult = new BlockedRequestResult(
                     "ratelimited", rateLimitDecision.trigger(), context.getRemoteAddress()
             );
