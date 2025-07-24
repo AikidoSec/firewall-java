@@ -9,7 +9,7 @@ public final class RequestToServiceHostnameChecker {
     private static final List ALLOWED_LOCALHOST_VARIANTS = List.of(
         "localhost",
         "localdomain",
-        // metadata is a hostname used by google, it gets automatically extended to metadata.goog
+        // metadata is a hostname used by google, it gets automatically extended to metadata.google.internal
         // https://stackoverflow.com/questions/23362887/can-you-get-external-ip-address-from-within-a-google-compute-vm-instance
         "metadata"
     );
