@@ -66,7 +66,7 @@ class App:
         print("✅ Tested rate-limiting (User)")
 
 def wait_until_live(url):
-    while i in range(10):
+    for i in range(10):
         res = requests.get(url)
         if res.status_code == 200:
             return True
