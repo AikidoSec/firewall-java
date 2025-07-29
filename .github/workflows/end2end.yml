@@ -85,4 +85,6 @@ jobs:
 
       - name: Run End-to-End tests
         working-directory: ./
-        run: tail -f ./sample-apps/${{ matrix.app.name }}/output.log && python ${{ matrix.app.test_file }}
+        run: |
+            tail -f ./sample-apps/${{ matrix.app.name }}/output.log &
+            python ${{ matrix.app.test_file }}
