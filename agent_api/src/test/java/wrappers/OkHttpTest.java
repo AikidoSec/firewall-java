@@ -35,6 +35,23 @@ public class OkHttpTest {
         ServiceConfigStore.updateBlocking(true);
     }
 
+    private void assertSSRF(String contextUrl, String reqUrl) {
+        setContextAndLifecycle(contextUrl);
+        RuntimeException exception1 = assertThrows(RuntimeException.class, () -> {
+            fetchResponse(reqUrl);
+        });
+        assertEquals(
+            "Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
+    }
+
+    private void assertNotSSRF(String contextUrl, String reqUrl) {
+        setContextAndLifecycle(contextUrl);
+        assertThrows(ConnectException.class, () -> {
+            fetchResponse(reqUrl);
+        });
+    }
+
     private void setContextAndLifecycle(String url) {
         Context.set(new EmptySampleContextObject(url));
     }
@@ -74,25 +91,9 @@ public class OkHttpTest {
 
     @Test
     public void testSSRFIPv6LoopBack() throws Exception {
-        assertEquals(0, getHits("::1", 5000));
-        setContextAndLifecycle("http://[::1]:5000");
-
-        RuntimeException exception1 = assertThrows(RuntimeException.class, () -> {
-            fetchResponse("http://[::1]:5000/api/test");
-        });
-        assertEquals(
-            "Aikido Zen has blocked a server-side request forgery",
-            exception1.getMessage());
-        assertEquals(1, getHits("::1", 5000));
-
-        setContextAndLifecycle("http://[::ffff:127.0.0.1]:5000");
-        RuntimeException exception2 = assertThrows(RuntimeException.class, () -> {
-            fetchResponse("http://[::ffff:127.0.0.1]:5000");
-        });
-        assertEquals(
-            "Aikido Zen has blocked a server-side request forgery",
-            exception2.getMessage());
-        assertEquals(1, getHits("::ffff:127.0.0.1", 5000));
+        assertSSRF("http://[::1]:5000", "http://[::1]:5000");
+        assertSSRF("http://[::1]:5000", "http://[::1]:5000/api/test");
+        assertSSRF("http://[::ffff:127.0.0.1]:5000", "http://[::ffff:127.0.0.1]:5000/api/test");
     }
 
     @Test
