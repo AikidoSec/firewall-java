@@ -73,6 +73,29 @@ public class OkHttpTest {
     }
 
     @Test
+    public void testSSRFIPv6LoopBack() throws Exception {
+        assertEquals(0, getHits("::1", 5000));
+        setContextAndLifecycle("http://[::1]:5000");
+
+        RuntimeException exception1 = assertThrows(RuntimeException.class, () -> {
+            fetchResponse("http://[::1]:5000/api/test");
+        });
+        assertEquals(
+            "Aikido Zen has blocked a server-side request forgery",
+            exception1.getMessage());
+        assertEquals(1, getHits("::1", 5000));
+
+        setContextAndLifecycle("http://[::ffff:127.0.0.1]:5000");
+        RuntimeException exception2 = assertThrows(RuntimeException.class, () -> {
+            fetchResponse("http://[::ffff:127.0.0.1]:5000");
+        });
+        assertEquals(
+            "Aikido Zen has blocked a server-side request forgery",
+            exception2.getMessage());
+        assertEquals(1, getHits("::ffff:127.0.0.1", 5000));
+    }
+
+    @Test
     public void testSSRFWithoutPort() throws Exception {
         setContextAndLifecycle("http://localhost:80");
         assertEquals(0, getHits("localhost", 80));
