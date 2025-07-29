@@ -67,8 +67,11 @@ class App:
 
 def wait_until_live(url):
     for i in range(10):
-        res = requests.get(url)
+        res = requests.get(url, timeout=5)
         if res.status_code == 200:
+            print("Server is live: " + url)
             return True
+        else:
+            print("Status code " + res.status_code + " for " + url)
         time.sleep(2)
     return False
