@@ -23,21 +23,16 @@ run: build
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCK=1 \
 	AIKIDO_LOG_LEVEL="debug" \
-	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8106 > output1.log &
+	java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8106
 
 # Run the application without Zen
 .PHONY: runWithoutZen
 runWithoutZen: build
 	@echo "Running JavaRestletMySQL without Zen & ENV (http://localhost:8107)"
-	AIKIDO_TOKEN="random-invalid-token" \
-	nohup java -jar $(JAR_FILE) --server.port=8107 > output2.log &
+	AIKIDO_TOKEN="random-invalid-token" java -jar $(JAR_FILE) --server.port=8107
 
 # Clean the project
 .PHONY: clean
 clean:
 	@echo "Cleaning the project..."
 	$(GRADLEW) clean
-
-.PHONY: kill
-kill:
-	pkill -f java
