@@ -17,14 +17,17 @@ public final class RustSQLInterface {
 
     private static final Logger logger = LogManager.getLogger(RustSQLInterface.class);
     public interface SqlLib {
-        int detect_sql_injection(String query, String userinput, int dialect);
+        int detect_sql_injection(String query, long queryLen, String userinput, long userinputLen, int dialect);
     }
     public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
         int dialectInteger = dialect.getDialectInteger();
         try {
             SqlLib lib = loadLibrary();
             if (lib != null) {
-                return lib.detect_sql_injection(query, userInput, dialectInteger) != 0;
+                long queryLen = query != null ? query.length() : 0;
+                long userInputLen = userInput != null ? userInput.length() : 0;
+                int result = lib.detect_sql_injection(query, queryLen, userInput, userInputLen, dialectInteger);
+                return result == 1;
             }
         } catch (Throwable e) {
             logger.trace(e);
