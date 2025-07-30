@@ -28,13 +28,13 @@ public final class WebResponseCollector {
             return;
         }
 
-        RoutesStore.addRouteHits(routeMetadata);
+        RoutesStore.addRouteHits(context.getMethod(), context.getRoute());
 
         // check if we need to generate api spec
-        int hits = RoutesStore.getRouteHits(routeMetadata);
+        int hits = RoutesStore.getRouteHits(context.getMethod(), context.getRoute());
         if (hits <= ANALYSIS_ON_FIRST_X_REQUESTS) {
             APISpec apiSpec = getApiInfo(context);
-            RoutesStore.updateApiSpec(routeMetadata, apiSpec);
+            RoutesStore.updateApiSpec(context.getMethod(), context.getRoute(), apiSpec);
         }
     }
 }

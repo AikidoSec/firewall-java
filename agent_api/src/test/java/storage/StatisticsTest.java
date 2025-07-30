@@ -34,9 +34,11 @@ public class StatisticsTest {
         stats.incrementAttacksDetected("test2");
         stats.incrementAttacksDetected("test1");
         stats.incrementAttacksDetected("test1");
+        stats.incrementRateLimited();
         assertEquals(3, stats.getAttacksDetected());
         assertEquals(2, stats.getAttacksBlocked());
         assertEquals(20, stats.getTotalHits());
+        assertEquals(1, stats.getRateLimited());
         assertEquals(2, stats.getOperations().get("test1").getAttacksDetected().get("total"));
         assertEquals(1, stats.getOperations().get("test1").getAttacksDetected().get("blocked"));
 
@@ -47,20 +49,29 @@ public class StatisticsTest {
         assertEquals(0, stats.getAttacksBlocked());
         assertEquals(0, stats.getAttacksDetected());
         assertEquals(0, stats.getTotalHits());
-
+        assertEquals(0, stats.getRateLimited());
     }
 
     @Test
     public void testConstructor() {
-        Statistics stats2 = new Statistics(100, 5, 1);
-        assertEquals(100, stats2.getTotalHits());
-        assertEquals(5, stats2.getAttacksDetected());
-        assertEquals(1, stats2.getAttacksBlocked());
+        Statistics stats2 = new Statistics();
+        assertEquals(0, stats2.getTotalHits());
+        assertEquals(0, stats2.getRateLimited());
+        assertEquals(0, stats2.getAttacksDetected());
+        assertEquals(0, stats2.getAttacksBlocked());
     }
 
     @Test
     public void testStatsRecord() {
-        Statistics stats2 = new Statistics(100, 5, 1);
+        Statistics stats2 = new Statistics();
+        stats2.incrementTotalHits(100);
+        stats2.incrementAttacksDetected("op2");
+        stats2.incrementAttacksDetected("op2");
+        stats2.incrementAttacksDetected("op2");
+        stats2.incrementAttacksDetected("op2");
+        stats2.incrementAttacksDetected("op2");
+        stats2.incrementAttacksBlocked("op2");
+
         stats2.registerCall("operation1", OperationKind.FS_OP);
         Statistics.StatsRecord statsRecord = stats2.getRecord();
         assertEquals(5, statsRecord.requests().attacksDetected().get("total"));
