@@ -63,6 +63,11 @@ jobs:
       - name: Cleanup application
         working-directory: ./sample-apps/JavalinPostgres
         run: chmod +x ./gradlew && make clean
+
+      - name: Build application
+        working-directory: ./sample-apps/JavalinPostgres
+        run: make build
+
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/JavalinPostgres
         run: |

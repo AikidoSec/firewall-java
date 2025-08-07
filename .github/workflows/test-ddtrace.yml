@@ -64,6 +64,11 @@ jobs:
       - name: Cleanup application
         working-directory: ./sample-apps/${{ matrix.app.name }}
         run: chmod +x ./gradlew && make clean
+
+      - name: Build application
+        working-directory: ./sample-apps/${{ matrix.app.name }}
+        run: make build
+
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/${{ matrix.app.name }}
         run: |
