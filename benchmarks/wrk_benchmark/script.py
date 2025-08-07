@@ -2,6 +2,7 @@ import re
 import subprocess
 import sys
 import time
+import requests
 
 def generate_wrk_command_for_url(url):
     # Define the command with awk included
