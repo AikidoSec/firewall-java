@@ -71,8 +71,8 @@ jobs:
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/JavalinPostgres
         run: |
-          nohup make runWithoutZen > output_without_zen.log &
-          nohup make runWithOpentel > output.log &
+          nohup make runWithoutZen > output_without_zen.log & sleep 5
+          nohup make runWithOpentel > output.log & sleep 5
 
       - name: Run End-to-End tests
         working-directory: ./
