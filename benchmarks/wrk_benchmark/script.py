@@ -9,7 +9,7 @@ def generate_wrk_command_for_url(url):
     return "wrk -t12 -c400 -d15s " + url
 
 def wait_until_live(url):
-    for i in range(10):
+    for i in range(30):
         try:
             res = requests.get(url, timeout=5)
             if res.status_code == 200:
@@ -40,8 +40,10 @@ def extract_requests_and_latency_tuple(output):
 
 def run_benchmark(route1, route2, descriptor, percentage_limit, ms_limit):
     # Cold start :
-    wait_until_live(route1)
-    wait_until_live(route2)
+    if not wait_until_live(route1):
+        raise Exception("Unable to access: " + route1)
+    if not wait_until_live(route2):
+        raise Exception("Unable to access: " + route2)
 
     output_nofw = subprocess.run(
         generate_wrk_command_for_url(route2),
