@@ -38,6 +38,3 @@ clean:
 	@echo "Cleaning the project..."
 	$(GRADLEW) clean
 
-.PHONY: kill
-kill:
-	pkill -f java
