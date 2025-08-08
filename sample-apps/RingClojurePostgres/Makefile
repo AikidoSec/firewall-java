@@ -9,4 +9,4 @@ run:
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCK=1 \
-	nohup lein run > output1.log &
+	lein run

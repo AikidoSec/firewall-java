@@ -1,4 +1,5 @@
 import time
+import requests
 
 from .EventHandler import EventHandler
 from .assert_equals import assert_eq
@@ -16,6 +17,10 @@ class App:
         }
         self.payloads = {}
         self.event_handler = EventHandler()
+        if not wait_until_live(self.urls["enabled"]):
+            raise Exception(self.urls["enabled"] + " is not turning on.")
+        if not wait_until_live(self.urls["disabled"]):
+            raise Exception(self.urls["disabled"] + " is not turning on.")
 
     def add_payload(self,key, safe_request, unsafe_request=None, test_event=None):
         self.payloads[key] = {
@@ -59,3 +64,17 @@ class App:
         print("✅ Tested rate-limiting")
         test_ratelimiting_per_user(self.urls["enabled"] + route)
         print("✅ Tested rate-limiting (User)")
+
+def wait_until_live(url):
+    for i in range(10):
+        try:
+            res = requests.get(url, timeout=5)
+            if res.status_code == 200:
+                print("Server is live: " + url)
+                return True
+            else:
+                print("Status code " + str(res.status_code) + " for " + url)
+        except requests.RequestException as e:
+            print(f"Request failed: {e}")
+        time.sleep(5)
+    return False
