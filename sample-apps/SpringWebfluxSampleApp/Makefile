@@ -17,7 +17,7 @@ build:
 # Run the application with the Java agent
 .PHONY: run
 run: build
-	@echo "Running SpringWebfluxPostgres with Zen & ENV (http://localhost:8090)"
+	@echo "Running SpringWebfluxSampleApp with Zen & ENV (http://localhost:8090)"
 	AIKIDO_LOG_LEVEL="error" \
 	AIKIDO_TOKEN="token" \
 	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
@@ -28,7 +28,7 @@ run: build
 # Run the application without Zen
 .PHONY: runWithoutZen
 runWithoutZen: build
-	@echo "Running SpringWebfluxPostgres without Zen & ENV (http://localhost:8091)"
+	@echo "Running SpringWebfluxSampleApp without Zen & ENV (http://localhost:8091)"
 	AIKIDO_TOKEN="random-invalid-token" java -jar $(JAR_FILE) --server.port=8091
 
 # Clean the project
