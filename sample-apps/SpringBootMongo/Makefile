@@ -30,7 +30,7 @@ run: build
 runWithoutZen: build
 	@echo "Running SpringBootMongo without Zen & ENV (http://localhost:8107)"
 	AIKIDO_TOKEN="random-invalid-token" \
-	nohup java -jar $(JAR_FILE) --server.port=8107 > output2.log &
+	java -jar $(JAR_FILE) --server.port=8107
 
 # Clean the project
 .PHONY: clean
