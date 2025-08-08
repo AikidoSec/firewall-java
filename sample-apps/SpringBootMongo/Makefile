@@ -23,7 +23,7 @@ run: build
 	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCK=1 \
 	AIKIDO_LOG_LEVEL="debug" \
-	nohup java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8106 > output1.log &
+	java -javaagent:$(JAVA_AGENT) -jar $(JAR_FILE) --server.port=8106
 
 # Run the application without Zen
 .PHONY: runWithoutZen
