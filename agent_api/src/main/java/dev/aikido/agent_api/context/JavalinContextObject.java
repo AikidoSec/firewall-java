@@ -20,7 +20,7 @@ public class JavalinContextObject extends ContextObject {
         this.cookies = cookies;
         this.headers = extractHeaders(headers);
         this.route = buildRouteFromUrl(this.url);
-        this.remoteAddress = getIpFromRequest(rawIp, this.getHeader("x-forwarded-for"));
+        this.remoteAddress = getIpFromRequest(rawIp, this.headers);
         this.source = "Javalin";
         this.redirectStartNodes = new ArrayList<>();
 

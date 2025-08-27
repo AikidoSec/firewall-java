@@ -18,7 +18,7 @@ public class SpringMVCContextObject extends SpringContextObject {
         this.cookies = cookies;
         this.headers = extractHeaders(headers);
         this.route = buildRouteFromUrl(this.url);
-        this.remoteAddress = getIpFromRequest(rawIp, this.getHeader("x-forwarded-for"));
+        this.remoteAddress = getIpFromRequest(rawIp, this.headers);
         this.source = "SpringFramework";
         this.redirectStartNodes = new ArrayList<>();
     }
