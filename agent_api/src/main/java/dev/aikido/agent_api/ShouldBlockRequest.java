@@ -9,6 +9,7 @@ import dev.aikido.agent_api.storage.ServiceConfiguration;
 public final class ShouldBlockRequest {
     private ShouldBlockRequest() {
     }
+    private static final ShouldBlockRequestResult NO_BLOCK = new ShouldBlockRequestResult(false, null);
 
     /**
      * shouldBlockRequest() checks user-blocking and rate-limiting.
@@ -24,9 +25,10 @@ public final class ShouldBlockRequest {
     public static ShouldBlockRequestResult shouldBlockRequest() {
         ContextObject context = Context.get();
         ServiceConfiguration config = ServiceConfigStore.getConfig();
-        if (context == null) {
-            return new ShouldBlockRequestResult(false, null); // Blocking false
+        if (context == null || config == null) {
+            return NO_BLOCK;
         }
+
         context.setExecutedMiddleware(true); // Mark middleware as executed.
         ServiceConfigStore.setMiddlewareInstalled(true);
         Context.set(context);
@@ -51,7 +53,7 @@ public final class ShouldBlockRequest {
             return new ShouldBlockRequestResult(true, blockedRequestResult);
         }
 
-        return new ShouldBlockRequestResult(false, null); // Blocking false
+        return NO_BLOCK;
     }
 
     public record ShouldBlockRequestResult(boolean block, BlockedRequestResult data) {
