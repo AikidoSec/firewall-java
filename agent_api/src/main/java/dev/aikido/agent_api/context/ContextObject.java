@@ -20,6 +20,7 @@ public class ContextObject {
     protected Object body;
     // Auxiliary :
     protected User user;
+    protected String rateLimitGroup;
     protected boolean executedMiddleware;
     protected transient ArrayList<RedirectNode> redirectStartNodes;
     protected transient Map<String, Map<String, String>> cache = new HashMap<>();
@@ -34,6 +35,13 @@ public class ContextObject {
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
+    public String getRateLimitGroup() {
+        return rateLimitGroup;
+    }
+    public void setRateLimitGroup(String groupId) {
+        this.rateLimitGroup = groupId;
+    }
 
     public Object getBody() {
         return body;
