@@ -24,6 +24,7 @@ Zen will autonomously protect your Java applications from the inside against:
 * 🛡️ [Command injection attacks](https://www.aikido.dev/blog/command-injection-in-2024-unpacked)
 * 🛡️ [Path traversal attacks](https://owasp.org/www-community/attacks/Path_Traversal) *This support is currently limited to Path/Paths and new File(String)*
 * 🛡️ [Server-side request forgery (SSRF)](./docs/ssrf.md)
+* 🛡️ Attack wave detection (vulnerability scanners)
 
 Zen operates autonomously on the same server as your Java app to:
 
