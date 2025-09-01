@@ -7,7 +7,7 @@ import dev.aikido.agent_api.helpers.logging.Logger;
 
 public class SetRateLimitGroup {
     private SetRateLimitGroup() {}
-    private static final Logger logger = LogManager.getLogger(SetUser.class);
+    private static final Logger logger = LogManager.getLogger(SetRateLimitGroup.class);
 
     public static void setRateLimitGroup(String groupId) {
         if (groupId == null || groupId.isEmpty()) {
