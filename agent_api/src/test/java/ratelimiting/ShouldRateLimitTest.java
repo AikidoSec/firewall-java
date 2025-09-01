@@ -203,4 +203,105 @@ public class ShouldRateLimitTest {
         assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
                 ShouldRateLimit.shouldRateLimit(metadata, new User("123456", "User 456", "1.2.3.4", 0), null,"1.2.3.4"));
     }
+
+    @Test
+    public void testRateLimitsByUserWithDifferentIps() {
+        List<Endpoint> endpoints = new ArrayList<>();
+        endpoints.add(new Endpoint("POST", "/login",
+            /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
+            false, false, true));
+        setEmptyConfigWithEndpointList(endpoints);
+        RouteMetadata metadata = createRouteMetadata("POST", "/login");
+
+        // First request from user 123, IP 1.2.3.4
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "group1", "1.2.3.4"));
+        // First request from user 123, IP 4.3.2.1
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "4.3.2.1", 0), "group1", "4.3.2.1"));
+        // Second request from user 123, IP 1.2.3.4
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "group1", "1.2.3.4"));
+        // This request should trigger the rate limit by group
+        assertEquals(new ShouldRateLimit.RateLimitDecision(true, "group"),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "4.3.2.1", 0), "group1", "4.3.2.1"));
+    }
+
+    @Test
+    public void testRateLimitsDifferentUsersInSameGroup() {
+        List<Endpoint> endpoints = new ArrayList<>();
+        endpoints.add(new Endpoint("POST", "/login",
+            /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
+            false, false, true));
+        setEmptyConfigWithEndpointList(endpoints);
+        RouteMetadata metadata = createRouteMetadata("POST", "/login");
+
+        // First request from user 123, IP 1.2.3.4
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "group1", "1.2.3.4"));
+        // First request from user 456, IP 4.3.2.1
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("456", "User 456", "4.3.2.1", 0), "group1", "4.3.2.1"));
+        // Second request from user 789, IP 1.2.3.4
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("789", "User 789", "1.2.3.4", 0), "group1", "1.2.3.4"));
+        // This request should trigger the rate limit by group
+        assertEquals(new ShouldRateLimit.RateLimitDecision(true, "group"),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("101112", "User 101112", "4.3.2.1", 0), "group1", "4.3.2.1"));
+    }
+
+    @Test
+    public void testWorksWithMultipleRateLimitGroupsAndDifferentUsers() {
+        List<Endpoint> endpoints = new ArrayList<>();
+        endpoints.add(new Endpoint("POST", "/login",
+            /*maxRequests*/ 2, /*windowSizeMS*/ 1000, List.of(),
+            false, false, true));
+        setEmptyConfigWithEndpointList(endpoints);
+        RouteMetadata metadata = createRouteMetadata("POST", "/login");
+
+        // First request from user 123, group1
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("123", "User 123", "1.2.3.4", 0), "group1", "1.2.3.4"));
+        // Second request from user 789, group1
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("789", "User 789", "1.2.3.4", 0), "group1", "1.2.3.4"));
+        // First request from user 101112, group2
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("101112", "User 101112", "4.3.2.1", 0), "group2", "4.3.2.1"));
+        // This request should trigger the rate limit for group1
+        assertEquals(new ShouldRateLimit.RateLimitDecision(true, "group"),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("789", "User 789", "1.2.3.4", 0), "group1", "1.2.3.4"));
+        // This request should also trigger the rate limit for group1
+        assertEquals(new ShouldRateLimit.RateLimitDecision(true, "group"),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("4321", "User 4321", "1.2.3.4", 0), "group1", "1.2.3.4"));
+        // First request from user 953, group2
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("953", "User 953", "4.3.2.1", 0), "group2", "4.3.2.1"));
+        // This request should trigger the rate limit for group2
+        assertEquals(new ShouldRateLimit.RateLimitDecision(true, "group"),
+            ShouldRateLimit.shouldRateLimit(metadata, new User("1563", "User 1563", "4.3.2.1", 0), "group2", "4.3.2.1"));
+    }
+
+    @Test
+    public void testRateLimitsByGroupIfUserIsNotSet() {
+        List<Endpoint> endpoints = new ArrayList<>();
+        endpoints.add(new Endpoint("POST", "/login",
+            /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
+            false, false, true));
+        setEmptyConfigWithEndpointList(endpoints);
+        RouteMetadata metadata = createRouteMetadata("POST", "/login");
+
+        // First request, no user, IP 1.2.3.4
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, null, "group1", "1.2.3.4"));
+        // Second request, no user, IP 4.3.2.1
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, null, "group1", "4.3.2.1"));
+        // Third request, no user, IP 1.2.3.4
+        assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+            ShouldRateLimit.shouldRateLimit(metadata, null, "group1", "1.2.3.4"));
+        // This request should trigger the rate limit by group
+        assertEquals(new ShouldRateLimit.RateLimitDecision(true, "group"),
+            ShouldRateLimit.shouldRateLimit(metadata, null, "group1", "4.3.2.1"));
+    }
 }
