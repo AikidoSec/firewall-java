@@ -1,8 +1,13 @@
 package dev.aikido.agent_api.vulnerabilities.attack_wave_detection;
 
+import java.util.List;
+
 public final class Paths {
     private Paths() {
     }
+    public static List<String> FILE_EXTENSIONS = List.of(
+        "env", "bak", "sql", "sqlite", "sqlite3", "db", "old", "save", "orig", "sqlitedb", "sqlite3db"
+    );
 
     // Copied over from AikidoSec/firewall-node
     // https://github.com/AikidoSec/firewall-node/blob/main/library/vulnerabilities/attack-wave-detection/paths/directoryNames.ts
@@ -52,8 +57,8 @@ public final class Paths {
         "tmp",
         "xampp",
         "cgi-bin",
-        "%systemroot%",
-        );
+        "%systemroot%"
+    );
 
 
     // Copied over from AikidoSec/firewall-node
@@ -359,6 +364,6 @@ public final class Paths {
         "openapi.json",
         "vim_settings.xml",
         "winscp.ini",
-        "ws_ftp.ini",
-        );
+        "ws_ftp.ini"
+    );
 }
