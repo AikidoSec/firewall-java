@@ -10,6 +10,17 @@ public final class ShouldBlockRequest {
     private ShouldBlockRequest() {
     }
 
+    /**
+     * shouldBlockRequest() checks user-blocking and rate-limiting.
+     * Returns {
+     *      block: boolean,
+     *      data: {
+     *          type: "blocked" | "ratelimited",
+     *          trigger: "ip" | "user" | "group",
+     *          ip?: string
+     *      }
+     *  }
+     */
     public static ShouldBlockRequestResult shouldBlockRequest() {
         ContextObject context = Context.get();
         ServiceConfiguration config = ServiceConfigStore.getConfig();
