@@ -51,7 +51,7 @@ public final class ShouldBlockRequest {
 
         // Rate-limiting for group, user, or IP.
         ShouldRateLimit.RateLimitDecision rateLimitDecision = ShouldRateLimit.shouldRateLimit(
-                context.getRouteMetadata(), context.getUser(), context.getRemoteAddress()
+            context.getRouteMetadata(), context.getUser(), context.getRateLimitGroup(), context.getRemoteAddress()
         );
         if (rateLimitDecision.block()) {
             BlockedRequestResult blockedRequestResult = new BlockedRequestResult(
