@@ -3,7 +3,7 @@ package dev.aikido.agent_api.vulnerabilities.attack_wave_detection;
 import java.util.HashMap;
 import java.util.List;
 
-public class WebQueryParamChecker {
+public final class WebQueryParamChecker {
     private static final List<String> KEYWORDS = List.of(
         "SELECT (CASE WHEN",
         "SELECT COUNT(",
@@ -21,6 +21,9 @@ public class WebQueryParamChecker {
         "UNION ALL SELECT",
         "../"
     );
+
+    private WebQueryParamChecker() {
+    }
 
     public static boolean queryParamsContainDangerousPayload(HashMap<String, List<String>> queryStrings) {
         if (queryStrings == null) {
