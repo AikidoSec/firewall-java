@@ -24,13 +24,4 @@ public final class AttackWaveDetectorStore {
             mutex.unlock();
         }
     }
-
-    public static void clear() {
-        mutex.lock();
-        try {
-            detector.clear();
-        } finally {
-            mutex.unlock();
-        }
-    }
 }

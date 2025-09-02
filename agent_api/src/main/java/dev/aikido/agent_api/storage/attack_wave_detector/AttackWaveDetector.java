@@ -46,9 +46,4 @@ public class AttackWaveDetector {
         this.sentEventsMap.set(ip, System.currentTimeMillis());
         return true;
     }
-
-    public void clear() {
-        this.suspiciousRequestsMap.clear();
-        this.sentEventsMap.clear();
-    }
 }
