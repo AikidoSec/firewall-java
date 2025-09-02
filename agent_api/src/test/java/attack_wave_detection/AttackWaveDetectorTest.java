@@ -1,0 +1,109 @@
+package attack_wave_detection;
+
+import dev.aikido.agent_api.storage.attack_wave_detector.AttackWaveDetector;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class AttackWaveDetectorTest {
+
+    private AttackWaveDetector newAttackWaveDetector() {
+        // Use much smaller time frames for testing (e.g., 100ms instead of 60s)
+        return new AttackWaveDetector(6, 100L, 200L, 10_000);
+    }   
+
+    @Test
+    void testNoIpAddress() throws InterruptedException {
+        AttackWaveDetector detector = newAttackWaveDetector();
+        assertFalse(detector.check(null, true));
+    }
+
+    @Test
+    void testNotAWebScanner() throws InterruptedException {
+        AttackWaveDetector detector = newAttackWaveDetector();
+        assertFalse(detector.check("::1", false));
+        assertFalse(detector.check("::1", false));
+        assertFalse(detector.check("::1", false));
+        assertFalse(detector.check("::1", false));
+        assertFalse(detector.check("::1", false));
+        assertFalse(detector.check("::1", false));
+    }
+
+    @Test
+    void testWebScanner() throws InterruptedException {
+        AttackWaveDetector detector = newAttackWaveDetector();
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertTrue(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+    }
+
+    @Test
+    void testWebScannerWithDelays() throws InterruptedException {
+        AttackWaveDetector detector = newAttackWaveDetector();
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+
+        // Small delay (50ms)
+        Thread.sleep(50);
+        assertFalse(detector.check("::1", true));
+        assertTrue(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+
+        // Wait for minTimeBetweenEvents (200ms)
+        Thread.sleep(205);
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertTrue(detector.check("::1", true));
+    }
+
+    @Test
+    void testSlowWebScannerSecondInterval() throws InterruptedException {
+        AttackWaveDetector detector = newAttackWaveDetector();
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+
+        // Small delay, move time frame (102ms)
+        Thread.sleep(102);
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertTrue(detector.check("::1", true));
+    }
+
+    @Test
+    void testSlowWebScannerThirdInterval() throws InterruptedException {
+        AttackWaveDetector detector = newAttackWaveDetector();
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+
+        // Small delay, move time frame (102ms)
+        Thread.sleep(102);
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+
+        // Small delay, move time frame (102ms)
+        Thread.sleep(102);
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertFalse(detector.check("::1", true));
+        assertTrue(detector.check("::1", true));
+    }
+}
