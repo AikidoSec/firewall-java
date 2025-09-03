@@ -56,4 +56,12 @@ public class WebScanDetectorTest {
             createTestContext("/", "GET", Map.of("test", List.of("abcd")))
         ));
     }
+
+    @Test
+    public void testWithNull() {
+        assertFalse(WebScanDetector.isWebScanner(createTestContext("graphql", "POST", Map.of())));
+        assertFalse(WebScanDetector.isWebScanner(createTestContext(null, "POST", Map.of())));
+        assertFalse(WebScanDetector.isWebScanner(createTestContext("graphql", null, Map.of())));
+        assertFalse(WebScanDetector.isWebScanner(createTestContext(null, null, Map.of())));
+    }
 }
