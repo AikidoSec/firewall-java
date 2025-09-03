@@ -1,5 +1,6 @@
 package dev.aikido.agent_api.storage.attack_wave_detector;
 
+import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
@@ -13,10 +14,10 @@ public final class AttackWaveDetectorStore {
     private AttackWaveDetectorStore() {
     }
 
-    public static boolean check(String ip, boolean isWebScanner) {
+    public static boolean check(ContextObject ctx) {
         mutex.lock();
         try {
-            return detector.check(ip, isWebScanner);
+            return detector.check(ctx);
         } catch (Throwable e) {
             logger.debug("An error occurred checking for attack waves: %s", e.getMessage());
             return false;
