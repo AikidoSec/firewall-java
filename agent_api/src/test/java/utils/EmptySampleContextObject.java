@@ -5,6 +5,7 @@ import dev.aikido.agent_api.context.ContextObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EmptySampleContextObject extends ContextObject {
     public EmptySampleContextObject() {
@@ -36,6 +37,12 @@ public class EmptySampleContextObject extends ContextObject {
         this.query.put("arg", List.of(argument));
         this.route = route;
         this.method = method;
+    }
+    public EmptySampleContextObject(String route, String method, Map<String, List<String>> queryParams) {
+        this();
+        this.route = route;
+        this.method = method;
+        this.query = new HashMap<>(queryParams);
     }
     public void setIp(String ip) {
         this.remoteAddress = ip;
