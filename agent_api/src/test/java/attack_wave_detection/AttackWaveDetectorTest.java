@@ -20,8 +20,6 @@ class AttackWaveDetectorTest {
             ctx = new EmptySampleContextObject("../etc/passwd", "/wp-config.php", "BADMETHOD");
         }
         ctx.setIp(ip);
-        // debug
-        System.out.println(ip);
         return detector.check(ctx);
     }
 
