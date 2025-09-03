@@ -7,25 +7,25 @@ import static org.junit.jupiter.api.Assertions.*;
 class ArrayHelpersTest {
 
     @Test
-    void testPop_WithNonEmptyArray_ReturnsLastElement() {
+    void testLastElement_WithNonEmptyArray_ReturnsLastElement() {
         String[] array = {"a", "b", "c"};
-        assertEquals("c", ArrayHelpers.pop(array));
+        assertEquals("c", ArrayHelpers.lastElement(array));
     }
 
     @Test
-    void testPop_WithEmptyArray_ReturnsNull() {
+    void testLastElement_WithEmptyArray_ReturnsNull() {
         String[] array = {};
-        assertNull(ArrayHelpers.pop(array));
+        assertNull(ArrayHelpers.lastElement(array));
     }
 
     @Test
-    void testPop_WithNullArray_ReturnsNull() {
-        assertNull(ArrayHelpers.pop(null));
+    void testLastElement_WithNullArray_ReturnsNull() {
+        assertNull(ArrayHelpers.lastElement(null));
     }
 
     @Test
-    void testPop_WithSingleElementArray_ReturnsElement() {
+    void testLastElement_WithSingleElementArray_ReturnsElement() {
         String[] array = {"only"};
-        assertEquals("only", ArrayHelpers.pop(array));
+        assertEquals("only", ArrayHelpers.lastElement(array));
     }
 }

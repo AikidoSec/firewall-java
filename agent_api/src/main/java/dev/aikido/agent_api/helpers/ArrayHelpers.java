@@ -4,7 +4,7 @@ public final class ArrayHelpers {
     private ArrayHelpers() {
     }
 
-    public static String pop(String[] array) {
+    public static String lastElement(String[] array) {
         if (array == null || array.length == 0) {
             return null;
         }

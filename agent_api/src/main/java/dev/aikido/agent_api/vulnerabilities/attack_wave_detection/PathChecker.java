@@ -11,7 +11,7 @@ public final class PathChecker {
     public static boolean isWebScanPath(String path) {
         String normalized = path.toLowerCase();
         String[] segments = normalized.split("/");
-        String filename = ArrayHelpers.pop(segments);
+        String filename = ArrayHelpers.lastElement(segments);
 
         if (filename != null) {
             if (FILE_NAMES.contains(filename)) {
