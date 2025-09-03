@@ -42,6 +42,10 @@ public final class AttackQueue {
         return queue.take();
     }
 
+    public static int getSize() {
+        return queue.size();
+    }
+
     public static void clear() {
         queue.clear();
     }
