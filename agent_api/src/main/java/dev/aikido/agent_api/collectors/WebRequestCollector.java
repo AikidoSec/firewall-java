@@ -56,6 +56,10 @@ public final class WebRequestCollector {
         if (blockedIpsRes != null)
             return blockedIpsRes;
 
+        Res blockedUARes = checkBlockedUserAgents(newContext.getHeader("user-agent"));
+        if (blockedUARes != null)
+            return blockedUARes;
+
         // Check for attack waves
         if (AttackWaveDetectorStore.check(newContext)) {
             AttackQueue.add(
@@ -63,7 +67,7 @@ public final class WebRequestCollector {
             );
         }
 
-        return checkBlockedUserAgents(newContext.getHeader("user-agent"));
+        return null;
     }
 
     private static Res checkEndpointAllowlist(RouteMetadata routeMetadata, String remoteAddress, ServiceConfiguration config) {
