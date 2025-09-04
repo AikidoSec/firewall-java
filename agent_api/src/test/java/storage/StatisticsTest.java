@@ -65,8 +65,8 @@ public class StatisticsTest {
         Statistics.StatsRecord statsRecord = stats2.getRecord();
         assertEquals(5, statsRecord.requests().attacksDetected().total());
         assertEquals(1, statsRecord.requests().attacksDetected().blocked());
-        assertEquals(0, statsRecord.requests().attackWavesDetected().total());
-        assertEquals(0, statsRecord.requests().attackWavesDetected().blocked());
+        assertEquals(0, statsRecord.requests().attackWaves().total());
+        assertEquals(0, statsRecord.requests().attackWaves().blocked());
         assertEquals(100, statsRecord.requests().total());
         assertEquals(1, statsRecord.operations().get("operation1").total());
         assertEquals(1, statsRecord.operations().size());
@@ -144,7 +144,7 @@ public class StatisticsTest {
         stats.incrementAttackWavesDetected();
         stats.incrementAttackWavesBlocked();
         Statistics.StatsRecord statsRecord = stats.getRecord();
-        assertEquals(2, statsRecord.requests().attackWavesDetected().total());
-        assertEquals(1, statsRecord.requests().attackWavesDetected().blocked());
+        assertEquals(2, statsRecord.requests().attackWaves().total());
+        assertEquals(1, statsRecord.requests().attackWaves().blocked());
     }
 }
