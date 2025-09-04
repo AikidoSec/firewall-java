@@ -13,33 +13,59 @@ import static dev.aikido.agent_api.ratelimiting.RateLimitedEndpointFinder.getRat
 
 public final class ShouldRateLimit {
     private ShouldRateLimit() {}
+    private static final RateLimitDecision NO_RATE_LIMIT = new RateLimitDecision(/*block*/false, null);
     public record RateLimitDecision(boolean block, String trigger) {}
-    public static RateLimitDecision shouldRateLimit(RouteMetadata routeMetadata, User user, String remoteAddress) {
+    public static RateLimitDecision shouldRateLimit(RouteMetadata routeMetadata, User user, String rateLimitGroup, String remoteAddress) {
         List<Endpoint> endpoints = ServiceConfigStore.getConfig().getEndpoints();
         List<Endpoint> matches = matchEndpoints(routeMetadata, endpoints);
         Endpoint rateLimitedEndpoint = getRateLimitedEndpoint(matches, routeMetadata.route());
         if (rateLimitedEndpoint == null) {
-            return new RateLimitDecision(/*block*/false, null);
+            return NO_RATE_LIMIT;
         }
 
         long windowSizeInMS = rateLimitedEndpoint.getRateLimiting().windowSizeInMS();
         long maxRequests = rateLimitedEndpoint.getRateLimiting().maxRequests();
+
+        // First check the group, then the user and finally the IP in that order.
+        if (rateLimitGroup != null) {
+            String key = getKeyForRateLimitGroup(rateLimitedEndpoint, rateLimitGroup);
+            boolean allowed = RateLimiterStore.isAllowed(key, windowSizeInMS, maxRequests);
+            if (allowed) {
+                // Do not continue to check based on User ID or IP if group is set
+                return NO_RATE_LIMIT;
+            }
+            return new RateLimitDecision(true, "group");
+        }
         if (user != null) {
-            String key = rateLimitedEndpoint.getMethod() + ":" + rateLimitedEndpoint.getRoute() + ":user:" + user.id();
+            String key = getKeyForUser(rateLimitedEndpoint, user);
             boolean allowed = RateLimiterStore.isAllowed(key, windowSizeInMS, maxRequests);
             if (allowed) {
                 // Do not continue to check based on IP if user is present:
-                return new RateLimitDecision(/*block*/false, null);
+                return NO_RATE_LIMIT;
             }
-            return new RateLimitDecision(/*block*/ true, /*trigger*/ "user");
+            return new RateLimitDecision(true, "user");
         }
         if (remoteAddress != null && !remoteAddress.isEmpty()) {
-            String key = rateLimitedEndpoint.getMethod() + ":" + rateLimitedEndpoint.getRoute() + ":ip:" + remoteAddress;
+            String key = getKeyForIp(rateLimitedEndpoint, remoteAddress);
             boolean allowed = RateLimiterStore.isAllowed(key, windowSizeInMS, maxRequests);
             if (!allowed) {
-                return new RateLimitDecision(/*block*/ true, /*trigger*/ "ip");
+                return new RateLimitDecision(true, "ip");
             }
         }
-        return new RateLimitDecision(/*block*/false, null);
+        return NO_RATE_LIMIT;
+    }
+
+    // Helpers to abstract the key creation logic
+    private static String getKeyForRateLimitGroup(Endpoint endpoint, String groupId) {
+        // `{method}:{route}:group:{groupId}`
+        return String.format("%s:%s:group:%s", endpoint.getMethod(), endpoint.getRoute(), groupId);
+    }
+    private static String getKeyForUser(Endpoint endpoint, User user) {
+        // `{method}:{route}:user:{userId}`
+        return String.format("%s:%s:user:%s", endpoint.getMethod(), endpoint.getRoute(), user.id());
+    }
+    private static String getKeyForIp(Endpoint endpoint, String ip) {
+        // `{method}:{route}:ip:{ip}`
+        return String.format("%s:%s:ip:%s", endpoint.getMethod(), endpoint.getRoute(), ip);
     }
 }
