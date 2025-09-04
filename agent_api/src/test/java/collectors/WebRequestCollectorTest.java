@@ -268,6 +268,7 @@ class WebRequestCollectorTest {
         WebRequestCollector.Res response = WebRequestCollector.report(attackWaveCtx);
         assertNull(response);
         assertEquals(0, AttackQueue.getSize());
+        assertEquals(0, StatisticsStore.getStatsRecord().requests().attackWavesDetected().total());
 
         // 2...14
         WebRequestCollector.report(attackWaveCtx);
@@ -294,6 +295,7 @@ class WebRequestCollectorTest {
         assertEquals("detected_attack_wave", event.type());
         assertEquals(null, event.attack().user());
         assertEquals(0, event.attack().metadata().size());
-
+        // check stats changed
+        assertEquals(1, StatisticsStore.getStatsRecord().requests().attackWavesDetected().total());
     }
 }
