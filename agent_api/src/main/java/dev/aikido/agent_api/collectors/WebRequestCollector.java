@@ -65,6 +65,7 @@ public final class WebRequestCollector {
             AttackQueue.add(
                 DetectedAttackWave.createAPIEvent(newContext)
             );
+            StatisticsStore.incrementAttackWavesDetected();
         }
 
         return null;
