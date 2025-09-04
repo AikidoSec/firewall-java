@@ -155,7 +155,7 @@ public class Statistics {
         long total,
         long aborted,
         StatsTotalAndBlocked attacksDetected,
-        StatsTotalAndBlocked attackWavesDetected
+        StatsTotalAndBlocked attackWaves
     ) {
     }
 
