@@ -1,89 +1,148 @@
 package helpers;
 
-import dev.aikido.agent_api.helpers.env.BooleanEnv;
-import dev.aikido.agent_api.helpers.net.ProxyForwardedParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProxyForwardedParserTest {
-
-    private ProxyForwardedParser parser;
+    private HashMap<String, List<String>> headers;
 
     @BeforeEach
     void setUp() {
-        parser = new ProxyForwardedParser();
+        headers = new HashMap<>();
     }
 
     @Test
     void testGetIpFromRequest_ValidXForwardedFor() {
-        String result = parser.getIpFromRequest("10.0.0.1", "192.168.1.1, 203.0.113.5");
+        headers.put("X-Forwarded-For", List.of("192.168.1.1, 203.0.113.5"));
+        String result = getIpFromRequest("10.0.0.1", headers);
         assertEquals("192.168.1.1", result);
     }
 
     @Test
     void testGetIpFromRequest_ValidXForwardedForWithPort() {
-        String result = parser.getIpFromRequest("10.0.0.1", "192.168.1.1:8080, 203.0.113.5:443");
+        headers.put("X-Forwarded-For", List.of("192.168.1.1:8080, 203.0.113.5:443"));
+        String result = getIpFromRequest("10.0.0.1", headers);
         assertEquals("192.168.1.1", result);
     }
 
     @Test
     void testGetIpFromRequest_ValidXForwardedForWithIPv6() {
-        String result = parser.getIpFromRequest("10.0.0.1", "2001:db8::1, 203.0.113.5");
+        headers.put("X-Forwarded-For", List.of("2001:db8::1, 203.0.113.5"));
+        String result = getIpFromRequest("10.0.0.1", headers);
         assertEquals("2001:db8::1", result);
     }
 
     @Test
     void testGetIpFromRequest_InvalidXForwardedFor() {
-        String result = parser.getIpFromRequest("10.0.0.1", "invalid.ip.address, 203.0.113.5");
-        assertEquals("203.0.113.5", result); // Only use 203.0.113.5
+        headers.put("X-Forwarded-For", List.of("invalid.ip.address, 203.0.113.5"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("203.0.113.5", result);
     }
 
     @Test
     void testGetIpFromRequest_InvalidXForwardedFor_with_port() {
-        String result = parser.getIpFromRequest("10.0.0.1", "invalid.ip.address:443, 203.0.113.5:8080192");
-        assertEquals("203.0.113.5", result); // Only use 203.0.113.5
+        headers.put("X-Forwarded-For", List.of("invalid.ip.address:443, 203.0.113.5:8080192"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("203.0.113.5", result);
     }
 
     @Test
     void testGetIpFromRequest_EmptyXForwardedFor() {
-        String result = parser.getIpFromRequest("10.0.0.1", "");
-        assertEquals("10.0.0.1", result); // Fallback to raw IP
+        headers.put("X-Forwarded-For", List.of(""));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("10.0.0.1", result);
     }
 
     @Test
     void testGetIpFromRequest_NullXForwardedFor() {
-        String result = parser.getIpFromRequest("10.0.0.1", null);
-        assertEquals("10.0.0.1", result); // Fallback to raw IP
+        String result = getIpFromRequest("10.0.0.1", new HashMap<>());
+        assertEquals("10.0.0.1", result);
     }
 
     @Test
-    @SetEnvironmentVariable(key="AIKIDO_TRUST_PROXY", value = "0")
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "0")
     void testGetIpFromRequest_TrustProxyFalse() {
-        String result = parser.getIpFromRequest("10.0.0.1", "192.168.1.1, 203.0.113.5");
-        assertEquals("10.0.0.1", result); // Should fallback to raw IP
+        headers.put("X-Forwarded-For", List.of("192.168.1.1, 203.0.113.5"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("10.0.0.1", result);
     }
 
     @Test
-    @SetEnvironmentVariable(key="AIKIDO_TRUST_PROXY", value = "1")
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
     void testGetIpFromRequest_TrustProxyTrueWithNoValidIPs() {
-        // Mocking the BooleanEnv to return true
-        BooleanEnv mockTrustProxy = new BooleanEnv("AIKIDO_TRUST_PROXY", true);
-        String result = parser.getIpFromRequest("10.0.0.1", "invalid.ip.address, another.invalid");
-        assertEquals("10.0.0.1", result); // Should fallback to raw IP
+        headers.put("X-Forwarded-For", List.of("invalid.ip.address, another.invalid"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("10.0.0.1", result);
     }
 
     @Test
-    @SetEnvironmentVariable(key="AIKIDO_TRUST_PROXY", value = "1")
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
     void testGetIpFromRequest_MultipleValidIPs() {
-        String result = parser.getIpFromRequest("10.0.0.1", "203.0.113.5, 192.168.1.1");
-        assertEquals("203.0.113.5", result); // Should return the first valid IP
+        headers.put("X-Forwarded-For", List.of("203.0.113.5, 192.168.1.1"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("203.0.113.5", result);
     }
 
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "0")
+    void testGetIpFromRequest_DefaultHeader() {
+        HashMap<String, List<String>> headers = new HashMap<>();
+        headers.put("X-Forwarded-For", List.of("127.0.0.1, 192.168.0.1"));
+        String result = getIpFromRequest("1.2.3.4", headers);
+        assertEquals("1.2.3.4", result);
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_CLIENT_IP_HEADER", value = "connecting-ip")
+    void testGetIpFromRequest_CustomHeader() {
+        HashMap<String, List<String>> headers = new HashMap<>();
+        headers.put("X-Forwarded-For", List.of("127.0.0.1, 192.168.0.1"));
+        headers.put("connecting-ip", List.of("9.9.9.9"));
+        String result = getIpFromRequest("1.2.3.4", headers);
+        assertEquals("9.9.9.9", result);
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_CLIENT_IP_HEADER", value = "connecting-ip")
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "0")
+    void testGetIpFromRequest_NoCustomHeader() {
+        HashMap<String, List<String>> headers = new HashMap<>();
+        headers.put("connecting-ip", List.of("5.6.7.8, 192.168.0.1"));
+        String result = getIpFromRequest("1.2.3.4", headers);
+        assertEquals("1.2.3.4", result);
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_CLIENT_IP_HEADER", value = "connecting-IP")
+    void testGetIpFromRequest_CustomHeaderCaseInsensitive() {
+        HashMap<String, List<String>> headers = new HashMap<>();
+        headers.put("X-Forwarded-For", List.of("127.0.0.1, 192.168.0.1"));
+        headers.put("connecting-ip", List.of("9.9.9.9"));
+        String result = getIpFromRequest("1.2.3.4", headers);
+        assertEquals("9.9.9.9", result);
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_CLIENT_IP_HEADER", value = "")
+    void testGetIpFromRequest_EmptyCustomHeader() {
+        HashMap<String, List<String>> headers = new HashMap<>();
+        headers.put("connecting-ip", List.of("9.9.9.9"));
+        String result = getIpFromRequest("1.2.3.4", headers);
+        assertEquals("1.2.3.4", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_MultipleValidIPsInXForwardedFor() {
+        HashMap<String, List<String>> headers = new HashMap<>();
+        headers.put("X-Forwarded-For", List.of(",5.6.7.8,,"));
+        String result = getIpFromRequest("1.2.3.4", headers);
+        assertEquals("5.6.7.8", result);
+    }
 }

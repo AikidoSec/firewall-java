@@ -66,10 +66,13 @@ public class ContextObject {
         return headers;
     }
     public String getHeader(String key) {
-        if (this.headers == null || this.headers.isEmpty()) {
+        return getHeader(this.headers, key);
+    }
+    public static String getHeader(HashMap<String, List<String>> headers, String key) {
+        if (headers == null || headers.isEmpty()) {
             return null;
         }
-        for (Map.Entry<String, List<String>> entry: this.headers.entrySet()) {
+        for (Map.Entry<String, List<String>> entry: headers.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(key)) {
                 List<String> headerValues = entry.getValue();
                 if (headerValues != null && !headerValues.isEmpty()) {
