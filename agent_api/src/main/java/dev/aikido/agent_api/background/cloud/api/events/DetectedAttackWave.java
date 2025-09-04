@@ -37,8 +37,6 @@ public final class DetectedAttackWave {
     }
 
     public static DetectedAttackWaveEvent createAPIEvent(ContextObject context) {
-        boolean blocking = getConfig().isBlockingEnabled();
-
         RequestData requestData = new RequestData(
             context.getRemoteAddress(), // ipAddress
             context.getHeader("user-agent"), // userAgent
