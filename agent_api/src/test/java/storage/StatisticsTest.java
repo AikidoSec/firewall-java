@@ -63,8 +63,10 @@ public class StatisticsTest {
         Statistics stats2 = new Statistics(100, 5, 1);
         stats2.registerCall("operation1", OperationKind.FS_OP);
         Statistics.StatsRecord statsRecord = stats2.getRecord();
-        assertEquals(5, statsRecord.requests().attacksDetected().get("total"));
-        assertEquals(1, statsRecord.requests().attacksDetected().get("blocked"));
+        assertEquals(5, statsRecord.requests().attacksDetected().total());
+        assertEquals(1, statsRecord.requests().attacksDetected().blocked());
+        assertEquals(0, statsRecord.requests().attackWaves().total());
+        assertEquals(0, statsRecord.requests().attackWaves().blocked());
         assertEquals(100, statsRecord.requests().total());
         assertEquals(1, statsRecord.operations().get("operation1").total());
         assertEquals(1, statsRecord.operations().size());
@@ -94,5 +96,55 @@ public class StatisticsTest {
         // Ensure that the returned map is not modifiable
         operations.put("operation2", new OperationRecord(OperationKind.EXEC_OP));
         assertEquals(1, stats.getOperations().size()); // Should still only have operation1
+    }
+
+    @Test
+    public void testIncrementAttackWavesDetected() {
+        assertEquals(0, stats.getAttackWavesDetected());
+        stats.incrementAttackWavesDetected();
+        assertEquals(1, stats.getAttackWavesDetected());
+        stats.incrementAttackWavesDetected();
+        assertEquals(2, stats.getAttackWavesDetected());
+    }
+
+    @Test
+    public void testIncrementAttackWavesBlocked() {
+        assertEquals(0, stats.getAttackWavesBlocked());
+        stats.incrementAttackWavesBlocked();
+        assertEquals(1, stats.getAttackWavesBlocked());
+        stats.incrementAttackWavesBlocked();
+        assertEquals(2, stats.getAttackWavesBlocked());
+    }
+
+    @Test
+    public void testAttackWavesStatsAfterClear() {
+        stats.incrementAttackWavesDetected();
+        stats.incrementAttackWavesDetected();
+        stats.incrementAttackWavesBlocked();
+        assertEquals(2, stats.getAttackWavesDetected());
+        assertEquals(1, stats.getAttackWavesBlocked());
+        stats.clear();
+        assertEquals(0, stats.getAttackWavesDetected());
+        assertEquals(0, stats.getAttackWavesBlocked());
+    }
+
+    @Test
+    public void testAttackWavesStatsInConstructor() {
+        Statistics stats2 = new Statistics(0, 3, 2);
+        assertEquals(3, stats2.getAttacksDetected());
+        assertEquals(2, stats2.getAttacksBlocked());
+        // Ensure new stats are zero
+        assertEquals(0, stats2.getAttackWavesDetected());
+        assertEquals(0, stats2.getAttackWavesBlocked());
+    }
+
+    @Test
+    public void testAttackWavesStatsRecord() {
+        stats.incrementAttackWavesDetected();
+        stats.incrementAttackWavesDetected();
+        stats.incrementAttackWavesBlocked();
+        Statistics.StatsRecord statsRecord = stats.getRecord();
+        assertEquals(2, statsRecord.requests().attackWaves().total());
+        assertEquals(1, statsRecord.requests().attackWaves().blocked());
     }
 }

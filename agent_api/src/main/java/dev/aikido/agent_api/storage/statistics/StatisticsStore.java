@@ -88,4 +88,13 @@ public final class StatisticsStore {
             mutex.unlock();
         }
     }
+
+    public static void incrementAttackWavesDetected() {
+        mutex.lock();
+        try {
+            stats.incrementAttackWavesDetected();
+        } finally {
+            mutex.unlock();
+        }
+    }
 }
