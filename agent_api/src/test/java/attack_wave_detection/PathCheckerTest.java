@@ -14,7 +14,7 @@ public class PathCheckerTest {
             "/.env", "/test/.env", "/test/.env.bak", "/.git/config",
             "/.aws/config", "/some/path/.git/test", "/some/path/.gitlab-ci.yml",
             "/some/path/.github/workflows/test.yml", "/.travis.yml",
-            "/../example/", "/./test"
+            "/../example/", "/./test", "/Cargo.lock", "/System32/test",
         };
         for (String path : dangerousPaths) {
             assertTrue(
