@@ -23,12 +23,50 @@ public class SSRFDetector {
             return null;
         }
 
-        if (resolvesToImdsIp(new HashSet<>(ipAddresses), hostname)) {
-            // An attacker could have stored a hostname in a database that points to an IMDS IP address
-            // We don't check if the user input contains the hostname because context might not be available
+        String imdsIp = resolvesToImdsIp(new HashSet<>(ipAddresses), hostname);
+        if (imdsIp != null) {
+            // Check if hostname is in user input (context available)
+            ContextObject context = Context.get();
+            if (context != null) {
+                FindHostnameInContext.Res attackFindings = findHostnameInContext(hostname, context, port);
+                if (attackFindings != null) {
+                    // Regular SSRF - hostname found in user input
+                    return new Attack(
+                            operation,
+                            new Vulnerabilities.SSRFVulnerability(),
+                            attackFindings.source(),
+                            attackFindings.pathToPayload(),
+                            Map.of(
+                                "hostname", hostname,
+                                "privateIP", imdsIp
+                            ),
+                            attackFindings.payload(),
+                            getCurrentStackTrace(),
+                            context.getUser()
+                    );
+                }
+            }
+
+            // Stored SSRF - no context or hostname not in user input
+            Attack storedSsrfAttack = new Attack(
+                    operation,
+                    new Vulnerabilities.StoredSSRFVulnerability(),
+                    null, // source is null for stored attacks
+                    "", // path is empty
+                    Map.of(
+                        "hostname", hostname,
+                        "privateIP", imdsIp
+                    ),
+                    hostname, // payload is the hostname
+                    getCurrentStackTrace(),
+                    null // user is null for stored attacks
+            );
+
             if(shouldBlock()) {
                 throw SSRFException.get();
             }
+
+            return storedSsrfAttack;
         }
         if (!containsPrivateIP(ipAddresses)) {
             // No real danger, returning.

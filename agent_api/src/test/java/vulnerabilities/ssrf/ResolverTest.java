@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static dev.aikido.agent_api.vulnerabilities.ssrf.imds.Resolver.resolvesToImdsIp;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ResolverTest {
     @Test
@@ -16,7 +16,7 @@ public class ResolverTest {
         Set<String> resolvedIps = new HashSet<>();
         resolvedIps.add("192.168.1.1"); // Non-IMDS IP
 
-        assertFalse(Resolver.resolvesToImdsIp(resolvedIps, "metadata.google.internal"));
+        assertNull(Resolver.resolvesToImdsIp(resolvedIps, "metadata.google.internal"));
     }
 
     @Test
@@ -24,7 +24,7 @@ public class ResolverTest {
         Set<String> resolvedIps = new HashSet<>();
         resolvedIps.add("169.254.169.254"); // IMDS IP
 
-        assertTrue(Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
+        assertEquals("169.254.169.254", Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
     }
 
     @Test
@@ -33,7 +33,7 @@ public class ResolverTest {
         resolvedIps.add("192.168.1.1"); // Non-IMDS IP
         resolvedIps.add("fd00:ec2::254"); // IMDS IP
 
-        assertTrue(Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
+        assertEquals("fd00:ec2::254", Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ResolverTest {
         resolvedIps.add("192.168.1.1"); // Non-IMDS IP
         resolvedIps.add("10.0.0.1"); // Another Non-IMDS IP
 
-        assertFalse(Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
+        assertNull(Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class ResolverTest {
         resolvedIps.add("192.168.1.1"); // Non-IMDS IP
         resolvedIps.add("10.0.0.1"); // Another Non-IMDS IP
 
-        assertFalse(Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
+        assertNull(Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
     }
 
     @Test
@@ -59,6 +59,6 @@ public class ResolverTest {
         Set<String> resolvedIps = new HashSet<>();
         resolvedIps.add("169.254.169.254"); // IMDS IP
 
-        assertFalse(Resolver.resolvesToImdsIp(resolvedIps, "metadata.google.internal"));
+        assertNull(Resolver.resolvesToImdsIp(resolvedIps, "metadata.google.internal"));
     }
 }
