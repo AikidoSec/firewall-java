@@ -6,6 +6,7 @@ import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.ratelimiting.ShouldRateLimit;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 public final class ShouldBlockRequest {
     private ShouldBlockRequest() {
@@ -54,6 +55,7 @@ public final class ShouldBlockRequest {
             context.getRouteMetadata(), context.getUser(), context.getRateLimitGroup(), context.getRemoteAddress()
         );
         if (rateLimitDecision.block()) {
+            StatisticsStore.incrementRateLimitedStats();
             BlockedRequestResult blockedRequestResult = new BlockedRequestResult(
                 /* type */    "ratelimited",
                 /* trigger */ rateLimitDecision.trigger(),

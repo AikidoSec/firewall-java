@@ -97,4 +97,13 @@ public final class StatisticsStore {
             mutex.unlock();
         }
     }
+
+    public static void incrementRateLimitedStats() {
+        mutex.lock();
+        try {
+            stats.incrementRateLimitStats();
+        } finally {
+            mutex.unlock();
+        }
+    }
 }
