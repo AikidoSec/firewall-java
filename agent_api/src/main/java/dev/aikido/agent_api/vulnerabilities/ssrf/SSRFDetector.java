@@ -25,30 +25,8 @@ public class SSRFDetector {
 
         String imdsIp = resolvesToImdsIp(new HashSet<>(ipAddresses), hostname);
         if (imdsIp != null) {
-            // Check if hostname is in user input (context available)
-            ContextObject context = Context.get();
-            if (context != null) {
-                FindHostnameInContext.Res attackFindings = findHostnameInContext(hostname, context, port);
-                if (attackFindings != null) {
-                    // Regular SSRF - hostname found in user input
-                    return new Attack(
-                            operation,
-                            new Vulnerabilities.SSRFVulnerability(),
-                            attackFindings.source(),
-                            attackFindings.pathToPayload(),
-                            Map.of(
-                                "hostname", hostname,
-                                "privateIP", imdsIp
-                            ),
-                            attackFindings.payload(),
-                            getCurrentStackTrace(),
-                            context.getUser()
-                    );
-                }
-            }
-
-            // Stored SSRF - no context or hostname not in user input
-            Attack storedSsrfAttack = new Attack(
+            // Stored SSRF - no context or hostname required in user input
+            return new Attack(
                     operation,
                     new Vulnerabilities.StoredSSRFVulnerability(),
                     null, // source is null for stored attacks
@@ -61,12 +39,6 @@ public class SSRFDetector {
                     getCurrentStackTrace(),
                     null // user is null for stored attacks
             );
-
-            if(shouldBlock()) {
-                throw SSRFException.get();
-            }
-
-            return storedSsrfAttack;
         }
         if (!containsPrivateIP(ipAddresses)) {
             // No real danger, returning.
@@ -96,7 +68,7 @@ public class SSRFDetector {
                     context.getUser()
             );
         }
-        
+
         return null;
     }
 }
