@@ -30,7 +30,7 @@ public class StatisticsStoreTest {
         StatisticsStore.incrementAttacksDetected(operation);
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertEquals(1, record.requests().attacksDetected().get("total"));
+        assertEquals(1, record.requests().attacksDetected().total());
     }
 
     @Test
@@ -39,7 +39,7 @@ public class StatisticsStoreTest {
         StatisticsStore.incrementAttacksBlocked(operation);
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertEquals(1, record.requests().attacksDetected().get("blocked"));
+        assertEquals(1, record.requests().attacksDetected().blocked());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class StatisticsStoreTest {
         StatisticsStore.incrementAttacksDetected(operation);
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertEquals(2, record.requests().attacksDetected().get("total"));
+        assertEquals(2, record.requests().attacksDetected().total());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class StatisticsStoreTest {
         StatisticsStore.incrementAttacksBlocked(operation);
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
-        assertEquals(2, record.requests().attacksDetected().get("blocked"));
+        assertEquals(2, record.requests().attacksDetected().blocked());
     }
 
     @Test
@@ -221,8 +221,8 @@ public class StatisticsStoreTest {
 
         assertNotNull(record);
         assertEquals(0, record.requests().total());
-        assertEquals(0, record.requests().attacksDetected().get("total"));
-        assertEquals(0, record.requests().attacksDetected().get("blocked"));
+        assertEquals(0, record.requests().attacksDetected().total());
+        assertEquals(0, record.requests().attacksDetected().blocked());
         assertEquals(0, record.ipAddresses().get("breakdown").size());
         assertEquals(0, record.userAgents().get("breakdown").size());
     }
@@ -270,8 +270,8 @@ public class StatisticsStoreTest {
         Statistics.StatsRecord record = StatisticsStore.getStatsRecord();
         assertNotNull(record);
         assertEquals(1, record.requests().total());
-        assertEquals(1, record.requests().attacksDetected().get("total"));
-        assertEquals(1, record.requests().attacksDetected().get("blocked"));
+        assertEquals(1, record.requests().attacksDetected().total());
+        assertEquals(1, record.requests().attacksDetected().blocked());
         assertNotNull(record.ipAddresses().get("breakdown").get(ip));
         assertEquals(1, record.ipAddresses().get("breakdown").get(ip));
         assertNotNull(record.userAgents().get("breakdown").get(userAgent));

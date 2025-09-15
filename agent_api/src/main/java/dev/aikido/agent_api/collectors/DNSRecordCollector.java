@@ -27,17 +27,18 @@ public final class DNSRecordCollector {
             // store stats
             StatisticsStore.registerCall("java.net.InetAddress.getAllByName", OperationKind.OUTGOING_HTTP_OP);
 
+            // Fetch hostnames from Context (this is to get port number e.g.)
+            if (Context.get() == null || Context.get().getHostnames() == null) {
+                logger.trace("Context not defined, returning.");
+                return;
+            }
+
             // Convert inetAddresses array to a List of IP strings :
             List<String> ipAddresses = new ArrayList<>();
             for (InetAddress inetAddress : inetAddresses) {
                 ipAddresses.add(inetAddress.getHostAddress());
             }
 
-            // Fetch hostnames from Context (this is to get port number e.g.)
-            if (Context.get() == null || Context.get().getHostnames() == null) {
-                logger.trace("Context not defined, returning.");
-                return;
-            }
             for (Hostnames.HostnameEntry hostnameEntry : Context.get().getHostnames().asArray()) {
                 if (!hostnameEntry.getHostname().equals(hostname)) {
                     continue;

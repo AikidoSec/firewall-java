@@ -65,6 +65,18 @@ public class PathTraversalDetectorTest {
     }
 
     @Test
+    public void testItFlagsDotDotSlashSlash() {
+        assertAttack(pathTraversalDetector.run("..//", new String[]{"..//test.txt"}));
+    }
+
+    @Test
+    public void testItFlagsMoreComplexPaths() {
+        assertAttack(pathTraversalDetector.run("..//secrets/key.txt", new String[]{"resources/blog/..//secrets/key.txt"}));
+        assertAttack(pathTraversalDetector.run(".././/secrets/key.txt", new String[]{"resources/blog/.././/secrets/key.txt"}));
+        assertAttack(pathTraversalDetector.run("////../secrets/key.txt", new String[]{"resources/blog/////../secrets/key.txt"}));
+    }
+
+    @Test
     public void testItFlagsBackslashDotDot() {
         assertAttack(pathTraversalDetector.run("..\\", new String[]{"..\\test.txt",}));
     }

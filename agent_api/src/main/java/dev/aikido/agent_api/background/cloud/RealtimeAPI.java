@@ -11,7 +11,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.security.KeyStore;
 
+import static dev.aikido.agent_api.background.cloud.SSLContextHelper.createDefaultSSLContext;
 import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoRealtimeEndpoint;
 
 public class RealtimeAPI {
@@ -25,10 +29,12 @@ public class RealtimeAPI {
         this.token = token;
     }
     public record ConfigResponse(long configUpdatedAt) {}
+
     public Optional<ConfigResponse> getConfig() {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                    .sslContext(createDefaultSSLContext())
                     .build();
             URI uri = URI.create(endpoint + "config");
             HttpRequest request = createConfigRequest(token.get(), uri);

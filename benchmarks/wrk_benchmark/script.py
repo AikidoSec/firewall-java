@@ -2,19 +2,26 @@ import re
 import subprocess
 import sys
 import time
+import requests
 
 def generate_wrk_command_for_url(url):
     # Define the command with awk included
     return "wrk -t12 -c400 -d15s " + url
 
-def cold_start(url):
-    for i in range(10):
-        subprocess.run(
-            "curl " + url,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+def wait_until_live(url):
+    for i in range(30):
+        try:
+            res = requests.get(url, timeout=5)
+            if res.status_code == 200:
+                print("Server is live: " + url)
+                return True
+            else:
+                print("Status code " + str(res.status_code) + " for " + url)
+        except requests.RequestException as e:
+            print(f"Request failed: {e}")
+        time.sleep(5)
+    return False
+
 
 def extract_requests_and_latency_tuple(output):
     if output.returncode == 0:
@@ -33,8 +40,10 @@ def extract_requests_and_latency_tuple(output):
 
 def run_benchmark(route1, route2, descriptor, percentage_limit, ms_limit):
     # Cold start :
-    cold_start(route1)
-    cold_start(route2)
+    if not wait_until_live(route1):
+        raise Exception("Unable to access: " + route1)
+    if not wait_until_live(route2):
+        raise Exception("Unable to access: " + route2)
 
     output_nofw = subprocess.run(
         generate_wrk_command_for_url(route2),

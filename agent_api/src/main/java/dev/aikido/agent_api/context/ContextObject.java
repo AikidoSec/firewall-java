@@ -20,6 +20,7 @@ public class ContextObject {
     protected Object body;
     // Auxiliary :
     protected User user;
+    protected String rateLimitGroup;
     protected boolean executedMiddleware;
     protected transient ArrayList<RedirectNode> redirectStartNodes;
     protected transient Map<String, Map<String, String>> cache = new HashMap<>();
@@ -34,6 +35,13 @@ public class ContextObject {
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
+    public String getRateLimitGroup() {
+        return rateLimitGroup;
+    }
+    public void setRateLimitGroup(String groupId) {
+        this.rateLimitGroup = groupId;
+    }
 
     public Object getBody() {
         return body;
@@ -66,10 +74,13 @@ public class ContextObject {
         return headers;
     }
     public String getHeader(String key) {
-        if (this.headers == null || this.headers.isEmpty()) {
+        return getHeader(this.headers, key);
+    }
+    public static String getHeader(HashMap<String, List<String>> headers, String key) {
+        if (headers == null || headers.isEmpty()) {
             return null;
         }
-        for (Map.Entry<String, List<String>> entry: this.headers.entrySet()) {
+        for (Map.Entry<String, List<String>> entry: headers.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(key)) {
                 List<String> headerValues = entry.getValue();
                 if (headerValues != null && !headerValues.isEmpty()) {
@@ -107,5 +118,14 @@ public class ContextObject {
 
     public RouteMetadata getRouteMetadata() {
         return new RouteMetadata(route, url, method);
+    }
+
+    @Override
+    public String toString() {
+        return "ContextObject{" +
+            "method='" + method + '\'' +
+            ", url='" + url + '\'' +
+            ", source='" + source + '\'' +
+            '}';
     }
 }

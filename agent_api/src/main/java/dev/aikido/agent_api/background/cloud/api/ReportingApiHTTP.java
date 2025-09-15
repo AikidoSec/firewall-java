@@ -17,6 +17,11 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.security.KeyStore;
+
+import static dev.aikido.agent_api.background.cloud.SSLContextHelper.createDefaultSSLContext;
 
 public class ReportingApiHTTP extends ReportingApi {
     private final Logger logger = LogManager.getLogger(ReportingApiHTTP.class);
@@ -34,6 +39,7 @@ public class ReportingApiHTTP extends ReportingApi {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                    .sslContext(createDefaultSSLContext())
                     .build();
 
             URI uri = URI.create(reportingUrl + "api/runtime/config");
@@ -41,6 +47,7 @@ public class ReportingApiHTTP extends ReportingApi {
 
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            logger.trace("Got response for %s: %s", uri.toString(), httpResponse.body());
             return Optional.of(toApiResponse(httpResponse));
         } catch (Exception e) {
             logger.debug("Error while fetching new config from cloud: %s", e.getMessage());
@@ -53,6 +60,7 @@ public class ReportingApiHTTP extends ReportingApi {
         try {
             HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                .sslContext(createDefaultSSLContext())
                 .build();
 
             URI uri = URI.create(reportingUrl + "api/runtime/events");
@@ -60,6 +68,7 @@ public class ReportingApiHTTP extends ReportingApi {
 
             // Send the request and get the response
             HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            logger.trace("Got response for %s: %s", uri.toString(), httpResponse.body());
             return Optional.of(toApiResponse(httpResponse));
         } catch (Exception e) {
             logger.debug("Error while communicating with cloud: %s", e.getMessage());
@@ -73,25 +82,32 @@ public class ReportingApiHTTP extends ReportingApi {
             return Optional.empty();
         }
         try {
-            // Make a GET request to api/runtime/firewall/lists
-            URL url = new URL(reportingUrl + "api/runtime/firewall/lists");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+            HttpClient httpClient = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(timeoutInSec))
+                    .sslContext(createDefaultSSLContext())
+                    .build();
 
-            // Set the Accept-Encoding header to gzip
-            connection.setRequestProperty("Accept-Encoding", "gzip");
-            connection.setRequestProperty("Authorization", token.get());
+            URI uri = URI.create(reportingUrl + "api/runtime/firewall/lists");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(uri)
+                    .timeout(Duration.ofSeconds(timeoutInSec))
+                    .header("Accept-Encoding", "gzip")
+                    .header("Authorization", token.get())
+                    .build();
 
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            // Send the request and get the response
+            HttpResponse<InputStream> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            if (httpResponse.statusCode() != HttpURLConnection.HTTP_OK) {
                 return Optional.empty();
             }
-            InputStream inputStream = connection.getInputStream();
+
+            InputStream inputStream = httpResponse.body();
             // Check if the response is gzipped
-            if ("gzip".equalsIgnoreCase(connection.getContentEncoding())) {
+            if ("gzip".equalsIgnoreCase(httpResponse.headers().firstValue("Content-Encoding").orElse(""))) {
                 inputStream = new GZIPInputStream(inputStream);
             }
 
-            // Read the response :
+            // Read the response
             APIListsResponse res = gson.fromJson(new InputStreamReader(inputStream), APIListsResponse.class);
             return Optional.of(res);
         } catch (Exception e) {
@@ -126,6 +142,7 @@ public class ReportingApiHTTP extends ReportingApi {
         if (event.isPresent()) {
             Gson gson = new Gson();
             String requestPayload = gson.toJson(event.get());
+            logger.trace("New request payload: %s", requestPayload);
             return requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestPayload)) // Set the request body
                 .build();
         }

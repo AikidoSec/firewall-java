@@ -1,11 +1,16 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.background.Endpoint;
+import dev.aikido.agent_api.background.cloud.api.events.DetectedAttackWave;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.storage.AttackQueue;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
+import dev.aikido.agent_api.storage.attack_wave_detector.AttackWaveDetectorStore;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 import java.util.List;
@@ -17,6 +22,7 @@ import static dev.aikido.agent_api.storage.ServiceConfigStore.getConfig;
 public final class WebRequestCollector {
     private WebRequestCollector() {
     }
+    private static final Logger logger = LogManager.getLogger(WebRequestCollector.class);
 
     /**
      * This function gets called in the initial phases of a request.
@@ -37,6 +43,8 @@ public final class WebRequestCollector {
 
         Context.set(newContext);
 
+        logger.debug("New context: %s", newContext);
+
         // Increment total hits :
         StatisticsStore.incrementHits();
 
@@ -48,7 +56,19 @@ public final class WebRequestCollector {
         if (blockedIpsRes != null)
             return blockedIpsRes;
 
-        return checkBlockedUserAgents(newContext.getHeader("user-agent"));
+        Res blockedUARes = checkBlockedUserAgents(newContext.getHeader("user-agent"));
+        if (blockedUARes != null)
+            return blockedUARes;
+
+        // Check for attack waves
+        if (AttackWaveDetectorStore.check(newContext)) {
+            AttackQueue.add(
+                DetectedAttackWave.createAPIEvent(newContext)
+            );
+            StatisticsStore.incrementAttackWavesDetected();
+        }
+
+        return null;
     }
 
     private static Res checkEndpointAllowlist(RouteMetadata routeMetadata, String remoteAddress, ServiceConfiguration config) {

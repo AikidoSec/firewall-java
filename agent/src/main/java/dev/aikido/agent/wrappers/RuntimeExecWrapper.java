@@ -73,7 +73,9 @@ public class RuntimeExecWrapper implements Wrapper {
                     throw invocationTargetException.getCause();
                 }
                 // Ignore non-aikido throwables.
-            } catch(Throwable e) {}
+            } catch(Throwable e) {
+                System.out.println("AIKIDO: " + e.getMessage());
+            }
         }
     }
 }

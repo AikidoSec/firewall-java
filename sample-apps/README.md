@@ -22,6 +22,8 @@ Here is an overview of all of our sample apps together with their port numbers.
 - [SpringBoot MVC with Postgres (Kotlin)](./SpringMVCPostgresKotlin) on port [`8092`](http://localhost:8092/)
 - [SpringBoot MVC with Postgres (Groovy)](./SpringMVCPostgresGroovy) on port [`8094`](http://localhost:8094/)
 - [SpringBoot MVC With SQLite](./SpringBootSQLite) on port [`8100`](http://localhost:8100/)
+- [SpringBoot MVC v2.7 With Postgres](./SpringBoot2.7Postgres) on port [`8104`](http://localhost:8104/)
+- [SpringBoot MVC With MongoDB](./SpringBootMongo) on port [`8106`](http://localhost:8106/)
 
 #### Webflux Apps
 - [SpringBoot Webflux with Postgres](./SpringWebfluxSampleApp) on port [`8090`](http://localhost:8090/)
@@ -30,6 +32,7 @@ Here is an overview of all of our sample apps together with their port numbers.
 - [Javalin App with Postgres](./JavalinPostgres) on port [`8088`](http://localhost:8088/)
 - [Javalin App with MySQL (Kotlin)](./JavalinMySQLKotlin/) on port [`8098`](http://localhost:8098)
 - [Ktor app with Postgres (Netty)](./KtorPostgresNetty) on port [`8096`](http://localhost:8096)
+- [Restlet app with MySQL (Java)](./JavaRestletMySQL/) on port [`8106`](http://localhost:8106)
 
 #### Clojure
 - [Ring app with Postgres](./RingClojurePostgres) on port [`8102`](http://localhost:8102/)

@@ -14,14 +14,17 @@ public class Statistics {
     private int rateLimited;
     private int attacksDetected;
     private int attacksBlocked;
+    private int attackWavesDetected;
+    private int attackWavesBlocked;
     private long startedAt;
 
-    public Statistics() {
-        this.totalHits = 0;
+    public Statistics(int totalHits, int attacksDetected, int attacksBlocked) {
+        this.totalHits = totalHits;
+        this.attacksDetected = attacksDetected;
+        this.attacksBlocked = attacksBlocked;
+        this.attackWavesDetected = 0;
+        this.attackWavesBlocked = 0;
         this.rateLimited = 0;
-        this.aborted = 0;
-        this.attacksDetected = 0;
-        this.attacksBlocked = 0;
         this.startedAt = UnixTimeMS.getUnixTimeMS();
     }
 
@@ -67,6 +70,22 @@ public class Statistics {
         return attacksBlocked;
     }
 
+    // attack wave stats
+    public void incrementAttackWavesDetected() {
+        this.attackWavesDetected += 1;
+    }
+
+    public void incrementAttackWavesBlocked() {
+        this.attackWavesBlocked += 1;
+    }
+
+    public int getAttackWavesDetected() {
+        return attackWavesDetected;
+    }
+
+    public int getAttackWavesBlocked() {
+        return attackWavesBlocked;
+    }
 
     // operations
     public void registerCall(String operation, OperationKind kind) {
@@ -111,12 +130,12 @@ public class Statistics {
 
     public StatsRecord getRecord() {
         long endedAt = UnixTimeMS.getUnixTimeMS();
-        return new StatsRecord(this.startedAt, endedAt, new StatsRequestsRecord(
-            totalHits, aborted, rateLimited,
-            /* attacksDetected */ Map.of(
-            "total", attacksDetected,
-            "blocked", attacksBlocked
-        )),
+        StatsTotalAndBlocked attackStats = new StatsTotalAndBlocked(attacksDetected, attacksBlocked);
+        StatsTotalAndBlocked attackWaveStats = new StatsTotalAndBlocked(attackWavesDetected, attackWavesBlocked);
+        return new StatsRecord(
+            this.startedAt,
+            endedAt,
+            new StatsRequestsRecord(totalHits, /* aborted: unknown */ 0, attackStats, attackWaveStats),
             getOperations(),
             Map.of("breakdown", getIpAddresses()),
             Map.of("breakdown", getUserAgents())
@@ -128,6 +147,8 @@ public class Statistics {
         this.rateLimited = 0;
         this.attacksBlocked = 0;
         this.attacksDetected = 0;
+        this.attackWavesBlocked = 0;
+        this.attackWavesDetected = 0;
         this.startedAt = UnixTimeMS.getUnixTimeMS();
         this.operations.clear();
         this.ipAddressMatches.clear();
@@ -135,8 +156,15 @@ public class Statistics {
     }
 
     // Stats records for sending out the heartbeat :
-    public record StatsRequestsRecord(long total, long aborted, long rateLimited,
-                                      Map<String, Integer> attacksDetected) {
+    public record StatsTotalAndBlocked(int total, int blocked) {
+    }
+
+    public record StatsRequestsRecord(
+        long total,
+        long aborted,
+        StatsTotalAndBlocked attacksDetected,
+        StatsTotalAndBlocked attackWaves
+    ) {
     }
 
     public record StatsRecord(long startedAt, long endedAt, StatsRequestsRecord requests,

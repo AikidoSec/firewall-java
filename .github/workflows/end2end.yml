@@ -44,7 +44,9 @@ jobs:
           - { name: SpringMVCPostgresGroovy, test_file: end2end/spring_mvc_postgres_groovy.py }
           - { name: JavalinPostgres, test_file: end2end/javalin_postgres.py }
           - { name: JavalinMySQLKotlin, test_file: end2end/javalin_mysql_kotlin.py }
+          - { name: SpringBoot2.7Postgres, test_file: end2end/spring_boot_2.7_postgres.py }
         java-version: [17, 18, 19, 20, 21]
+        distribution: ['adopt', 'corretto', 'oracle']
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -52,10 +54,10 @@ jobs:
           name: pkg-build
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: 'adopt'
+          distribution: ${{ matrix.distribution }}
 
       - name: Start mock server
         working-directory: ./end2end/server
@@ -69,10 +71,20 @@ jobs:
           docker compose up --build -d
       - name: Install Python dependencies
         run: python -m pip install -r end2end/requirements.txt
+
+      - name: Build Application (ensures cache)
+        working-directory: ./sample-apps/${{ matrix.app.name }}
+        run: |
+          make build
+
       - name: Start Application (with and without Zen)
         working-directory: ./sample-apps/${{ matrix.app.name }}
-        run: make run && make runWithoutZen
+        run: |
+          nohup make runWithoutZen > output_without_zen.log & sleep 5
+          nohup make run > output.log & sleep 5
 
       - name: Run End-to-End tests
         working-directory: ./
-        run: tail -f ./sample-apps/${{ matrix.app.name }}/output1.log & sleep 20 && python ${{ matrix.app.test_file }}
+        run: |
+            tail -f ./sample-apps/${{ matrix.app.name }}/output.log &
+            python ${{ matrix.app.test_file }}

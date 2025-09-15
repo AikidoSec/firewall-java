@@ -8,6 +8,9 @@ public final class IMDSAddresses {
         // Add the IP addresses used by AWS EC2 instances for IMDS
         imdsAddresses.addAddress("169.254.169.254", "ipv4");
         imdsAddresses.addAddress("fd00:ec2::254", "ipv6");
+
+        // Add the IP addresses used for Alibaba Cloud
+        imdsAddresses.addAddress("100.100.100.200", "ipv4");
     }
 
     /** Checks if the IP is an IMDS IP */

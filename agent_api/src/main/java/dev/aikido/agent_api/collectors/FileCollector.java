@@ -1,5 +1,8 @@
 package dev.aikido.agent_api.collectors;
 
+import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.helpers.logging.LogManager;
+import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.statistics.OperationKind;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.Scanner;
@@ -11,6 +14,7 @@ import java.nio.file.Path;
 public final class FileCollector {
     private FileCollector() {}
     private static final int MAX_RECURSION_DEPTH = 3;
+    private static final Logger logger = LogManager.getLogger(FileCollector.class);
 
     public static void report(Object filePath, String operation) {
         report(filePath, operation, 0); // Start with depth of zero
@@ -19,7 +23,12 @@ public final class FileCollector {
         if (filePath == null) {
             return; // Make sure filePath is defined
         }
-
+        if (Context.get() == null) {
+            // The FileCollector tries to extract file paths from the `Object filePath`, so we don't want to wait
+            // for a context check in `scanForGivenVulnerability`
+            return;
+        }
+        logger.trace("Scan on %s for file: %s", operation, filePath);
         StatisticsStore.registerCall(operation, OperationKind.FS_OP);
 
         Vulnerabilities.Vulnerability vulnerability = new Vulnerabilities.PathTraversalVulnerability();

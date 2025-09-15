@@ -62,6 +62,30 @@ public class SSRFDetectorTest {
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
+    public void testSsrfDetectorWithRedirectTo127IPButHostnameCapitalizationDifferent() throws MalformedURLException {
+        // Setup context :
+        setContextAndLifecycle("http://Ssrf-redirects.testssandbox.com/ssrf-test");
+
+        URLCollector.report(new URL("http://Ssrf-redirects.testssandbox.com/ssrf-test"));
+        RedirectCollector.report(new URL("http://ssrf-Redirects.testssandbox.com/ssrf-test"), new URL("http://127.0.0.1:8080"));
+        Attack attackData = new SSRFDetector().run(
+            "127.0.0.1", 8080,
+            List.of("127.0.0.1"),
+            "testop"
+        );
+
+        assertNotNull(attackData);
+        assertEquals("testop", attackData.operation);
+        assertEquals("ssrf", attackData.kind);
+        assertEquals("query", attackData.source);
+        assertEquals("http://Ssrf-redirects.testssandbox.com/ssrf-test", attackData.payload);
+        assertEquals(".arg.[0]", attackData.pathToPayload);
+        assertEquals("127.0.0.1", attackData.metadata.get("hostname"));
+        assertEquals("8080", attackData.metadata.get("port"));
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
     public void testSsrfDetectorWithRedirectToLocalhost() throws MalformedURLException {
         // Setup context :
         setContextAndLifecycle("http://ssrf-redirects.testssandbox.com/");
@@ -99,6 +123,23 @@ public class SSRFDetectorTest {
                 "localhost", 80,
                 List.of("127.0.0.1"),
                 "test2nd_op"
+        );
+
+        assertNull(attackData);
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
+    public void testSsrfDetectorWithServiceHostnameInRedirect() throws MalformedURLException {
+        // Setup context :
+        setContextAndLifecycle("http://mysql-database/ssrf-test");
+
+        URLCollector.report(new URL("http://mysql-database/ssrf-test"));
+        RedirectCollector.report(new URL("http://mysql-database/ssrf-test"), new URL("http://127.0.0.1:8080"));
+        Attack attackData = new SSRFDetector().run(
+            "127.0.0.1", 8080,
+            List.of("127.0.0.1"),
+            "testop"
         );
 
         assertNull(attackData);

@@ -24,9 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
+import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 
-public class SpringMVCWrapper implements Wrapper {
-    public static final Logger logger = LogManager.getLogger(SpringMVCWrapper.class);
+public class SpringMVCJakartaWrapper implements Wrapper {
+    public static final Logger logger = LogManager.getLogger(SpringMVCJakartaWrapper.class);
 
     @Override
     public String getName() {
@@ -38,7 +39,9 @@ public class SpringMVCWrapper implements Wrapper {
     }
     @Override
     public ElementMatcher<? super MethodDescription> getMatcher() {
-        return ElementMatchers.nameContainsIgnoreCase("doFilterInternal");
+        return ElementMatchers.nameContainsIgnoreCase("doFilterInternal")
+            .and(takesArgument(0, nameContains("jakarta")))
+            .and(takesArgument(1, nameContains("jakarta")));
     }
 
     @Override

@@ -1,0 +1,5 @@
+{
+    "name": "Zen Java Agent",
+    "image": "mcr.microsoft.com/devcontainers/java:dev-21",
+    "postCreateCommand": "./.devcontainer/postCreateCommand.sh"
+}

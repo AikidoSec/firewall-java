@@ -1,5 +1,7 @@
 package dev.aikido.agent_api.helpers.logging;
 
+import dev.aikido.agent_api.helpers.env.BooleanEnv;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -8,18 +10,29 @@ import java.util.Collection;
 import java.util.List;
 
 public class Logger {
-    private final LogLevel logLevel;
+    private LogLevel logLevel;
     private final Class<?> logClass;
     private static final int MAX_ARGUMENT_LENGTH = 300;
+    private static final LogLevel DEFAULT_LOG_LEVEL = LogLevel.INFO;
 
     public Logger(Class<?> logClass) {
+        this.logLevel = DEFAULT_LOG_LEVEL;
+        this.logClass = logClass;
+
+        // We first check "AIKIDO_LOG_LEVEL", because "AIKIDO_DEBUG" takes precedent.
         String logLevelString = System.getenv("AIKIDO_LOG_LEVEL");
         if (logLevelString != null) {
-            this.logLevel = LogLevel.valueOf(logLevelString.toUpperCase());
-        } else {
-            this.logLevel = LogLevel.INFO; // Default loglevel
+            try {
+                this.logLevel = LogLevel.valueOf(logLevelString.toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                this.error("Unknown log level `%s`", logLevelString);
+            }
         }
-        this.logClass = logClass;
+        // "AIKIDO_DEBUG"
+        BooleanEnv aikidoDebug = new BooleanEnv("AIKIDO_DEBUG", false);
+        if (aikidoDebug.getValue()) {
+            this.logLevel = LogLevel.TRACE;
+        }
     }
     public Logger(Class<?> logClass, LogLevel logLevel) {
         this.logLevel = logLevel;
@@ -100,5 +113,8 @@ public class Logger {
     }
     public void fatal(Object message, Object... args) {
         log(LogLevel.FATAL, message, args);
+    }
+    public boolean logsTraceLogs() {
+        return LogLevel.TRACE.getLevel() >= logLevel.getLevel();
     }
 }

@@ -21,7 +21,7 @@ public class SpringWebfluxContextObject extends SpringContextObject {
         this.headers = extractHeaders(headers);
 
         this.route = buildRouteFromUrl(this.url);
-        this.remoteAddress = getIpFromRequest(rawIp.getAddress().getHostAddress(), this.getHeader("x-forwarded-for"));
+        this.remoteAddress = getIpFromRequest(rawIp.getAddress().getHostAddress(), this.headers);
         this.source = "SpringWebflux";
         this.redirectStartNodes = new ArrayList<>();
     }

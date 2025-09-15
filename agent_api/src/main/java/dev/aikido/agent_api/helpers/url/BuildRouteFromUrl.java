@@ -12,6 +12,8 @@ public final class BuildRouteFromUrl {
     private static final Pattern UUID_REGEX = Pattern.compile(
             "[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff",
             Pattern.CASE_INSENSITIVE);
+    private static final Pattern OBJECT_ID_REGEX = Pattern.compile("^[0-9a-f]{24}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ULID_REGEX = Pattern.compile("^[0-9A-HJKMNP-TV-Z]{26}$", Pattern.CASE_INSENSITIVE);
     private static final Pattern NUMBER_REGEX = Pattern.compile("^\\d+$");
     private static final Pattern DATE_REGEX = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}|\\d{2}-\\d{2}-\\d{4}$");
     private static final Pattern EMAIL_REGEX = Pattern.compile(
@@ -57,6 +59,10 @@ public final class BuildRouteFromUrl {
             return ":number";
         } else if (segment.length() == 36 && UUID_REGEX.matcher(segment).matches()) {
             return ":uuid";
+        } else if (segment.length() == 26 && ULID_REGEX.matcher(segment).matches()) {
+            return ":ulid";
+        } else if (segment.length() == 24 && OBJECT_ID_REGEX.matcher(segment).matches()) {
+            return ":objectId";
         } else if (startsWithNumber && DATE_REGEX.matcher(segment).matches()) {
             return ":date";
         } else if (segment.contains("@") && EMAIL_REGEX.matcher(segment).matches()) {

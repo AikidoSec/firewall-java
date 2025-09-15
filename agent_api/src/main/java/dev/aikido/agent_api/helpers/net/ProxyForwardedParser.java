@@ -2,17 +2,19 @@ package dev.aikido.agent_api.helpers.net;
 
 import dev.aikido.agent_api.helpers.env.BooleanEnv;
 
-import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+
+import static dev.aikido.agent_api.context.ContextObject.getHeader;
 
 public class ProxyForwardedParser {
-    private static final String X_FORWARDED_FOR = "x-forwarded-for";
-
-    public static String getIpFromRequest(String rawIp, String xForwardedForHeader) {
-        if (xForwardedForHeader != null && !xForwardedForHeader.isEmpty() && trustProxy()) {
-            // Parse X-Forwarded-For and return the correct IP :
-            String xForwardedForIp = extractIpFromHeader(xForwardedForHeader);
-            if (xForwardedForIp != null) {
-                return xForwardedForIp;
+    public static String getIpFromRequest(String rawIp, HashMap<String, List<String>> headers) {
+        String ipHeader = getHeader(headers, getIpHeaderName());
+        if (ipHeader != null && !ipHeader.isEmpty() && trustProxy()) {
+            // Parse ip header and return the correct IP :
+            String ipHeaderValue = extractIpFromHeader(ipHeader);
+            if (ipHeaderValue != null) {
+                return ipHeaderValue;
             }
         }
 
@@ -47,5 +49,13 @@ public class ProxyForwardedParser {
             }
         }
         return null;
+    }
+
+    private static String getIpHeaderName() {
+        String clientIpHeader = System.getenv("AIKIDO_CLIENT_IP_HEADER");
+        if (clientIpHeader != null && !clientIpHeader.isEmpty()) {
+            return clientIpHeader;
+        }
+        return "X-Forwarded-For";
     }
 }
