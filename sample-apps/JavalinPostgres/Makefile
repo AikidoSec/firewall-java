@@ -18,7 +18,9 @@ build:
 .PHONY: run
 run: build
 	@echo "Running JavalinPostgres with Zen & ENV (http://localhost:8088)"
-	AIKIDO_TOKEN="AIK_RUNTIME_644_29096_zsgZKC6o5eGiM8AHV5PsfL3TDF01RuIcIe5HBTF7ftVLoLpb" \
+	AIKIDO_TOKEN="token" \
+	AIKIDO_REALTIME_ENDPOINT="http://localhost:5000/realtime" \
+	AIKIDO_ENDPOINT="http://localhost:5000" \
 	AIKIDO_BLOCK=1 \
 	java -javaagent:$(JAVA_AGENT) -DportNumber=8088 -jar $(JAR_FILE)
 
