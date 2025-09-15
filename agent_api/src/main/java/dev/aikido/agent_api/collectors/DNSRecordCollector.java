@@ -74,7 +74,7 @@ public final class DNSRecordCollector {
                     throw SSRFException.get();
                 }
             }
-        } catch (SSRFException e) {
+        } catch (SSRFException | StoredSSRFException e) {
             throw e;
         } catch (Throwable e) {
             logger.trace(e);
