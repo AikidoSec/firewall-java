@@ -10,7 +10,6 @@ public class Statistics {
     private final Map<String, Integer> ipAddressMatches = new HashMap<>();
     private final Map<String, Integer> userAgentMatches = new HashMap<>();
     private int totalHits;
-    private final int aborted; // We don't use the "aborted" field right now
     private int rateLimited;
     private int attacksDetected;
     private int attacksBlocked;
@@ -135,7 +134,7 @@ public class Statistics {
         return new StatsRecord(
             this.startedAt,
             endedAt,
-            new StatsRequestsRecord(totalHits, /* aborted: unknown */ 0, attackStats, attackWaveStats),
+            new StatsRequestsRecord(totalHits, /* aborted: unknown */ 0, rateLimited, attackStats, attackWaveStats),
             getOperations(),
             Map.of("breakdown", getIpAddresses()),
             Map.of("breakdown", getUserAgents())
@@ -162,6 +161,7 @@ public class Statistics {
     public record StatsRequestsRecord(
         long total,
         long aborted,
+        long rateLimited,
         StatsTotalAndBlocked attacksDetected,
         StatsTotalAndBlocked attackWaves
     ) {
