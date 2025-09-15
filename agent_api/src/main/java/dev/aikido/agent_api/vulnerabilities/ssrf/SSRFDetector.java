@@ -23,23 +23,6 @@ public class SSRFDetector {
             return null;
         }
 
-        String imdsIp = resolvesToImdsIp(new HashSet<>(ipAddresses), hostname);
-        if (imdsIp != null) {
-            // Stored SSRF - no context or hostname required in user input
-            return new Attack(
-                    operation,
-                    new Vulnerabilities.StoredSSRFVulnerability(),
-                    null, // source is null for stored attacks
-                    "", // path is empty
-                    Map.of(
-                        "hostname", hostname,
-                        "privateIP", imdsIp
-                    ),
-                    hostname, // payload is the hostname
-                    getCurrentStackTrace(),
-                    null // user is null for stored attacks
-            );
-        }
         if (!containsPrivateIP(ipAddresses)) {
             // No real danger, returning.
             return null;
