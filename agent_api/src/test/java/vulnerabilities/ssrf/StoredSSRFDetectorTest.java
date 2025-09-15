@@ -33,7 +33,7 @@ class StoredSSRFDetectorTest {
         Attack result = detector.run("test.example.com", List.of("169.254.169.254"), "testOperation");
         assertNotNull(result);
         assertEquals("testOperation", result.operation);
-        assertEquals("stored-ssrf", result.kind);
+        assertEquals("stored_ssrf", result.kind);
         assertEquals("test.example.com", result.payload);
         assertEquals("test.example.com", result.metadata.get("hostname"));
         assertEquals("169.254.169.254", result.metadata.get("privateIP"));
@@ -47,7 +47,7 @@ class StoredSSRFDetectorTest {
         Attack result = detector.run("test.example.com", List.of("100.100.100.200"), "testOperation");
         assertNotNull(result);
         assertEquals("testOperation", result.operation);
-        assertEquals("stored-ssrf", result.kind);
+        assertEquals("stored_ssrf", result.kind);
         assertEquals("test.example.com", result.payload);
         assertEquals("test.example.com", result.metadata.get("hostname"));
         assertEquals("100.100.100.200", result.metadata.get("privateIP"));
@@ -61,7 +61,7 @@ class StoredSSRFDetectorTest {
         Attack result = detector.run("test.example.com", List.of("fd00:ec2::254"), "testOperation");
         assertNotNull(result);
         assertEquals("testOperation", result.operation);
-        assertEquals("stored-ssrf", result.kind);
+        assertEquals("stored_ssrf", result.kind);
         assertEquals("test.example.com", result.payload);
         assertEquals("test.example.com", result.metadata.get("hostname"));
         assertEquals("fd00:ec2::254", result.metadata.get("privateIP"));

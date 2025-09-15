@@ -44,7 +44,7 @@ public final class Vulnerabilities {
         public Detector getDetector() { return null; }
         @Override
         public String getKind() {
-            return "stored-ssrf";
+            return "stored_ssrf";
         }
     }
     public static final class ShellInjectionVulnerability implements Vulnerability {
