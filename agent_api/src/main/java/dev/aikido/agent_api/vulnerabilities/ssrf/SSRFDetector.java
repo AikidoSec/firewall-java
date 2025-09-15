@@ -23,13 +23,6 @@ public class SSRFDetector {
             return null;
         }
 
-        if (resolvesToImdsIp(new HashSet<>(ipAddresses), hostname)) {
-            // An attacker could have stored a hostname in a database that points to an IMDS IP address
-            // We don't check if the user input contains the hostname because context might not be available
-            if(shouldBlock()) {
-                throw SSRFException.get();
-            }
-        }
         if (!containsPrivateIP(ipAddresses)) {
             // No real danger, returning.
             return null;
@@ -58,7 +51,7 @@ public class SSRFDetector {
                     context.getUser()
             );
         }
-        
+
         return null;
     }
 }

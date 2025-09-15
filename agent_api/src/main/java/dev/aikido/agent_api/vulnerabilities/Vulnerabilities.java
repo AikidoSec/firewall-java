@@ -39,6 +39,14 @@ public final class Vulnerabilities {
             return "ssrf";
         }
     }
+    public static final class StoredSSRFVulnerability implements Vulnerability {
+        @Override
+        public Detector getDetector() { return null; }
+        @Override
+        public String getKind() {
+            return "stored_ssrf";
+        }
+    }
     public static final class ShellInjectionVulnerability implements Vulnerability {
         @Override
         public Detector getDetector() { return new ShellInjectionDetector(); }
