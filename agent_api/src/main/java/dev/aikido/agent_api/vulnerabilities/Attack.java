@@ -34,6 +34,6 @@ public class Attack {
                 ", metadata=" + metadata +
                 ", payload='" + payload + '\'' +
                 ", stack='" + stack + '\'' +
-                ", user=" + user.id() + '}';
+                ", user=" + user + '}';
     }
 }
