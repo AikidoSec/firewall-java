@@ -150,6 +150,7 @@ public class Statistics {
         this.attacksDetected = 0;
         this.attackWavesBlocked = 0;
         this.attackWavesDetected = 0;
+        this.rateLimited = 0;
         this.startedAt = UnixTimeMS.getUnixTimeMS();
         this.operations.clear();
         this.ipAddressMatches.clear();

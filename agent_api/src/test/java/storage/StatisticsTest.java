@@ -34,11 +34,14 @@ public class StatisticsTest {
         stats.incrementAttacksDetected("test2");
         stats.incrementAttacksDetected("test1");
         stats.incrementAttacksDetected("test1");
+        stats.incrementRateLimitStats();
+        stats.incrementRateLimitStats();
         assertEquals(3, stats.getAttacksDetected());
         assertEquals(2, stats.getAttacksBlocked());
         assertEquals(20, stats.getTotalHits());
         assertEquals(2, stats.getOperations().get("test1").getAttacksDetected().get("total"));
         assertEquals(1, stats.getOperations().get("test1").getAttacksDetected().get("blocked"));
+        assertEquals(2, stats.getRateLimitedStats());
 
         assertFalse(stats.getOperations().containsKey("test2"));
         // Reset :
@@ -47,6 +50,7 @@ public class StatisticsTest {
         assertEquals(0, stats.getAttacksBlocked());
         assertEquals(0, stats.getAttacksDetected());
         assertEquals(0, stats.getTotalHits());
+        assertEquals(0, stats.getRateLimitedStats());
 
     }
 
@@ -56,6 +60,7 @@ public class StatisticsTest {
         assertEquals(100, stats2.getTotalHits());
         assertEquals(5, stats2.getAttacksDetected());
         assertEquals(1, stats2.getAttacksBlocked());
+        assertEquals(0, stats.getRateLimitedStats());
     }
 
     @Test
