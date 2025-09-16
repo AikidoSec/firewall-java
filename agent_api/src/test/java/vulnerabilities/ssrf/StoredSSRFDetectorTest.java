@@ -71,6 +71,13 @@ class StoredSSRFDetectorTest {
     }
 
     @Test
+    void run_WhenIpIsIpv6ImdsIp_ReturnsAttackNotWhenIpIsHostname() {
+        Attack result = detector.run("fd00:ec2::254", List.of("fd00:ec2::254"), "testOperation");
+        assertNull(result);
+    }
+
+
+    @Test
     void run_WhenIpIsNotImdsIp_ReturnsNull() {
         Attack result = detector.run("test.example.com", List.of("192.168.1.1"), "testOperation");
         assertNull(result);
