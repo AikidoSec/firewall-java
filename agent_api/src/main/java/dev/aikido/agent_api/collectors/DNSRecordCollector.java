@@ -30,19 +30,42 @@ public final class DNSRecordCollector {
             // store stats
             StatisticsStore.registerCall("java.net.InetAddress.getAllByName", OperationKind.OUTGOING_HTTP_OP);
 
-            // Fetch hostnames from Context (this is to get port number e.g.)
-            if (Context.get() == null || Context.get().getHostnames() == null) {
-                logger.trace("Context not defined, returning.");
-                return;
-            }
-
             // Convert inetAddresses array to a List of IP strings :
             List<String> ipAddresses = new ArrayList<>();
             for (InetAddress inetAddress : inetAddresses) {
                 ipAddresses.add(inetAddress.getHostAddress());
             }
 
-            // we check for stored ssrf before we check for ssrf, since we don't need anything from the context for it.
+            // Fetch hostnames from Context (this is to get port number e.g.)
+            if (Context.get() != null && Context.get().getHostnames() != null) {
+                for (Hostnames.HostnameEntry hostnameEntry : Context.get().getHostnames().asArray()) {
+                    if (!hostnameEntry.getHostname().equals(hostname)) {
+                        continue;
+                    }
+                    logger.debug("Hostname: %s, Port: %s, IPs: %s", hostnameEntry.getHostname(), hostnameEntry.getPort(), ipAddresses);
+
+                    Attack attack = new SSRFDetector().run(
+                        hostname, hostnameEntry.getPort(), ipAddresses, OPERATION_NAME
+                    );
+                    if (attack == null) {
+                        continue;
+                    }
+
+                    logger.debug("SSRF Attack detected due to: %s:%s", hostname, hostnameEntry.getPort());
+                    attackDetected(attack, Context.get());
+
+                    if (shouldBlock()) {
+                        logger.debug("Blocking SSRF attack...");
+                        throw SSRFException.get();
+                    }
+
+                    // We don't want to test for a stored SSRF attack.
+                    return;
+                }
+            }
+
+            // We don't need the context object to check for stored ssrf, but we do want to run this after our other
+            // SSRF checks, making sure if it's a normal ssrf attack it gets reported like that.
             Attack storedSsrfAttack = new StoredSSRFDetector().run(hostname, ipAddresses, OPERATION_NAME);
             if (storedSsrfAttack != null) {
                 attackDetected(storedSsrfAttack, Context.get());
@@ -53,27 +76,6 @@ public final class DNSRecordCollector {
                 }
             }
 
-            for (Hostnames.HostnameEntry hostnameEntry : Context.get().getHostnames().asArray()) {
-                if (!hostnameEntry.getHostname().equals(hostname)) {
-                    continue;
-                }
-                logger.debug("Hostname: %s, Port: %s, IPs: %s", hostnameEntry.getHostname(), hostnameEntry.getPort(), ipAddresses);
-
-                Attack attack = new SSRFDetector().run(
-                    hostname, hostnameEntry.getPort(), ipAddresses, OPERATION_NAME
-                );
-                if (attack == null) {
-                    continue;
-                }
-
-                logger.debug("SSRF Attack detected due to: %s:%s", hostname, hostnameEntry.getPort());
-                attackDetected(attack, Context.get());
-
-                if (shouldBlock()) {
-                    logger.debug("Blocking SSRF attack...");
-                    throw SSRFException.get();
-                }
-            }
         } catch (SSRFException | StoredSSRFException e) {
             throw e;
         } catch (Throwable e) {
