@@ -28,6 +28,14 @@ public class ResolverTest {
     }
 
     @Test
+    void testDoesntResolveToImdsIp_WithHostnameImdsIp() {
+        Set<String> resolvedIps = new HashSet<>();
+        resolvedIps.add("169.254.169.254"); // IMDS IP
+
+        assertNull(Resolver.resolvesToImdsIp(resolvedIps, " 169.254.169.254 "));
+    }
+
+    @Test
     void testResolvesToImdsIp_WithMultipleResolvedIps_OneImdsIp() {
         Set<String> resolvedIps = new HashSet<>();
         resolvedIps.add("192.168.1.1"); // Non-IMDS IP
