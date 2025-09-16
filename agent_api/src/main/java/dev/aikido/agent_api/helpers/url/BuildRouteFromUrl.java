@@ -59,7 +59,7 @@ public final class BuildRouteFromUrl {
 
         if (startsWithNumber && NUMBER_REGEX.matcher(segment).matches()) {
             return ":number";
-        } else if (NUMBER_ARRAY_REGEX.matcher(segment).matches()) {
+        } else if (segment.contains(",") && NUMBER_ARRAY_REGEX.matcher(segment).matches()) {
             return ":array(number)";
         } else if (segment.length() == 36 && UUID_REGEX.matcher(segment).matches()) {
             return ":uuid";
