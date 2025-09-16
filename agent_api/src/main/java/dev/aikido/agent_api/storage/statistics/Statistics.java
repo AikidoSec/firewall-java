@@ -14,6 +14,7 @@ public class Statistics {
     private int attacksBlocked;
     private int attackWavesDetected;
     private int attackWavesBlocked;
+    private int rateLimited;
     private long startedAt;
 
     public Statistics(int totalHits, int attacksDetected, int attacksBlocked) {
@@ -22,6 +23,7 @@ public class Statistics {
         this.attacksBlocked = attacksBlocked;
         this.attackWavesDetected = 0;
         this.attackWavesBlocked = 0;
+        this.rateLimited = 0;
         this.startedAt = UnixTimeMS.getUnixTimeMS();
     }
 
@@ -80,6 +82,13 @@ public class Statistics {
         return attackWavesBlocked;
     }
 
+    public void incrementRateLimitStats() {
+        this.rateLimited += 1;
+    }
+    public int getRateLimitedStats() {
+        return this.rateLimited;
+    }
+
     // operations
     public void registerCall(String operation, OperationKind kind) {
         if (!this.operations.containsKey(operation)) {
@@ -128,7 +137,7 @@ public class Statistics {
         return new StatsRecord(
             this.startedAt,
             endedAt,
-            new StatsRequestsRecord(totalHits, /* aborted: unknown */ 0, attackStats, attackWaveStats),
+            new StatsRequestsRecord(totalHits, /* aborted: unknown */ 0, rateLimited, attackStats, attackWaveStats),
             getOperations(),
             Map.of("breakdown", getIpAddresses()),
             Map.of("breakdown", getUserAgents())
@@ -141,6 +150,7 @@ public class Statistics {
         this.attacksDetected = 0;
         this.attackWavesBlocked = 0;
         this.attackWavesDetected = 0;
+        this.rateLimited = 0;
         this.startedAt = UnixTimeMS.getUnixTimeMS();
         this.operations.clear();
         this.ipAddressMatches.clear();
@@ -154,6 +164,7 @@ public class Statistics {
     public record StatsRequestsRecord(
         long total,
         long aborted,
+        long rateLimited,
         StatsTotalAndBlocked attacksDetected,
         StatsTotalAndBlocked attackWaves
     ) {

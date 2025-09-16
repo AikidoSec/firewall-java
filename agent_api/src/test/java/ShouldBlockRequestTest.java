@@ -4,7 +4,9 @@ import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
+import dev.aikido.agent_api.storage.RateLimiterStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,12 +40,16 @@ public class ShouldBlockRequestTest {
     public static void clean() {
         Context.set(null);
         ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
+        StatisticsStore.clear();
+        RateLimiterStore.clear();
     };
 
     @AfterEach
     public void tearDown() throws SQLException {
         Context.set(null);
         ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
+        StatisticsStore.clear();
+        RateLimiterStore.clear();
     }
 
     @Test
@@ -135,7 +141,7 @@ public class ShouldBlockRequestTest {
     public void testEndpointsExistWithMatch() throws SQLException {
         Context.set(null);
         setEmptyConfigWithEndpointList(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, false)
+            new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, false)
         ));
 
         // Test with match & rate-limiting disabled :
@@ -144,12 +150,38 @@ public class ShouldBlockRequestTest {
 
         Context.set(null);
         setEmptyConfigWithEndpointList(List.of(
-                new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
+            new Endpoint("GET", "/api/*", 1, 1000, Collections.emptyList(), false, false, true)
         ));
 
         // Test with match & rate-limiting enabled :
         var res2 = ShouldBlockRequest.shouldBlockRequest();
         assertFalse(res2.block());
+    }
+
+    @Test
+    public void testEndpointsExistAndGetsRateLimited() throws SQLException {
+        setEmptyConfigWithEndpointList(List.of(
+                new Endpoint("GET", "/api/*", 2, 1000, Collections.emptyList(), false, false, true)
+        ));
+
+        // Test with match
+        Context.set(new SampleContextObject());
+        var res1 = ShouldBlockRequest.shouldBlockRequest();
+        assertFalse(res1.block());
+
+        // Test with match
+        var res2 = ShouldBlockRequest.shouldBlockRequest();
+        assertFalse(res2.block());
+        assertEquals(0, StatisticsStore.getStatsRecord().requests().rateLimited());
+
+        var res3 = ShouldBlockRequest.shouldBlockRequest();
+        var res4 = ShouldBlockRequest.shouldBlockRequest();
+        assertTrue(res3.block());
+        assertTrue(res4.block());
+        assertEquals("ip", res3.data().trigger());
+        assertEquals("192.168.1.1", res3.data().ip());
+        assertEquals("ratelimited", res3.data().type());
+        assertEquals(2, StatisticsStore.getStatsRecord().requests().rateLimited());
     }
 
     @Test
