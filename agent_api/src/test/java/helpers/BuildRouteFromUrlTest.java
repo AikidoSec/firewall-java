@@ -44,14 +44,14 @@ public class BuildRouteFromUrlTest {
 
     @Test
     void testMatchesArrays() {
-        assertEquals("/posts/:array", buildRouteFromUrl("/posts/3,000"));
-        assertEquals("/posts/:array", buildRouteFromUrl("/posts/0,1,2,3,4"));
+        assertEquals("/posts/:array(number)", buildRouteFromUrl("/posts/3,000"));
+        assertEquals("/posts/:array(number)", buildRouteFromUrl("/posts/0,1,2,3,4"));
         assertEquals("/posts/,1,2,3,4", buildRouteFromUrl("/posts/,1,2,3,4"));
         assertEquals("/posts/0,1,2,3,4,", buildRouteFromUrl("/posts/0,1,2,3,4,"));
         assertEquals("/posts/,1,2,3,4,", buildRouteFromUrl("/posts/,1,2,3,4,"));
         assertEquals("/posts/,", buildRouteFromUrl("/posts/,"));
-        assertEquals("/posts/:array", buildRouteFromUrl("/posts/1,2"));
-        assertEquals("/posts/:array", buildRouteFromUrl("/posts/200000,2,20000"));
+        assertEquals("/posts/:array(number)", buildRouteFromUrl("/posts/1,2"));
+        assertEquals("/posts/:array(number)", buildRouteFromUrl("/posts/200000,2,20000"));
     }
 
     @Test

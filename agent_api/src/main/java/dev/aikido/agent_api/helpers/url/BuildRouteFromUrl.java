@@ -20,7 +20,7 @@ public final class BuildRouteFromUrl {
             "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
     private static final Pattern HASH_REGEX = Pattern.compile("^(?:[a-f0-9]{32}|[a-f0-9]{40}|[a-f0-9]{64}|[a-f0-9]{128})$", Pattern.CASE_INSENSITIVE);
     private static final int[] HASH_LENGTHS = {32, 40, 64, 128};
-    private static final Pattern ARRAY_REGEX = Pattern.compile("^\\d+(?:,\\d+)*$");
+    private static final Pattern NUMBER_ARRAY_REGEX = Pattern.compile("^\\d+(?:,\\d+)*$");
 
 
     public static String buildRouteFromUrl(String url) {
@@ -59,8 +59,8 @@ public final class BuildRouteFromUrl {
 
         if (startsWithNumber && NUMBER_REGEX.matcher(segment).matches()) {
             return ":number";
-        } else if (ARRAY_REGEX.matcher(segment).matches()) {
-            return ":array";
+        } else if (NUMBER_ARRAY_REGEX.matcher(segment).matches()) {
+            return ":array(number)";
         } else if (segment.length() == 36 && UUID_REGEX.matcher(segment).matches()) {
             return ":uuid";
         } else if (segment.length() == 26 && ULID_REGEX.matcher(segment).matches()) {
