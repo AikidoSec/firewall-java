@@ -24,6 +24,7 @@ Here is an overview of all of our sample apps together with their port numbers.
 - [SpringBoot MVC With SQLite](./SpringBootSQLite) on port [`8100`](http://localhost:8100/)
 - [SpringBoot MVC v2.7 With Postgres](./SpringBoot2.7Postgres) on port [`8104`](http://localhost:8104/)
 - [SpringBoot MVC With MongoDB](./SpringBootMongo) on port [`8106`](http://localhost:8106/)
+- [SpringBoot MVC With HyperSQL](./SpringBootPostgres) on port [`8108`](http://localhost:8108/)
 
 #### Webflux Apps
 - [SpringBoot Webflux with Postgres](./SpringWebfluxSampleApp) on port [`8090`](http://localhost:8090/)

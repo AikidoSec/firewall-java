@@ -18,6 +18,11 @@ public class Dialect {
         } else if(Objects.equals(dialect, "sqlite")) {
           rustDialectInt = 12;
           humanName = "SQLite";
+        } else if(Objects.equals(dialect, "hsql database engine")) {
+            // HyperSQL dialect doesn't exist yet on our tokenizer, so we use generic dialect,
+            // which is SQL:2016, HyperSQL is closest to this variant.
+          rustDialectInt = 0;
+          humanName = "HyperSQL";
         } else {
             rustDialectInt = 0; // Default option
             humanName = "Generic";

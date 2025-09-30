@@ -41,6 +41,7 @@ public final class Wrappers {
             new JavalinWrapper(),
             new JavalinDataWrapper(),
             new JavalinContextClearWrapper(),
-            new SQLiteWrapper()
+            new SQLiteWrapper(),
+            new HyperSQLWrapper()
     );
 }
