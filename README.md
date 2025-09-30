@@ -57,6 +57,7 @@ Zen operates autonomously on the same server as your Java app to:
 * ✅ [`Microsoft JDBC Driver For SQL Server`](https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc)
 * ✅ [`MySQL Connector/J`](https://mvnrepository.com/artifact/com.mysql/mysql-connector-j)
 * ✅ [`PostgreSQL JDBC Driver`](https://mvnrepository.com/artifact/org.postgresql/postgresql)
+* ✅ [`HyperSQL JDBC Driver`](https://mvnrepository.com/artifact/org.hsqldb/hsqldb)
 * ✅ `SQLite JDBC Drivers`
 
 ### API Tools
