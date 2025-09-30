@@ -45,6 +45,7 @@ jobs:
           - { name: JavalinPostgres, test_file: end2end/javalin_postgres.py }
           - { name: JavalinMySQLKotlin, test_file: end2end/javalin_mysql_kotlin.py }
           - { name: SpringBoot2.7Postgres, test_file: end2end/spring_boot_2.7_postgres.py }
+          - { name: SpringBootHyperSQL, test_file: end2end/spring_boot_hypersql.py }
         java-version: [17, 18, 19, 20, 21]
         distribution: ['adopt', 'corretto', 'oracle']
     steps:
