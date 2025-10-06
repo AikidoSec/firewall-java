@@ -15,14 +15,17 @@ public class DataSchemaGenerator {
     private static final int MAX_PROPS = 100;
 
     public static DataSchemaItem getDataSchema(Object data) {
-        return new DataSchemaGenerator().getDataSchema(data, 0);
+        // Ensures that we don't get recursion :
+        Set<Object> scanned = new HashSet<>();
+        return new DataSchemaGenerator().getDataSchema(data, 0, scanned);
     }
 
-    private DataSchemaItem getDataSchema(Object data, int depth) {
-        if (data == null) {
+    private DataSchemaItem getDataSchema(Object data, int depth, Set<Object> scanned) {
+        if (data == null || scanned.contains(data)) {
             // Handle null as a special case
             return new DataSchemaItem(DataSchemaType.EMPTY);
         }
+        scanned.add(data);
 
         if (isPrimitiveOrString(data)) {
             // Handle primitive types: (e.g. long, int, bool, strings, bytes, ...)
@@ -31,13 +34,13 @@ public class DataSchemaGenerator {
 
         // Collection is a catch-all for lists, sets, ...
         if (data instanceof Collection<?> dataList) {
-            return getDataSchema(dataList.toArray(), depth);
+            return getDataSchema(dataList.toArray(), depth, scanned);
         }
         // Arrays are still another thing :
         if (data.getClass().isArray()) {
             DataSchemaItem items = null;
             for (int i = 0; i < Math.min(MAX_ARRAY_DEPTH, Array.getLength(data)); i++) {
-                DataSchemaItem childDataSchemaItem = getDataSchema(Array.get(data, i), depth);
+                DataSchemaItem childDataSchemaItem = getDataSchema(Array.get(data, i), depth, scanned);
                 if (items == null) {
                     items = childDataSchemaItem;
                 } else {
@@ -60,7 +63,7 @@ public class DataSchemaGenerator {
                         // We cannot allow more properties than MAX_PROPS, breaking for loop.
                         break;
                     }
-                    props.put((String) key, getDataSchema(map.get(key), depth + 1));
+                    props.put((String) key, getDataSchema(map.get(key), depth + 1, scanned));
                 }
             } else if (data.getClass().toString().startsWith("class org.codehaus.groovy")) {
                 // pass through, we do not want to check org.codehaus.groovy
@@ -76,7 +79,7 @@ public class DataSchemaGenerator {
                             // We cannot allow more properties than MAX_PROPS, breaking for loop.
                             break;
                         }
-                        props.put(field.getName(), getDataSchema(field.get(data), depth + 1));
+                        props.put(field.getName(), getDataSchema(field.get(data), depth + 1, scanned));
                     } catch (IllegalAccessException | RuntimeException ignored) {
                     }
                 }
