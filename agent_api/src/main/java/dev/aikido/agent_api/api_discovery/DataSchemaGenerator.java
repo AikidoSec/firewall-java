@@ -25,12 +25,14 @@ public class DataSchemaGenerator {
             // Handle null as a special case
             return new DataSchemaItem(DataSchemaType.EMPTY);
         }
-        scanned.add(data);
 
         if (isPrimitiveOrString(data)) {
             // Handle primitive types: (e.g. long, int, bool, strings, bytes, ...)
             return new DataSchemaItem(primitiveToType(data));
         }
+
+        // Don't add primitive types to the scanned list (which avoids slow & heavy recursions)
+        scanned.add(data);
 
         // Collection is a catch-all for lists, sets, ...
         if (data instanceof Collection<?> dataList) {
