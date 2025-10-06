@@ -56,6 +56,49 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.NUMBER, schema.properties().get("test").type());
     }
 
+    static class MyRecursiveTestClass {
+        private String world;
+        private MyRecursiveTestClass myClass1;
+        private MyRecursiveTestClass myClass2;
+        private MyRecursiveTestClass myClass3;
+        private MyRecursiveTestClass myClass4;
+        private MyRecursiveTestClass myClass5;
+        private MyRecursiveTestClass myClass6;
+        private MyRecursiveTestClass myClass7;
+        private MyRecursiveTestClass myClass8;
+        private MyRecursiveTestClass myClass9;
+        private MyRecursiveTestClass myClass10;
+        MyRecursiveTestClass(String world) {
+            this.world = world;
+        }
+
+        public void setClasses(MyRecursiveTestClass recursiveTestClass) {
+            this.myClass1 = recursiveTestClass;
+            this.myClass2 = recursiveTestClass;
+            this.myClass3 = recursiveTestClass;
+            this.myClass4 = recursiveTestClass;
+            this.myClass5 = recursiveTestClass;
+            this.myClass6 = recursiveTestClass;
+            this.myClass7 = recursiveTestClass;
+            this.myClass8 = recursiveTestClass;
+            this.myClass9 = recursiveTestClass;
+            this.myClass10 = recursiveTestClass;
+        }
+    }
+
+    @Test
+    public void testKeepsTrackOfScannedObjects() {
+        // Causes Java Heap Space bug if we are not keeping track of scanned objects.
+        Map<String, Object> input = new HashMap<>();
+        var testRecursionClass = new MyRecursiveTestClass("World1");
+        testRecursionClass.setClasses(testRecursionClass);
+        input.put("test", testRecursionClass);
+        DataSchemaItem schema = DataSchemaGenerator.getDataSchema(input);
+        assertEquals(DataSchemaType.OBJECT, schema.type());
+        assertEquals(DataSchemaType.OBJECT, schema.properties().get("test").type());
+        assertEquals(DataSchemaType.STRING, schema.properties().get("test").properties().get("world").type());
+    }
+
     @Test
     public void testGetDataSchemaNestedObject() {
         Map<String, Object> input = new HashMap<>();
