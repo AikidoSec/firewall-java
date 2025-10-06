@@ -5,6 +5,8 @@ import dev.aikido.agent_api.api_discovery.DataSchemaGenerator;
 import dev.aikido.agent_api.api_discovery.DataSchemaItem;
 import dev.aikido.agent_api.api_discovery.DataSchemaType;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,6 +45,15 @@ public class DataSchemaGeneratorTest {
         assertEquals(DataSchemaType.NUMBER, schema.properties().get("test").type());
         assertEquals(DataSchemaType.ARRAY, schema.properties().get("arr").type());
         assertEquals(DataSchemaType.NUMBER, schema.properties().get("arr").items().type());
+    }
+
+    @Test
+    public void testGetDataSchemaWithBigDecimal() {
+        Map<String, Object> input = new HashMap<>();
+        input.put("test", new BigDecimal("2.2"));
+        DataSchemaItem schema = DataSchemaGenerator.getDataSchema(input);
+        assertEquals(DataSchemaType.OBJECT, schema.type());
+        assertEquals(DataSchemaType.NUMBER, schema.properties().get("test").type());
     }
 
     @Test
