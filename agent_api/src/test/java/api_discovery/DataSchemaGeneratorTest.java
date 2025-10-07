@@ -219,7 +219,7 @@ public class DataSchemaGeneratorTest {
     }
 
     private Map<String, Object> generateTestObjectWithDepth(int depth) {
-        if (depth == 0) {
+        if (depth == 1) {
             return Collections.singletonMap("value", "testValue");
         }
         return Collections.singletonMap("prop", generateTestObjectWithDepth(depth - 1));
