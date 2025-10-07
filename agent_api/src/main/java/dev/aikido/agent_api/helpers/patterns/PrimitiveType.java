@@ -32,6 +32,10 @@ public final class PrimitiveType {
         if (WRAPPER_TYPE_MAP.containsKey(source.getClass())) {
             return true;
         }
+        if (source instanceof Number) {
+            // Add special case for numbers, since it's hard to put all different number types in this map.
+            return true;
+        }
         return source instanceof String;
     }
 }
