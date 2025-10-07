@@ -15,8 +15,10 @@ public class DataSchemaGenerator {
     private static final int MAX_PROPS = 100;
 
     public static DataSchemaItem getDataSchema(Object data) {
-        // Ensures that we don't get recursion :
-        Set<Object> scanned = new HashSet<>();
+        // We use an IdentityHashMap to skip the hashCode() and equals() checks
+        // these checks can take longer than a simple identity check, and in rare cases
+        // be themselves recursive.
+        Set<Object> scanned = Collections.newSetFromMap(new IdentityHashMap<>());
         return new DataSchemaGenerator().getDataSchema(data, 0, scanned);
     }
 
