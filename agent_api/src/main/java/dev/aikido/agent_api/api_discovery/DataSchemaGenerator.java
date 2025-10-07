@@ -21,6 +21,12 @@ public class DataSchemaGenerator {
     }
 
     private DataSchemaItem getDataSchema(Object data, int depth, Set<Object> scanned) {
+        if (depth > MAX_TRAVERSAL_DEPTH) {
+            // Don't go beyond the traversal depth.
+            return new DataSchemaItem(DataSchemaType.EMPTY);
+        }
+        depth += 1;
+
         if (data == null || scanned.contains(data)) {
             // Handle null as a special case
             return new DataSchemaItem(DataSchemaType.EMPTY);
@@ -58,32 +64,30 @@ public class DataSchemaGenerator {
 
         // If the depth is less than the maximum depth, get the schema for each property
         Map<String, DataSchemaItem> props = new HashMap<>();
-        if (depth <= MAX_TRAVERSAL_DEPTH) {
-            if (data instanceof Map<?, ?> map) {
-                for (Object key : map.keySet()) {
+        if (data instanceof Map<?, ?> map) {
+            for (Object key : map.keySet()) {
+                if (props.size() >= MAX_PROPS) {
+                    // We cannot allow more properties than MAX_PROPS, breaking for loop.
+                    break;
+                }
+                props.put((String) key, getDataSchema(map.get(key), depth, scanned));
+            }
+        } else if (data.getClass().toString().startsWith("class org.codehaus.groovy")) {
+            // pass through, we do not want to check org.codehaus.groovy
+        } else {
+            Field[] fields = data.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                try {
+                    if (Modifier.isTransient(field.getModifiers())) {
+                        continue; // Do not scan transient fields.
+                    }
+                    field.setAccessible(true); // Allow access to private fields
                     if (props.size() >= MAX_PROPS) {
                         // We cannot allow more properties than MAX_PROPS, breaking for loop.
                         break;
                     }
-                    props.put((String) key, getDataSchema(map.get(key), depth + 1, scanned));
-                }
-            } else if (data.getClass().toString().startsWith("class org.codehaus.groovy")) {
-                // pass through, we do not want to check org.codehaus.groovy
-            } else {
-                Field[] fields = data.getClass().getDeclaredFields();
-                for (Field field : fields) {
-                    try {
-                        if (Modifier.isTransient(field.getModifiers())) {
-                            continue; // Do not scan transient fields.
-                        }
-                        field.setAccessible(true); // Allow access to private fields
-                        if (props.size() >= MAX_PROPS) {
-                            // We cannot allow more properties than MAX_PROPS, breaking for loop.
-                            break;
-                        }
-                        props.put(field.getName(), getDataSchema(field.get(data), depth + 1, scanned));
-                    } catch (IllegalAccessException | RuntimeException ignored) {
-                    }
+                    props.put(field.getName(), getDataSchema(field.get(data), depth, scanned));
+                } catch (IllegalAccessException | RuntimeException ignored) {
                 }
             }
         }
