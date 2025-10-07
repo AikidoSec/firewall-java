@@ -24,7 +24,7 @@ public class DataSchemaGenerator {
 
     private DataSchemaItem getDataSchema(Object data, int depth, Set<Object> scanned) {
         if (depth > MAX_TRAVERSAL_DEPTH) {
-            // Don't go beyond the traversal depth.
+            // avoid expensive recursion loops
             return new DataSchemaItem(DataSchemaType.EMPTY);
         }
         depth += 1;
