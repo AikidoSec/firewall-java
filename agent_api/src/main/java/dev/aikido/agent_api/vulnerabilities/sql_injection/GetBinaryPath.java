@@ -48,19 +48,21 @@ public final class GetBinaryPath {
 
     private static String getLibCVariant() {
         try {
-            Process process = new ProcessBuilder("uname", "-o").start();
+            // ldd --version, if supported, returns something like `musl libc (aarch64)` for musl
+            // or `ldd (Ubuntu GLIBC 2.39-0ubuntu8.6) 2.39` for GNU
+            Process process = new ProcessBuilder("ldd", "--version").start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = reader.readLine();
-            if (line != null) {
-                if (line.toLowerCase().contains("gnu")) {
-                    return "gnu";
-                } else {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.toLowerCase().contains("musl")) {
                     return "musl";
+                } else if (line.toLowerCase().contains("gnu") || line.toLowerCase().contains("glibc")) {
+                    return "gnu";
                 }
             }
         } catch (IOException e) {
             logger.trace(e);
         }
-        return "gnu"; // Default to gnu
+        return "gnu";
     }
 }
