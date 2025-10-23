@@ -85,5 +85,5 @@ jobs:
               run: |
                   docker run --rm -v "$(pwd):/app" -w /app eclipse-temurin:21-jdk-alpine sh -c "
                     chmod +x gradlew && \
-                    ./gradlew test --tests 'vulnerabilities.RustSQLInterfaceTest' --info
+                    AIKIDO_DEBUG=true ./gradlew test --tests 'vulnerabilities.RustSQLInterfaceTest' --info
                   "
