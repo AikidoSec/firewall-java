@@ -36,9 +36,18 @@ jobs:
               run: |
                   ./gradlew test --tests "vulnerabilities.RustSQLInterfaceTest" --info
 
-    smoke-test-alpine:
-        name: Smoke Test (Alpine musl, Java 21)
+    smoke-test-musl:
+        name: Smoke Test (Musl ${{matrix.os}}, Java 21)
         runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                image: [
+                    "eclipse-temurin:21-jdk-alpine",
+                    "amazoncorretto:21-alpine",
+                    "azul/zulu-openjdk-alpine:21",
+                    "bellsoft/liberica-openjdk-alpine:21"
+                ]
         steps:
             - name: Check out code
               uses: actions/checkout@v4
@@ -50,9 +59,9 @@ jobs:
                   make binaries
                   make build
 
-            - name: Run RustSQLInterfaceTest on eclipse-temurin:21-jdk-alpine
+            - name: Run RustSQLInterfaceTest on ${{matrix.os}}
               run: |
-                  docker run --rm -v "$(pwd):/app" -w /app eclipse-temurin:21-jdk-alpine sh -c "
+                  docker run --rm -v "$(pwd):/app" -w /app ${{matrix.os}} sh -c "
                     chmod +x gradlew && \
                     AIKIDO_DEBUG=true ./gradlew test --tests 'vulnerabilities.RustSQLInterfaceTest' --info
                   "
