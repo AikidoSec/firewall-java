@@ -1,0 +1,58 @@
+name: Run Smoke Tests for zen-internals
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+jobs:
+    smoke-test-native:
+        name: Smoke Test (${{ matrix.os }}, Java 21)
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v4
+
+            - name: Set up JDK 21
+              uses: actions/setup-java@v4
+              with:
+                  java-version: '21'
+                  distribution: 'temurin'
+
+            - name: Build with Gradle
+              working-directory: ./
+              run: |
+                  chmod +x gradlew
+                  make binaries
+                  make build
+
+            - name: Run RustSQLInterfaceTest
+              working-directory: ./
+              run: |
+                  ./gradlew test --tests "vulnerabilities.RustSQLInterfaceTest" --info
+
+    smoke-test-alpine:
+        name: Smoke Test (Alpine musl, Java 21)
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v4
+
+            - name: Build with Gradle (native)
+              working-directory: ./
+              run: |
+                  chmod +x gradlew
+                  make binaries
+                  make build
+
+            - name: Run RustSQLInterfaceTest on eclipse-temurin:21-jdk-alpine
+              run: |
+                  docker run --rm -v "$(pwd):/app" -w /app eclipse-temurin:21-jdk-alpine sh -c "
+                    chmod +x gradlew && \
+                    ./gradlew test --tests 'vulnerabilities.RustSQLInterfaceTest' --info
+                  "
