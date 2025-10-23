@@ -35,13 +35,11 @@ public final class GetBinaryPath {
             fileName.append("x86_64-"); // Default to x86-64
         }
 
-        boolean isMusl = os.contains("musl") || architecture.contains("musl");
-
         if (os.contains("win")) {
             fileName.append("pc-windows-gnu.dll"); // Windows
         } else if (os.contains("mac")) {
             fileName.append("apple-darwin.dylib"); // macOS
-        } else { // os.contains("nix") || os.contains("nux")
+        } else {
             // Default to linux
             fileName.append(String.format("unknown-linux-%s.so", getLibCVariant()));
         }
