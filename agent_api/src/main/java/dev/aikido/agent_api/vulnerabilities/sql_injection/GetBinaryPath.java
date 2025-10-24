@@ -2,11 +2,13 @@ package dev.aikido.agent_api.vulnerabilities.sql_injection;
 
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import jnr.ffi.Library;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
+import java.lang.annotation.Native;
 
 public final class GetBinaryPath {
     private GetBinaryPath() {}
@@ -50,20 +52,18 @@ public final class GetBinaryPath {
         try {
             // ldd --version, if supported, returns something like `musl libc (aarch64)` for musl
             // or `ldd (Ubuntu GLIBC 2.39-0ubuntu8.6) 2.39` for GNU
-            Process process = Runtime.getRuntime().exec("ldd `which ls`");
+            Process process = Runtime.getRuntime().exec("ldd --version");
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
+            String line = "";
             while ((line = reader.readLine()) != null) {
-                logger.error(line); // Debug
                 if (line.toLowerCase().contains("musl")) {
                     return "musl";
                 } else if (line.toLowerCase().contains("gnu") || line.toLowerCase().contains("glibc")) {
                     return "gnu";
                 }
             }
-            logger.error("No data to command");
         } catch (IOException e) {
-            logger.error(e);
+            logger.debug(e);
         }
         return "gnu";
     }
