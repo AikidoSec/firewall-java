@@ -54,13 +54,14 @@ public final class GetBinaryPath {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                System.err.println(line); // Debug
+                logger.error(line); // Debug
                 if (line.toLowerCase().contains("musl")) {
                     return "musl";
                 } else if (line.toLowerCase().contains("gnu") || line.toLowerCase().contains("glibc")) {
                     return "gnu";
                 }
             }
+            logger.error("No data to command");
         } catch (IOException e) {
             logger.error(e);
         }
