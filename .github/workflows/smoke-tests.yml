@@ -6,9 +6,6 @@ on:
             - main
     pull_request:
 
-permissions:
-    contents: read
-
 jobs:
     smoke-test-native:
         name: Smoke Test (${{ matrix.os }}, Java 21)
