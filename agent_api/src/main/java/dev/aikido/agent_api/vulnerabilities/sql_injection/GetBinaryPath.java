@@ -2,7 +2,9 @@ package dev.aikido.agent_api.vulnerabilities.sql_injection;
 
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import jnr.a64asm.INST_CODE;
 import jnr.ffi.Library;
+import jnr.ffi.LibraryLoader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,24 +50,17 @@ public final class GetBinaryPath {
         return fileName.toString();
     }
 
+    public interface Libc {
+        Libc INSTANCE = LibraryLoader.create(Libc.class).load("c");
+
+        String gnu_get_libc_version();
+    }
+
+
     private static String getLibCVariant() {
-        try {
             // ldd --version, if supported, returns something like `musl libc (aarch64)` for musl
             // or `ldd (Ubuntu GLIBC 2.39-0ubuntu8.6) 2.39` for GNU
-            Process process = Runtime.getRuntime().exec("ldd `which ls`");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                logger.error(line);
-                if (line.toLowerCase().contains("musl")) {
-                    return "musl";
-                } else if (line.toLowerCase().contains("gnu") || line.toLowerCase().contains("glibc")) {
-                    return "gnu";
-                }
-            }
-        } catch (IOException e) {
-            logger.debug(e);
-        }
+        logger.error(Libc.INSTANCE.gnu_get_libc_version());
         return "gnu";
     }
 }
