@@ -56,6 +56,7 @@ public final class GetBinaryPath {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = "";
             while ((line = reader.readLine()) != null) {
+                logger.error(line);
                 if (line.toLowerCase().contains("musl")) {
                     return "musl";
                 } else if (line.toLowerCase().contains("gnu") || line.toLowerCase().contains("glibc")) {
