@@ -1,10 +1,13 @@
-name: Run Gradle Tests
+name: 🧪 Unit Tests
 
 on:
   push:
     branches:
       - main
   pull_request:
+
+permissions:
+    contents: read
 
 jobs:
   build:

@@ -1,7 +1,10 @@
-name: Run Benchmarks
+name: 📊 Benchmarks
 
 on:
   pull_request:
+
+permissions:
+    contents: read
 
 jobs:
   build:
