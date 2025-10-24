@@ -52,15 +52,16 @@ public final class GetBinaryPath {
 
     public interface Libc {
         Libc INSTANCE = LibraryLoader.create(Libc.class).load("c");
-
         String gnu_get_libc_version();
     }
 
-
     private static String getLibCVariant() {
-            // ldd --version, if supported, returns something like `musl libc (aarch64)` for musl
-            // or `ldd (Ubuntu GLIBC 2.39-0ubuntu8.6) 2.39` for GNU
-        logger.error(Libc.INSTANCE.gnu_get_libc_version());
+        // gnu_get_libc_version only works for systems with gnu installed.
+        try {
+            Libc.INSTANCE.gnu_get_libc_version();
+        } catch (UnsatisfiedLinkError e) {
+            return "musl";
+        }
         return "gnu";
     }
 }
