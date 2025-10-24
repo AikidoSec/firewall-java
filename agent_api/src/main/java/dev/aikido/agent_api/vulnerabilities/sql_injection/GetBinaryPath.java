@@ -62,7 +62,7 @@ public final class GetBinaryPath {
                 }
             }
         } catch (IOException e) {
-            logger.trace(e);
+            logger.error(e);
         }
         return "gnu";
     }
