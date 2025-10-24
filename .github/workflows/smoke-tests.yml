@@ -1,10 +1,13 @@
-name: Run Smoke Tests for zen-internals
+name: 🔥 Smoke Tests for FFI
 
 on:
     push:
         branches:
             - main
     pull_request:
+
+permissions:
+    contents: read
 
 jobs:
     smoke-test-native:
