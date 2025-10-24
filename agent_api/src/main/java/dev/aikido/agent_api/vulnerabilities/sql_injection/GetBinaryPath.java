@@ -50,7 +50,7 @@ public final class GetBinaryPath {
         try {
             // ldd --version, if supported, returns something like `musl libc (aarch64)` for musl
             // or `ldd (Ubuntu GLIBC 2.39-0ubuntu8.6) 2.39` for GNU
-            Process process = new ProcessBuilder("ldd", "--version").start();
+            Process process = Runtime.getRuntime().exec("ldd --version");
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
