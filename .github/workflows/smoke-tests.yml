@@ -59,9 +59,9 @@ jobs:
                   make binaries
                   make build
 
-            - name: Run RustSQLInterfaceTest on ${{matrix.os}}
+            - name: Run RustSQLInterfaceTest on ${{matrix.image}}
               run: |
-                  docker run --rm -v "$(pwd):/app" -w /app ${{matrix.os}} sh -c "
+                  docker run --rm -v "$(pwd):/app" -w /app ${{matrix.image}} sh -c "
                     chmod +x gradlew && \
                     AIKIDO_DEBUG=true ./gradlew test --tests 'vulnerabilities.RustSQLInterfaceTest' --info
                   "
