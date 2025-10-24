@@ -40,7 +40,7 @@ jobs:
                   ./gradlew test --tests "vulnerabilities.RustSQLInterfaceTest" --info
 
     smoke-test-musl:
-        name: Smoke Test (Musl ${{matrix.os}}, Java 21)
+        name: Smoke Test (${{matrix.image}}, Java 21)
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
