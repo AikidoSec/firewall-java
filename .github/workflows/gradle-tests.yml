@@ -1,4 +1,4 @@
-name: Run Gradle Tests
+name: 🧪 Unit Tests
 
 on:
   push:

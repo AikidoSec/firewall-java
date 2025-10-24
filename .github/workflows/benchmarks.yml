@@ -1,4 +1,4 @@
-name: Run Benchmarks
+name: 📊 Benchmarks
 
 on:
   pull_request:

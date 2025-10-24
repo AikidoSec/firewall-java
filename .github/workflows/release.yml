@@ -1,4 +1,4 @@
-name: Release a new version
+name: 📦 Publish new Release
 
 on:
   release:

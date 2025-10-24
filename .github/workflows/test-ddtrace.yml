@@ -1,4 +1,4 @@
-name: Test with Datadog APM installed
+name: 🕵️ End to end tests with DataDog
 
 on:
   pull_request:

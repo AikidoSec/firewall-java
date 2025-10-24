@@ -1,4 +1,4 @@
-name: Build and Run End-to-End Tests
+name: 🕵️ End to end tests
 
 on:
   pull_request:
