@@ -21,17 +21,17 @@ public final class RustSQLInterface {
 
     @Encoding("UTF-8")
     public interface SqlLib {
+        SqlLib INSTANCE = loadLibrary();
         int detect_sql_injection(String query, long queryLen, String userinput, long userinputLen, int dialect);
     }
 
     public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
         int dialectInteger = dialect.getDialectInteger();
         try {
-            SqlLib lib = loadLibrary();
-            if (lib != null) {
+            if (SqlLib.INSTANCE != null) {
                 long queryLen = query != null ? query.getBytes(StandardCharsets.UTF_8).length : 0;
                 long userInputLen = userInput != null ? userInput.getBytes(StandardCharsets.UTF_8).length : 0;
-                int result = lib.detect_sql_injection(query, queryLen, userInput, userInputLen, dialectInteger);
+                int result = SqlLib.INSTANCE.detect_sql_injection(query, queryLen, userInput, userInputLen, dialectInteger);
                 return result == 1;
             }
         } catch (Throwable e) {
@@ -40,28 +40,24 @@ public final class RustSQLInterface {
         return false;
     }
     public static SqlLib loadLibrary() {
-        String path = getPathForBinary();
-        if (path == null || !Files.exists(Path.of(path))) {
-            logger.error("Could not load zen binaries used for SQL Injection algorithm. Path: %s", path);
+        try {
+            String path = getPathForBinary();
+            if (path == null || !Files.exists(Path.of(path))) {
+                throw new RuntimeException("Could not find zen binaries for path: " + path);
+            }
+            Map<LibraryOption, Object> libraryOptions = new HashMap<>();
+            libraryOptions.put(LibraryOption.LoadNow, true); // load immediately instead of lazily (ie on first use)
+            libraryOptions.put(LibraryOption.IgnoreError, true); // calls shouldn't save last errno after call
+
+            SqlLib library = LibraryLoader.loadLibrary(SqlLib.class, libraryOptions, path);
+            if (library == null) {
+                throw new RuntimeException("Loaded in Sql Library should not be null.");
+            }
+            return library;
+        } catch (Throwable e) {
+            logger.error("Failed to load in zen binaries - this means there will not be any protection against SQL Injections.");
+            logger.debug("Zen binaries loading error: %s", e);
             return null;
         }
-        Map<LibraryOption, Object> libraryOptions = new HashMap<>();
-        libraryOptions.put(LibraryOption.LoadNow, true); // load immediately instead of lazily (ie on first use)
-        libraryOptions.put(LibraryOption.IgnoreError, true); // calls shouldn't save last errno after call
-
-        SqlLib library = null;
-        try {
-            library = LibraryLoader.loadLibrary(SqlLib.class, libraryOptions, path);
-        } catch (Throwable e) {
-            String os = System.getProperty("os.name").toLowerCase();
-            String architecture = System.getProperty("os.arch").toLowerCase();
-            logger.error("Failed to load Zen Internals (%s, %s)", os, architecture);
-            throw e;
-        }
-
-        if (library == null) {
-            logger.error("Failed to load zen binaries.");
-        }
-        return library;
     }
 }
