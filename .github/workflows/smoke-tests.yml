@@ -1,0 +1,67 @@
+name: 🔥 Smoke Tests for FFI
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+jobs:
+    smoke-test-native:
+        name: Smoke Test (${{ matrix.os }}, Java 21)
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v4
+
+            - name: Set up JDK 21
+              uses: actions/setup-java@v4
+              with:
+                  java-version: '21'
+                  distribution: 'temurin'
+
+            - name: Build with Gradle
+              working-directory: ./
+              run: |
+                  chmod +x gradlew
+                  make binaries
+                  make build
+
+            - name: Run RustSQLInterfaceTest
+              working-directory: ./
+              run: |
+                  ./gradlew test --tests "vulnerabilities.RustSQLInterfaceTest" --info
+
+    smoke-test-musl:
+        name: Smoke Test (${{matrix.image}}, Java 21)
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                image: [
+                    "eclipse-temurin:21-jdk-alpine",
+                    "amazoncorretto:21-alpine",
+                    "azul/zulu-openjdk-alpine:21",
+                    "bellsoft/liberica-openjdk-alpine:21"
+                ]
+        steps:
+            - name: Check out code
+              uses: actions/checkout@v4
+
+            - name: Build with Gradle (native)
+              working-directory: ./
+              run: |
+                  chmod +x gradlew
+                  make binaries
+                  make build
+
+            - name: Run RustSQLInterfaceTest on ${{matrix.image}}
+              run: |
+                  docker run --rm -v "$(pwd):/app" -w /app ${{matrix.image}} sh -c "
+                    chmod +x gradlew && \
+                    AIKIDO_DEBUG=true ./gradlew test --tests 'vulnerabilities.RustSQLInterfaceTest' --info
+                  "
