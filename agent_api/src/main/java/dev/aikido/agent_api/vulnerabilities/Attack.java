@@ -1,5 +1,6 @@
 package dev.aikido.agent_api.vulnerabilities;
 
+import com.google.gson.Gson;
 import dev.aikido.agent_api.context.User;
 
 import java.util.Map;
@@ -26,14 +27,7 @@ public class Attack {
 
     @Override
     public String toString() {
-        return "Attack{" +
-                "operation='" + operation + '\'' +
-                ", kind='" + kind + '\'' +
-                ", source='" + source + '\'' +
-                ", pathToPayload='" + pathToPayload + '\'' +
-                ", metadata=" + metadata +
-                ", payload='" + payload + '\'' +
-                ", stack='" + stack + '\'' +
-                ", user=" + user.id() + '}';
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 }

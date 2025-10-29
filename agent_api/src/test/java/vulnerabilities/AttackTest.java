@@ -38,7 +38,7 @@ public class AttackTest {
         assertEquals(stack, attack.stack);
         assertEquals(user, attack.user);
         assertEquals(
-                "Attack{operation='SQL Injection', kind='sql_injection', source='User Input', pathToPayload='/api/vulnerable', metadata={userId=123}, payload='SELECT * FROM users WHERE id = 1', stack='Stack trace here', user=id}",
+                "{\"operation\":\"SQL Injection\",\"kind\":\"sql_injection\",\"source\":\"User Input\",\"pathToPayload\":\"/api/vulnerable\",\"metadata\":{\"userId\":\"123\"},\"payload\":\"SELECT * FROM users WHERE id \\u003d 1\",\"stack\":\"Stack trace here\",\"user\":{\"id\":\"id\",\"name\":\"name\",\"lastIpAddress\":\"1.1.1.1\",\"firstSeenAt\":0,\"lastSeenAt\":0}}",
                 attack.toString()
         );
     }
@@ -67,7 +67,7 @@ public class AttackTest {
         assertEquals(payload, attack.payload);
         assertEquals(stack, attack.stack);
         assertEquals(
-                "Attack{operation='XSS Attack', kind='sql_injection', source='User Input', pathToPayload='/api/vulnerable', metadata={}, payload='<script>alert('XSS');</script>', stack='Stack trace here', user=123}",
+            "{\"operation\":\"XSS Attack\",\"kind\":\"sql_injection\",\"source\":\"User Input\",\"pathToPayload\":\"/api/vulnerable\",\"metadata\":{},\"payload\":\"\\u003cscript\\u003ealert(\\u0027XSS\\u0027);\\u003c/script\\u003e\",\"stack\":\"Stack trace here\",\"user\":{\"id\":\"123\",\"name\":\"name\",\"lastIpAddress\":\"1.1.1.1\",\"firstSeenAt\":0,\"lastSeenAt\":0}}",
                 attack.toString()
         );
     }
