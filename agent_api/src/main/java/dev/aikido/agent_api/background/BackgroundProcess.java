@@ -38,7 +38,6 @@ public class BackgroundProcess extends Thread {
         }
         logger.trace("Starting agent thread: %s", Thread.currentThread());
 
-        ServiceConfigStore.updateBlocking(new BlockingEnv().getValue());
         ReportingApiHTTP api = new ReportingApiHTTP(getAikidoAPIEndpoint(), API_TIMEOUT, token);
         RealtimeAPI realtimeApi = new RealtimeAPI(token);
 
