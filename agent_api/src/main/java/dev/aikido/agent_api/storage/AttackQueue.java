@@ -28,11 +28,12 @@ public final class AttackQueue {
         }
 
         // we want to log the attack at this stage, to make sure that even if it is only detected, we still see logs
+        String blockingMode = "detected";
         if (ServiceConfigStore.getConfig().isBlockingEnabled()) {
-            logger.error("Blocking attack: %s", attack);
-        } else {
-            logger.error("Detected attack (Blocking disabled): %s", attack);
+            blockingMode = "blocked";
         }
+        logger.error("%s attack %s: operation=%s, source=%s", attack.kind, blockingMode, attack.operation, attack.source);
+        System.err.println(attack); // we print out the JSON using System.err so that it is not prefixed by another string.
 
         // generate attack API event
         APIEvent detectedAttack = createAPIEvent(attack, context);
