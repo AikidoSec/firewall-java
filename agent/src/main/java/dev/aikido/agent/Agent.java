@@ -2,9 +2,11 @@ package dev.aikido.agent;
 
 import dev.aikido.agent.wrappers.*;
 import dev.aikido.agent_api.Config;
+import dev.aikido.agent_api.helpers.env.BlockingEnv;
 import dev.aikido.agent_api.helpers.env.BooleanEnv;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -42,7 +44,10 @@ public class Agent {
             .installOn(inst);
 
         logger.info("Instrumentation installed.");
-        
+
+        // We want to load in the blocking value here, it's important that this happens regardless of the token.
+        ServiceConfigStore.updateBlocking(new BlockingEnv().getValue());
+
         startDaemon(agentArgs);
     }
     private static class AikidoTransformer {
