@@ -27,6 +27,13 @@ public final class AttackQueue {
             StatisticsStore.incrementAttacksBlocked(attack.operation); // Also increment blocked attacks.
         }
 
+        // we want to log the attack at this stage, to make sure that even if it is only detected, we still see logs
+        if (ServiceConfigStore.getConfig().isBlockingEnabled()) {
+            logger.error("Blocking attack: %s", attack);
+        } else {
+            logger.error("Detected attack (Blocking disabled): %s", attack);
+        }
+
         // generate attack API event
         APIEvent detectedAttack = createAPIEvent(attack, context);
         add(detectedAttack);
