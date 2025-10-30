@@ -1,0 +1,51 @@
+name: 🧪 QA Tests
+permissions:
+    contents: read
+on:
+    push: {}
+    workflow_call: {}
+
+jobs:
+    qa-tests:
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - name: Checkout firewall-java
+              uses: actions/checkout@v5
+              with:
+                  path: firewall-java
+
+            - name: Checkout zen-demo-java
+              uses: actions/checkout@v5
+              with:
+                  repository: Aikido-demo-apps/zen-demo-java
+                  path: zen-demo-java
+                  ref: qa-test
+                  submodules: true
+
+            - name: Set up JDK 21
+              uses: actions/setup-java@v4
+              with:
+                  java-version: '21'
+                  distribution: 'temurin'
+
+            - name: Build with Gradle
+              working-directory: ./
+              run: |
+                  chmod +x gradlew
+                  make binaries
+                  make build
+
+                  # Move the build jars to demo app
+                  mv dist ../zen-demo-java/zen_by_aikido
+
+            - name: Replace Dockerfile with QA version
+              run: |
+                  cp firewall-java/.github/workflows/Dockerfile.qa zen-demo-java/Dockerfile
+
+            - name: Run Firewall QA Tests
+              uses: AikidoSec/firewall-tester-action@releases/v1
+              with:
+                  dockerfile_path: ./zen-demo-java/Dockerfile
+                  app_port: 8080
+                  sleep_before_test: 10
