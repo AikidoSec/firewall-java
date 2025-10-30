@@ -12,7 +12,8 @@ COPY . .
 
 # Run make download
 # --- modified part ---
-RUN mv zen_by_aikido_copy zen_by_aikido
+RUN mkdir zen_by_aikido
+RUN mv zen_dist zen_by_aikido/zen
 # --- end modified part ---
 RUN make build
 

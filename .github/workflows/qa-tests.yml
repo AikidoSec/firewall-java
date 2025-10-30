@@ -37,8 +37,7 @@ jobs:
                   make build
 
                   # Move the build jars to demo app
-                  mkdir ../zen-demo-java/zen_by_aikido_copy
-                  mv dist ../zen-demo-java/zen_by_aikido_copy/zen
+                  mv dist ../zen-demo-java/zen_dist
 
             - name: Replace Dockerfile with QA version
               run: |
