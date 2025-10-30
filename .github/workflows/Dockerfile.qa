@@ -12,7 +12,7 @@ COPY . .
 
 # Run make download
 # --- modified part ---
-mv zen_by_aikido_copy zen_by_aikido
+RUN mv zen_by_aikido_copy zen_by_aikido
 # --- end modified part ---
 RUN make build
 
