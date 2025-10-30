@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Packages {
     public record PackageInfo(String name, String version, long requiredAt) {}
-    private Map<String, List<PackageInfo>> packages = new HashMap<>();
+    private final Map<String, List<PackageInfo>> packages = new HashMap<>();
 
     public void addPackage(String name, String version) {
         List<PackageInfo> versions = packages.computeIfAbsent(name, k -> new ArrayList<>());
