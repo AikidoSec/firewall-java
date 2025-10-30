@@ -48,4 +48,4 @@ jobs:
               with:
                   dockerfile_path: ./zen-demo-java/Dockerfile
                   app_port: 8080
-                  sleep_before_test: 10
+                  sleep_before_test: 30
