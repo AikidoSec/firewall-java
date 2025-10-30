@@ -11,7 +11,6 @@ public final class SQLCollector {
     private SQLCollector() {}
     private static final Logger logger = LogManager.getLogger(SQLCollector.class);
     public static void report(String sql, String dialect, String operation) {
-        logger.trace("Scanning sql: %s, with dialect: %s", sql, dialect);
         // register statistics
         StatisticsStore.registerCall(operation, OperationKind.SQL_OP);
 
