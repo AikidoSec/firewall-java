@@ -30,7 +30,7 @@ jobs:
                   distribution: 'temurin'
 
             - name: Build with Gradle
-              working-directory: ./
+              working-directory: ./firewall-java
               run: |
                   chmod +x gradlew
                   make binaries
