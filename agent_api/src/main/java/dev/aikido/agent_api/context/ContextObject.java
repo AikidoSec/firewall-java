@@ -99,16 +99,6 @@ public class ContextObject {
     public Map<String, Map<String, String>> getCache() { return cache; }
     public Hostnames getHostnames() { return hostnames; }
 
-    public String toJson() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(this);
-    }
-
-    public String getJSONBody() {
-        Gson gson = new Gson();
-        return gson.toJson(this.body);
-    }
-
     public void setForcedProtectionOff(boolean forcedProtectionOff) {
         this.forcedProtectionOff = Optional.of(forcedProtectionOff);
     }

@@ -23,11 +23,9 @@ public final class DetectedAttack {
     ) implements APIEvent {}
     public record RequestData (
         String method,
-        Map<String, List<String>> headers,
         String ipAddress,
         String userAgent,
         String url,
-        String body,
         String source,
         String route
     ) {};
@@ -49,14 +47,12 @@ public final class DetectedAttack {
     public static DetectedAttackEvent createAPIEvent(Attack attack, ContextObject context) {
         boolean blocking = getConfig().isBlockingEnabled();
         RequestData requestData = new RequestData(
-            context.getMethod(), // Method
-            context.getHeaders(), // headers
-            context.getRemoteAddress(), // ipAddress
-            context.getHeader("user-agent"), // userAgent
-            context.getUrl(), // url
-            context.getJSONBody(), // body
-            context.getSource(), // source
-            context.getRoute() // route
+            context.getMethod(),
+            context.getRemoteAddress(),
+            context.getHeader("user-agent"),
+            context.getUrl(),
+            context.getSource(),
+            context.getRoute()
         );
         AttackData attackData = new AttackData(
             attack.kind, attack.operation, attack.source, attack.pathToPayload, attack.payload, attack.metadata,
