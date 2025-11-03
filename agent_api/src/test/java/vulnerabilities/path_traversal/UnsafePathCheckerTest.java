@@ -37,4 +37,11 @@ public class UnsafePathCheckerTest {
         assertTrue(UnsafePathChecker.startsWithUnsafePath("c:/", "c:/"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("c:/folder/file.txt", "c:/folder"));
     }
+
+    @Test
+    public void testMultipleSlashes() {
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("///etc///passwd", "///etc//"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("///etc/passwd", "///etc"));
+        assertFalse(UnsafePathChecker.startsWithUnsafePath("etc/passwd///../test.txt", "etc/passwd///../test.txt"));
+    }
 }
