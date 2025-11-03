@@ -11,7 +11,7 @@ public final class PackagesStore {
     private static final ReentrantLock mutex = new ReentrantLock();
     private static final Packages packages = new Packages();
 
-    public void addPackage(String packageName, String packageVersion) {
+    public static void addPackage(String packageName, String packageVersion) {
         mutex.lock();
         try {
             packages.addPackage(packageName, packageVersion);
@@ -22,7 +22,7 @@ public final class PackagesStore {
         }
     }
 
-    public List<Packages.PackageInfo> asArray() {
+    public static List<Packages.PackageInfo> asArray() {
         mutex.lock();
         try {
             return packages.asArray();
@@ -34,7 +34,7 @@ public final class PackagesStore {
         }
     }
 
-    public void clear() {
+    public static void clear() {
         mutex.lock();
         try {
             packages.clear();
