@@ -32,22 +32,30 @@ public final class UnsafePathChecker {
             "c:\\"
     );
 
-    public static boolean startsWithUnsafePath(String filePath) {
-        String lowerCasePath = filePath.toLowerCase();
+    public static boolean startsWithUnsafePath(String filePathRaw) {
+        String filePath = ensureOneLeadingSlash(filePathRaw.toLowerCase());
 
         List<String> dangerousStartsList = new ArrayList<>(DANGEROUS_PATH_STARTS);
         dangerousStartsList.addAll(LINUX_ROOT_FOLDERS);
 
         for (String dangerousStart : dangerousStartsList) {
-            if (lowerCasePath.startsWith(dangerousStart)) {
+            if (filePath.startsWith(dangerousStart)) {
                 return true;
             }
         }
         return false;
     }
-    public static boolean startsWithUnsafePath(String filePath, String userInput) {
-        String filePathLowercase = filePath.toLowerCase();
-        String userinputLowercase = userInput.toLowerCase();
-        return startsWithUnsafePath(filePathLowercase) && filePathLowercase.startsWith(userinputLowercase);
+
+    public static boolean startsWithUnsafePath(String filePathRaw, String userInputRaw) {
+        String filePath = ensureOneLeadingSlash(filePathRaw.toLowerCase());
+        String userInput = ensureOneLeadingSlash(userInputRaw.toLowerCase());
+        return startsWithUnsafePath(filePath) && filePath.startsWith(userInput);
+    }
+
+    private static String ensureOneLeadingSlash(String path) {
+        if (path.startsWith("/")) {
+            return "/" + path.replaceAll("^/+", "");
+        }
+        return path;
     }
 }
