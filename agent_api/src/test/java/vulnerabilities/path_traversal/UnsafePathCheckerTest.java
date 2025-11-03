@@ -43,5 +43,9 @@ public class UnsafePathCheckerTest {
         assertTrue(UnsafePathChecker.startsWithUnsafePath("///etc///passwd", "///etc//"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("///etc/passwd", "///etc"));
         assertFalse(UnsafePathChecker.startsWithUnsafePath("etc/passwd///../test.txt", "etc/passwd///../test.txt"));
+
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("///etc///passwd"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("///etc/passwd"));
+        assertFalse(UnsafePathChecker.startsWithUnsafePath("etc/passwd///../test.txt"));
     }
 }
