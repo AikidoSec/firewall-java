@@ -10,6 +10,10 @@ import utils.EmptySampleContextObject;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,7 +45,7 @@ public class FileWrapperTest {
         assertThrows(RuntimeException.class, () -> {
             new File("/var/../file.txt");
         });
-        
+
         cleanup();
         assertDoesNotThrow(() -> {
             new File("/var/../file.txt");
@@ -86,6 +90,57 @@ public class FileWrapperTest {
         cleanup();
         assertDoesNotThrow(() -> {
             new File("/etc/", "/var/../file.txt");
+        });
+    }
+
+    @Test
+    public void testOsCreatePathWithMultipleSlashes() {
+        String filePath = "/////etc/passwd";
+        setContextAndLifecycle(filePath);
+        assertThrows(RuntimeException.class, () -> {
+            Path fullPath = Paths.get(filePath);
+            List<String> lines = Files.readAllLines(fullPath);
+            System.err.println(lines);
+        });
+    }
+
+    @Test
+    public void testOsCreatePathWithMultipleSlashesNegative() {
+        String filePath = "safe/relative/path";
+        setContextAndLifecycle(filePath);
+        assertDoesNotThrow(() -> {
+            File fullPath = new File("flaskr/resources/blogs/", filePath);
+            fullPath.exists(); // Simulate access
+        });
+    }
+
+    @Test
+    public void testOsCreatePathWithMultipleDoubleSlashes() {
+        String filePath = "////etc//passwd";
+        setContextAndLifecycle(filePath);
+        assertThrows(RuntimeException.class, () -> {
+            File fullPath = new File("flaskr/resources/blogs/", filePath);
+            fullPath.exists(); // Simulate access
+        });
+    }
+
+    @Test
+    public void testOsCreatePathWithMultipleDoubleSlashesNegative() {
+        String filePath = "safe//relative//path";
+        setContextAndLifecycle(filePath);
+        assertDoesNotThrow(() -> {
+            File fullPath = new File("flaskr/resources/blogs/", filePath);
+            fullPath.exists(); // Simulate access
+        });
+    }
+
+    @Test
+    public void testOsPathTraversalWithMultipleSlashes() {
+        String filePath = "home///..////..////my_secret.txt";
+        setContextAndLifecycle(filePath);
+        assertThrows(RuntimeException.class, () -> {
+            File fullPath = new File("flaskr/resources/blogs/", filePath);
+            fullPath.exists(); // Simulate access
         });
     }
 }
