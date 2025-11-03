@@ -33,28 +33,7 @@ COPY --from=builder /app .
 COPY database.sql /app/database.sql
 
 # Create startup script
-RUN echo '#!/bin/bash\n\
-\n\
-# Parse DATABASE_URL\n\
-if [ -z "$DATABASE_URL" ]; then\n\
-    echo "DATABASE_URL environment variable is required"\n\
-    exit 1\n\
-fi\n\
-\n\
-# Wait for postgres to be ready\n\
-until psql "$DATABASE_URL" -c "\q"; do\n\
-    echo "Postgres is unavailable - sleeping"\n\
-    sleep 1\n\
-done\n\
-\n\
-echo "Postgres is up - executing SQL script"\n\
-psql "$DATABASE_URL" -f /app/database.sql\n\
-echo "Creating tmp dir"\n\
-mkdir -pv /app/.tmp\n\
-\n\
-echo "Starting application"\n\
-AIKIDO_TMP_DIR=/app/.tmp make run' > /app/start.sh
-
+COPY start.sh /app/start.sh
 RUN chmod 755 /app/start.sh
 
 ENTRYPOINT ["/app/start.sh"]
