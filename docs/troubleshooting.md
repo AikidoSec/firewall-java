@@ -9,28 +9,6 @@ Typical places:
 
 Tip: search for lines containing `Aikido` or `Zen` to spot initialization and request logs.
 
-**Spring Boot**
-To increase verbosity during troubleshooting, add temporarily to `application.properties`:
-
-`logging.level.root=INFO`
-
-optionally narrow to the Aikido package if you use it `logging.level.com.yourorg.aikido=INFO`
-
-## Confirm the dependency is present
-
-**Maven**
-
-```
-grep -i “aikido” pom.xml
-mvn -q dependency:tree | grep -i “aikido”
-```
-
-**Gradle**
-```
-grep -i “aikido” build.gradle*
-./gradlew dependencies | grep -i “aikido”
-```
-
 ## Contact support
 
 If you still can’t resolve the issue:
