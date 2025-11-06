@@ -15,21 +15,6 @@ The firewall must be able to reach Aikido’s API endpoints.
 
 Test from the same environment where your app runs and follow the instructions on this page: https://help.aikido.dev/zen-firewall/miscellaneous/outbound-network-connections-for-zen
 
-## Review installation steps
-
-Double-check your setup against the [installation guide](../README.md#installation).  
-Make sure:
-- The package installed correctly.  
-- The firewall is initialized early in your app (before routes or handlers).  
-- Your framework-specific integration (middleware, decorator, etc.) matches the example in the README.  
-- You’re running a supported runtime version for your language.
-
-## Check connection to Aikido
-
-The firewall must be able to reach Aikido’s API endpoints.
-
-Test from the same environment where your app runs and follow the instructions on this page: https://help.aikido.dev/zen-firewall/miscellaneous/outbound-network-connections-for-zen
-
 ## Check logs for errors
 
 Typical places:
