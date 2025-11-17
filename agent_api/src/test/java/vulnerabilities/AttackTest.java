@@ -16,7 +16,6 @@ public class AttackTest {
     public void testAttackConstructor() {
         // Arrange
         String operation = "SQL Injection";
-        Vulnerabilities.Vulnerability vulnerability = new Vulnerabilities.SQLInjectionVulnerability();
         String source = "User Input";
         String pathToPayload = "/api/vulnerable";
         Map<String, String> metadata = new HashMap<>();
@@ -26,11 +25,11 @@ public class AttackTest {
         User user = new User("id", "name", "1.1.1.1", 0);
 
         // Act
-        Attack attack = new Attack(operation, vulnerability, source, pathToPayload, metadata, payload, stack, user);
+        Attack attack = new Attack(operation, Vulnerabilities.SQL_INJECTION, source, pathToPayload, metadata, payload, stack, user);
 
         // Assert
         assertEquals(operation, attack.operation);
-        assertEquals(vulnerability.getKind(), attack.kind);
+        assertEquals("sql_injection", attack.kind);
         assertEquals(source, attack.source);
         assertEquals(pathToPayload, attack.pathToPayload);
         assertEquals(metadata, attack.metadata);
@@ -47,7 +46,6 @@ public class AttackTest {
     public void testAttackWithEmptyMetadata() {
         // Arrange
         String operation = "XSS Attack";
-        Vulnerabilities.Vulnerability vulnerability = new Vulnerabilities.SQLInjectionVulnerability();
         String source = "User Input";
         String pathToPayload = "/api/vulnerable";
         Map<String, String> metadata = new HashMap<>(); // Empty metadata
@@ -56,11 +54,11 @@ public class AttackTest {
         User user = new User("123", "name", "1.1.1.1", 0);
 
         // Act
-        Attack attack = new Attack(operation, vulnerability, source, pathToPayload, metadata, payload, stack, user);
+        Attack attack = new Attack(operation, Vulnerabilities.SQL_INJECTION, source, pathToPayload, metadata, payload, stack, user);
 
         // Assert
         assertEquals(operation, attack.operation);
-        assertEquals(vulnerability.getKind(), attack.kind);
+        assertEquals("sql_injection", attack.kind);
         assertEquals(source, attack.source);
         assertEquals(pathToPayload, attack.pathToPayload);
         assertEquals(metadata, attack.metadata);

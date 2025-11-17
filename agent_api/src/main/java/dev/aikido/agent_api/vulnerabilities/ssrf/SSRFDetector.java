@@ -39,7 +39,7 @@ public class SSRFDetector {
         if(attackFindings != null) {
             return new Attack(
                     operation,
-                    new Vulnerabilities.SSRFVulnerability(),
+                    Vulnerabilities.SSRF,
                     attackFindings.source(),
                     attackFindings.pathToPayload(),
                     /*metadata*/ Map.of(
