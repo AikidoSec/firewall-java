@@ -11,7 +11,8 @@ public final class Vulnerabilities {
         Detector getDetector();
         String getKind();
     }
-    public static final class SQLInjectionVulnerability implements Vulnerability {
+
+    private static final class SQLInjectionVulnerability implements Vulnerability {
         @Override
         public Detector getDetector() {
             return new SqlDetector();
@@ -21,7 +22,9 @@ public final class Vulnerabilities {
             return "sql_injection";
         }
     }
-    public static final class PathTraversalVulnerability implements Vulnerability {
+    public static final Vulnerability SQL_INJECTION = new SQLInjectionVulnerability();
+
+    private static final class PathTraversalVulnerability implements Vulnerability {
         @Override
         public Detector getDetector() {
             return new PathTraversalDetector();
@@ -31,7 +34,9 @@ public final class Vulnerabilities {
             return "path_traversal";
         }
     }
-    public static final class SSRFVulnerability implements Vulnerability {
+    public static final Vulnerability PATH_TRAVERSAL = new PathTraversalVulnerability();
+
+    private static final class SSRFVulnerability implements Vulnerability {
         @Override
         public Detector getDetector() { return null; }
         @Override
@@ -39,7 +44,9 @@ public final class Vulnerabilities {
             return "ssrf";
         }
     }
-    public static final class StoredSSRFVulnerability implements Vulnerability {
+    public static final Vulnerability SSRF = new SSRFVulnerability();
+
+    private static final class StoredSSRFVulnerability implements Vulnerability {
         @Override
         public Detector getDetector() { return null; }
         @Override
@@ -47,7 +54,9 @@ public final class Vulnerabilities {
             return "stored_ssrf";
         }
     }
-    public static final class ShellInjectionVulnerability implements Vulnerability {
+    public static final Vulnerability STORED_SSRF = new StoredSSRFVulnerability();
+
+    private static final class ShellInjectionVulnerability implements Vulnerability {
         @Override
         public Detector getDetector() { return new ShellInjectionDetector(); }
         @Override
@@ -55,4 +64,5 @@ public final class Vulnerabilities {
             return "shell_injection";
         }
     }
+    public static final Vulnerability SHELL_INJECTION = new ShellInjectionVulnerability();
 }
