@@ -51,9 +51,3 @@ public final class WebResponseCollector {
         }
     }
 }
-//do we run @Marian Popovici’s tests already on Ruby?
-// we do, but most of them fail because there are some differences in the implementation, like sending post intead of POST in event, or /test_ratelimiting_1(.:format) instead of /test_ratelimiting_1
-
-// Other porbless: 
-// path traversal bypas - https://aikido-security.slack.com/archives/C07F482T4JG/p1754669410362449
-// 
