@@ -1,10 +1,14 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.api_discovery.APISpec;
+import dev.aikido.agent_api.background.cloud.api.events.DetectedAttackWave;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
+import dev.aikido.agent_api.storage.AttackQueue;
+import dev.aikido.agent_api.storage.attack_wave_detector.AttackWaveDetectorStore;
 import dev.aikido.agent_api.storage.routes.RoutesStore;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 import static dev.aikido.agent_api.api_discovery.GetApiInfo.getApiInfo;
 import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
@@ -23,6 +27,15 @@ public final class WebResponseCollector {
         if (statusCode <= 0 || context == null) {
             return; // Status code below or equal to zero: Invalid request
         }
+
+        // Check for attack waves (after request is complete and user has been set)
+        if (AttackWaveDetectorStore.check(context)) {
+            AttackQueue.add(
+                DetectedAttackWave.createAPIEvent(context)
+            );
+            StatisticsStore.incrementAttackWavesDetected();
+        }
+
         RouteMetadata routeMetadata = context.getRouteMetadata();
         if (routeMetadata == null || !isUsefulRoute(statusCode, context.getRoute(), context.getMethod())) {
             return;
@@ -38,3 +51,9 @@ public final class WebResponseCollector {
         }
     }
 }
+//do we run @Marian Popovici’s tests already on Ruby?
+// we do, but most of them fail because there are some differences in the implementation, like sending post intead of POST in event, or /test_ratelimiting_1(.:format) instead of /test_ratelimiting_1
+
+// Other porbless: 
+// path traversal bypas - https://aikido-security.slack.com/archives/C07F482T4JG/p1754669410362449
+// 

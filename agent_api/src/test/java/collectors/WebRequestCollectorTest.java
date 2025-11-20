@@ -3,10 +3,8 @@ package collectors;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
-import dev.aikido.agent_api.background.cloud.api.events.DetectedAttackWave;
 import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.AttackQueue;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
@@ -15,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import utils.EmptySampleContextObject;
 
 import java.util.List;
-import java.util.Map;
 
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 import static org.junit.jupiter.api.Assertions.*;
@@ -261,41 +258,4 @@ class WebRequestCollectorTest {
         assertNull(Context.get());
     }
 
-    @Test
-    void testReport_WithAttackWaveContext() throws InterruptedException {
-        ContextObject attackWaveCtx = new EmptySampleContextObject("/wp-config.php", "BADMETHOD", Map.of());
-
-        WebRequestCollector.Res response = WebRequestCollector.report(attackWaveCtx);
-        assertNull(response);
-        assertEquals(0, AttackQueue.getSize());
-        assertEquals(0, StatisticsStore.getStatsRecord().requests().attackWaves().total());
-
-        // 2...14
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-
-        WebRequestCollector.Res response2 = WebRequestCollector.report(attackWaveCtx);
-        assertNull(response2);
-        assertEquals(1, AttackQueue.getSize());
-        DetectedAttackWave.DetectedAttackWaveEvent event = (DetectedAttackWave.DetectedAttackWaveEvent) AttackQueue.get();
-        assertEquals("192.168.1.1", event.request().ipAddress());
-        assertEquals("web", event.request().source());
-        assertEquals(null, event.request().userAgent());
-        assertEquals("detected_attack_wave", event.type());
-        assertEquals(null, event.attack().user());
-        assertEquals(0, event.attack().metadata().size());
-        // check stats changed
-        assertEquals(1, StatisticsStore.getStatsRecord().requests().attackWaves().total());
-    }
 }
