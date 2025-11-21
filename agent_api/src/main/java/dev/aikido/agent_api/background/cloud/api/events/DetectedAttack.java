@@ -46,7 +46,7 @@ public final class DetectedAttack {
     public static DetectedAttackEvent createAPIEvent(Attack attack, ContextObject context) {
         boolean blocking = getConfig().isBlockingEnabled();
         return new DetectedAttackEvent(
-        "detected_attack", // type
+            "detected_attack", // type
             buildRequestData(context), // request
             buildAttackData(attack, blocking), // attack
             getManagerInfo(), // agent
