@@ -17,8 +17,8 @@ import static net.bytebuddy.matcher.ElementMatchers.named;
 
 public class ProcessBuilderWrapper implements Wrapper {
     public String getName() {
-        // Wrap ProcessBuilder constructor.
-        // https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ProcessBuilder.html#%3Cinit%3E(java.lang.String...)
+        // Wrap ProcessBuilder start().
+        // https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ProcessBuilder.html#start()
         return ProcessBuilderAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
