@@ -8,5 +8,5 @@ If you need to use a different header to determine the client's IP address, you 
 
 ```bash
 # For DigitalOcean App Platform
-AIKIDO_CLIENT_IP_HEADER=do-connecting-ip node app.js
+AIKIDO_CLIENT_IP_HEADER=do-connecting-ip java -javaagent:... -jar ...
 ```
