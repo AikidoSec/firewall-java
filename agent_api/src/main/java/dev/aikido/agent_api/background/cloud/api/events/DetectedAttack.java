@@ -5,7 +5,6 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 
-import java.util.List;
 import java.util.Map;
 
 import static dev.aikido.agent_api.background.cloud.GetManagerInfo.getManagerInfo;
@@ -46,7 +45,20 @@ public final class DetectedAttack {
 
     public static DetectedAttackEvent createAPIEvent(Attack attack, ContextObject context) {
         boolean blocking = getConfig().isBlockingEnabled();
-        RequestData requestData = new RequestData(
+        return new DetectedAttackEvent(
+            "detected_attack", // type
+            buildRequestData(context), // request
+            buildAttackData(attack, blocking), // attack
+            getManagerInfo(), // agent
+            getUnixTimeMS() // time
+        );
+    }
+
+    private static RequestData buildRequestData(ContextObject context) {
+        if (context == null) {
+            return null;
+        }
+        return new RequestData(
             context.getMethod(),
             context.getRemoteAddress(),
             context.getHeader("user-agent"),
@@ -54,16 +66,20 @@ public final class DetectedAttack {
             context.getSource(),
             context.getRoute()
         );
-        AttackData attackData = new AttackData(
-            attack.kind, attack.operation, attack.source, attack.pathToPayload, attack.payload, attack.metadata,
-            "module", blocking, attack.stack, attack.user
-        );
-        return new DetectedAttackEvent(
-        "detected_attack", // type
-            requestData, // request
-            attackData, // attack
-            getManagerInfo(), // agent
-            getUnixTimeMS() // time
+    }
+
+    private static AttackData buildAttackData(Attack attack, boolean blocking) {
+        return new AttackData(
+            attack.kind,
+            attack.operation,
+            attack.source,
+            attack.pathToPayload,
+            attack.payload,
+            attack.metadata,
+            "module",
+            blocking,
+            attack.stack,
+            attack.user
         );
     }
 }
