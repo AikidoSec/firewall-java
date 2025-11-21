@@ -22,8 +22,7 @@ public final class CommandCollector {
             StatisticsStore.registerCall("runtime.Exec", OperationKind.EXEC_OP);
 
             // scan
-            Vulnerabilities.Vulnerability vulnerability = new Vulnerabilities.ShellInjectionVulnerability();
-            Scanner.scanForGivenVulnerability(vulnerability, "runtime.Exec", new String[]{commandStr});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SHELL_INJECTION, "runtime.Exec", new String[]{commandStr});
         }
     }
 }

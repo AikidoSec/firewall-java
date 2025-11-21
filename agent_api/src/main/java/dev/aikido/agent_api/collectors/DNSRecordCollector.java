@@ -44,7 +44,7 @@ public final class DNSRecordCollector {
                     }
                     logger.debug("Hostname: %s, Port: %s, IPs: %s", hostnameEntry.getHostname(), hostnameEntry.getPort(), ipAddresses);
 
-                    Attack attack = new SSRFDetector().run(
+                    Attack attack = SSRFDetector.run(
                         hostname, hostnameEntry.getPort(), ipAddresses, OPERATION_NAME
                     );
                     if (attack == null) {

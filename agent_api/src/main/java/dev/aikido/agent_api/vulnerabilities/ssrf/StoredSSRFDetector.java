@@ -23,7 +23,7 @@ public class StoredSSRFDetector {
 
         return new Attack(
             operation,
-            new Vulnerabilities.StoredSSRFVulnerability(),
+            Vulnerabilities.STORED_SSRF,
             null, // source is null for stored attacks
             "", // path is empty
             Map.of(

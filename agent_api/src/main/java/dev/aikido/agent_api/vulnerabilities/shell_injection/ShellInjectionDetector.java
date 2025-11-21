@@ -9,6 +9,8 @@ import static dev.aikido.agent_api.vulnerabilities.shell_injection.DangerousShel
 import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellSyntaxChecker.containsShellSyntax;
 
 public class ShellInjectionDetector implements Detector {
+    public static final ShellInjectionDetector INSTANCE = new ShellInjectionDetector();
+
     @Override
     public DetectorResult run(String userInput, String[] arguments) {
         if (userInput.isEmpty() || arguments == null || arguments.length == 0 || arguments[0] == null) {

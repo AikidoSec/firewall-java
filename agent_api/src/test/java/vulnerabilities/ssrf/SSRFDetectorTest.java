@@ -44,7 +44,7 @@ public class SSRFDetectorTest {
 
         URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
         RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://127.0.0.1:8080"));
-        Attack attackData = new SSRFDetector().run(
+        Attack attackData = SSRFDetector.run(
                 "127.0.0.1", 8080,
                 List.of("127.0.0.1"),
                 "testop"
@@ -68,7 +68,7 @@ public class SSRFDetectorTest {
 
         URLCollector.report(new URL("http://Ssrf-redirects.testssandbox.com/ssrf-test"));
         RedirectCollector.report(new URL("http://ssrf-Redirects.testssandbox.com/ssrf-test"), new URL("http://127.0.0.1:8080"));
-        Attack attackData = new SSRFDetector().run(
+        Attack attackData = SSRFDetector.run(
             "127.0.0.1", 8080,
             List.of("127.0.0.1"),
             "testop"
@@ -92,7 +92,7 @@ public class SSRFDetectorTest {
 
         URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
         RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"));
-        Attack attackData = new SSRFDetector().run(
+        Attack attackData = SSRFDetector.run(
                 "localhost", 80,
                 List.of("127.0.0.1"),
                 "test2nd_op"
@@ -119,7 +119,7 @@ public class SSRFDetectorTest {
 
         URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
         RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"));
-        Attack attackData = new SSRFDetector().run(
+        Attack attackData = SSRFDetector.run(
                 "localhost", 80,
                 List.of("127.0.0.1"),
                 "test2nd_op"
@@ -136,7 +136,7 @@ public class SSRFDetectorTest {
 
         URLCollector.report(new URL("http://mysql-database/ssrf-test"));
         RedirectCollector.report(new URL("http://mysql-database/ssrf-test"), new URL("http://127.0.0.1:8080"));
-        Attack attackData = new SSRFDetector().run(
+        Attack attackData = SSRFDetector.run(
             "127.0.0.1", 8080,
             List.of("127.0.0.1"),
             "testop"

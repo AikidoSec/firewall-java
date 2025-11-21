@@ -15,7 +15,6 @@ public final class SQLCollector {
         StatisticsStore.registerCall(operation, OperationKind.SQL_OP);
 
         // scan
-        Vulnerabilities.Vulnerability vulnerability = new Vulnerabilities.SQLInjectionVulnerability();
-        Scanner.scanForGivenVulnerability(vulnerability, operation, new String[]{sql, dialect});
+        Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, operation, new String[]{sql, dialect});
     }
 }
