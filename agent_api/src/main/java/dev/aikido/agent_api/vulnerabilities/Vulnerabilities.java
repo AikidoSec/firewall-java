@@ -14,7 +14,7 @@ public final class Vulnerabilities {
     private static final class SQLInjectionVulnerability implements Vulnerability {
         @Override
         public Detector getDetector() {
-            return new SqlDetector();
+            return SqlDetector.INSTANCE;
         }
         @Override
         public String getKind() {
@@ -26,7 +26,7 @@ public final class Vulnerabilities {
     private static final class PathTraversalVulnerability implements Vulnerability {
         @Override
         public Detector getDetector() {
-            return new PathTraversalDetector();
+            return PathTraversalDetector.INSTANCE;
         }
         @Override
         public String getKind() {
@@ -57,7 +57,7 @@ public final class Vulnerabilities {
 
     private static final class ShellInjectionVulnerability implements Vulnerability {
         @Override
-        public Detector getDetector() { return new ShellInjectionDetector(); }
+        public Detector getDetector() { return ShellInjectionDetector.INSTANCE; }
         @Override
         public String getKind() {
             return "shell_injection";
