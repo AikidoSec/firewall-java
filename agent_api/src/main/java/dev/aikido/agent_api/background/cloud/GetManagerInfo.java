@@ -1,14 +1,13 @@
 package dev.aikido.agent_api.background.cloud;
 
 import dev.aikido.agent_api.Config;
+import dev.aikido.agent_api.helpers.net.Hostname;
+import dev.aikido.agent_api.helpers.net.IPAddress;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
 
 import java.util.List;
 import java.util.Map;
-
-import static dev.aikido.agent_api.helpers.net.Hostname.getHostname;
-import static dev.aikido.agent_api.helpers.net.IPAddress.getIpAddress;
 
 /**
  * Class to give you the "agent" info, which is the CloudConnectionManager in Java.
@@ -29,37 +28,40 @@ public final class GetManagerInfo {
             String nodeEnv,
             Platform platform
     ) {}
+
+
     public record OS(String name, String version) {}
+    private static final OS OS_INFO;
+    static {
+        String osName = System.getProperty("os.name");
+        String osVersion = System.getProperty("os.version");
+        OS_INFO = new OS(osName, osVersion);
+    }
 
     public record Platform(String name, String version) {}
+    private static final Platform PLATFORM_INFO;
+    static {
+        String jvmName = System.getProperty("java.vm.name");
+        String jvmVersion = System.getProperty("java.version");
+        PLATFORM_INFO = new Platform(jvmName, jvmVersion);
+    }
+
 
     public static ManagerInfo getManagerInfo() {
         ServiceConfiguration serviceConfig = ServiceConfigStore.getConfig();
         return new ManagerInfo(
             !serviceConfig.isBlockingEnabled(), // dryMode
-            getHostname(), // hostname
+            Hostname.get(), // hostname
             Config.pkgVersion, // version
             "firewall-java", // library
-            getIpAddress(), // ipAddress
+            IPAddress.get(), // ipAddress
             Map.of(), // packages (FIX LATER)
             null, // serverless is not supported for Java
             List.of(), // stack
-            getOSInfo(), // os
+            OS_INFO, // os
             false, // preventedPrototypePollution, should be removed from API
             "", // nodeEnv
-            getPlatformInfo() // platform info
+            PLATFORM_INFO // platform info
         );
-    }
-
-    private static OS getOSInfo() {
-        String name = System.getProperty("os.name");
-        String version = System.getProperty("os.version");
-        return new OS(name, version);
-    }
-
-    private static Platform getPlatformInfo() {
-        String name = System.getProperty("java.vm.name");
-        String version = System.getProperty("java.version");
-        return new Platform(name, version);
     }
 }
