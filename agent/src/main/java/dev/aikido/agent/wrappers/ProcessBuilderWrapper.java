@@ -5,7 +5,6 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -14,7 +13,6 @@ import java.net.URLClassLoader;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.is;
-import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
 public class ProcessBuilderWrapper implements Wrapper {
     public String getName() {
@@ -24,7 +22,7 @@ public class ProcessBuilderWrapper implements Wrapper {
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.isDeclaredBy(ProcessBuilder.class)
-                .and(ElementMatchers.isConstructor()).and(takesArguments(String.class));
+                .and(ElementMatchers.isConstructor());
     }
 
     @Override
@@ -38,7 +36,7 @@ public class ProcessBuilderWrapper implements Wrapper {
         // To bypass this issue we load collectors from a .jar file.
         @Advice.OnMethodEnter
         public static void before(
-            @Advice.AllArguments String[] allArguments
+            @Advice.AllArguments(typing = DYNAMIC) Object[] allArguments
         ) throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
