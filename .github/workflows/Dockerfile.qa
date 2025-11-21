@@ -21,9 +21,10 @@ RUN make build
 FROM amazoncorretto:17-alpine
 
 # Install make and postgresql-client
-RUN apt-get update && \
-    apt-get install -y make postgresql-client && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk update && \
+    apk add make postgresql-client bash && \
+    rm -rf /var/cache/apk/*
+
 
 # Set working directory
 WORKDIR /app
