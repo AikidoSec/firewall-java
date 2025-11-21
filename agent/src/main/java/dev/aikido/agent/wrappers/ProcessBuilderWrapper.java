@@ -13,6 +13,7 @@ import java.net.URLClassLoader;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.is;
+import static net.bytebuddy.matcher.ElementMatchers.named;
 
 public class ProcessBuilderWrapper implements Wrapper {
     public String getName() {
@@ -22,7 +23,7 @@ public class ProcessBuilderWrapper implements Wrapper {
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
         return ElementMatchers.isDeclaredBy(ProcessBuilder.class)
-                .and(ElementMatchers.isConstructor());
+                .and(named("start"));
     }
 
     @Override
@@ -36,7 +37,7 @@ public class ProcessBuilderWrapper implements Wrapper {
         // To bypass this issue we load collectors from a .jar file.
         @Advice.OnMethodEnter
         public static void before(
-            @Advice.AllArguments(typing = DYNAMIC) Object[] allArguments
+            @Advice.This(typing = DYNAMIC) ProcessBuilder target
         ) throws Throwable {
             String jarFilePath = System.getProperty("AIK_agent_api_jar");
             URLClassLoader classLoader = null;
@@ -55,7 +56,7 @@ public class ProcessBuilderWrapper implements Wrapper {
                 // Run report with "argument"
                 for (Method method2: clazz.getMethods()) {
                     if(method2.getName().equals("report")) {
-                        method2.invoke(null, allArguments);
+                        method2.invoke(null, target.command());
                         break;
                     }
                 }
