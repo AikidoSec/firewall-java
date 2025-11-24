@@ -1,5 +1,8 @@
 # Setting up Spring Webflux
 
+> [!WARNING]  
+> Due to the way that Spring Webflux hops between multiple threads, the support for it is still a **work in progress.**
+
 To setup with Spring Webflux you just have to follow the normal installation instructions for the Java Agent.
 
 ## Rate-limiting
