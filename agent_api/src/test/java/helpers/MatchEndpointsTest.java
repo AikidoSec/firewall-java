@@ -26,7 +26,7 @@ public class MatchEndpointsTest {
 
     @Test
     void testInvalidUrlAndNoRoute() {
-        assertNull(matchEndpoints(sampleRouteMetadata(null, null, "abc"), Collections.emptyList()));
+        assertNull(matchEndpoints(new RouteMetadata(null, "abc", null), Collections.emptyList()));
     }
 
     @Test

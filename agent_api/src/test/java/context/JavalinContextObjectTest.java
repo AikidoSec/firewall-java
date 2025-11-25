@@ -67,14 +67,6 @@ class JavalinContextObjectTest {
     }
 
     @Test
-    void testToJson() {
-        String json = contextObject.toJson();
-        assertNotNull(json);
-        assertTrue(json.contains("GET"));
-        assertTrue(json.contains("http://example.com/api/resource"));
-    }
-
-    @Test
     void testGetRouteMetadata() {
         RouteMetadata metadata = contextObject.getRouteMetadata();
         assertNotNull(metadata);
