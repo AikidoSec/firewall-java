@@ -24,11 +24,11 @@ class SpringMVCContextObjectTest {
     void testGetRouteWithSlashTest() {
         // Act
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>(), null
+                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>(), "a=b"
         );
 
         // Assert
-        assertEquals("http://localhost/test", springContextObject.getUrl());
+        assertEquals("http://localhost/test?a=b", springContextObject.getUrl());
         assertEquals("/test", springContextObject.getRoute());
     }
 
@@ -36,7 +36,7 @@ class SpringMVCContextObjectTest {
     void testGetRouteWithNumbers() {
         // Act
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>(), null
+                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>(), ""
         );
 
         // Assert
