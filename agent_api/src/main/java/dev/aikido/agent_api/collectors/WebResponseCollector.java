@@ -1,10 +1,14 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.api_discovery.APISpec;
+import dev.aikido.agent_api.background.cloud.api.events.DetectedAttackWave;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.RouteMetadata;
+import dev.aikido.agent_api.storage.AttackQueue;
+import dev.aikido.agent_api.storage.attack_wave_detector.AttackWaveDetectorStore;
 import dev.aikido.agent_api.storage.routes.RoutesStore;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 import static dev.aikido.agent_api.api_discovery.GetApiInfo.getApiInfo;
 import static dev.aikido.agent_api.helpers.url.IsUsefulRoute.isUsefulRoute;
@@ -20,9 +24,22 @@ public final class WebResponseCollector {
      */
     public static void report(int statusCode) {
         ContextObject context = Context.get();
-        if (statusCode <= 0 || context == null) {
+        if (context == null) {
+            return;
+        }
+
+        // Check for attack waves
+        if (AttackWaveDetectorStore.check(context)) {
+            AttackQueue.add(
+                DetectedAttackWave.createAPIEvent(context)
+            );
+            StatisticsStore.incrementAttackWavesDetected();
+        }
+
+        if (statusCode <= 0) {
             return; // Status code below or equal to zero: Invalid request
         }
+
         RouteMetadata routeMetadata = context.getRouteMetadata();
         if (routeMetadata == null || !isUsefulRoute(statusCode, context.getRoute(), context.getMethod())) {
             return;
