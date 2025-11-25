@@ -11,6 +11,9 @@
     "source": "body",
     "operation": "(MySQL Connector/J) java.sql.Connection.prepareStatement"
   },
+  "javalin_mysql_request": {
+    "url": ""
+  },
   "javalin_postgres_attack": {
     "blocked": true,
     "kind": "sql_injection",
