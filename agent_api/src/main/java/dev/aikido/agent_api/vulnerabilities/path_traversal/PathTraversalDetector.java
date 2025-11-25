@@ -8,6 +8,8 @@ import static dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathChec
 import static dev.aikido.agent_api.vulnerabilities.path_traversal.UnsafePathPartsChecker.containsUnsafePathParts;
 
 public class PathTraversalDetector implements Detector {
+    public static final PathTraversalDetector INSTANCE = new PathTraversalDetector();
+
     /**
      * @param userInput, this is the user input which we will evaluate
      * @param arguments, Includes one element : filename
