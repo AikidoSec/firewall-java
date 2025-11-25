@@ -131,7 +131,7 @@ public class ContentDispositionHeader {
         }
 
         // normalize type
-        int index = matcher.end();
+        int index = matcher.end() - 1;
         String type = matcher.group(1).toLowerCase();
 
         String key;
