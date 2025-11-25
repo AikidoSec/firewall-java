@@ -78,15 +78,15 @@ class ScannerTest {
     void testScanSafeSQLCode() throws InterruptedException {
         ServiceConfigStore.updateBlocking(true);
         // Safe :
-        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgresql"});
+        Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT", "postgresql"});
         // Argument-mismatch, safe :
-        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM"});
-        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
+        Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM"});
+        Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
 
         // Unsafe :
         AttackQueue.clear();
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
         DetectedAttack.DetectedAttackEvent attackEvent = (DetectedAttack.DetectedAttackEvent) AttackQueue.get();
         assertEquals("SELECT * FRO", attackEvent.attack().payload());
@@ -98,14 +98,14 @@ class ScannerTest {
     void testScanSafeSQLCodeButBlockingFalse() {
         ServiceConfigStore.updateBlocking(false);
         // Safe :
-        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT", "postgresql"});
+        Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT", "postgresql"});
         // Argument-mismatch, safe :
-        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM"});
-        Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
+        Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM"});
+        Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "1", "2", "3"});
 
         // Unsafe :
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
@@ -114,22 +114,22 @@ class ScannerTest {
         ServiceConfigStore.updateBlocking(true);
         // Thread cache does not force any protection off :
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
         // Set to protection forced off route :
         Context.set(new SampleContextObject3("/api2/test/2/4"));
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
         Context.set(new SampleContextObject3("/api2/"));
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
 
         // Set to IP where route exists but protection is not forced off :
         Context.set(new SampleContextObject3("/api3/test"));
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
@@ -138,7 +138,7 @@ class ScannerTest {
         ServiceConfigStore.updateBlocking(true);
         Context.set(null);
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
@@ -148,7 +148,7 @@ class ScannerTest {
         ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
         ServiceConfigStore.updateBlocking(true);
         assertThrows(SQLInjectionException.class, () -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 
@@ -156,7 +156,7 @@ class ScannerTest {
     void TestDoesNotThrowWithEmptyAPIResponse() {
         ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
         assertDoesNotThrow(() -> {
-            Scanner.scanForGivenVulnerability(new Vulnerabilities.SQLInjectionVulnerability(), "operation", new String[]{"SELECT * FROM", "postgresql"});
+            Scanner.scanForGivenVulnerability(Vulnerabilities.SQL_INJECTION, "operation", new String[]{"SELECT * FROM", "postgresql"});
         });
     }
 }
