@@ -18,7 +18,7 @@ RUN mv zen_dist zen_by_aikido/zen
 RUN make build
 
 # Runtime stage
-FROM eclipse-temurin:21
+FROM eclipse-temurin:17
 
 # Install make and postgresql-client
 RUN apt-get update && \
