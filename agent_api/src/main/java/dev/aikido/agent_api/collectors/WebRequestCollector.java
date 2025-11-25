@@ -60,14 +60,6 @@ public final class WebRequestCollector {
         if (blockedUARes != null)
             return blockedUARes;
 
-        // Check for attack waves
-        if (AttackWaveDetectorStore.check(newContext)) {
-            AttackQueue.add(
-                DetectedAttackWave.createAPIEvent(newContext)
-            );
-            StatisticsStore.incrementAttackWavesDetected();
-        }
-
         return null;
     }
 
