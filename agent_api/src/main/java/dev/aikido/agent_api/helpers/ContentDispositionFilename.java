@@ -3,8 +3,8 @@ package dev.aikido.agent_api.helpers;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class ContentDispositionParser {
-    private ContentDispositionParser() {}
+public final class ContentDispositionFilename {
+    private ContentDispositionFilename() {}
 
     public static String extractFilenameFromHeader(String contentDisposition) {
         if (contentDisposition == null || contentDisposition.isEmpty()) {
