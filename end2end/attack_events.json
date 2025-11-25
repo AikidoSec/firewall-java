@@ -11,6 +11,9 @@
     "source": "body",
     "operation": "(MySQL Connector/J) java.sql.Connection.prepareStatement"
   },
+  "javalin_mysql_request": {
+    "url": "http://localhost:8098/api/create?a=b"
+  },
   "javalin_postgres_attack": {
     "blocked": true,
     "kind": "sql_injection",
@@ -35,6 +38,9 @@
     "source": "body",
     "operation": "(MySQL Connector/J) java.sql.Connection.prepareStatement",
     "user_id": "123"
+  },
+  "spring_mysql_boot_mysql_request": {
+    "url": "http://localhost:8082/api/pets/create?b=2&c=3"
   },
   "spring_mysql_boot_mariadb_attack": {
     "blocked": true,

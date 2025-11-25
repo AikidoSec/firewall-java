@@ -4,9 +4,9 @@ from utils import App, Request
 javalin_mysql_app = App(8098)
 
 javalin_mysql_app.add_payload(
-    key="sql", test_event=events["javalin_mysql_attack"],
-    safe_request=Request(route="/api/create", body={"name": "Bobby"}),
-    unsafe_request=Request(route="/api/create", body={"name": "Malicious Pet\", \"Gru from the Minions\") -- "})
+    key="sql", test_event=events["javalin_mysql_attack"], test_request=events["javalin_mysql_request"],
+    safe_request=Request(route="/api/create?a=b#test2", body={"name": "Bobby"}),
+    unsafe_request=Request(route="/api/create?a=b#test2", body={"name": "Malicious Pet\", \"Gru from the Minions\") -- "})
 )
 
 javalin_mysql_app.add_payload(

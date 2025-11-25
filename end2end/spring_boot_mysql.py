@@ -5,10 +5,10 @@ from utils import App, Request
 spring_boot_mysql_app = App(8082)
 
 spring_boot_mysql_app.add_payload(
-    "sql_mysql",test_event=events["spring_mysql_boot_mysql_attack"],
-    safe_request=Request("/api/pets/create", headers={'user': '123'}, body={"name": "Bobby"}),
+    "sql_mysql",test_event=events["spring_mysql_boot_mysql_attack"], test_request=events["spring_mysql_boot_mysql_request"],
+    safe_request=Request("/api/pets/create?b=2&c=3#fragment", headers={'user': '123'}, body={"name": "Bobby"}),
     unsafe_request=Request(
-        "/api/pets/create", headers={'user': '123'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
+        "/api/pets/create?b=2&c=3#fragment", headers={'user': '123'}, body={"name": 'Malicious Pet", "Gru from the Minions") -- '}
     )
 )
 

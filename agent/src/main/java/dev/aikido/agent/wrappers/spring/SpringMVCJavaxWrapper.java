@@ -89,7 +89,7 @@ public class SpringMVCJavaxWrapper implements Wrapper {
 
             ContextObject contextObject = new SpringMVCContextObject(
                     request.getMethod(), request.getRequestURL(), request.getRemoteAddr(),
-                    request.getParameterMap(), cookiesMap, headersMap
+                    request.getParameterMap(), cookiesMap, headersMap, request.getQueryString()
             );
 
             // Write a new response:

@@ -22,7 +22,7 @@ public class StringsFromContextTest {
                         "userId", List.of("user1"))),
                 /* headers: */ new HashMap<>(Map.of(
                         "content-type", new Vector<>(List.of("application/json")).elements(),
-                        "authorization", new Vector<>(List.of("Bearer token")).elements()))
+                        "authorization", new Vector<>(List.of("Bearer token")).elements())), null
         );
     }
 
