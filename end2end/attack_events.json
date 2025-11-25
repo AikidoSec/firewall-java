@@ -39,6 +39,9 @@
     "operation": "(MySQL Connector/J) java.sql.Connection.prepareStatement",
     "user_id": "123"
   },
+  "spring_mysql_boot_mysql_request": {
+    "url": ""
+  },
   "spring_mysql_boot_mariadb_attack": {
     "blocked": true,
     "kind": "sql_injection",
