@@ -146,7 +146,7 @@ public class ContentDispositionHeader {
         // match parameters
         while (matcher.find()) {
             if (matcher.start() != index) {
-                throw new IllegalArgumentException("invalid parameter format");
+                continue;
             }
 
             index = matcher.end();
@@ -154,7 +154,7 @@ public class ContentDispositionHeader {
             value = matcher.group(2);
 
             if (names.contains(key)) {
-                throw new IllegalArgumentException("invalid duplicate parameter");
+                continue;
             }
 
             names.add(key);
@@ -181,10 +181,6 @@ public class ContentDispositionHeader {
             }
 
             params.put(key, value);
-        }
-
-        if (index != -1 && index != string.length()) {
-            throw new IllegalArgumentException("invalid parameter format");
         }
 
         return new ParseResult(type, params);

@@ -20,12 +20,6 @@ public class ContentDispositionHeaderTest {
     }
 
     @Test
-    public void testParseRejectsTrailingSemicolon() {
-        assertThrows(IllegalArgumentException.class, () -> ContentDispositionHeader.parse("attachment;"),
-            "invalid parameter format");
-    }
-
-    @Test
     public void testParseAttachment() {
         ContentDispositionHeader.ParseResult result = ContentDispositionHeader.parse("attachment");
         assertEquals("attachment", result.type());
