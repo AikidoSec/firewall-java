@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class SqlDetector implements Detector {
+    public static final SqlDetector INSTANCE = new SqlDetector();
     private static final Logger logger = LogManager.getLogger(SqlDetector.class);
+
     /**
      * @param userInput contains the user input which we want to scan
      * @param arguments contains: [query, dialect]

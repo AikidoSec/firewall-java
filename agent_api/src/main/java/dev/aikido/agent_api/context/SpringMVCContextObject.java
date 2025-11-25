@@ -8,11 +8,14 @@ import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromU
 public class SpringMVCContextObject extends SpringContextObject {
     public SpringMVCContextObject(
             String method, StringBuffer url, String rawIp, Map<String, String[]> queryParams,
-            HashMap<String, List<String>> cookies, HashMap<String, Enumeration<String>> headers
+            HashMap<String, List<String>> cookies, HashMap<String, Enumeration<String>> headers, String queryString
     ) {
         this.method = method;
         if (url != null) {
             this.url = url.toString();
+            if (queryString != null && !queryString.isEmpty()) {
+                this.url = this.url + "?" + queryString;
+            }
         }
         this.query = extractQueryParameters(queryParams);
         this.cookies = cookies;

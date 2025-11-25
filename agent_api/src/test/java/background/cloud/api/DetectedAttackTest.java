@@ -24,7 +24,7 @@ class DetectedAttackTest {
 
         Attack attack = new Attack(
             "read",
-            new Vulnerabilities.SQLInjectionVulnerability(),
+            Vulnerabilities.SQL_INJECTION,
             "web",
             "/api/resource",
             metadata,
@@ -62,7 +62,7 @@ class DetectedAttackTest {
         // Arrange
         Attack attack = new Attack(
             "read",
-            new Vulnerabilities.SQLInjectionVulnerability(),
+            Vulnerabilities.SQL_INJECTION,
             "web",
             "/api/resource",
             Map.of("key", "value"),

@@ -79,7 +79,7 @@ public class SpringAnnotationCollectorTest {
     @BeforeEach
     public void setUp() {
         mockContext = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
+                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>(), null
         );
         Context.set(mockContext);
     }

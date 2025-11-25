@@ -49,13 +49,13 @@ class App:
         if payload["test_event"]:
             for k, v in payload["test_event"].items():
                 if k == "user_id":  # exemption rule for user ids
-                    assert_eq(attacks[0]["attack"]["user"]["id"], v)
+                    assert_eq(reported_event["attack"]["user"]["id"], v)
                 else:
-                    assert_eq(attacks[0]["attack"][k], equals=v)
+                    assert_eq(reported_event["attack"][k], equals=v)
             print("✅ Tested accurate evet[attack] reporting for: " + key)
         if payload["test_request"]:
             for k, v in payload["test_request"].items():
-                assert_eq(attacks[0]["request"][k], equals=v)
+                assert_eq(reported_event["request"][k], equals=v)
             print("✅ Tested accurate event[request] reporting for: " + key)
 
     def test_all_payloads(self):

@@ -16,7 +16,7 @@ class SpringMVCContextObjectTest {
     @BeforeEach
     void setUp() {
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
+                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>(), null
         );
     }
 
@@ -24,7 +24,7 @@ class SpringMVCContextObjectTest {
     void testGetRouteWithSlashTest() {
         // Act
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
+                "GET", new StringBuffer("http://localhost/test"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>(), null
         );
 
         // Assert
@@ -36,7 +36,7 @@ class SpringMVCContextObjectTest {
     void testGetRouteWithNumbers() {
         // Act
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>()
+                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), new HashMap<>(), null
         );
 
         // Assert
@@ -59,7 +59,7 @@ class SpringMVCContextObjectTest {
         headers.put("x-forwarded-for", forwardedForValues.elements());
 
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
+                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers, null
         );
 
         assertEquals(1, springContextObject.getHeaders().size());
@@ -75,7 +75,7 @@ class SpringMVCContextObjectTest {
         headers.put("x-forwarded-for", forwardedForValues.elements());
 
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
+                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers, null
         );
 
         assertEquals(1, springContextObject.getHeaders().size());
@@ -91,7 +91,7 @@ class SpringMVCContextObjectTest {
         headers.put("x-forwarded-for", forwardedForValues.elements());
 
         springContextObject = new SpringMVCContextObject(
-                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers
+                "GET", new StringBuffer("http://localhost/api/dog/28632"), "192.168.1.1", Map.of(), new HashMap<>(), headers, null
         );
 
         assertEquals(1, springContextObject.getHeaders().size());
