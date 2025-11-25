@@ -12,7 +12,7 @@
     "operation": "(MySQL Connector/J) java.sql.Connection.prepareStatement"
   },
   "javalin_mysql_request": {
-    "url": ""
+    "url": "http://localhost:8098/api/create?a=b#test2"
   },
   "javalin_postgres_attack": {
     "blocked": true,
@@ -40,7 +40,7 @@
     "user_id": "123"
   },
   "spring_mysql_boot_mysql_request": {
-    "url": ""
+    "url": "http://localhost:8098/api/create"
   },
   "spring_mysql_boot_mariadb_attack": {
     "blocked": true,
