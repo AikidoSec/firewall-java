@@ -20,6 +20,18 @@ public class ContentDispositionHeaderTest {
     }
 
     @Test
+    public void testThrowsIfUnknownCharset() {
+        assertThrows(IllegalArgumentException.class, () -> ContentDispositionHeader.parse("attachment; filename*=UTF-7''file%20name.jpg"),
+            "unsupported charset in extended field");
+    }
+
+    @Test
+    public void testThrowsIfFirstRegex() {
+        assertThrows(IllegalArgumentException.class, () -> ContentDispositionHeader.parse("}"),
+            "invalid extended field value");
+    }
+
+    @Test
     public void testParseAttachment() {
         ContentDispositionHeader.ParseResult result = ContentDispositionHeader.parse("attachment");
         assertEquals("attachment", result.type());
