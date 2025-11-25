@@ -1,7 +1,6 @@
 package dev.aikido.agent_api.context;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import dev.aikido.agent_api.helpers.ContentDispositionFilename;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.RedirectNode;
 
@@ -71,7 +70,13 @@ public class ContextObject {
         return remoteAddress;
     }
     public HashMap<String, List<String>> getHeaders() {
-        return headers;
+        HashMap<String, List<String>> result = new HashMap<>(headers);
+
+        // parse special headers like Content-Disposition to already extract certain values
+        Optional<String> filename = ContentDispositionFilename.extract(getHeader("Content-Disposition"));
+        filename.ifPresent(s -> result.put("Content-Disposition[filename]", List.of(s)));
+
+        return result;
     }
     public String getHeader(String key) {
         return getHeader(this.headers, key);
