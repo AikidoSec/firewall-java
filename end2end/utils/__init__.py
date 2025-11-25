@@ -22,11 +22,12 @@ class App:
         if not wait_until_live(self.urls["disabled"]):
             raise Exception(self.urls["disabled"] + " is not turning on.")
 
-    def add_payload(self,key, safe_request, unsafe_request=None, test_event=None):
+    def add_payload(self,key, safe_request, unsafe_request=None, test_event=None, test_request=None):
         self.payloads[key] = {
             "safe": safe_request,
             "unsafe": unsafe_request,
-            "test_event": test_event
+            "test_event": test_event,
+            "test_request": test_request
         }
 
     def test_payload(self, key):
@@ -38,16 +39,24 @@ class App:
         test_payloads_safe_vs_unsafe(payload, self.urls)
         print("✅ Tested payload: " + key)
 
-        if payload["test_event"]:
+        reported_event = None
+        if payload["test_event"] or payload["test_request"]:
             time.sleep(5)
-            attacks = self.event_handler.fetch_attacks()
-            assert_eq(len(attacks), equals=1)
+            attack_events = self.event_handler.fetch_attacks()
+            assert_eq(len(attack_events), equals=1)
+            reported_event = attack_events[0]
+
+        if payload["test_event"]:
             for k, v in payload["test_event"].items():
                 if k == "user_id":  # exemption rule for user ids
                     assert_eq(attacks[0]["attack"]["user"]["id"], v)
                 else:
                     assert_eq(attacks[0]["attack"][k], equals=v)
-            print("✅ Tested accurate event reporting for: " + key)
+            print("✅ Tested accurate evet[attack] reporting for: " + key)
+        if payload["test_request"]:
+            for k, v in payload["test_request"].items():
+                assert_eq(attacks[0]["request"][k], equals=v)
+            print("✅ Tested accurate event[request] reporting for: " + key)
 
     def test_all_payloads(self):
         for key in self.payloads.keys():
