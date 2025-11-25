@@ -23,7 +23,11 @@ public final class Wrappers {
             new SpringControllerWrapper(),
             new FileConstructorSingleArgumentWrapper(),
             new FileConstructorMultiArgumentWrapper(),
+
+            // Shell wrappers
             new RuntimeExecWrapper(),
+            new ProcessBuilderWrapper(),
+
             new MysqlCJWrapper(),
             new MSSQLWrapper(),
             new MariaDBWrapper(),
