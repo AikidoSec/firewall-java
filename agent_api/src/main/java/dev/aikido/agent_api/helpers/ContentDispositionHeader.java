@@ -11,7 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.*;
 
-public class ContentDispositionHeader {
+public final class ContentDispositionHeader {
+    private ContentDispositionHeader() {}
     private static final Pattern HEX_ESCAPE_REPLACE_REGEXP = Pattern.compile("%([0-9A-Fa-f]{2})");
 
     /**
