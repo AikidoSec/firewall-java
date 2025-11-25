@@ -58,7 +58,7 @@ public class JavalinWrapper implements Wrapper {
 
             // Create a context object for Javalin
             ContextObject context = new JavalinContextObject(
-                    ctx.method().name(), ctx.url(), ctx.ip(),
+                        ctx.method().name(), ctx.fullUrl(), ctx.ip(),
                     ctx.queryParamMap(), cookies, headers
             );
             WebRequestCollector.Res response = WebRequestCollector.report(context);
