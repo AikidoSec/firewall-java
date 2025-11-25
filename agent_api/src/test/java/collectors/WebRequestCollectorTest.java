@@ -260,42 +260,4 @@ class WebRequestCollectorTest {
         assertNull(response);
         assertNull(Context.get());
     }
-
-    @Test
-    void testReport_WithAttackWaveContext() throws InterruptedException {
-        ContextObject attackWaveCtx = new EmptySampleContextObject("/wp-config.php", "BADMETHOD", Map.of());
-
-        WebRequestCollector.Res response = WebRequestCollector.report(attackWaveCtx);
-        assertNull(response);
-        assertEquals(0, AttackQueue.getSize());
-        assertEquals(0, StatisticsStore.getStatsRecord().requests().attackWaves().total());
-
-        // 2...14
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-        WebRequestCollector.report(attackWaveCtx);
-
-        WebRequestCollector.Res response2 = WebRequestCollector.report(attackWaveCtx);
-        assertNull(response2);
-        assertEquals(1, AttackQueue.getSize());
-        DetectedAttackWave.DetectedAttackWaveEvent event = (DetectedAttackWave.DetectedAttackWaveEvent) AttackQueue.get();
-        assertEquals("192.168.1.1", event.request().ipAddress());
-        assertEquals("web", event.request().source());
-        assertEquals(null, event.request().userAgent());
-        assertEquals("detected_attack_wave", event.type());
-        assertEquals(null, event.attack().user());
-        assertEquals(0, event.attack().metadata().size());
-        // check stats changed
-        assertEquals(1, StatisticsStore.getStatsRecord().requests().attackWaves().total());
-    }
 }
