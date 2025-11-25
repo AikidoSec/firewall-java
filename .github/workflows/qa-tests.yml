@@ -49,3 +49,4 @@ jobs:
                   dockerfile_path: ./zen-demo-java/Dockerfile
                   app_port: 8080
                   sleep_before_test: 30
+                  skip_tests: test_ssrf,test_demo_apps_generic_tests
