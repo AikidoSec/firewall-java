@@ -52,7 +52,7 @@ class App:
                     assert_eq(reported_event["attack"]["user"]["id"], v)
                 else:
                     assert_eq(reported_event["attack"][k], equals=v)
-            print("✅ Tested accurate evet[attack] reporting for: " + key)
+            print("✅ Tested accurate event[attack] reporting for: " + key)
         if payload["test_request"]:
             for k, v in payload["test_request"].items():
                 assert_eq(reported_event["request"][k], equals=v)
