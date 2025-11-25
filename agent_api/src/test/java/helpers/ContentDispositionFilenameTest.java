@@ -103,6 +103,15 @@ class ContentDispositionFilenameTest {
         assertEquals("example.txt", result.get());
     }
 
+
+    @Test
+    void testExtractFilenameWithBothStarFromHeader_QuotedFilenameWithSemicolon() {
+        String header = "attachment; filename*=UTF-8''file%20name.jpg";
+        Optional<String> result = ContentDispositionFilename.extract(header);
+        assertTrue(result.isPresent());
+        assertEquals("file name.jpg", result.get());
+    }
+    
     @Test
     void testExtractFilenameFromHeader_QuotedFilenameWithEscapedQuotes() {
         String header = "attachment; filename=\"example\\\"quoted\\\"file.txt\"";
