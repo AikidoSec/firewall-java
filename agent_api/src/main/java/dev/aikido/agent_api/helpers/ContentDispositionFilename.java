@@ -4,14 +4,12 @@ import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class ContentDispositionFilename {
     private ContentDispositionFilename() {}
     private static final Logger logger = LogManager.getLogger(ContentDispositionFilename.class);
 
-    public static Optional<String> extractFilenameFromHeader(String contentDisposition) {
+    public static Optional<String> extract(String contentDisposition) {
         try {
             ContentDispositionHeader.ParseResult res = ContentDispositionHeader.parse(contentDisposition);
 
