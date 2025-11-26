@@ -25,6 +25,8 @@ public class StoredSSRFDetector {
         }
 
         ContextObject context = Context.get();
+        // the 2nd param makes it so that if context is not set, we default to false.
+        // this is necessary for stored SSRF where we don't want an early return even if there's no context.
         if (shouldSkipVulnerabilityScan(context, false)) {
             return null;
         }
