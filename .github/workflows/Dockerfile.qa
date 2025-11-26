@@ -1,0 +1,39 @@
+# Build stage
+FROM gradle:7.6.1-jdk17 AS builder
+
+# Install make
+RUN apt-get update && apt-get install -y make
+
+# Set working directory
+WORKDIR /app
+
+# Copy your source code, including Makefile
+COPY . .
+
+# Run make download
+# --- modified part ---
+RUN mkdir zen_by_aikido
+RUN mv zen_dist zen_by_aikido/zen
+# --- end modified part ---
+RUN make build
+
+# Runtime stage
+FROM eclipse-temurin:17
+
+# Install make and postgresql-client
+RUN apt-get update && \
+    apt-get install -y make postgresql-client && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy the built application and SQL file from builder stage
+COPY --from=builder /app .
+COPY database.sql /app/database.sql
+
+# Create startup script
+COPY start.sh /app/start.sh
+RUN chmod 755 /app/start.sh
+
+ENTRYPOINT ["/app/start.sh"]
