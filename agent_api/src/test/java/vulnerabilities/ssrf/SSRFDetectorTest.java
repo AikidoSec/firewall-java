@@ -1,5 +1,6 @@
 package vulnerabilities.ssrf;
 
+import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.collectors.RedirectCollector;
 import dev.aikido.agent_api.collectors.URLCollector;
 import dev.aikido.agent_api.context.Context;
@@ -18,6 +19,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static utils.EmptyAPIResponses.emptyAPIResponse;
+import static utils.EmptyAPIResponses.setEmptyConfigWithEndpointList;
 
 public class SSRFDetectorTest {
     @BeforeAll
@@ -34,7 +36,18 @@ public class SSRFDetectorTest {
         Context.set(new EmptySampleContextObject(url));
         ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
     }
-
+    private void setContextAndLifecycle(String url, String route) {
+        ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
+        setEmptyConfigWithEndpointList(List.of(
+            new Endpoint(
+                /* method */ "*", /* route */ "/api2/*",
+                /* rlm params */ 0, 0,
+                /* Allowed IPs */ List.of(), /* graphql */ false,
+                /* forceProtectionOff */ true, /* rlm */ false
+            )
+        ));
+        Context.set(new EmptySampleContextObject(url, "http://localhost:3000" + route));
+    }
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
@@ -140,6 +153,23 @@ public class SSRFDetectorTest {
             "127.0.0.1", 8080,
             List.of("127.0.0.1"),
             "testop"
+        );
+
+        assertNull(attackData);
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
+    public void testSsrfDetectorForcedProtectionOff() throws MalformedURLException {
+        // Setup context :
+        setContextAndLifecycle("http://ssrf-redirects.testssandbox.com/", "/api2/forced-off-route");
+
+        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
+        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"));
+        Attack attackData = SSRFDetector.run(
+            "localhost", 80,
+            List.of("127.0.0.1"),
+            "test2nd_op"
         );
 
         assertNull(attackData);

@@ -1,5 +1,7 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
+import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
 
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
+import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.imds.Resolver.resolvesToImdsIp;
 
 public class StoredSSRFDetector {
@@ -18,6 +21,13 @@ public class StoredSSRFDetector {
 
         String imdsIp = resolvesToImdsIp(new HashSet<>(ipAddresses), hostname);
         if (imdsIp == null) {
+            return null;
+        }
+
+        ContextObject context = Context.get();
+        // the 2nd param makes it so that if context is not set, we default to false.
+        // this is necessary for stored SSRF where we don't want an early return even if there's no context.
+        if (shouldSkipVulnerabilityScan(context, false)) {
             return null;
         }
 

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import static dev.aikido.agent_api.helpers.StackTrace.getCurrentStackTrace;
+import static dev.aikido.agent_api.vulnerabilities.SkipVulnerabilityScanDecider.shouldSkipVulnerabilityScan;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.FindHostnameInContext.findHostnameInContext;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.containsPrivateIP;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.PrivateIPRedirectFinder.isRedirectToPrivateIP;
@@ -25,7 +26,7 @@ public final class SSRFDetector {
         }
 
         ContextObject context = Context.get();
-        if(context == null) {
+        if (shouldSkipVulnerabilityScan(context)) {
             return null;
         }
         FindHostnameInContext.Res attackFindings = findHostnameInContext(hostname, context, port);
