@@ -101,7 +101,6 @@ public final class ContentDispositionHeader {
         String encoded = matcher.group(2);
         String value;
 
-        // to binary string
         String binary = replaceAll(encoded, result -> pDecode(result.group(1)));
 
         value = switch (charset) {
