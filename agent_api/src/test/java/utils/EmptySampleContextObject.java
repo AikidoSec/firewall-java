@@ -47,4 +47,7 @@ public class EmptySampleContextObject extends ContextObject {
     public void setIp(String ip) {
         this.remoteAddress = ip;
     }
+    public void setRoute(String route) {
+        this.route = route;
+    }
 }
