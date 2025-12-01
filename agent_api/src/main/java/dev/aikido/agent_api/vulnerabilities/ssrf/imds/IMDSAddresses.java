@@ -1,20 +1,25 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf.imds;
 
+import dev.aikido.agent_api.helpers.net.IPList;
+import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.mapIPv4ToIPv6;
+
 public final class IMDSAddresses {
     private IMDSAddresses() {}
-    private static final BlockList imdsAddresses = new BlockList();
+    private static final IPList imdsAddresses = new IPList();
 
     static {
         // Add the IP addresses used by AWS EC2 instances for IMDS
-        imdsAddresses.addAddress("169.254.169.254", "ipv4");
-        imdsAddresses.addAddress("fd00:ec2::254", "ipv6");
+        imdsAddresses.add("169.254.169.254");
+        imdsAddresses.add("fd00:ec2::254");
+        imdsAddresses.add(mapIPv4ToIPv6("169.254.169.254"));
 
         // Add the IP addresses used for Alibaba Cloud
-        imdsAddresses.addAddress("100.100.100.200", "ipv4");
+        imdsAddresses.add("100.100.100.200");
+        imdsAddresses.add(mapIPv4ToIPv6("100.100.100.200"));
     }
 
     /** Checks if the IP is an IMDS IP */
     public static boolean isImdsIpAddress(String ip) {
-        return imdsAddresses.check(ip, "ipv4") || imdsAddresses.check(ip, "ipv6");
+        return imdsAddresses.matches(ip);
     }
 }
