@@ -15,7 +15,7 @@ public final class IMDSAddresses {
 
         // Add the IP addresses used for Alibaba Cloud
         imdsAddresses.add("100.100.100.200");
-        imdsAddresses.add(mapIPv4ToIPv6("169.254.169.254"));
+        imdsAddresses.add(mapIPv4ToIPv6("100.100.100.200"));
     }
 
     /** Checks if the IP is an IMDS IP */
