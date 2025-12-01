@@ -28,6 +28,22 @@ public class ResolverTest {
     }
 
     @Test
+    void testResolvesToImdsIp_WithIpv4MappedIP() {
+        Set<String> resolvedIps = new HashSet<>();
+        resolvedIps.add("::ffff:169.254.169.254"); // IMDS IP
+
+        assertEquals("::ffff:169.254.169.254", Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
+    }
+
+    @Test
+    void testResolvesToImdsIp_WithIpv4MappedIP2() {
+        Set<String> resolvedIps = new HashSet<>();
+        resolvedIps.add("::ffff:100.100.100.200"); // IMDS IP
+
+        assertEquals("::ffff:100.100.100.200", Resolver.resolvesToImdsIp(resolvedIps, "example.com"));
+    }
+
+    @Test
     void testDoesntResolveToImdsIp_WithHostnameImdsIp() {
         Set<String> resolvedIps = new HashSet<>();
         resolvedIps.add("169.254.169.254"); // IMDS IP
