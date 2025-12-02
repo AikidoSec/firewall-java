@@ -4,14 +4,15 @@ import dev.aikido.agent_api.storage.attack_wave_detector.AttackWaveDetector;
 import org.junit.jupiter.api.Test;
 import utils.EmptySampleContextObject;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class AttackWaveDetectorTest {
 
     private AttackWaveDetector newAttackWaveDetector() {
         // Use much smaller time frames for testing (e.g., 100ms instead of 60s)
-        return new AttackWaveDetector(6, 100L, 200L, 10_000);
+        return new AttackWaveDetector(6, 100L, 200L, 10_000, 3);
     }
 
     private static boolean checkDetector(AttackWaveDetector detector, String ip, boolean isWebScanner) {
@@ -59,6 +60,12 @@ class AttackWaveDetectorTest {
         assertFalse(checkDetector(detector, "::1", true));
         assertFalse(checkDetector(detector, "::1", true));
         assertFalse(checkDetector(detector, "::1", true));
+        assertArrayEquals(
+            List.of(
+                new AttackWaveDetector.Sample("BADMETHOD", "https://example.com/api/resource")
+            ).toArray(),
+            detector.getSamplesForIp("::1").toArray()
+        );
 
         // Small delay (50ms)
         Thread.sleep(50);
