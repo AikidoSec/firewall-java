@@ -8,9 +8,7 @@ import dev.aikido.agent_api.storage.service_configuration.Domain;
 import dev.aikido.agent_api.storage.service_configuration.ParsedFirewallLists;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
@@ -27,7 +25,7 @@ public class ServiceConfiguration {
     private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
-    private List<Domain> domains = new ArrayList<>();
+    private Map<String, Domain> domains = new HashMap<>();
     private boolean blockNewOutgoingRequests = false;
 
     public ServiceConfiguration() {
@@ -50,7 +48,12 @@ public class ServiceConfiguration {
             this.endpoints = apiResponse.endpoints();
         }
         if (apiResponse.domains() != null) {
-            this.domains = apiResponse.domains();
+            for (Domain domain : apiResponse.domains()) {
+                if (this.domains.get(domain.hostname()) != null) {
+                    continue; // use first provided domain value
+                }
+                this.domains.put(domain.hostname(), domain);
+            }
         }
         this.blockNewOutgoingRequests = apiResponse.blockNewOutgoingRequests();
         this.receivedAnyStats = apiResponse.receivedAnyStats();
@@ -133,5 +136,19 @@ public class ServiceConfiguration {
     }
 
     public record BlockedResult(boolean blocked, String description) {
+    }
+
+    public boolean shouldBlockOutgoingRequest(String hostname) {
+        Domain matchingDomain = this.domains.get(hostname);
+        if (matchingDomain == null) {
+            return false;
+        }
+
+        boolean isDomainBlocked = matchingDomain.isBlockingMode();
+        if (this.blockNewOutgoingRequests) {
+            return isDomainBlocked;
+        }
+
+        return isDomainBlocked;
     }
 }
