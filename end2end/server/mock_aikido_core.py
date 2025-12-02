@@ -44,6 +44,8 @@ responses = {
             }
         ],
         "blockedUserIds": ["12345"],
+        "blockNewOutgoingRequests": False,
+        "domains": [],
         "block": True,
     },
     "lists": {
