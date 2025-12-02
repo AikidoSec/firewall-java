@@ -6,7 +6,7 @@ import dev.aikido.agent_api.ratelimiting.LRUCache;
 import static dev.aikido.agent_api.vulnerabilities.attack_wave_detection.WebScanDetector.isWebScanner;
 
 public class AttackWaveDetector {
-    private final LRUCache<String, Integer> suspiciousRequestsMap;
+    private final LRUCache<String, Integer> suspiciousRequestsCounts;
     private final LRUCache<String, Long> sentEventsMap;
     private final int attackWaveThreshold;
 
@@ -28,7 +28,7 @@ public class AttackWaveDetector {
     public AttackWaveDetector(int attackWaveThreshold, long attackWaveTimeFrame,
                               long minTimeBetweenEvents, int maxLRUEntries) {
         this.attackWaveThreshold = attackWaveThreshold;
-        this.suspiciousRequestsMap = new LRUCache<>(maxLRUEntries, attackWaveTimeFrame);
+        this.suspiciousRequestsCounts = new LRUCache<>(maxLRUEntries, attackWaveTimeFrame);
         this.sentEventsMap = new LRUCache<>(maxLRUEntries, minTimeBetweenEvents);
     }
 
@@ -56,11 +56,11 @@ public class AttackWaveDetector {
 
         // Add 1 to the suspiciousRequests counter.
         int suspiciousRequests = 1;
-        Integer existingSuspiciousRequests = this.suspiciousRequestsMap.get(ip);
+        Integer existingSuspiciousRequests = this.suspiciousRequestsCounts.get(ip);
         if (existingSuspiciousRequests != null) {
             suspiciousRequests = existingSuspiciousRequests + 1;
         }
-        this.suspiciousRequestsMap.set(ip, suspiciousRequests);
+        this.suspiciousRequestsCounts.set(ip, suspiciousRequests);
 
         if (suspiciousRequests < this.attackWaveThreshold) {
             return false;
