@@ -135,7 +135,9 @@ public class WebResponseCollectorTest {
         assertEquals("123", event.attack().user().id());
         assertEquals("Jane Doe", event.attack().user().name());
 
-        assertEquals(0, event.attack().metadata().size());
+        assertEquals(1, event.attack().metadata().size());
+        assertEquals("[{\"method\":\"BADMETHOD\",\"url\":\"https://example.com/api/resource\"}]", event.attack().metadata().get("samples"));
+
         // check stats changed
         assertEquals(1, StatisticsStore.getStatsRecord().requests().attackWaves().total());
     }
