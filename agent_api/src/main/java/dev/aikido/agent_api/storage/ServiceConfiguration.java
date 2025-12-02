@@ -4,6 +4,7 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.net.IPList;
+import dev.aikido.agent_api.storage.service_configuration.Domain;
 import dev.aikido.agent_api.storage.service_configuration.ParsedFirewallLists;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
@@ -26,6 +27,8 @@ public class ServiceConfiguration {
     private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
+    private List<Domain> domains = new ArrayList<>();
+    private boolean blockNewOutgoingRequests = false;
 
     public ServiceConfiguration() {
         this.receivedAnyStats = true; // true by default, waiting for the startup event
@@ -46,6 +49,10 @@ public class ServiceConfiguration {
         if (apiResponse.endpoints() != null) {
             this.endpoints = apiResponse.endpoints();
         }
+        if (apiResponse.domains() != null) {
+            this.domains = apiResponse.domains();
+        }
+        this.blockNewOutgoingRequests = apiResponse.blockNewOutgoingRequests();
         this.receivedAnyStats = apiResponse.receivedAnyStats();
     }
 
