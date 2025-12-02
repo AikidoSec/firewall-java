@@ -125,4 +125,24 @@ class AttackWaveDetectorTest {
         assertFalse(checkDetector(detector, "::1", true));
         assertTrue(checkDetector(detector, "::1", true));
     }
+
+    @Test
+    void testItRespectsSamplesLimit() {
+        AttackWaveDetector detector = newAttackWaveDetector();
+        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "GET"));
+        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "GET"));
+        detector.check(new EmptySampleContextObject("", "/test2", "GET"));
+        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "POST"));
+        detector.check(new EmptySampleContextObject("", "/test3", "PUT"));
+        detector.check(new EmptySampleContextObject("", "/.env", "GET"));
+        detector.check(new EmptySampleContextObject("", "/test4", "BADMETHOD"));
+        assertArrayEquals(
+            List.of(
+                new AttackWaveDetector.Sample("GET", "https://example.com/../etc/passwd"),
+                new AttackWaveDetector.Sample("POST", "https://example.com/../etc/passwd"),
+                new AttackWaveDetector.Sample("GET", "https://example.com/.env")
+            ).toArray(),
+            detector.getSamplesForIp("192.168.1.1").toArray()
+        );
+    }
 }
