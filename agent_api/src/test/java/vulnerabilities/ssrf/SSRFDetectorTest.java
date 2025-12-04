@@ -55,8 +55,8 @@ public class SSRFDetectorTest {
         // Setup context :
         setContextAndLifecycle("http://ssrf-redirects.testssandbox.com/ssrf-test");
 
-        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
-        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://127.0.0.1:8080"));
+        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), "test");
+        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://127.0.0.1:8080"), "test");
         Attack attackData = SSRFDetector.run(
                 "127.0.0.1", 8080,
                 List.of("127.0.0.1"),
@@ -79,8 +79,8 @@ public class SSRFDetectorTest {
         // Setup context :
         setContextAndLifecycle("http://Ssrf-redirects.testssandbox.com/ssrf-test");
 
-        URLCollector.report(new URL("http://Ssrf-redirects.testssandbox.com/ssrf-test"));
-        RedirectCollector.report(new URL("http://ssrf-Redirects.testssandbox.com/ssrf-test"), new URL("http://127.0.0.1:8080"));
+        URLCollector.report(new URL("http://Ssrf-redirects.testssandbox.com/ssrf-test"), "test");
+        RedirectCollector.report(new URL("http://ssrf-Redirects.testssandbox.com/ssrf-test"), new URL("http://127.0.0.1:8080"), "test");
         Attack attackData = SSRFDetector.run(
             "127.0.0.1", 8080,
             List.of("127.0.0.1"),
@@ -103,8 +103,8 @@ public class SSRFDetectorTest {
         // Setup context :
         setContextAndLifecycle("http://ssrf-redirects.testssandbox.com/");
 
-        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
-        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"));
+        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), "test");
+        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"), "test");
         Attack attackData = SSRFDetector.run(
                 "localhost", 80,
                 List.of("127.0.0.1"),
@@ -130,8 +130,8 @@ public class SSRFDetectorTest {
                 "http://ssrf-redirects.testssandbox.com/examplesite")); // url
 
 
-        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
-        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"));
+        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), "test");
+        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"), "test");
         Attack attackData = SSRFDetector.run(
                 "localhost", 80,
                 List.of("127.0.0.1"),
@@ -147,8 +147,8 @@ public class SSRFDetectorTest {
         // Setup context :
         setContextAndLifecycle("http://mysql-database/ssrf-test");
 
-        URLCollector.report(new URL("http://mysql-database/ssrf-test"));
-        RedirectCollector.report(new URL("http://mysql-database/ssrf-test"), new URL("http://127.0.0.1:8080"));
+        URLCollector.report(new URL("http://mysql-database/ssrf-test"), "test");
+        RedirectCollector.report(new URL("http://mysql-database/ssrf-test"), new URL("http://127.0.0.1:8080"), "test");
         Attack attackData = SSRFDetector.run(
             "127.0.0.1", 8080,
             List.of("127.0.0.1"),
@@ -164,8 +164,8 @@ public class SSRFDetectorTest {
         // Setup context :
         setContextAndLifecycle("http://ssrf-redirects.testssandbox.com/", "/api2/forced-off-route");
 
-        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
-        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"));
+        URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), "test");
+        RedirectCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"), new URL("http://localhost"), "test");
         Attack attackData = SSRFDetector.run(
             "localhost", 80,
             List.of("127.0.0.1"),
