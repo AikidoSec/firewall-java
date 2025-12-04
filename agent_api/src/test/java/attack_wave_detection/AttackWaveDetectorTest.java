@@ -62,7 +62,7 @@ class AttackWaveDetectorTest {
         assertFalse(checkDetector(detector, "::1", true));
         assertArrayEquals(
             List.of(
-                new AttackWaveDetector.Sample("BADMETHOD", "https://example.com/api/resource")
+                new AttackWaveDetector.Sample("BADMETHOD", "https://example.com/wp-config.php")
             ).toArray(),
             detector.getSamplesForIp("::1").toArray()
         );
