@@ -160,7 +160,7 @@ public class RedirectOriginFinderTest {
             RedirectCollector.report(
                     new URL("https://example.com/" + i),
                     new URL("https://example.com/" + (i + 1)),
-                , "test-op"
+                    "test-op"
             );
         }
 
