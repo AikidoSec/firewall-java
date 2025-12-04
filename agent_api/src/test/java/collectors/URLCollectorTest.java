@@ -38,8 +38,8 @@ public class URLCollectorTest {
     @Test
     public void testNewUrlConnectionWithPort() throws IOException {
         setContextAndLifecycle("");
-        
-        URLCollector.report(new URL("http://localhost:8080"));
+
+        URLCollector.report(new URL("http://localhost:8080"), "test");
         Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
         assertEquals(1, hostnameArray.length);
         assertEquals(8080, hostnameArray[0].getPort());
@@ -49,7 +49,7 @@ public class URLCollectorTest {
     @Test
     public void testNewUrlConnectionWithHttp() throws IOException {
         setContextAndLifecycle("");
-        URLCollector.report(new URL("http://app.local.aikido.io"));
+        URLCollector.report(new URL("http://app.local.aikido.io"), "test");
         Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
         assertEquals(1, hostnameArray.length);
         assertEquals(80, hostnameArray[0].getPort());
@@ -64,7 +64,7 @@ public class URLCollectorTest {
     @Test
     public void testNewUrlConnectionHttps() throws IOException {
         setContextAndLifecycle("");
-        URLCollector.report(new URL("https://aikido.dev"));
+        URLCollector.report(new URL("https://aikido.dev"), "test");
         Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
         assertEquals(1, hostnameArray.length);
         assertEquals(443, hostnameArray[0].getPort());
@@ -79,7 +79,7 @@ public class URLCollectorTest {
     @Test
     public void testNewUrlConnectionFaultyProtocol() throws IOException {
         setContextAndLifecycle("");
-        URLCollector.report(new URL("ftp://localhost:8080"));
+        URLCollector.report(new URL("ftp://localhost:8080"), "test");
         Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
         assertEquals(0, hostnameArray.length);
         Hostnames.HostnameEntry[] hostnameArray2 = Context.get().getHostnames().asArray();
@@ -89,7 +89,7 @@ public class URLCollectorTest {
     @Test
     public void testWithNullURL() throws IOException {
         setContextAndLifecycle("");
-        URLCollector.report(null);
+        URLCollector.report(null, "test");
         Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
         assertEquals(0, hostnameArray.length);
         Hostnames.HostnameEntry[] hostnameArray2 = Context.get().getHostnames().asArray();
@@ -100,7 +100,7 @@ public class URLCollectorTest {
     public void testWithNullContext() throws IOException {
         setContextAndLifecycle("");
         Context.reset();
-        URLCollector.report(new URL("https://aikido.dev"));
+        URLCollector.report(new URL("https://aikido.dev"), "test");
         Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
         assertEquals(1, hostnameArray.length);
         assertEquals(443, hostnameArray[0].getPort());
@@ -112,7 +112,7 @@ public class URLCollectorTest {
     public void testOnlyContext() throws IOException {
         setContextAndLifecycle("");
         HostnamesStore.clear();
-        URLCollector.report(new URL("https://aikido.dev"));
+        URLCollector.report(new URL("https://aikido.dev"), "test");
         Hostnames.HostnameEntry[] hostnameArray = Context.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);
         assertEquals(443, hostnameArray[0].getPort());

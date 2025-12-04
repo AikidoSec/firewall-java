@@ -2,6 +2,7 @@ package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.statistics.OperationKind;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.Attack;
