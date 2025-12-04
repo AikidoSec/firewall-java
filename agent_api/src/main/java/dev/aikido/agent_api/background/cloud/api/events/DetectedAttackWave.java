@@ -1,14 +1,17 @@
 package dev.aikido.agent_api.background.cloud.api.events;
 
+import com.google.gson.Gson;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.context.User;
+import dev.aikido.agent_api.storage.attack_wave_detector.AttackWaveDetector;
+import dev.aikido.agent_api.storage.attack_wave_detector.AttackWaveDetectorStore;
 
+import java.util.List;
 import java.util.Map;
 
 import static dev.aikido.agent_api.background.cloud.GetManagerInfo.getManagerInfo;
 import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
-import static dev.aikido.agent_api.storage.ServiceConfigStore.getConfig;
 
 public final class DetectedAttackWave {
     private DetectedAttackWave() {
@@ -42,9 +45,15 @@ public final class DetectedAttackWave {
             context.getHeader("user-agent"), // userAgent
             context.getSource() // source
         );
+
+        String ip = context.getRemoteAddress();
+        List<AttackWaveDetector.Sample> samples = AttackWaveDetectorStore.getSamplesForIp(ip);
+        Map<String, String> metadata = Map.of(
+            "samples", new Gson().toJson(samples)
+        );
+
         AttackWaveData attackData = new AttackWaveData(
-            Map.of(),
-            context.getUser()
+            metadata, context.getUser()
         );
 
         return new DetectedAttackWaveEvent(

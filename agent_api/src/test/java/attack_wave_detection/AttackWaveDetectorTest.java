@@ -4,14 +4,15 @@ import dev.aikido.agent_api.storage.attack_wave_detector.AttackWaveDetector;
 import org.junit.jupiter.api.Test;
 import utils.EmptySampleContextObject;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class AttackWaveDetectorTest {
 
     private AttackWaveDetector newAttackWaveDetector() {
         // Use much smaller time frames for testing (e.g., 100ms instead of 60s)
-        return new AttackWaveDetector(6, 100L, 200L, 10_000);
+        return new AttackWaveDetector(6, 100L, 200L, 10_000, 3);
     }
 
     private static boolean checkDetector(AttackWaveDetector detector, String ip, boolean isWebScanner) {
@@ -59,6 +60,12 @@ class AttackWaveDetectorTest {
         assertFalse(checkDetector(detector, "::1", true));
         assertFalse(checkDetector(detector, "::1", true));
         assertFalse(checkDetector(detector, "::1", true));
+        assertArrayEquals(
+            List.of(
+                new AttackWaveDetector.Sample("BADMETHOD", "https://example.com/wp-config.php")
+            ).toArray(),
+            detector.getSamplesForIp("::1").toArray()
+        );
 
         // Small delay (50ms)
         Thread.sleep(50);
@@ -117,5 +124,25 @@ class AttackWaveDetectorTest {
         assertFalse(checkDetector(detector, "::1", true));
         assertFalse(checkDetector(detector, "::1", true));
         assertTrue(checkDetector(detector, "::1", true));
+    }
+
+    @Test
+    void testItRespectsSamplesLimit() {
+        AttackWaveDetector detector = newAttackWaveDetector();
+        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "GET"));
+        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "GET"));
+        detector.check(new EmptySampleContextObject("", "/test2", "GET"));
+        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "POST"));
+        detector.check(new EmptySampleContextObject("", "/test3", "PUT"));
+        detector.check(new EmptySampleContextObject("", "/.env", "GET"));
+        detector.check(new EmptySampleContextObject("", "/test4", "BADMETHOD"));
+        assertArrayEquals(
+            List.of(
+                new AttackWaveDetector.Sample("GET", "https://example.com/../etc/passwd"),
+                new AttackWaveDetector.Sample("POST", "https://example.com/../etc/passwd"),
+                new AttackWaveDetector.Sample("GET", "https://example.com/.env")
+            ).toArray(),
+            detector.getSamplesForIp("192.168.1.1").toArray()
+        );
     }
 }

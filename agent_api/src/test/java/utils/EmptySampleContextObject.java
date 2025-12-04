@@ -36,6 +36,7 @@ public class EmptySampleContextObject extends ContextObject {
         this();
         this.query.put("arg", List.of(argument));
         this.route = route;
+        this.url = "https://example.com" + route;
         this.method = method;
     }
     public EmptySampleContextObject(String route, String method, Map<String, List<String>> queryParams) {
