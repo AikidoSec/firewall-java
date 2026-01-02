@@ -49,7 +49,7 @@ public class ApacheHttpClientWrapper implements Wrapper {
             }
             if (uri != null) {
                 // Report the URL :
-                URLCollector.report(uri.toURL());
+                URLCollector.report(uri.toURL(), "org.apache.http.HttpClient.execute");
             }
         }
     }

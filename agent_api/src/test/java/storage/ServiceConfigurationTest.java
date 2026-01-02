@@ -33,6 +33,8 @@ public class ServiceConfigurationTest {
                 List.of(mock(Endpoint.class)),
                 List.of("user1", "user2"),
                 List.of("192.168.1.1"),
+                false,
+                null,
                 true,
                 true
         );
@@ -60,6 +62,8 @@ public class ServiceConfigurationTest {
                 0L,
                 null,
                 null,
+                null,
+                false,
                 null,
                 false,
                 false
@@ -301,6 +305,8 @@ public class ServiceConfigurationTest {
                 null,
                 null,
                 false,
+                null,
+                false,
                 true
         );
 
@@ -318,6 +324,8 @@ public class ServiceConfigurationTest {
                 null,
                 null,
                 Collections.emptyList(),
+                false,
+                null,
                 true,
                 true
         ));
@@ -334,6 +342,8 @@ public class ServiceConfigurationTest {
                 null,
                 null,
                 List.of("192.168.1.1", "192.168.1.2"),
+                false,
+                null,
                 true,
                 true
         );
@@ -354,6 +364,8 @@ public class ServiceConfigurationTest {
                 null,
                 Collections.emptyList(),
                 null,
+                false,
+                null,
                 true,
                 true
         ));
@@ -369,6 +381,8 @@ public class ServiceConfigurationTest {
                 12345L,
                 null,
                 List.of("user1", "user2"),
+                null,
+                false,
                 null,
                 true,
                 true
@@ -389,6 +403,8 @@ public class ServiceConfigurationTest {
                 List.of(mock(Endpoint.class)),
                 null,
                 null,
+                false,
+                null,
                 true,
                 true
         );
@@ -406,6 +422,8 @@ public class ServiceConfigurationTest {
                 12345L,
                 Collections.emptyList(),
                 null,
+                null,
+                false,
                 null,
                 true,
                 true
