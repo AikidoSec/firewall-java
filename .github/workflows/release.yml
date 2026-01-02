@@ -28,13 +28,15 @@ jobs:
       - name: Download binaries & Build with Gradle
         working-directory: ./
         run: chmod +x gradlew && make binaries && make build
-      - name: Create a zip file of the build
-        run:
-          mv dist/ zen/ && zip -r zen.zip zen/*
-      - name: Generate SHA checksum
+      - name: Create zip and tar.gz files of the build
+        run: |
+          mv dist/ zen/
+          zip -r zen.zip zen/*
+          tar -czf zen.tar.gz zen/*
+      - name: Generate SHA checksums
         run: |
           shasum -a 256 zen.zip > zen.zip.sha256sum
-
+          shasum -a 256 zen.tar.gz > zen.tar.gz.sha256sum
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -52,4 +54,22 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./zen.zip.sha256sum
           asset_name: zen.zip.sha256sum
+          asset_content_type: text/plain
+      - name: Upload Release Asset (tar.gz)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./zen.tar.gz
+          asset_name: zen.tar.gz
+          asset_content_type: application/gzip
+      - name: Upload Release Asset (tar.gz SHA)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./zen.tar.gz.sha256sum
+          asset_name: zen.tar.gz.sha256sum
           asset_content_type: text/plain
