@@ -70,7 +70,7 @@ we picked `/opt/zen` here for our Linux system as an example. We also have suppo
 Please ensure you do not alter the structure of this folder and that the process can read & write to it.
 To activate Zen you then just have to add the following argument to your Java command **before** the `-jar` argument
 ```
--javaagent:/opt/zen/agent.jar
+java -javaagent:/opt/zen/agent.jar -jar build/myapp.jar
 ```
 Replace `/opt/zen` with your directory of choice.
 
