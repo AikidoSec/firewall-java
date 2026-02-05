@@ -50,7 +50,7 @@ public final class UnsafePathChecker {
     public static boolean startsWithUnsafePath(String filePathRaw, String userInputRaw) {
         String filePath = normalizePath(filePathRaw.toLowerCase());
         String userInput = normalizePath(userInputRaw.toLowerCase());
-        return startsWithUnsafePath(filePathRaw) && filePath.startsWith(userInput);
+        return startsWithUnsafePath(filePath) && filePath.startsWith(userInput);
     }
 
     /**
