@@ -48,4 +48,36 @@ public class UnsafePathCheckerTest {
         assertTrue(UnsafePathChecker.startsWithUnsafePath("///etc/passwd"));
         assertFalse(UnsafePathChecker.startsWithUnsafePath("etc/passwd///../test.txt"));
     }
+
+    @Test
+    public void testCurrentDirectoryReferences() {
+        // /./ should be normalized to /
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/./etc/passwd", "/./etc"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/etc/./passwd", "/etc"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/etc/./passwd", "/etc/./"));
+
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/./etc/passwd"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/etc/./passwd"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/./etc/./passwd"));
+
+        // Multiple /./ sequences
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/././etc/passwd", "/././etc"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/etc/././passwd"));
+    }
+
+    @Test
+    public void testNormalizePath() {
+        // Test normalizePath directly
+        assertEquals("/etc/passwd", UnsafePathChecker.normalizePath("//etc//passwd"));
+        assertEquals("/etc/passwd", UnsafePathChecker.normalizePath("/./etc/./passwd"));
+        assertEquals("/etc/passwd", UnsafePathChecker.normalizePath("///etc///passwd"));
+        assertEquals("/etc/passwd", UnsafePathChecker.normalizePath("/././etc/passwd"));
+        assertEquals("etc/passwd", UnsafePathChecker.normalizePath("etc/passwd"));
+        assertEquals("", UnsafePathChecker.normalizePath(""));
+        assertNull(UnsafePathChecker.normalizePath(null));
+
+        // Combined slashes and dot: ///./// should become /
+        assertEquals("/", UnsafePathChecker.normalizePath("///.///"));
+        assertEquals("/etc/passwd", UnsafePathChecker.normalizePath("///.///etc/passwd"));
+    }
 }

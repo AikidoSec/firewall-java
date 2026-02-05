@@ -6,6 +6,7 @@ import java.util.List;
 
 public final class UnsafePathChecker {
     private UnsafePathChecker() {}
+
     private static final List<String> LINUX_ROOT_FOLDERS = Arrays.asList(
             "/bin/",
             "/boot/",
@@ -33,7 +34,7 @@ public final class UnsafePathChecker {
     );
 
     public static boolean startsWithUnsafePath(String filePathRaw) {
-        String filePath = ensureOneLeadingSlash(filePathRaw.toLowerCase());
+        String filePath = normalizePath(filePathRaw.toLowerCase());
 
         List<String> dangerousStartsList = new ArrayList<>(DANGEROUS_PATH_STARTS);
         dangerousStartsList.addAll(LINUX_ROOT_FOLDERS);
@@ -47,15 +48,27 @@ public final class UnsafePathChecker {
     }
 
     public static boolean startsWithUnsafePath(String filePathRaw, String userInputRaw) {
-        String filePath = ensureOneLeadingSlash(filePathRaw.toLowerCase());
-        String userInput = ensureOneLeadingSlash(userInputRaw.toLowerCase());
-        return startsWithUnsafePath(filePath) && filePath.startsWith(userInput);
+        String filePath = normalizePath(filePathRaw.toLowerCase());
+        String userInput = normalizePath(userInputRaw.toLowerCase());
+        return startsWithUnsafePath(filePathRaw) && filePath.startsWith(userInput);
     }
 
-    private static String ensureOneLeadingSlash(String path) {
-        if (path.startsWith("/")) {
-            return "/" + path.replaceAll("^/+", "");
+    /**
+     * Normalizes a path by removing /./ and removing consecutive slashes
+     */
+    public static String normalizePath(String path) {
+        if (path == null || path.isEmpty()) {
+            return path;
         }
-        return path;
+
+        // Loop needed because /././ becomes /./
+        String normalized = path;
+        while (normalized.contains("/./")) {
+            normalized = normalized.replaceAll("/+\\./+", "/");
+        }
+
+        // Only merge consecutive slashes after removing the current directory mentions (i.e. /./ )
+        normalized = normalized.replaceAll("/+", "/");
+        return normalized;
     }
 }
