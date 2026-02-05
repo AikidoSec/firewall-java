@@ -56,7 +56,7 @@ public final class UnsafePathChecker {
     /**
      * Normalizes a path by removing /./ and removing consecutive slashes
      */
-    public static String normalizePath(String path) {
+    private static String normalizePath(String path) {
         if (path == null || path.isEmpty()) {
             return path;
         }
