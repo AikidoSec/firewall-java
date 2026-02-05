@@ -67,7 +67,6 @@ public final class UnsafePathChecker {
             normalized = normalized.replaceAll("/+\\./+", "/");
         }
 
-        // Only merge consecutive slashes after removing the current directory mentions (i.e. /./ )
         normalized = normalized.replaceAll("/+", "/");
         return normalized;
     }
