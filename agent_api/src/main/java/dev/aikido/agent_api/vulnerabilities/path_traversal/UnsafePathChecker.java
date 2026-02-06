@@ -3,9 +3,12 @@ package dev.aikido.agent_api.vulnerabilities.path_traversal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public final class UnsafePathChecker {
     private UnsafePathChecker() {}
+
+    private static final Pattern CURRENT_DIR_PATTERN = Pattern.compile("/(\\./)+");
 
     private static final List<String> LINUX_ROOT_FOLDERS = Arrays.asList(
             "/bin/",
@@ -61,12 +64,10 @@ public final class UnsafePathChecker {
             return path;
         }
 
-        // Loop needed because /././ becomes /./
-        String normalized = path;
-        while (normalized.contains("/./")) {
-            normalized = normalized.replaceAll("/+\\./+", "/");
-        }
+        // Matches /./ or /././ or /./././ etc. (one or more ./ sequences after a /)
+        String normalized = CURRENT_DIR_PATTERN.matcher(path).replaceAll("/");
 
+        // Merge consecutive slashes since these don't change where you are in the path.
         normalized = normalized.replaceAll("/+", "/");
         return normalized;
     }
