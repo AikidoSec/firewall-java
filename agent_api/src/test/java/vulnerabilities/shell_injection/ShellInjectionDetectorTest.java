@@ -439,6 +439,7 @@ public class ShellInjectionDetectorTest {
     void testCarriageReturnAsSeparator() {
         // \r (carriage return) as separator before dangerous command
         assertIsShellInjection("ls\rrm", "rm");
+        assertIsShellInjection("sleep\r5", "sleep\r5");
         assertIsShellInjection("echo test\rrm -rf /", "rm");
     }
 
@@ -446,6 +447,16 @@ public class ShellInjectionDetectorTest {
     void testFormFeedAsSeparator() {
         // \f (form feed) as separator before dangerous command
         assertIsShellInjection("ls\frm", "rm");
+        assertIsShellInjection("sleep\f5", "sleep\f5");
         assertIsShellInjection("echo test\frm -rf /", "rm");
+    }
+
+    @Test
+    void testCommandExactlyMatchesUserInputWithSeparators() {
+        // When command equals userInput and contains \r or \f separators
+        assertIsShellInjection("ls\rrm", "ls\rrm");
+        assertIsShellInjection("ls\frm", "ls\frm");
+        assertIsShellInjection("echo\rcat /etc/passwd", "echo\rcat /etc/passwd");
+        assertIsShellInjection("echo\fcat /etc/passwd", "echo\fcat /etc/passwd");
     }
 }

@@ -7,7 +7,7 @@ public final class DangerousShellChars {
     private DangerousShellChars() {}
     private static final List<String> DANGEROUS_CHARS = Arrays.asList(
             "#", "!", "\"", "$", "&", "'", "(", ")", "*", ";", "<", "=", ">", "?",
-            "[", "\\", "]", "^", "`", "{", "|", "}", " ", "\n", "\t", "~"
+            "[", "\\", "]", "^", "`", "{", "|", "}", " ", "\n", "\t", "~", "\r", "\f"
     );
 
     public static boolean containDangerousCharacter(String userInput) {
