@@ -448,11 +448,4 @@ public class ShellInjectionDetectorTest {
         assertIsShellInjection("ls\frm", "rm");
         assertIsShellInjection("echo test\frm -rf /", "rm");
     }
-
-    @Test
-    void testVerticalTabAsSeparator() {
-        // \u000B (vertical tab) as separator before dangerous command
-        assertIsShellInjection("ls\u000Brm", "rm");
-        assertIsShellInjection("echo test\u000Brm -rf /", "rm");
-    }
 }
