@@ -434,4 +434,18 @@ public class ShellInjectionDetectorTest {
                 "for (( i=0, j=10; i<j; i++, j-- ))"
         );
     }
+
+    @Test
+    void testCarriageReturnAsSeparator() {
+        // \r (carriage return) as separator before dangerous command
+        assertIsShellInjection("ls\rrm", "rm");
+        assertIsShellInjection("echo test\rrm -rf /", "rm");
+    }
+
+    @Test
+    void testFormFeedAsSeparator() {
+        // \f (form feed) as separator before dangerous command
+        assertIsShellInjection("ls\frm", "rm");
+        assertIsShellInjection("echo test\frm -rf /", "rm");
+    }
 }

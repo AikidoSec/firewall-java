@@ -10,7 +10,7 @@ import static dev.aikido.agent_api.vulnerabilities.shell_injection.ShellCommands
 public final class ShellSyntaxChecker {
     private ShellSyntaxChecker() {}
     private static final List<String> SEPARATORS = Arrays.asList(
-            " ", "\t", "\n", ";", "&", "|", "(", ")", "<", ">"
+            " ", "\t", "\n", ";", "&", "|", "(", ")", "<", ">", "\r", "\f"
     );
 
     public static boolean containsShellSyntax(String command, String userInput) {
