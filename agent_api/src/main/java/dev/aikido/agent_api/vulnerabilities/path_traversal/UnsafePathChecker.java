@@ -3,9 +3,13 @@ package dev.aikido.agent_api.vulnerabilities.path_traversal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public final class UnsafePathChecker {
     private UnsafePathChecker() {}
+
+    private static final Pattern CURRENT_DIR_PATTERN = Pattern.compile("/(\\./)+");
+
     private static final List<String> LINUX_ROOT_FOLDERS = Arrays.asList(
             "/bin/",
             "/boot/",
@@ -33,7 +37,7 @@ public final class UnsafePathChecker {
     );
 
     public static boolean startsWithUnsafePath(String filePathRaw) {
-        String filePath = ensureOneLeadingSlash(filePathRaw.toLowerCase());
+        String filePath = normalizePath(filePathRaw.toLowerCase());
 
         List<String> dangerousStartsList = new ArrayList<>(DANGEROUS_PATH_STARTS);
         dangerousStartsList.addAll(LINUX_ROOT_FOLDERS);
@@ -47,15 +51,24 @@ public final class UnsafePathChecker {
     }
 
     public static boolean startsWithUnsafePath(String filePathRaw, String userInputRaw) {
-        String filePath = ensureOneLeadingSlash(filePathRaw.toLowerCase());
-        String userInput = ensureOneLeadingSlash(userInputRaw.toLowerCase());
+        String filePath = normalizePath(filePathRaw.toLowerCase());
+        String userInput = normalizePath(userInputRaw.toLowerCase());
         return startsWithUnsafePath(filePath) && filePath.startsWith(userInput);
     }
 
-    private static String ensureOneLeadingSlash(String path) {
-        if (path.startsWith("/")) {
-            return "/" + path.replaceAll("^/+", "");
+    /**
+     * Normalizes a path by removing /./ and removing consecutive slashes
+     */
+    private static String normalizePath(String path) {
+        if (path == null || path.isEmpty()) {
+            return path;
         }
-        return path;
+
+        // Matches /./ or /././ or /./././ etc. (one or more ./ sequences after a /)
+        String normalized = CURRENT_DIR_PATTERN.matcher(path).replaceAll("/");
+
+        // Merge consecutive slashes since these don't change where you are in the path.
+        normalized = normalized.replaceAll("/+", "/");
+        return normalized;
     }
 }
