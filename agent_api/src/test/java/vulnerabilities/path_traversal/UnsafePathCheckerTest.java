@@ -15,6 +15,12 @@ public class UnsafePathCheckerTest {
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/usr/local/bin", "/usr"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/var/log/syslog", "/var"));
 
+        // Docker container common directories :
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/app/config.yml", "/app"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/code/src/main.py", "/code"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/app/config.yml"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/code/src/main.py"));
+
         // Capitalization checks :
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/var/log/syslog", "/VaR"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/home/user/file.txt", "/HoMe"));

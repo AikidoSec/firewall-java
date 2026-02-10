@@ -29,7 +29,9 @@ public final class UnsafePathChecker {
             "/sys/",
             "/tmp/",
             "/usr/",
-            "/var/"
+            "/var/",
+            "/app/",
+            "/code/"
     );
     private static final List<String> DANGEROUS_PATH_STARTS = Arrays.asList(
             "c:/",
