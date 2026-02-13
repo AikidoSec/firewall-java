@@ -87,7 +87,7 @@ public class ShouldBlockRequestTest {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
                 true, "", getUnixTimeMS(), List.of(),
                 /* blockedUserIds */ List.of("ID1", "ID2", "ID3"), List.of(),
-                false, true
+                false, null, false, true
         ));
         var res2 = ShouldBlockRequest.shouldBlockRequest();
         assertTrue(res2.block());
@@ -227,7 +227,7 @@ public class ShouldBlockRequestTest {
         );
         List<String> blockedUserIds = List.of("ID1");
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-                true, "", getUnixTimeMS(), endpoints, blockedUserIds, List.of(), true, false
+                true, "", getUnixTimeMS(), endpoints, blockedUserIds, List.of(), false, null,true, false
         ));
 
         // Call the method

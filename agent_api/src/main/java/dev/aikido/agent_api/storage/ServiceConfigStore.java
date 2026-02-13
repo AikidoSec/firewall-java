@@ -90,4 +90,13 @@ public final class ServiceConfigStore {
             mutex.writeLock().unlock();
         }
     }
+
+    public static boolean shouldBlockOutgoingRequest(String hostname) {
+        mutex.readLock().lock();
+        try {
+            return config.shouldBlockOutgoingRequest(hostname);
+        } finally {
+            mutex.readLock().unlock();
+        }
+    }
 }

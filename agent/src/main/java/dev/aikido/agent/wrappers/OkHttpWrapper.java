@@ -50,7 +50,7 @@ public class OkHttpWrapper implements Wrapper {
             URL url = (URL) toUrlMethod.invoke(urlObject);
 
             // Report the URL
-            URLCollector.report(url);
+            URLCollector.report(url, "okhttp3.OkHttpClient.newCall");
         }
     }
 }
