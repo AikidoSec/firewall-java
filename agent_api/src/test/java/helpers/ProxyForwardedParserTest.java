@@ -40,6 +40,27 @@ class ProxyForwardedParserTest {
     }
 
     @Test
+    void testGetIpFromRequest_ValidXForwardedForWithIPv6AndBrackets() {
+        headers.put("X-Forwarded-For", List.of("[2001:db8::1], 203.0.113.5"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("2001:db8::1", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_ValidXForwardedForWithIPv6AndBracketsHalf() {
+        headers.put("X-Forwarded-For", List.of("[2001:db8::1, 203.0.113.5"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("203.0.113.5", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_ValidXForwardedForWithIPv6AndBracketsHalf2() {
+        headers.put("X-Forwarded-For", List.of("2001:db8::1], 203.0.113.5"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("203.0.113.5", result);
+    }
+
+    @Test
     void testGetIpFromRequest_InvalidXForwardedFor() {
         headers.put("X-Forwarded-For", List.of("invalid.ip.address, 203.0.113.5"));
         String result = getIpFromRequest("10.0.0.1", headers);
