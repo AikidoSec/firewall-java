@@ -2,8 +2,8 @@ package collectors;
 
 import dev.aikido.agent_api.collectors.URLCollector;
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
+import dev.aikido.agent_api.storage.PendingHostnamesStore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +12,9 @@ import utils.EmptySampleContextObject;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class URLCollectorTest {
     @BeforeAll
@@ -29,6 +29,7 @@ public class URLCollectorTest {
     @BeforeEach
     void beforeEach() {
         cleanup();
+        PendingHostnamesStore.clear();
     }
 
     private void setContextAndLifecycle(String url) {
@@ -40,50 +41,43 @@ public class URLCollectorTest {
         setContextAndLifecycle("");
 
         URLCollector.report(new URL("http://localhost:8080"));
-        Hostnames.HostnameEntry[] hostnameArray = Context.get().getHostnames().asArray();
-        assertEquals(1, hostnameArray.length);
-        assertEquals(8080, hostnameArray[0].getPort());
-        assertEquals("localhost", hostnameArray[0].getHostname());
+        Set<Integer> ports = PendingHostnamesStore.getPorts("localhost");
+        assertEquals(1, ports.size());
+        assertTrue(ports.contains(8080));
     }
 
     @Test
     public void testNewUrlConnectionWithHttp() throws IOException {
         setContextAndLifecycle("");
         URLCollector.report(new URL("http://app.local.aikido.io"));
-        Hostnames.HostnameEntry[] hostnameArray = Context.get().getHostnames().asArray();
-        assertEquals(1, hostnameArray.length);
-        assertEquals(80, hostnameArray[0].getPort());
-        assertEquals("app.local.aikido.io", hostnameArray[0].getHostname());
+        Set<Integer> ports = PendingHostnamesStore.getPorts("app.local.aikido.io");
+        assertEquals(1, ports.size());
+        assertTrue(ports.contains(80));
     }
 
     @Test
     public void testNewUrlConnectionHttps() throws IOException {
         setContextAndLifecycle("");
         URLCollector.report(new URL("https://aikido.dev"));
-        Hostnames.HostnameEntry[] hostnameArray = Context.get().getHostnames().asArray();
-        assertEquals(1, hostnameArray.length);
-        assertEquals(443, hostnameArray[0].getPort());
-        assertEquals("aikido.dev", hostnameArray[0].getHostname());
+        Set<Integer> ports = PendingHostnamesStore.getPorts("aikido.dev");
+        assertEquals(1, ports.size());
+        assertTrue(ports.contains(443));
     }
 
     @Test
     public void testNewUrlConnectionFaultyProtocol() throws IOException {
         setContextAndLifecycle("");
         URLCollector.report(new URL("ftp://localhost:8080"));
-        Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
-        assertEquals(0, hostnameArray.length);
-        Hostnames.HostnameEntry[] hostnameArray2 = Context.get().getHostnames().asArray();
-        assertEquals(0, hostnameArray2.length);
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+        assertTrue(PendingHostnamesStore.getPorts("localhost").isEmpty());
     }
 
     @Test
     public void testWithNullURL() throws IOException {
         setContextAndLifecycle("");
         URLCollector.report(null);
-        Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
-        assertEquals(0, hostnameArray.length);
-        Hostnames.HostnameEntry[] hostnameArray2 = Context.get().getHostnames().asArray();
-        assertEquals(0, hostnameArray2.length);
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+        assertTrue(PendingHostnamesStore.getPorts("localhost").isEmpty());
     }
 
     @Test
@@ -91,20 +85,21 @@ public class URLCollectorTest {
         setContextAndLifecycle("");
         Context.reset();
         URLCollector.report(new URL("https://aikido.dev"));
-        // URLCollector only writes to context, so HostnamesStore stays empty when context is null
-        Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
-        assertEquals(0, hostnameArray.length);
+        // URLCollector writes to PendingHostnamesStore regardless of context state
+        Set<Integer> ports = PendingHostnamesStore.getPorts("aikido.dev");
+        assertEquals(1, ports.size());
+        assertTrue(ports.contains(443));
         assertNull(Context.get());
     }
 
     @Test
-    public void testOnlyContext() throws IOException {
+    public void testOnlyPendingStore() throws IOException {
         setContextAndLifecycle("");
-        HostnamesStore.clear();
         URLCollector.report(new URL("https://aikido.dev"));
-        Hostnames.HostnameEntry[] hostnameArray = Context.get().getHostnames().asArray();
-        assertEquals(1, hostnameArray.length);
-        assertEquals(443, hostnameArray[0].getPort());
-        assertEquals("aikido.dev", hostnameArray[0].getHostname());
+        // HostnamesStore is only written by DNSRecordCollector, not URLCollector
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+        Set<Integer> ports = PendingHostnamesStore.getPorts("aikido.dev");
+        assertEquals(1, ports.size());
+        assertTrue(ports.contains(443));
     }
 }
