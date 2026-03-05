@@ -53,7 +53,7 @@ public class HttpURLConnectionWrapper implements Wrapper {
             // Run report with "argument"
             for (Method method2: clazz.getMethods()) {
                 if(method2.getName().equals("report")) {
-                    method2.invoke(null, url, "HttpUrlConnection");
+                    method2.invoke(null, url);
                     break;
                 }
             }
