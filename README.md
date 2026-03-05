@@ -68,9 +68,10 @@ Zen operates autonomously on the same server as your Java app to:
 You can install Zen by downloading the zip file [here](https://github.com/AikidoSec/firewall-java/releases/latest) and unzipping it to your directory of choice,
 we picked `/opt/zen` here for our Linux system as an example. We also have support for Windows and Mac OS X.
 Please ensure you do not alter the structure of this folder and that the process can read & write to it.
-To activate Zen you then just have to add the following argument to your Java command :
+
+To activate Zen you then just have to add the following `-javaagent` to your Java command **before** the `-jar` argument
 ```
--javaagent:/opt/zen/agent.jar
+java -javaagent:/opt/zen/agent.jar -jar build/myapp.jar
 ```
 Replace `/opt/zen` with your directory of choice.
 

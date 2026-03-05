@@ -15,6 +15,12 @@ public class UnsafePathCheckerTest {
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/usr/local/bin", "/usr"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/var/log/syslog", "/var"));
 
+        // Docker container common directories :
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/app/config.yml", "/app"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/code/src/main.py", "/code"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/app/config.yml"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/code/src/main.py"));
+
         // Capitalization checks :
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/var/log/syslog", "/VaR"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("/home/user/file.txt", "/HoMe"));
@@ -47,5 +53,37 @@ public class UnsafePathCheckerTest {
         assertTrue(UnsafePathChecker.startsWithUnsafePath("///etc///passwd"));
         assertTrue(UnsafePathChecker.startsWithUnsafePath("///etc/passwd"));
         assertFalse(UnsafePathChecker.startsWithUnsafePath("etc/passwd///../test.txt"));
+    }
+
+    @Test
+    public void testCurrentDirectoryReferences() {
+        // /./ should be normalized to /
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/./etc/passwd", "/./etc"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/etc/./passwd", "/etc"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/etc/./passwd", "/etc/./"));
+
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/./etc/passwd"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/etc/./passwd"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/./etc/./passwd"));
+
+        // Multiple /./ sequences
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/././etc/passwd", "/././etc"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/etc/././passwd"));
+    }
+
+    @Test
+    public void testPathNormalization() {
+        // Paths with multiple slashes and /./ should be normalized and detected
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("//etc//passwd", "/etc"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/./etc/./passwd", "/etc"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("/././etc/passwd", "/etc"));
+
+        // Paths without leading slash are not unsafe
+        assertFalse(UnsafePathChecker.startsWithUnsafePath("etc/passwd", "etc"));
+        assertFalse(UnsafePathChecker.startsWithUnsafePath("", ""));
+
+        // Combined slashes and dot: ///.///etc/passwd should normalize to /etc/passwd
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("///.///etc/passwd", "///.///etc"));
+        assertTrue(UnsafePathChecker.startsWithUnsafePath("///.///etc/passwd"));
     }
 }

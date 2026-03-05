@@ -4,6 +4,7 @@ import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public final class AttackWaveDetectorStore {
@@ -21,6 +22,15 @@ public final class AttackWaveDetectorStore {
         } catch (Throwable e) {
             logger.debug("An error occurred checking for attack waves: %s", e.getMessage());
             return false;
+        } finally {
+            mutex.unlock();
+        }
+    }
+
+    public static List<AttackWaveDetector.Sample> getSamplesForIp(String ip) {
+        mutex.lock();
+        try {
+            return detector.getSamplesForIp(ip);
         } finally {
             mutex.unlock();
         }
