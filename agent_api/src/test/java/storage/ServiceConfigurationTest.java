@@ -8,6 +8,8 @@ import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import dev.aikido.agent_api.storage.service_configuration.Domain;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -563,6 +565,39 @@ public class ServiceConfigurationTest {
         ServiceConfiguration.BlockedResult resultNotBlocked = serviceConfiguration.isIpBlocked("10.0.0.1");
         assertTrue(resultBlocked.blocked());
         assertFalse(resultNotBlocked.blocked());
+    }
+
+    @Test
+    public void testShouldBlockOutgoingRequest() {
+        APIResponse apiResponse = new APIResponse(
+                true, null, 0L, null, null, null,
+                true,
+                List.of(new Domain("example.com", "block"), new Domain("allowed.com", "allow")),
+                true, true
+        );
+        serviceConfiguration.updateConfig(apiResponse);
+
+        // blockNewOutgoingRequests=true: unknown hostname gets blocked
+        assertTrue(serviceConfiguration.shouldBlockOutgoingRequest("unknown.com"));
+        // blockNewOutgoingRequests=true: "allow" mode is not blocked
+        assertFalse(serviceConfiguration.shouldBlockOutgoingRequest("allowed.com"));
+        // blockNewOutgoingRequests=true: "block" mode is blocked
+        assertTrue(serviceConfiguration.shouldBlockOutgoingRequest("example.com"));
+
+        APIResponse apiResponse2 = new APIResponse(
+                true, null, 0L, null, null, null,
+                false,
+                List.of(new Domain("example.com", "block"), new Domain("allowed.com", "allow")),
+                true, true
+        );
+        serviceConfiguration.updateConfig(apiResponse2);
+
+        // blockNewOutgoingRequests=false: unknown hostname is not blocked
+        assertFalse(serviceConfiguration.shouldBlockOutgoingRequest("unknown.com"));
+        // blockNewOutgoingRequests=false: "allow" mode is not blocked
+        assertFalse(serviceConfiguration.shouldBlockOutgoingRequest("allowed.com"));
+        // blockNewOutgoingRequests=false: "block" mode is blocked
+        assertTrue(serviceConfiguration.shouldBlockOutgoingRequest("example.com"));
     }
 
     @Test

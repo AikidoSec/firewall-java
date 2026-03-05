@@ -140,15 +140,14 @@ public class ServiceConfiguration {
 
     public boolean shouldBlockOutgoingRequest(String hostname) {
         Domain matchingDomain = this.domains.get(hostname);
-        if (matchingDomain == null) {
-            return false;
-        }
 
-        boolean isDomainBlocked = matchingDomain.isBlockingMode();
         if (this.blockNewOutgoingRequests) {
-            return isDomainBlocked;
+            // Only allow outgoing requests if the mode is "allow"
+            // unknown hostnames also get blocked.
+            return matchingDomain == null || matchingDomain.isBlockingMode();
         }
 
-        return isDomainBlocked;
+        // Only block outgoing requests if the mode is "block"
+        return matchingDomain != null && matchingDomain.isBlockingMode();
     }
 }
