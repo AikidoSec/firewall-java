@@ -14,11 +14,11 @@ public final class RedirectCollector {
     private static final Logger logger = LogManager.getLogger(RedirectCollector.class);
 
     private RedirectCollector() {}
-    public static void report(URL origin, URL dest, String operation) {
+    public static void report(URL origin, URL dest) {
         logger.trace("Redirect detected: [Origin]<%s> -> [Destination]<%s>", origin, dest);
         ContextObject context = Context.get();
         // Report destination URL :
-        URLCollector.report(dest, operation);
+        URLCollector.report(dest);
 
         // Add as a node :
         List<RedirectNode> redirectStarterNodes = context.getRedirectStartNodes();
