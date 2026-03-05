@@ -9,7 +9,7 @@ import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.Vulnerabilities;
-import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
+import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundException;
 
 import java.net.URL;
 import java.util.Map;
@@ -58,7 +58,7 @@ public final class URLCollector {
                 attackDetected(attack, ctx);
                 if (shouldBlock()) {
                     logger.debug("Blocking request to domain: %s", hostname);
-                    throw SSRFException.get();
+                    throw BlockedOutboundException.get();
                 }
             };
 
