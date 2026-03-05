@@ -10,9 +10,6 @@ public final class Context {
         return threadLocalContext.get();
     }
     public static void set(ContextObject contextObject) {
-        // Flush pending hostnames on every context change to prevent the store from
-        // growing unboundedly when a thread is reused across multiple requests.
-        PendingHostnamesStore.clear();
         threadLocalContext.set(contextObject);
     }
     public static void reset() {
