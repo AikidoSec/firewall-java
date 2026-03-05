@@ -2,7 +2,6 @@ package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
-import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 
@@ -21,16 +20,9 @@ public final class URLCollector {
             }
             logger.trace("Adding a new URL to the cache: %s", url);
             int port = getPortFromURL(url);
-
-            // We store hostname and port in two places, HostnamesStore and Context. HostnamesStore is for reporting
-            // outbound domains. Context is to have a map of hostnames with used port numbers to detect SSRF attacks.
-
             String hostname = url.getHost();
 
-            // Store (new) hostname hits
-            HostnamesStore.incrementHits(hostname, port);
-
-            // Add to context :
+            // Add hostname and port to context so DNSRecordCollector can use it for SSRF detection and outbound domains
             ContextObject context = Context.get();
             if (context != null) {
                 context.getHostnames().add(hostname, port);

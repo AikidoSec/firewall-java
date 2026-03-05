@@ -176,6 +176,78 @@ public class DNSRecordCollectorTest {
     }
 
     @Test
+    public void testHostnamesStorePort0WhenNoContext() {
+        Context.set(null);
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{inetAddress1});
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(1, entries.length);
+        assertEquals("dev.aikido", entries[0].getHostname());
+        assertEquals(0, entries[0].getPort());
+    }
+
+    @Test
+    public void testHostnamesStorePort0WhenHostnameNotInContext() {
+        ContextObject ctx = mock(ContextObject.class);
+        Hostnames hostnames = new Hostnames(20);
+        hostnames.add("other.hostname", 8080);
+        when(ctx.getHostnames()).thenReturn(hostnames);
+        Context.set(ctx);
+
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{inetAddress1});
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(1, entries.length);
+        assertEquals("dev.aikido", entries[0].getHostname());
+        assertEquals(0, entries[0].getPort());
+    }
+
+    @Test
+    public void testHostnamesStoreUsesPortFromContext() {
+        ContextObject ctx = mock(ContextObject.class);
+        Hostnames hostnames = new Hostnames(20);
+        hostnames.add("dev.aikido", 8080);
+        when(ctx.getHostnames()).thenReturn(hostnames);
+        Context.set(ctx);
+
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{inetAddress1});
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(1, entries.length);
+        assertEquals("dev.aikido", entries[0].getHostname());
+        assertEquals(8080, entries[0].getPort());
+    }
+
+    @Test
+    public void testHostnamesStoreIncrementedForAllPortsFromContext() {
+        ContextObject ctx = mock(ContextObject.class);
+        Hostnames hostnames = new Hostnames(20);
+        hostnames.add("dev.aikido", 80);
+        hostnames.add("dev.aikido", 443);
+        when(ctx.getHostnames()).thenReturn(hostnames);
+        Context.set(ctx);
+
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{inetAddress1});
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(2, entries.length);
+        assertEquals(80, entries[0].getPort());
+        assertEquals(443, entries[1].getPort());
+    }
+
+    @Test
+    public void testSSRFStillRunsWhenPortInContextIsZero() {
+        ServiceConfigStore.updateBlocking(true);
+
+        ContextObject myContextObject = new SampleContextObject();
+        myContextObject.getHostnames().add("dev.aikido", 0);
+        Context.set(myContextObject);
+
+        Exception exception = assertThrows(SSRFException.class, () -> {
+            DNSRecordCollector.report("dev.aikido", new InetAddress[]{
+                    inetAddress1, inetAddress2
+            });
+        });
+        assertEquals("Aikido Zen has blocked a server-side request forgery", exception.getMessage());
+    }
+
+    @Test
     public void testStoredSSRFWithNoContext() throws InterruptedException {
         ServiceConfigStore.updateBlocking(true);
 

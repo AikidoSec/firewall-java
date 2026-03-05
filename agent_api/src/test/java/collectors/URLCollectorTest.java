@@ -38,9 +38,9 @@ public class URLCollectorTest {
     @Test
     public void testNewUrlConnectionWithPort() throws IOException {
         setContextAndLifecycle("");
-        
+
         URLCollector.report(new URL("http://localhost:8080"));
-        Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
+        Hostnames.HostnameEntry[] hostnameArray = Context.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);
         assertEquals(8080, hostnameArray[0].getPort());
         assertEquals("localhost", hostnameArray[0].getHostname());
@@ -50,30 +50,20 @@ public class URLCollectorTest {
     public void testNewUrlConnectionWithHttp() throws IOException {
         setContextAndLifecycle("");
         URLCollector.report(new URL("http://app.local.aikido.io"));
-        Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
+        Hostnames.HostnameEntry[] hostnameArray = Context.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);
         assertEquals(80, hostnameArray[0].getPort());
         assertEquals("app.local.aikido.io", hostnameArray[0].getHostname());
-
-        Hostnames.HostnameEntry[] hostnameArray2 = Context.get().getHostnames().asArray();
-        assertEquals(1, hostnameArray2.length);
-        assertEquals(80, hostnameArray2[0].getPort());
-        assertEquals("app.local.aikido.io", hostnameArray2[0].getHostname());
     }
 
     @Test
     public void testNewUrlConnectionHttps() throws IOException {
         setContextAndLifecycle("");
         URLCollector.report(new URL("https://aikido.dev"));
-        Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
+        Hostnames.HostnameEntry[] hostnameArray = Context.get().getHostnames().asArray();
         assertEquals(1, hostnameArray.length);
         assertEquals(443, hostnameArray[0].getPort());
         assertEquals("aikido.dev", hostnameArray[0].getHostname());
-
-        Hostnames.HostnameEntry[] hostnameArray2 = Context.get().getHostnames().asArray();
-        assertEquals(1, hostnameArray2.length);
-        assertEquals(443, hostnameArray2[0].getPort());
-        assertEquals("aikido.dev", hostnameArray2[0].getHostname());
     }
 
     @Test
@@ -101,10 +91,9 @@ public class URLCollectorTest {
         setContextAndLifecycle("");
         Context.reset();
         URLCollector.report(new URL("https://aikido.dev"));
+        // URLCollector only writes to context, so HostnamesStore stays empty when context is null
         Hostnames.HostnameEntry[] hostnameArray = HostnamesStore.getHostnamesAsList();
-        assertEquals(1, hostnameArray.length);
-        assertEquals(443, hostnameArray[0].getPort());
-        assertEquals("aikido.dev", hostnameArray[0].getHostname());
+        assertEquals(0, hostnameArray.length);
         assertNull(Context.get());
     }
 

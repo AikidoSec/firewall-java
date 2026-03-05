@@ -2,6 +2,7 @@ package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.statistics.OperationKind;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
@@ -32,6 +33,17 @@ public final class DNSRecordCollector {
             // store stats
             StatisticsStore.registerCall("java.net.InetAddress.getAllByName", OperationKind.OUTGOING_HTTP_OP);
 
+            List<Integer> portsFromContext = getPortsFromContext(hostname);
+            if (!portsFromContext.isEmpty()) {
+                for (int port : portsFromContext) {
+                    HostnamesStore.incrementHits(hostname, port);
+                }
+            } else {
+                // ensure that even if URLCollector didn't receive this hostname it still gets reported to core
+                // so that we can be confident in our outbound domain blocking
+                HostnamesStore.incrementHits(hostname, 0);
+            }
+
             // Block if the hostname is in the blocked domains list
             if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
                 logger.debug("Blocking DNS lookup for domain: %s", hostname);
@@ -44,32 +56,25 @@ public final class DNSRecordCollector {
                 ipAddresses.add(inetAddress.getHostAddress());
             }
 
-            // Fetch hostnames from Context (this is to get port number e.g.)
-            if (Context.get() != null && Context.get().getHostnames() != null) {
-                for (Hostnames.HostnameEntry hostnameEntry : Context.get().getHostnames().asArray()) {
-                    if (!hostnameEntry.getHostname().equals(hostname)) {
-                        continue;
-                    }
-                    logger.debug("Hostname: %s, Port: %s, IPs: %s", hostnameEntry.getHostname(), hostnameEntry.getPort(), ipAddresses);
+            // Run SSRF check for all ports found for this hostname in context
+            for (int port : portsFromContext) {
+                logger.debug("Hostname: %s, Port: %s, IPs: %s", hostname, port, ipAddresses);
 
-                    Attack attack = SSRFDetector.run(
-                        hostname, hostnameEntry.getPort(), ipAddresses, OPERATION_NAME
-                    );
-                    if (attack == null) {
-                        continue;
-                    }
-
-                    logger.debug("SSRF Attack detected due to: %s:%s", hostname, hostnameEntry.getPort());
-                    attackDetected(attack, Context.get());
-
-                    if (shouldBlock()) {
-                        logger.debug("Blocking SSRF attack...");
-                        throw SSRFException.get();
-                    }
-
-                    // We don't want to test for a stored SSRF attack.
-                    return;
+                Attack attack = SSRFDetector.run(hostname, port, ipAddresses, OPERATION_NAME);
+                if (attack == null) {
+                    continue;
                 }
+
+                logger.debug("SSRF Attack detected due to: %s:%s", hostname, port);
+                attackDetected(attack, Context.get());
+
+                if (shouldBlock()) {
+                    logger.debug("Blocking SSRF attack...");
+                    throw SSRFException.get();
+                }
+
+                // We don't want to test for a stored SSRF attack.
+                return;
             }
 
             // We don't need the context object to check for stored ssrf, but we do want to run this after our other
@@ -89,5 +94,17 @@ public final class DNSRecordCollector {
         } catch (Throwable e) {
             logger.trace(e);
         }
+    }
+
+    private static List<Integer> getPortsFromContext(String hostname) {
+        List<Integer> ports = new ArrayList<>();
+        if (Context.get() != null && Context.get().getHostnames() != null) {
+            for (Hostnames.HostnameEntry hostnameEntry : Context.get().getHostnames().asArray()) {
+                if (hostnameEntry.getHostname().equals(hostname)) {
+                    ports.add(hostnameEntry.getPort());
+                }
+            }
+        }
+        return ports;
     }
 }
