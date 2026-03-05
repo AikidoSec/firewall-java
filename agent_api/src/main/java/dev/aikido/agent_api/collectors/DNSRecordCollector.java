@@ -7,6 +7,7 @@ import dev.aikido.agent_api.storage.statistics.OperationKind;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
+import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundException;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
@@ -30,6 +31,12 @@ public final class DNSRecordCollector {
 
             // store stats
             StatisticsStore.registerCall("java.net.InetAddress.getAllByName", OperationKind.OUTGOING_HTTP_OP);
+
+            // Block if the hostname is in the blocked domains list
+            if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
+                logger.debug("Blocking DNS lookup for domain: %s", hostname);
+                throw BlockedOutboundException.get();
+            }
 
             // Convert inetAddresses array to a List of IP strings :
             List<String> ipAddresses = new ArrayList<>();
@@ -77,7 +84,7 @@ public final class DNSRecordCollector {
                 }
             }
 
-        } catch (SSRFException | StoredSSRFException e) {
+        } catch (BlockedOutboundException | SSRFException | StoredSSRFException e) {
             throw e;
         } catch (Throwable e) {
             logger.trace(e);

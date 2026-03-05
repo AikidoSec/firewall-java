@@ -1,5 +1,6 @@
 package collectors;
 
+import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.events.DetectedAttack;
 import dev.aikido.agent_api.collectors.DNSRecordCollector;
 import dev.aikido.agent_api.context.Context;
@@ -8,7 +9,9 @@ import dev.aikido.agent_api.storage.AttackQueue;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
+import dev.aikido.agent_api.storage.service_configuration.Domain;
 import dev.aikido.agent_api.vulnerabilities.Attack;
+import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundException;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFException;
 import org.junit.jupiter.api.*;
@@ -40,6 +43,10 @@ public class DNSRecordCollectorTest {
         HostnamesStore.clear();
         Context.set(null);
         AttackQueue.clear();
+        // Reset domain config
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null, false, List.of(), true, false
+        ));
     }
 
     @Test
@@ -133,6 +140,39 @@ public class DNSRecordCollectorTest {
                 imdsAddress1, inetAddress2
             });
         });
+    }
+
+    @Test
+    public void testBlockedDomain() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null,
+            false, List.of(new Domain("blocked.example.com", "block")), true, true
+        ));
+        assertThrows(BlockedOutboundException.class, () ->
+            DNSRecordCollector.report("blocked.example.com", new InetAddress[]{inetAddress1})
+        );
+    }
+
+    @Test
+    public void testAllowedDomainNotBlocked() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null,
+            false, List.of(new Domain("allowed.example.com", "allow")), true, true
+        ));
+        assertDoesNotThrow(() ->
+            DNSRecordCollector.report("allowed.example.com", new InetAddress[]{inetAddress1})
+        );
+    }
+
+    @Test
+    public void testUnknownDomainBlockedWhenBlockNewOutgoingRequests() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null,
+            true, List.of(), true, true
+        ));
+        assertThrows(BlockedOutboundException.class, () ->
+            DNSRecordCollector.report("unknown.example.com", new InetAddress[]{inetAddress1})
+        );
     }
 
     @Test
