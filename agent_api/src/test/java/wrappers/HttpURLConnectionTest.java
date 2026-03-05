@@ -3,6 +3,7 @@ package wrappers;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
+import dev.aikido.agent_api.storage.PendingHostnamesStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +26,14 @@ public class HttpURLConnectionTest {
     void cleanup() {
         Context.set(null);
         HostnamesStore.clear();
+        PendingHostnamesStore.clear();
     }
 
     @BeforeEach
     void beforeEach() {
         cleanup();
         ServiceConfigStore.updateBlocking(true);
+        PendingHostnamesStore.clear();
     }
 
     private void setContextAndLifecycle(String url) {
