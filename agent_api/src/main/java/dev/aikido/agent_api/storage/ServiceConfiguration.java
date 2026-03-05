@@ -4,8 +4,8 @@ import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.net.IPList;
-import dev.aikido.agent_api.storage.service_configuration.Domain;
 import dev.aikido.agent_api.storage.service_configuration.ParsedFirewallLists;
+import dev.aikido.agent_api.vulnerabilities.outbound_blocking.OutboundDomains;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 import java.util.*;
@@ -25,8 +25,7 @@ public class ServiceConfiguration {
     private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
-    private Map<String, Domain> domains = new HashMap<>();
-    private boolean blockNewOutgoingRequests = false;
+    private OutboundDomains outboundDomains = new OutboundDomains();
 
     public ServiceConfiguration() {
         this.receivedAnyStats = true; // true by default, waiting for the startup event
@@ -47,15 +46,7 @@ public class ServiceConfiguration {
         if (apiResponse.endpoints() != null) {
             this.endpoints = apiResponse.endpoints();
         }
-        if (apiResponse.domains() != null) {
-            for (Domain domain : apiResponse.domains()) {
-                if (this.domains.get(domain.hostname()) != null) {
-                    continue; // use first provided domain value
-                }
-                this.domains.put(domain.hostname(), domain);
-            }
-        }
-        this.blockNewOutgoingRequests = apiResponse.blockNewOutgoingRequests();
+        this.outboundDomains.update(apiResponse.domains(), apiResponse.blockNewOutgoingRequests());
         this.receivedAnyStats = apiResponse.receivedAnyStats();
     }
 
@@ -139,15 +130,6 @@ public class ServiceConfiguration {
     }
 
     public boolean shouldBlockOutgoingRequest(String hostname) {
-        Domain matchingDomain = this.domains.get(hostname);
-
-        if (this.blockNewOutgoingRequests) {
-            // Only allow outgoing requests if the mode is "allow"
-            // unknown hostnames also get blocked.
-            return matchingDomain == null || matchingDomain.isBlockingMode();
-        }
-
-        // Only block outgoing requests if the mode is "block"
-        return matchingDomain != null && matchingDomain.isBlockingMode();
+        return this.outboundDomains.shouldBlockOutgoingRequest(hostname);
     }
 }
