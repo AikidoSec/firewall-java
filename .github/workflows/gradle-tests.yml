@@ -59,6 +59,7 @@ jobs:
       - name: Add local.aikido.io to /etc/hosts
         run: |
           echo "127.0.0.1 local.aikido.io" | sudo tee -a /etc/hosts
+          echo "127.0.0.1 app.local.aikido.io" | sudo tee -a /etc/hosts
 
       - name: Start databases
         working-directory: ./sample-apps/databases
