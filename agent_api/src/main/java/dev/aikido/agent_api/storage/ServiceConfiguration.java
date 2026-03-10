@@ -5,11 +5,10 @@ import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.helpers.net.IPList;
 import dev.aikido.agent_api.storage.service_configuration.ParsedFirewallLists;
+import dev.aikido.agent_api.vulnerabilities.outbound_blocking.OutboundDomains;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
@@ -26,6 +25,7 @@ public class ServiceConfiguration {
     private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
+    private OutboundDomains outboundDomains = new OutboundDomains();
 
     public ServiceConfiguration() {
         this.receivedAnyStats = true; // true by default, waiting for the startup event
@@ -46,6 +46,7 @@ public class ServiceConfiguration {
         if (apiResponse.endpoints() != null) {
             this.endpoints = apiResponse.endpoints();
         }
+        this.outboundDomains.update(apiResponse.domains(), apiResponse.blockNewOutgoingRequests());
         this.receivedAnyStats = apiResponse.receivedAnyStats();
     }
 
@@ -126,5 +127,9 @@ public class ServiceConfiguration {
     }
 
     public record BlockedResult(boolean blocked, String description) {
+    }
+
+    public boolean shouldBlockOutgoingRequest(String hostname) {
+        return this.outboundDomains.shouldBlockOutgoingRequest(hostname);
     }
 }

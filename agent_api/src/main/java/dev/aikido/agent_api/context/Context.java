@@ -1,5 +1,7 @@
 package dev.aikido.agent_api.context;
 
+import dev.aikido.agent_api.storage.PendingHostnamesStore;
+
 public final class Context {
     private Context() {}
 

@@ -152,7 +152,7 @@ public class ReportingApiHTTP extends ReportingApi {
         return new APIResponse(
                 false, // Success
                 error,
-                0, null, null, null, false, false // Unimportant values.
+                0, null, null, null, false, null, false, false // Unimportant values.
         );
     }
 }

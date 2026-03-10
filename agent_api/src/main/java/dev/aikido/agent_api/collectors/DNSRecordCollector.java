@@ -1,11 +1,14 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
-import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.HostnamesStore;
+import dev.aikido.agent_api.storage.PendingHostnamesStore;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.statistics.OperationKind;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.Attack;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFDetector;
+import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundException;
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
@@ -15,6 +18,7 @@ import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static dev.aikido.agent_api.helpers.ShouldBlockHelper.shouldBlock;
 import static dev.aikido.agent_api.storage.AttackQueue.attackDetected;
@@ -30,38 +34,49 @@ public final class DNSRecordCollector {
             // store stats
             StatisticsStore.registerCall("java.net.InetAddress.getAllByName", OperationKind.OUTGOING_HTTP_OP);
 
+            // Consume pending ports recorded by URLCollector for this hostname.
+            // Removing them here ensures each (hostname, port) pair is counted exactly once.
+            Set<Integer> ports = PendingHostnamesStore.getAndRemove(hostname);
+            if (!ports.isEmpty()) {
+                for (int port : ports) {
+                    HostnamesStore.incrementHits(hostname, port);
+                }
+            } else {
+                // We still need to report a hit to the hostname for outbound domain blocking
+                HostnamesStore.incrementHits(hostname, 0);
+            }
+
+            // Block if the hostname is in the blocked domains list
+            if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
+                logger.debug("Blocking DNS lookup for domain: %s", hostname);
+                throw BlockedOutboundException.get();
+            }
+
             // Convert inetAddresses array to a List of IP strings :
             List<String> ipAddresses = new ArrayList<>();
             for (InetAddress inetAddress : inetAddresses) {
                 ipAddresses.add(inetAddress.getHostAddress());
             }
 
-            // Fetch hostnames from Context (this is to get port number e.g.)
-            if (Context.get() != null && Context.get().getHostnames() != null) {
-                for (Hostnames.HostnameEntry hostnameEntry : Context.get().getHostnames().asArray()) {
-                    if (!hostnameEntry.getHostname().equals(hostname)) {
-                        continue;
-                    }
-                    logger.debug("Hostname: %s, Port: %s, IPs: %s", hostnameEntry.getHostname(), hostnameEntry.getPort(), ipAddresses);
+            // Run SSRF check for all ports found in the pending store (empty = no SSRF check)
+            for (int port : ports) {
+                logger.debug("Hostname: %s, Port: %s, IPs: %s", hostname, port, ipAddresses);
 
-                    Attack attack = SSRFDetector.run(
-                        hostname, hostnameEntry.getPort(), ipAddresses, OPERATION_NAME
-                    );
-                    if (attack == null) {
-                        continue;
-                    }
-
-                    logger.debug("SSRF Attack detected due to: %s:%s", hostname, hostnameEntry.getPort());
-                    attackDetected(attack, Context.get());
-
-                    if (shouldBlock()) {
-                        logger.debug("Blocking SSRF attack...");
-                        throw SSRFException.get();
-                    }
-
-                    // We don't want to test for a stored SSRF attack.
-                    return;
+                Attack attack = SSRFDetector.run(hostname, port, ipAddresses, OPERATION_NAME);
+                if (attack == null) {
+                    continue;
                 }
+
+                logger.debug("SSRF Attack detected due to: %s:%s", hostname, port);
+                attackDetected(attack, Context.get());
+
+                if (shouldBlock()) {
+                    logger.debug("Blocking SSRF attack...");
+                    throw SSRFException.get();
+                }
+
+                // We don't want to test for a stored SSRF attack.
+                return;
             }
 
             // We don't need the context object to check for stored ssrf, but we do want to run this after our other
@@ -76,7 +91,7 @@ public final class DNSRecordCollector {
                 }
             }
 
-        } catch (SSRFException | StoredSSRFException e) {
+        } catch (BlockedOutboundException | SSRFException | StoredSSRFException e) {
             throw e;
         } catch (Throwable e) {
             logger.trace(e);

@@ -8,6 +8,7 @@ import dev.aikido.agent_api.context.RouteMetadata;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.AttackQueue;
+import dev.aikido.agent_api.storage.PendingHostnamesStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.ServiceConfiguration;
 import dev.aikido.agent_api.storage.attack_wave_detector.AttackWaveDetectorStore;
@@ -36,7 +37,14 @@ public final class WebRequestCollector {
      */
     public static Res report(ContextObject newContext) {
         ServiceConfiguration config = getConfig();
-        Context.reset(); // clear context
+
+        // clear context
+        Context.reset();
+
+        // Flush pending hostnames on every context change to prevent the store from
+        // growing unboundedly when a thread is reused across multiple requests.
+        PendingHostnamesStore.clear();
+
         if (config.isIpBypassed(newContext.getRemoteAddress())) {
             return null; // do not set context when the IP address is bypassed (zen = off)
         }
