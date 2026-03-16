@@ -16,9 +16,11 @@ public class Hostnames {
     }
 
     public void add(String hostname, int port) {
-        String key = getKey(hostname, port);
+        if (hostname == null) return;
+        String normalizedHostname = hostname.toLowerCase();
+        String key = getKey(normalizedHostname, port);
         if (!map.containsKey(key)) {
-            map.put(key, new HostnameEntry(hostname, port));
+            map.put(key, new HostnameEntry(normalizedHostname, port));
         }
         map.get(key).incrementHits();
     }
