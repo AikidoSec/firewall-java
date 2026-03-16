@@ -106,6 +106,30 @@ public class HostnamesTest {
         assertTrue(containsEntry(entries, "newsite.com", 3000));
     }
 
+    @Test
+    public void testAddNullHostnameIsIgnored() {
+        hostnames.add(null, 80);
+        assertEquals(0, hostnames.asArray().length);
+    }
+
+    @Test
+    public void testAddUppercaseHostnameIsLowercased() {
+        hostnames.add("EXAMPLE.COM", 80);
+        Hostnames.HostnameEntry[] entries = hostnames.asArray();
+        assertEquals(1, entries.length);
+        assertEquals("example.com", entries[0].getHostname());
+    }
+
+    @Test
+    public void testMixedCaseAndLowercaseSameEntryDeduplication() {
+        hostnames.add("Example.COM", 80);
+        hostnames.add("example.com", 80);
+        Hostnames.HostnameEntry[] entries = hostnames.asArray();
+        assertEquals(1, entries.length);
+        assertEquals("example.com", entries[0].getHostname());
+        assertEquals(2, entries[0].getHits());
+    }
+
     private boolean containsEntry(Hostnames.HostnameEntry[] entries, String hostname, int port) {
         for (Hostnames.HostnameEntry entry : entries) {
             if (entry.getHostname().equals(hostname) && entry.getPort() == port) {
