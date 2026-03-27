@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 
 import static dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector.detectSqlInjection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SqlInjectionTest {
     private void isNotSqlInjection(String sql, String input, String dialect) {
