@@ -5,30 +5,30 @@ import dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector;
 import org.junit.jupiter.api.Test;
 
 import static dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector.detectSqlInjection;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class SqlInjectionTest {
     private void isNotSqlInjection(String sql, String input, String dialect) {
-        boolean result;
+        int result;
         if ("mysql".equals(dialect) || "all".equals(dialect)) {
             result = detectSqlInjection(sql, input, new Dialect("mysql"));
-            assertFalse(result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
+            assertNotEquals(1, result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
         }
         if ("postgresql".equals(dialect) || "all".equals(dialect)) {
             result = detectSqlInjection(sql, input, new Dialect("postgresql"));
-            assertFalse(result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
+            assertNotEquals(1, result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
         }
     }
     private void isSqlInjection(String sql, String input, String dialect) {
-        boolean result;
+        int result;
         if ("mysql".equals(dialect) || "all".equals(dialect)) {
             result = detectSqlInjection(sql, input, new Dialect("mysql"));
-            assertTrue(result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
+            assertEquals(1, result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
         }
         if ("postgresql".equals(dialect) || "all".equals(dialect)) {
             result = detectSqlInjection(sql, input, new Dialect("postgresql"));
-            assertTrue(result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
+            assertEquals(1, result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
         }
     }
 
