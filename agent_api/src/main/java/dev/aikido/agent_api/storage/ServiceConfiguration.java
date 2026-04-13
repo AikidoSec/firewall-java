@@ -24,6 +24,7 @@ public class ServiceConfiguration {
     private boolean middlewareInstalled;
     private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
+    private HashSet<String> excludedUserIdsFromRateLimiting = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
     private OutboundDomains outboundDomains = new OutboundDomains();
 
@@ -42,6 +43,9 @@ public class ServiceConfiguration {
         }
         if (apiResponse.blockedUserIds() != null) {
             this.blockedUserIDs = new HashSet<>(apiResponse.blockedUserIds());
+        }
+        if (apiResponse.excludedUserIdsFromRateLimiting() != null) {
+            this.excludedUserIdsFromRateLimiting = new HashSet<>(apiResponse.excludedUserIdsFromRateLimiting());
         }
         if (apiResponse.endpoints() != null) {
             this.endpoints = apiResponse.endpoints();
@@ -76,6 +80,10 @@ public class ServiceConfiguration {
 
     public boolean isUserBlocked(String userId) {
         return this.blockedUserIDs.contains(userId);
+    }
+
+    public boolean isUserExcludedFromRateLimiting(String userId) {
+        return this.excludedUserIdsFromRateLimiting.contains(userId);
     }
 
     public boolean isIpBypassed(String ip) {

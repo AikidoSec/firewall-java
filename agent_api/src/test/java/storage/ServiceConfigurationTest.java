@@ -38,7 +38,8 @@ public class ServiceConfigurationTest {
                 false,
                 null,
                 true,
-                true
+                true,
+                null
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -68,7 +69,8 @@ public class ServiceConfigurationTest {
                 false,
                 null,
                 false,
-                false
+                false,
+                null
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -309,7 +311,8 @@ public class ServiceConfigurationTest {
                 false,
                 null,
                 false,
-                true
+                true,
+                null
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -329,7 +332,8 @@ public class ServiceConfigurationTest {
                 false,
                 null,
                 true,
-                true
+                true,
+                null
         ));
 
         assertFalse(serviceConfiguration.isIpBypassed("192.168.1.1"));
@@ -347,7 +351,8 @@ public class ServiceConfigurationTest {
                 false,
                 null,
                 true,
-                true
+                true,
+                null
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -369,10 +374,44 @@ public class ServiceConfigurationTest {
                 false,
                 null,
                 true,
-                true
+                true,
+                null
         ));
 
         assertFalse(serviceConfiguration.isUserBlocked("user1"));
+    }
+
+    @Test
+    public void testExcludedUserIdsFromRateLimiting() {
+        // Initially empty
+        assertFalse(serviceConfiguration.isUserExcludedFromRateLimiting("user1"));
+
+        // Populated via updateConfig
+        serviceConfiguration.updateConfig(new APIResponse(
+                true, null, 12345L, null, null, null,
+                false, null, true, true,
+                List.of("user1", "user2")
+        ));
+        assertTrue(serviceConfiguration.isUserExcludedFromRateLimiting("user1"));
+        assertTrue(serviceConfiguration.isUserExcludedFromRateLimiting("user2"));
+        assertFalse(serviceConfiguration.isUserExcludedFromRateLimiting("user3"));
+
+        // Subsequent update replaces the set
+        serviceConfiguration.updateConfig(new APIResponse(
+                true, null, 12345L, null, null, null,
+                false, null, true, true,
+                List.of("user3")
+        ));
+        assertFalse(serviceConfiguration.isUserExcludedFromRateLimiting("user1"));
+        assertTrue(serviceConfiguration.isUserExcludedFromRateLimiting("user3"));
+
+        // Empty list clears all
+        serviceConfiguration.updateConfig(new APIResponse(
+                true, null, 12345L, null, null, null,
+                false, null, true, true,
+                Collections.emptyList()
+        ));
+        assertFalse(serviceConfiguration.isUserExcludedFromRateLimiting("user3"));
     }
 
     @Test
@@ -387,7 +426,8 @@ public class ServiceConfigurationTest {
                 false,
                 null,
                 true,
-                true
+                true,
+                null
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -408,7 +448,8 @@ public class ServiceConfigurationTest {
                 false,
                 null,
                 true,
-                true
+                true,
+                null
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -428,7 +469,8 @@ public class ServiceConfigurationTest {
                 false,
                 null,
                 true,
-                true
+                true,
+                null
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -573,7 +615,7 @@ public class ServiceConfigurationTest {
                 true, null, 0L, null, null, null,
                 true,
                 List.of(new Domain("example.com", "block"), new Domain("allowed.com", "allow")),
-                true, true
+                true, true, null
         );
         serviceConfiguration.updateConfig(apiResponse);
 
@@ -588,7 +630,7 @@ public class ServiceConfigurationTest {
                 true, null, 0L, null, null, null,
                 false,
                 List.of(new Domain("example.com", "block"), new Domain("allowed.com", "allow")),
-                true, true
+                true, true, null
         );
         serviceConfiguration.updateConfig(apiResponse2);
 
