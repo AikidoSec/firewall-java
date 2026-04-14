@@ -150,6 +150,73 @@ public class DNSRecordCollectorTest {
     }
 
     @Test
+    public void testUnicodeDomainBlockedForPunycodeRequest() {
+        // Blocklist stores Unicode; a Punycode request for the same domain must still be blocked.
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null,
+            false, List.of(new Domain("böse.example.com", "block")), true, true, List.of()
+        ));
+        assertThrows(BlockedOutboundException.class, () ->
+            DNSRecordCollector.report("xn--bse-sna.example.com", new InetAddress[]{inetAddress1})
+        );
+    }
+
+    @Test
+    public void testUnicodeDomainBlockedForUnicodeRequest() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null,
+            false, List.of(new Domain("münchen.example.com", "block")), true, true, List.of()
+        ));
+        assertThrows(BlockedOutboundException.class, () ->
+            DNSRecordCollector.report("münchen.example.com", new InetAddress[]{inetAddress1})
+        );
+    }
+
+    @Test
+    public void testAllowedUnicodeDomainNotBlockedForPunycodeRequest() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null,
+            true, List.of(new Domain("münchen-allowed.example.com", "allow")), true, true, List.of()
+        ));
+        assertDoesNotThrow(() ->
+            DNSRecordCollector.report("xn--mnchen-allowed-gsb.example.com", new InetAddress[]{inetAddress1})
+        );
+    }
+
+    @Test
+    public void testAllowedUnicodeDomainNotBlockedForUnicodeRequest() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null,
+            true, List.of(new Domain("münchen-allowed.example.com", "allow")), true, true, List.of()
+        ));
+        assertDoesNotThrow(() ->
+            DNSRecordCollector.report("münchen-allowed.example.com", new InetAddress[]{inetAddress1})
+        );
+    }
+
+    @Test
+    public void testBypassedIpDoesNotRecordHostname() {
+        BypassedContextStore.setBypassed(true);
+        DNSRecordCollector.report("domain1.example.com", new InetAddress[]{inetAddress1});
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(0, entries.length);
+    }
+
+    @Test
+    public void testBlockedDomainStillRecordedWhenNotBypassed() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null,
+            false, List.of(new Domain("blocked.example.com", "block")), true, true, List.of()
+        ));
+        assertThrows(BlockedOutboundException.class, () ->
+            DNSRecordCollector.report("blocked.example.com", new InetAddress[]{inetAddress1})
+        );
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(1, entries.length);
+        assertEquals("blocked.example.com", entries[0].getHostname());
+    }
+
+    @Test
     public void testUnknownDomainBlockedWhenBlockNewOutgoingRequests() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null,
