@@ -18,13 +18,20 @@ public class IPList {
             return; // Don't add if IP is null
         }
         IPAddress ip = new IPAddressString(ipOrCIDR).getAddress();
+        if (ip == null) {
+            return;
+        }
+        // Normalize IPv4-mapped IPv6 addresses to their IPv4 form so matching is symmetric.
+        if (ip.isIPv6() && ip.toIPv6().isIPv4Convertible()) {
+            IPAddress ipv4 = ip.toIPv6().toIPv4();
+            if (ipv4 != null) {
+                ip = ipv4;
+            }
+        }
         if (ipOrCIDR.contains("/")) {
-            // CIDR :
             ip = ip.toPrefixBlock();
         }
-        if (ip != null) {
-            ipAddresses.add(ip);
-        }
+        ipAddresses.add(ip);
     }
 
     public boolean matches(String ip) {

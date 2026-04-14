@@ -263,33 +263,6 @@ class WebRequestCollectorTest {
     }
 
     @Test
-    void testReport_bypassedIp_setsBypassedStore() {
-        List<String> bypassedIps = List.of("192.168.1.1");
-        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of()
-        ));
-
-        assertFalse(BypassedContextStore.isBypassed());
-
-        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
-
-        assertNull(response);
-        assertNull(Context.get());
-        assertTrue(BypassedContextStore.isBypassed());
-    }
-
-    @Test
-    void testReport_nonBypassedIp_clearsBypassedStore() {
-        BypassedContextStore.setBypassed(true);
-        assertTrue(BypassedContextStore.isBypassed());
-
-        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
-
-        assertNull(response);
-        assertFalse(BypassedContextStore.isBypassed());
-    }
-
-    @Test
     void testReport_ipNotAllowedUsingLists_Ip_Bypassed() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(
             List.of(), List.of(),

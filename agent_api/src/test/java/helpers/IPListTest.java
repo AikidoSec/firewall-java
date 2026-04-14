@@ -140,4 +140,32 @@ public class IPListTest {
         blocklist.add("::ffff:23.45.67.89");
         assertTrue(blocklist.matches("::ffff:23.45.67.89"));
     }
+
+    @Test
+    public void testBlocklistAddInvalidIpIgnored() {
+        blocklist.add("notanip");
+        assertEquals(0, blocklist.length());
+        assertFalse(blocklist.matches("192.168.1.1"));
+    }
+
+    @Test
+    public void testBlocklistLengthEmpty() {
+        assertEquals(0, blocklist.length());
+    }
+
+    @Test
+    public void testBlocklistStoredIPv4MappedMatchesPlainIPv4() {
+        blocklist.add("::ffff:23.45.67.89");
+        assertTrue(blocklist.matches("23.45.67.89"));
+        assertTrue(blocklist.matches("::ffff:23.45.67.89"));
+        assertFalse(blocklist.matches("23.45.67.90"));
+    }
+
+    @Test
+    public void testBlocklistStoredIPv4MappedCidrMatchesPlainIPv4() {
+        blocklist.add("::ffff:10.0.0.0/104");
+        assertTrue(blocklist.matches("10.1.2.3"));
+        assertTrue(blocklist.matches("::ffff:10.1.2.3"));
+        assertFalse(blocklist.matches("11.1.2.3"));
+    }
 }
