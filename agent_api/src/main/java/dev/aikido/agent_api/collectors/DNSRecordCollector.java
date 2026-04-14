@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.BypassedContextStore;
 import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.storage.PendingHostnamesStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
@@ -47,7 +48,7 @@ public final class DNSRecordCollector {
             }
 
             // Block if the hostname is in the blocked domains list
-            if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
+            if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname) && !BypassedContextStore.isBypassed()) {
                 logger.debug("Blocking DNS lookup for domain: %s", hostname);
                 throw BlockedOutboundException.get();
             }
