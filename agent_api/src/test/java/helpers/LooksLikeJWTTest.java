@@ -1,12 +1,15 @@
 package helpers;
 
 import dev.aikido.agent_api.helpers.patterns.LooksLikeJWT;
+import dev.aikido.agent_api.vulnerabilities.DangerousBodyException;
 import org.junit.jupiter.api.Test;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LooksLikeJWTTest {
 
@@ -51,5 +54,36 @@ public class LooksLikeJWTTest {
         expectedPayload.put("username", usernameMap);
         expectedPayload.put("iat", 1.516239022E9);
         assertEquals(new LooksLikeJWT.Result(true, expectedPayload), LooksLikeJWT.tryDecodeAsJwt(validJwtWithBearer));
+    }
+
+    private static String buildJwt(String payloadJson) {
+        String payloadB64 = Base64.getUrlEncoder().withoutPadding()
+                .encodeToString(payloadJson.getBytes());
+        return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." + payloadB64 + ".sig";
+    }
+
+    @Test
+    void testThrowsDangerousBodyExceptionForOversizedPayload() {
+        StringBuilder sb = new StringBuilder("{\"k\":\"");
+        for (int i = 0; i < LooksLikeJWT.MAX_JWT_PAYLOAD_BYTES + 10; i++) {
+            sb.append('a');
+        }
+        sb.append("\"}");
+        String jwt = buildJwt(sb.toString());
+        assertThrows(DangerousBodyException.class, () -> LooksLikeJWT.tryDecodeAsJwt(jwt));
+    }
+
+    @Test
+    void testThrowsDangerousBodyExceptionForDeeplyNestedPayload() {
+        int depth = 7000;
+        StringBuilder open = new StringBuilder();
+        StringBuilder close = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            open.append("{\"a\":");
+            close.append("}");
+        }
+        String payload = open.toString() + "1" + close.toString();
+        String jwt = buildJwt(payload);
+        assertThrows(DangerousBodyException.class, () -> LooksLikeJWT.tryDecodeAsJwt(jwt));
     }
 }
