@@ -6,6 +6,7 @@ import dev.aikido.agent_api.collectors.DNSRecordCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.AttackQueue;
+import dev.aikido.agent_api.storage.BypassedContextStore;
 import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.storage.PendingHostnamesStore;
@@ -37,6 +38,7 @@ public class DNSRecordCollectorTest {
         AttackQueue.clear();
         HostnamesStore.clear();
         PendingHostnamesStore.clear();
+        BypassedContextStore.clear();
     }
 
     @AfterEach
@@ -45,6 +47,7 @@ public class DNSRecordCollectorTest {
         PendingHostnamesStore.clear();
         Context.set(null);
         AttackQueue.clear();
+        BypassedContextStore.clear();
         // Reset domain config
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null, false, List.of(), true, false, List.of()
@@ -131,6 +134,18 @@ public class DNSRecordCollectorTest {
         ));
         assertDoesNotThrow(() ->
             DNSRecordCollector.report("allowed.example.com", new InetAddress[]{inetAddress1})
+        );
+    }
+
+    @Test
+    public void testBlockedDomainNotBlockedWhenIpBypassed() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null,
+            false, List.of(new Domain("blocked.example.com", "block")), true, true, List.of()
+        ));
+        BypassedContextStore.setBypassed(true);
+        assertDoesNotThrow(() ->
+            DNSRecordCollector.report("blocked.example.com", new InetAddress[]{inetAddress1})
         );
     }
 
