@@ -4,6 +4,7 @@ import api_discovery.DataSchemaGeneratorTest;
 import dev.aikido.agent_api.api_discovery.DataSchemaGenerator;
 import dev.aikido.agent_api.api_discovery.DataSchemaItem;
 import dev.aikido.agent_api.api_discovery.DataSchemaType;
+import dev.aikido.agent_api.vulnerabilities.DangerousBodyException;
 import org.junit.jupiter.api.Test;
 
 import static dev.aikido.agent_api.helpers.extraction.StringExtractor.extractStringsFromObject;
@@ -405,6 +406,42 @@ public class StringExtractorTest {
         assertEquals(".important_record.stringsList.[2]", result.get("ghi"));
         assertEquals(".", result.get("important_record"));
         assertEquals(".important_record.a", result.get("Hello World"));
+    }
+
+    @Test
+    public void testThrowsDangerousBodyExceptionForTooDeepNesting() {
+        Map<String, Object> root = new HashMap<>();
+        Map<String, Object> current = root;
+        for (int i = 0; i < 1100; i++) {
+            Map<String, Object> next = new HashMap<>();
+            current.put("a", next);
+            current = next;
+        }
+        current.put("leaf", "x");
+        assertThrows(DangerousBodyException.class, () -> extractStringsFromObject(root));
+    }
+
+    @Test
+    public void testDoesNotThrowForModestNesting() {
+        Map<String, Object> root = new HashMap<>();
+        Map<String, Object> current = root;
+        for (int i = 0; i < 500; i++) {
+            Map<String, Object> next = new HashMap<>();
+            current.put("a", next);
+            current = next;
+        }
+        current.put("leaf", "x");
+        Map<String, String> result = extractStringsFromObject(root);
+        assertEquals("x", findKeyEndingWithLeafValue(result));
+    }
+
+    private static String findKeyEndingWithLeafValue(Map<String, String> result) {
+        for (Map.Entry<String, String> e : result.entrySet()) {
+            if ("x".equals(e.getKey())) {
+                return e.getKey();
+            }
+        }
+        return null;
     }
 
     @Test

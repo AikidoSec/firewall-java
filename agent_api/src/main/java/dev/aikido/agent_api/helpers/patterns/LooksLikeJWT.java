@@ -4,11 +4,15 @@ import java.util.Base64;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import dev.aikido.agent_api.vulnerabilities.DangerousBodyException;
+
 import java.util.Map;
 import java.util.Objects;
 
 public final class LooksLikeJWT {
     private LooksLikeJWT() {}
+
+    public static final int MAX_JWT_PAYLOAD_BYTES = 8 * 1024;
 
     public static Result tryDecodeAsJwt(String jwt) {
         // Check if the JWT contains the required parts
@@ -23,14 +27,24 @@ public final class LooksLikeJWT {
             return new Result(false, null);
         }
 
+        byte[] decoded;
         try {
-            // Decode the middle part (payload) of the JWT
-            String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
+            decoded = Base64.getUrlDecoder().decode(parts[1]);
+        } catch (IllegalArgumentException ignored) {
+            return new Result(false, null);
+        }
 
+        if (decoded.length > MAX_JWT_PAYLOAD_BYTES) {
+            throw DangerousBodyException.jwtTooLarge();
+        }
+
+        String payload = new String(decoded);
+        try {
             Gson gson = new Gson();
             Map<String, Object> jwtPayload = gson.fromJson(payload, new TypeToken<Map<String, Object>>(){}.getType());
-
             return new Result(true, jwtPayload);
+        } catch (StackOverflowError soe) {
+            throw DangerousBodyException.jwtTooLarge();
         } catch (Exception ignored) {
             return new Result(false, null);
         }
