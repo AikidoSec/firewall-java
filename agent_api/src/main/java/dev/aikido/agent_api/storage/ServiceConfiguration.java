@@ -97,7 +97,7 @@ public class ServiceConfiguration {
         // Check for allowed ip addresses (i.e. only one country is allowed to visit the site)
         // Always allow access from private IP addresses (those include local IP addresses)
         if (!isPrivateIp(ip) && !firewallLists.matchesAllowedIps(ip)) {
-            return new BlockedResult(true, "not in allowlist");
+            return new BlockedResult(true, "not allowed");
         }
 
         // Check for monitored IP addresses
