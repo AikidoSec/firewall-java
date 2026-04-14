@@ -241,6 +241,26 @@ class WebRequestCollectorTest {
     }
 
     @Test
+    void testReport_ipBlockedUsingLists_IPv4MappedBypass() {
+        contextObject.setIp("::ffff:192.168.1.1");
+
+        ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
+            new ReportingApi.ListsResponseEntry("key", "geoip", "geoip restrictions", List.of("192.168.1.1"))
+        ), List.of(), List.of(), null, null, List.of());
+        ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
+
+        List<String> bypassedIps = List.of("192.168.1.1");
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of()
+        ));
+
+        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
+
+        assertNull(response);
+        assertNull(Context.get());
+    }
+
+    @Test
     void testReport_ipNotAllowedUsingLists_Ip_Bypassed() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(
             List.of(), List.of(),
