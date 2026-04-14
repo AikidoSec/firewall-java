@@ -304,4 +304,40 @@ public class ShouldRateLimitTest {
         assertEquals(new ShouldRateLimit.RateLimitDecision(true, "group"),
             ShouldRateLimit.shouldRateLimit(metadata, null, "group1", "4.3.2.1"));
     }
+
+    @Test
+    public void testDoesNotRateLimitExcludedUsers() {
+        List<Endpoint> endpoints = new ArrayList<>();
+        endpoints.add(new Endpoint("POST", "/login",
+                /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
+                false, false, true));
+        utils.EmptyAPIResponses.setEmptyConfigWithEndpointListAndExcludedUsers(
+                endpoints, List.of("excluded-user-id"));
+
+        RouteMetadata routeMetadata = createRouteMetadata("POST", "/login");
+        User excludedUser = new User("excluded-user-id", "John Doe", "1.1.1.1", 0);
+
+        for (int i = 0; i < 5; i++) {
+            assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+                    ShouldRateLimit.shouldRateLimit(routeMetadata, excludedUser, null, "1.2.3.4"));
+        }
+    }
+
+    @Test
+    public void testDoesNotRateLimitExcludedUsersInGroup() {
+        List<Endpoint> endpoints = new ArrayList<>();
+        endpoints.add(new Endpoint("POST", "/login",
+                /*maxRequests*/ 3, /*windowSizeMS*/ 1000, List.of(),
+                false, false, true));
+        utils.EmptyAPIResponses.setEmptyConfigWithEndpointListAndExcludedUsers(
+                endpoints, List.of("excluded-user-id"));
+
+        RouteMetadata routeMetadata = createRouteMetadata("POST", "/login");
+        User excludedUser = new User("excluded-user-id", "John Doe", "1.1.1.1", 0);
+
+        for (int i = 0; i < 5; i++) {
+            assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+                    ShouldRateLimit.shouldRateLimit(routeMetadata, excludedUser, "group1", "1.2.3.4"));
+        }
+    }
 }
