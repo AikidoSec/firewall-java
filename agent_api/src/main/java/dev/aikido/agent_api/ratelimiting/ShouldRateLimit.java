@@ -23,6 +23,10 @@ public final class ShouldRateLimit {
             return NO_RATE_LIMIT;
         }
 
+        if (user != null && ServiceConfigStore.getConfig().isUserExcludedFromRateLimiting(user.id())) {
+            return NO_RATE_LIMIT;
+        }
+
         long windowSizeInMS = rateLimitedEndpoint.getRateLimiting().windowSizeInMS();
         long maxRequests = rateLimitedEndpoint.getRateLimiting().maxRequests();
 

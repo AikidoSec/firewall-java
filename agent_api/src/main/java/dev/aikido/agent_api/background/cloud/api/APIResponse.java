@@ -15,6 +15,7 @@ public record APIResponse(
         boolean blockNewOutgoingRequests,
         List<Domain> domains,
         boolean receivedAnyStats,
-        boolean block
+        boolean block,
+        List<String> excludedUserIdsFromRateLimiting
 ) {
 }
