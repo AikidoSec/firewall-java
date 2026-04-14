@@ -8,6 +8,7 @@ import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.AttackQueue;
+import dev.aikido.agent_api.storage.BypassedContextStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import org.junit.jupiter.api.BeforeEach;
@@ -226,6 +227,26 @@ class WebRequestCollectorTest {
     void testReport_ipBlockedUsingLists_Ip_Bypassed() {
         ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
             new ReportingApi.ListsResponseEntry("key", "geoip", "geoip restrictions", List.of("bullshit.ip", "192.168.1.1"))
+        ), List.of(), List.of(), null, null, List.of());
+        ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
+
+        List<String> bypassedIps = List.of("192.168.1.1");
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of()
+        ));
+
+        WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
+
+        assertNull(response);
+        assertNull(Context.get());
+    }
+
+    @Test
+    void testReport_ipBlockedUsingLists_IPv4MappedBypass() {
+        contextObject.setIp("::ffff:192.168.1.1");
+
+        ReportingApi.APIListsResponse blockedListsRes = new ReportingApi.APIListsResponse(List.of(
+            new ReportingApi.ListsResponseEntry("key", "geoip", "geoip restrictions", List.of("192.168.1.1"))
         ), List.of(), List.of(), null, null, List.of());
         ServiceConfigStore.updateFromAPIListsResponse(blockedListsRes);
 

@@ -114,4 +114,30 @@ public class IPListTest {
         assertTrue(blocklist.matches("192.168.2.1"));
         assertTrue(blocklist.matches("192.168.2.2"));
     }
+
+    @Test
+    public void testBlocklistMatchesIPv4MappedIPv6() {
+        blocklist.add("192.168.1.1");
+        assertTrue(blocklist.matches("::ffff:192.168.1.1"));
+        assertFalse(blocklist.matches("::ffff:192.168.1.2"));
+
+        blocklist.add("10.0.0.0/8");
+        assertTrue(blocklist.matches("::ffff:10.5.6.7"));
+        assertTrue(blocklist.matches("::ffff:10.0.0.1"));
+        assertFalse(blocklist.matches("::ffff:11.0.0.1"));
+    }
+
+    @Test
+    public void testBlocklistIPv6OnlyIgnoresIPv4MappedMismatch() {
+        blocklist.add("2001:db8::/32");
+        assertTrue(blocklist.matches("2001:db8::1"));
+        assertFalse(blocklist.matches("::ffff:192.168.1.1"));
+        assertFalse(blocklist.matches("192.168.1.1"));
+    }
+
+    @Test
+    public void testBlocklistStoredIPv4MappedMatchesIPv4Input() {
+        blocklist.add("::ffff:23.45.67.89");
+        assertTrue(blocklist.matches("::ffff:23.45.67.89"));
+    }
 }
