@@ -8,6 +8,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.IDN;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,6 +33,29 @@ public class InetAddressWrapper implements Wrapper {
         // Since we have to wrap a native Java Class stuff gets more complicated
         // The classpath is not the same anymore, and we can't import our modules directly.
         // To bypass this issue we load collectors from a .jar file
+
+        // Java's system resolver rejects non-ASCII hostnames, so convert IDN to Punycode
+        // before the real lookup runs. Without this, getAllByName throws UnknownHostException
+        // and OnMethodExit never fires — meaning DNSRecordCollector can't block or track
+        // the hostname.
+        @Advice.OnMethodEnter(suppress = Throwable.class)
+        public static void before(
+                @Advice.Argument(value = 0, readOnly = false) String hostname
+        ) {
+            if (hostname == null) {
+                return;
+            }
+            for (int i = 0; i < hostname.length(); i++) {
+                if (hostname.charAt(i) > 0x7F) {
+                    try {
+                        hostname = IDN.toASCII(hostname, IDN.ALLOW_UNASSIGNED);
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                    return;
+                }
+            }
+        }
+
         @Advice.OnMethodExit
         public static void after(
                 @Advice.Argument(0) String hostname,
