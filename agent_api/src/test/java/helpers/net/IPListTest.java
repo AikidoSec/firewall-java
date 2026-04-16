@@ -1,4 +1,4 @@
-package helpers;
+package helpers.net;
 
 import dev.aikido.agent_api.helpers.net.IPList;
 import org.junit.jupiter.api.BeforeEach;
