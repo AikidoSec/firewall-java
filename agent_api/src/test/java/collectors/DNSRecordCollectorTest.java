@@ -150,6 +150,30 @@ public class DNSRecordCollectorTest {
     }
 
     @Test
+    public void testHostnamesStoreNotUpdatedWhenBypassed() {
+        BypassedContextStore.setBypassed(true);
+        Context.set(new EmptySampleContextObject());
+
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{inetAddress1});
+
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+    }
+
+    @Test
+    public void testHostnamesStoreNotUpdatedWhenBypassedWithPendingPorts() {
+        PendingHostnamesStore.add("dev.aikido", 80);
+        PendingHostnamesStore.add("dev.aikido", 443);
+        BypassedContextStore.setBypassed(true);
+        Context.set(mock(ContextObject.class));
+
+        DNSRecordCollector.report("dev.aikido", new InetAddress[]{inetAddress1});
+
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+        // Pending entries are still consumed even when bypassed so the store doesn't grow unboundedly
+        assertTrue(PendingHostnamesStore.getPorts("dev.aikido").isEmpty());
+    }
+
+    @Test
     public void testUnknownDomainBlockedWhenBlockNewOutgoingRequests() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null,
