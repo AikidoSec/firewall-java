@@ -1,12 +1,8 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
 import dev.aikido.agent_api.helpers.net.IPList;
-import inet.ipaddr.IPAddressString;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public final class IsPrivateIP {
     // Define private IP ranges
@@ -45,10 +41,6 @@ public final class IsPrivateIP {
     static {
         PRIVATE_IP_RANGES.stream().forEach(privateIpNetworks::add);
         PRIVATE_IPV6_RANGES.stream().forEach(privateIpNetworks::add);
-        // Add IPv4-mapped IPv6 addresses
-        for (String ipv4Ranges: PRIVATE_IP_RANGES) {
-            privateIpNetworks.add(mapIPv4ToIPv6(ipv4Ranges));
-        }
     }
 
     private IsPrivateIP() {
@@ -65,22 +57,5 @@ public final class IsPrivateIP {
 
     public static boolean isPrivateIp(String ip) {
         return privateIpNetworks.matches(ip);
-    }
-
-    /**
-     * Maps an IPv4 address to an IPv6 address.
-     * e.g. 127.0.0.0/8 -> ::ffff:127.0.0.0/104
-     */
-    public static String mapIPv4ToIPv6(String ip) {
-        if (!ip.contains("/")) {
-            // No CIDR suffix, assume /32
-            return "::ffff:" + ip + "/128";
-        }
-
-        String[] parts = ip.split("/");
-        int suffix = Integer.parseInt(parts[1]);
-        // We add 96 to the suffix, since ::ffff: already is 96 bits,
-        // so the 32 remaining bits are decided by the IPv4 address
-        return "::ffff:" + parts[0] + "/" + (suffix + 96);
     }
 }
