@@ -5,30 +5,39 @@ import dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector;
 import org.junit.jupiter.api.Test;
 
 import static dev.aikido.agent_api.vulnerabilities.sql_injection.SqlDetector.detectSqlInjection;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SqlInjectionTest {
     private void isNotSqlInjection(String sql, String input, String dialect) {
-        boolean result;
         if ("mysql".equals(dialect) || "all".equals(dialect)) {
-            result = detectSqlInjection(sql, input, new Dialect("mysql"));
-            assertFalse(result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
+            int result = detectSqlInjection(sql, input, new Dialect("mysql"));
+            assertEquals(0, result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
         }
         if ("postgresql".equals(dialect) || "all".equals(dialect)) {
-            result = detectSqlInjection(sql, input, new Dialect("postgresql"));
-            assertFalse(result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
+            int result = detectSqlInjection(sql, input, new Dialect("postgresql"));
+            assertEquals(0, result, String.format("Expected no SQL injection for SQL: %s and input: %s", sql, input));
         }
     }
     private void isSqlInjection(String sql, String input, String dialect) {
-        boolean result;
         if ("mysql".equals(dialect) || "all".equals(dialect)) {
-            result = detectSqlInjection(sql, input, new Dialect("mysql"));
-            assertTrue(result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
+            int result = detectSqlInjection(sql, input, new Dialect("mysql"));
+            assertEquals(1, result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
         }
         if ("postgresql".equals(dialect) || "all".equals(dialect)) {
-            result = detectSqlInjection(sql, input, new Dialect("postgresql"));
-            assertTrue(result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
+            int result = detectSqlInjection(sql, input, new Dialect("postgresql"));
+            assertEquals(1, result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
+        }
+    }
+    private void isSqlTokenizeError(String sql, String input, String dialect) {
+        if ("mysql".equals(dialect) || "all".equals(dialect)) {
+            int result = detectSqlInjection(sql, input, new Dialect("mysql"));
+            assertEquals(3, result, String.format("Expected SQL tokenize error for SQL: %s and input: %s", sql, input));
+        }
+        if ("postgresql".equals(dialect) || "all".equals(dialect)) {
+            int result = detectSqlInjection(sql, input, new Dialect("postgresql"));
+            assertEquals(3, result, String.format("Expected SQL tokenize error for SQL: %s and input: %s", sql, input));
         }
     }
 
@@ -164,17 +173,8 @@ public class SqlInjectionTest {
         assertFalse(SqlDetector.shouldReturnEarly("SELECT * FROM users; DROP TABLE", "users; DROP TABLE"));
     }
 
-    /**
-     * Moved :
-     * is_sql_injection("SELECT * FROM users WHERE id = 'users\\'", "users\\")
-     * is_sql_injection("SELECT * FROM users WHERE id = 'users\\\\'", "users\\\\")
-     * to is_not_sql_injection. Reason : Invalid SQL.
-     */
     @Test
     public void testAllowEscapeSequences() {
-        // Invalid queries:
-        isNotSqlInjection("SELECT * FROM users WHERE id = 'users\\'", "users\\", "all");
-        isNotSqlInjection("SELECT * FROM users WHERE id = 'users\\\\'", "users\\\\", "all");
         isNotSqlInjection("SELECT * FROM users WHERE id = '\nusers'", "\nusers", "all");
         isNotSqlInjection("SELECT * FROM users WHERE id = '\rusers'", "\rusers", "all");
         isNotSqlInjection("SELECT * FROM users WHERE id = '\tusers'", "\tusers", "all");
@@ -218,8 +218,7 @@ public class SqlInjectionTest {
                 "SELECT * FROM comments WHERE comment = \"I\\`m writing you\"", "I`m writing you", "all"
         );
 
-        // Invalid query (strings don't terminate)
-        isNotSqlInjection(
+        isSqlTokenizeError(
                 "SELECT * FROM comments WHERE comment = 'I'm writing you'", "I'm writing you", "all"
         );
 
@@ -371,6 +370,12 @@ public class SqlInjectionTest {
         String expectedSqlInjection = "' OR 1=1 -- a";
 
         isSqlInjection(sql, expectedSqlInjection, "all");
+    }
+
+    @Test
+    public void testUnterminatedStrings() {
+        isSqlTokenizeError("SELECT * FROM users WHERE id = 'users\\'", "users\\", "all");
+        isSqlTokenizeError("SELECT * FROM users WHERE id = 'users\\\\'", "users\\\\", "all");
     }
 
     /**
