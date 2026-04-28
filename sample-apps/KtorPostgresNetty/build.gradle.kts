@@ -12,6 +12,10 @@ application {
     mainClass.set("com.example.ApplicationKt")
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 repositories {
     mavenCentral()
 }
