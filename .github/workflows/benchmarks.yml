@@ -57,7 +57,7 @@ jobs:
           docker run --name mock_core -d -p 5000:5000 mock_core
       - name: Start databases
         working-directory: ./sample-apps/databases
-        run: docker compose up --build -d
+        run: docker compose up --build -d postgres_database
 
       - name: Build Application (ensures cache)
         working-directory: ./sample-apps/${{ matrix.app }}
