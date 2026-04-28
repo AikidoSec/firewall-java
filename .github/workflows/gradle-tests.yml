@@ -63,7 +63,7 @@ jobs:
 
       - name: Start databases
         working-directory: ./sample-apps/databases
-        run: docker compose up --build -d && sleep 10
+        run: docker compose up --build -d postgres_database mysql_database mssql_database && sleep 10
 
       - name: Start mock server
         working-directory: ./end2end/server

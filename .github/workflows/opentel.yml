@@ -60,7 +60,7 @@ jobs:
         working-directory: ./sample-apps/databases
         run: |
           docker compose down --volumes
-          docker compose up --build -d
+          docker compose up --build -d postgres_database
       - name: Install Python dependencies
         run: python -m pip install -r end2end/requirements.txt
       - name: Cleanup application
