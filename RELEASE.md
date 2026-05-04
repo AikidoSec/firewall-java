@@ -1,6 +1,5 @@
 # Releasing
 
-1. Go to **GitHub → Releases → Draft a new release**
-2. Choose a tag (e.g. `v1.2.3`) and set it as a **draft**
-3. Click **Save draft** — this triggers the release workflow
-4. The workflow builds the artifacts, uploads them to the draft, then publishes the release automatically
+1. Create and push a tag for the version you want to release (e.g. `git tag v1.2.3 && git push origin v1.2.3`) — this triggers the release workflow
+2. The workflow builds the artifacts and uploads them to a **draft** release on GitHub
+3. Go to **GitHub → Releases**, review the draft, then click **Edit → Publish release** to make it public

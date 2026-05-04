@@ -1,32 +1,37 @@
 name: 📦 Publish new Release
 
 on:
-  release:
-    types: [created]
-
-permissions:
-  contents: write
-  packages: write
-  deployments: write
+  push:
+    tags:
+      - "v*"
 
 jobs:
-  create-release-asset:
-    runs-on: open-source-releaser
+  extract-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
 
+  build:
+    needs: extract-version
+    runs-on: open-source-releaser
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set the version for this release
-        run: |
-          TAG_NAME=${GITHUB_REF##*/}
-          make replace_version version=${TAG_NAME#v}
+        run: make replace_version version=${{ needs.extract-version.outputs.version }}
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'adopt'
       - name: Download binaries & Build with Gradle
-        working-directory: ./
         run: chmod +x gradlew && make binaries && make build
       - name: Create zip and tar.gz files of the build
         run: |
@@ -37,43 +42,36 @@ jobs:
         run: |
           shasum -a 256 zen.zip > zen.zip.sha256sum
           shasum -a 256 zen.tar.gz > zen.tar.gz.sha256sum
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./zen.zip
-          asset_name: zen.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset (SHA)
-        uses: actions/upload-release-asset@v1
+          name: release-artifacts
+          path: |
+            zen.zip
+            zen.zip.sha256sum
+            zen.tar.gz
+            zen.tar.gz.sha256sum
+
+  release:
+    needs: [extract-version, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+        with:
+          draft: true
+          files: |
+            zen.zip
+            zen.zip.sha256sum
+            zen.tar.gz
+            zen.tar.gz.sha256sum
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./zen.zip.sha256sum
-          asset_name: zen.zip.sha256sum
-          asset_content_type: text/plain
-      - name: Upload Release Asset (tar.gz)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./zen.tar.gz
-          asset_name: zen.tar.gz
-          asset_content_type: application/gzip
-      - name: Upload Release Asset (tar.gz SHA)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./zen.tar.gz.sha256sum
-          asset_name: zen.tar.gz.sha256sum
-          asset_content_type: text/plain
-      - name: Publish release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release edit ${{ github.event.release.tag_name }} --draft=false --repo ${{ github.repository }}
