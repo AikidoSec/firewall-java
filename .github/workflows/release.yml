@@ -2,7 +2,7 @@ name: 📦 Publish new Release
 
 on:
   release:
-    types: [published]
+    types: [created]
 
 permissions:
   contents: write
@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   create-release-asset:
-    runs-on: ubuntu-latest
+    runs-on: open-source-releaser
 
     steps:
       - name: Check out code
@@ -73,3 +73,7 @@ jobs:
           asset_path: ./zen.tar.gz.sha256sum
           asset_name: zen.tar.gz.sha256sum
           asset_content_type: text/plain
+      - name: Publish release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit ${{ github.event.release.tag_name }} --draft=false --repo ${{ github.repository }}
