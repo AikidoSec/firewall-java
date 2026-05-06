@@ -54,7 +54,7 @@ jobs:
 
   release:
     needs: [extract-version, build]
-    runs-on: ubuntu-latest
+    runs-on: open-source-releaser
     permissions:
       contents: write
     steps:
