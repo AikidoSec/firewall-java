@@ -8,6 +8,7 @@ import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.AttackQueue;
+import dev.aikido.agent_api.storage.BypassedContextStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ class WebRequestCollectorTest {
         ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
         ServiceConfigStore.updateFromAPIListsResponse(emptyAPIListsResponse);
         AttackQueue.clear();
+        BypassedContextStore.clear();
     }
 
     @Test
@@ -157,7 +159,7 @@ class WebRequestCollectorTest {
         contextObject.setIp("4.4.4.4");
         response = WebRequestCollector.report(contextObject);
         assertNotNull(response);
-        assertEquals("Your IP address is blocked. Reason: not in allowlist (Your IP: 4.4.4.4)", response.msg());
+        assertEquals("Your IP address is blocked. Reason: not allowed (Your IP: 4.4.4.4)", response.msg());
         assertEquals(403, response.status());
     }
 

@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.helpers.extraction;
 
 import dev.aikido.agent_api.helpers.patterns.LooksLikeJWT;
+import dev.aikido.agent_api.vulnerabilities.DangerousBodyException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -9,12 +10,16 @@ import static dev.aikido.agent_api.helpers.extraction.PathBuilder.buildPathToPay
 import static dev.aikido.agent_api.helpers.patterns.PrimitiveType.isPrimitiveType;
 
 public class StringExtractor {
+    private static final int MAX_DEPTH = 1024;
     // Ensures that we don't get recursion :
     Set<Object> scanned = new HashSet<>();
     public static Map<String, String> extractStringsFromObject(Object obj) {
-        return new StringExtractor().extractStringsRecursive(obj, new ArrayList<>());
+        return new StringExtractor().extractStringsRecursive(obj, new ArrayList<>(), 0);
     }
-    private Map<String, String> extractStringsRecursive(Object target, ArrayList<PathBuilder.PathPart> pathToPayload) {
+    private Map<String, String> extractStringsRecursive(Object target, ArrayList<PathBuilder.PathPart> pathToPayload, int depth) {
+        if (depth > MAX_DEPTH) {
+            throw DangerousBodyException.bodyTooDeep();
+        }
         HashMap<String, String> result = new HashMap<>();
         if (target == null || scanned.contains(target)) {
             return Map.of(); // Do not rescan objects, because this might lead to recursion.
@@ -22,18 +27,18 @@ public class StringExtractor {
         scanned.add(target);
 
         if (target instanceof String targetString) {
-            result.putAll(extractStringsFromString(targetString, pathToPayload));
+            result.putAll(extractStringsFromString(targetString, pathToPayload, depth));
         } else if (target instanceof Collection<?> || target.getClass().isArray()) {
-            result.putAll(extractStringsFromArray(target, pathToPayload));
+            result.putAll(extractStringsFromArray(target, pathToPayload, depth));
         } else if (target instanceof Map<?, ?> targetMap) {
-            result.putAll(extractStringsFromMap(targetMap, pathToPayload));
+            result.putAll(extractStringsFromMap(targetMap, pathToPayload, depth));
         } else if (!isPrimitiveType(target)) { // Stop algorithm if it's a primitive type.
-            result.putAll(extractStringsFromStructure(target, pathToPayload));
+            result.putAll(extractStringsFromStructure(target, pathToPayload, depth));
         }
         return result;
     }
 
-    private Map<String, String> extractStringsFromString(String target, ArrayList<PathBuilder.PathPart> pathToPayload) {
+    private Map<String, String> extractStringsFromString(String target, ArrayList<PathBuilder.PathPart> pathToPayload, int depth) {
         HashMap<String, String> result = new HashMap<>();
         result.put(target, buildPathToPayload(pathToPayload));
 
@@ -42,7 +47,7 @@ public class StringExtractor {
         if (jwtResult.success()) {
             ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
             newPathToPayload.add(new PathBuilder.PathPart("jwt"));
-            Map<String, String> resultsFromJWT = extractStringsRecursive(jwtResult.payload(), newPathToPayload);
+            Map<String, String> resultsFromJWT = extractStringsRecursive(jwtResult.payload(), newPathToPayload, depth + 1);
             for (Map.Entry<String, String> entry : resultsFromJWT.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
@@ -57,27 +62,27 @@ public class StringExtractor {
         return result;
     }
 
-    private Map<String, String> extractStringsFromArray(Object target, ArrayList<PathBuilder.PathPart> pathToPayload) {
+    private Map<String, String> extractStringsFromArray(Object target, ArrayList<PathBuilder.PathPart> pathToPayload, int depth) {
         HashMap<String, String> result = new HashMap<>();
         if (target instanceof Collection<?> targetCollection) {
             int index = 0;
             for (Object element : (Collection<?>) targetCollection) {
                 ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
                 newPathToPayload.add(new PathBuilder.PathPart("array", index));
-                result.putAll(extractStringsRecursive(element, newPathToPayload));
+                result.putAll(extractStringsRecursive(element, newPathToPayload, depth + 1));
                 index++;
             }
         } else if (target instanceof Object[] targetArray) {
             for (int i = 0; i < targetArray.length; i++) {
                 ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
                 newPathToPayload.add(new PathBuilder.PathPart("array", i));
-                result.putAll(extractStringsRecursive(targetArray[i], newPathToPayload));
+                result.putAll(extractStringsRecursive(targetArray[i], newPathToPayload, depth + 1));
             }
         }
         return result;
     }
 
-    private Map<String, String> extractStringsFromMap(Map<?, ?> target, ArrayList<PathBuilder.PathPart> pathToPayload) {
+    private Map<String, String> extractStringsFromMap(Map<?, ?> target, ArrayList<PathBuilder.PathPart> pathToPayload, int depth) {
         HashMap<String, String> result = new HashMap<>();
         for (Object key : target.keySet()) {
             if (key instanceof String stringKey) {
@@ -89,12 +94,12 @@ public class StringExtractor {
             } else {
                 newPathToPayload.add(new PathBuilder.PathPart("object", key.toString()));
             }
-            result.putAll(extractStringsRecursive(target.get(key), newPathToPayload));
+            result.putAll(extractStringsRecursive(target.get(key), newPathToPayload, depth + 1));
         }
         return result;
     }
 
-    private Map<String, String> extractStringsFromStructure(Object target, ArrayList<PathBuilder.PathPart> pathToPayload) {
+    private Map<String, String> extractStringsFromStructure(Object target, ArrayList<PathBuilder.PathPart> pathToPayload, int depth) {
         HashMap<String, String> result = new HashMap<>();
         Field[] fields = target.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -106,7 +111,9 @@ public class StringExtractor {
                 Object fieldValue = field.get(target);
                 ArrayList<PathBuilder.PathPart> newPathToPayload = new ArrayList<>(pathToPayload);
                 newPathToPayload.add(new PathBuilder.PathPart("object", field.getName()));
-                result.putAll(extractStringsRecursive(fieldValue, newPathToPayload));
+                result.putAll(extractStringsRecursive(fieldValue, newPathToPayload, depth + 1));
+            } catch (DangerousBodyException e) {
+                throw e;
             } catch (IllegalAccessException | RuntimeException e) {
                 // pass-through
             }
