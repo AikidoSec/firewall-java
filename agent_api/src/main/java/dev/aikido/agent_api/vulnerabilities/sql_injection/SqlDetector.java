@@ -1,9 +1,11 @@
 package dev.aikido.agent_api.vulnerabilities.sql_injection;
 
+import dev.aikido.agent_api.helpers.env.BlockInvalidSqlEnv;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.vulnerabilities.Detector;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -23,21 +25,32 @@ public class SqlDetector implements Detector {
         }
         String query = arguments[0];
         Dialect dialect = new Dialect(arguments[1]);
-        boolean detectedAttack = detectSqlInjection(query, userInput, dialect);
-        if (detectedAttack) {
+        int result = detectSqlInjection(query, userInput, dialect);
+
+        if (result == 1) {
             Map<String, String> metadata = Map.of(
                 "sql", query,
                 "dialect", dialect.getHumanName()
             );
-            return new DetectorResult(/* detectedAttack*/ true, metadata, SQLInjectionException.get(dialect));
+            return new DetectorResult(true, metadata, SQLInjectionException.get(dialect));
         }
+
+        if (result == 3 && new BlockInvalidSqlEnv().getValue()) {
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("sql", query);
+            metadata.put("dialect", dialect.getHumanName());
+            metadata.put("failedToTokenize", "true");
+            return new DetectorResult(true, metadata, SQLInjectionException.get(dialect));
+        }
+
         return new DetectorResult();
     }
-    public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
+
+    public static int detectSqlInjection(String query, String userInput, Dialect dialect) {
         String queryLower = query.toLowerCase();
         String userInputLower = userInput.toLowerCase();
         if (shouldReturnEarly(queryLower, userInputLower)) {
-            return false;
+            return 0;
         }
         return RustSQLInterface.detectSqlInjection(queryLower, userInputLower, dialect);
     }

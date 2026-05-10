@@ -24,20 +24,19 @@ public final class RustSQLInterface {
         int detect_sql_injection(String query, long queryLen, String userinput, long userinputLen, int dialect);
     }
 
-    public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
+    public static int detectSqlInjection(String query, String userInput, Dialect dialect) {
         int dialectInteger = dialect.getDialectInteger();
         try {
             SqlLib lib = loadLibrary();
             if (lib != null) {
                 long queryLen = query != null ? query.getBytes(StandardCharsets.UTF_8).length : 0;
                 long userInputLen = userInput != null ? userInput.getBytes(StandardCharsets.UTF_8).length : 0;
-                int result = lib.detect_sql_injection(query, queryLen, userInput, userInputLen, dialectInteger);
-                return result == 1;
+                return lib.detect_sql_injection(query, queryLen, userInput, userInputLen, dialectInteger);
             }
         } catch (Throwable e) {
             logger.trace(e);
         }
-        return false;
+        return 0;
     }
     public static SqlLib loadLibrary() {
         String path = getPathForBinary();
