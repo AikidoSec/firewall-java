@@ -8,7 +8,7 @@ public class BlockedOutboundException extends AikidoException {
     }
 
     public static BlockedOutboundException get() {
-        String defaultMsg = generateDefaultMessage("an outbound request");
+        String defaultMsg = generateDefaultMessage("an outbound connection");
         return new BlockedOutboundException(defaultMsg);
     }
 }

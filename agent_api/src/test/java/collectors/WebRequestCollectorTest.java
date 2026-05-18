@@ -157,7 +157,7 @@ class WebRequestCollectorTest {
         contextObject.setIp("4.4.4.4");
         response = WebRequestCollector.report(contextObject);
         assertNotNull(response);
-        assertEquals("Your IP address is blocked. Reason: not in allowlist (Your IP: 4.4.4.4)", response.msg());
+        assertEquals("Your IP address is blocked. Reason: not allowed (Your IP: 4.4.4.4)", response.msg());
         assertEquals(403, response.status());
     }
 
