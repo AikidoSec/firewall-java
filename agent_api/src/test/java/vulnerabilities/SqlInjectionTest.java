@@ -357,6 +357,17 @@ public class SqlInjectionTest {
         );
     }
     @Test
+    public void testTrimmedUserInputBypass() {
+        // Attacker pads payload with trailing spaces; app trims before DB execution.
+        // The trimmed payload must still be detected (AIKIDO-OR0E0082).
+        isSqlInjection(
+                "INSERT INTO pets (name, owner) VALUES ('x', 'dummy'), ('injected', 'hacker'); --', 'owner')",
+                "x', 'dummy'), ('injected', 'hacker'); --    ",
+                "all"
+        );
+    }
+
+    @Test
     public void testLowercasedInputSqlInjection() {
         String sql = """
         SELECT id,

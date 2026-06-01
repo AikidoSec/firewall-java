@@ -35,11 +35,11 @@ public class SqlDetector implements Detector {
     }
     public static boolean detectSqlInjection(String query, String userInput, Dialect dialect) {
         String queryLower = query.toLowerCase();
-        String userInputLower = userInput.toLowerCase();
-        if (shouldReturnEarly(queryLower, userInputLower)) {
+        String userInputNormalized = userInput.toLowerCase().trim();
+        if (shouldReturnEarly(queryLower, userInputNormalized)) {
             return false;
         }
-        return RustSQLInterface.detectSqlInjection(queryLower, userInputLower, dialect);
+        return RustSQLInterface.detectSqlInjection(queryLower, userInputNormalized, dialect);
     }
     /**
      *     Input : Lowercased query and user_input.
