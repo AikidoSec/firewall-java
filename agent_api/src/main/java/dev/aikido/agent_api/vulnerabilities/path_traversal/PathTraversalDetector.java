@@ -30,7 +30,7 @@ public class PathTraversalDetector implements Detector {
             // Ignore cases where the user input is longer than the file path.
             return new DetectorResult();
         }
-        if (!filePath.contains(userInput)) {
+        if (!filePath.toLowerCase().contains(userInput.toLowerCase())) {
             // Ignore cases where the user input is not part of the file path.
             return new DetectorResult();
         }
