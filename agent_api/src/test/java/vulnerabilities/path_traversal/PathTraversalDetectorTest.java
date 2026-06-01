@@ -210,4 +210,11 @@ public class PathTraversalDetectorTest {
     public void testUserInputWithFilePathContainingSpaces() {
         assertNotAttack(PathTraversalDetector.INSTANCE.run("test file", new String[]{"directory/test file.txt"}));
     }
+
+    @Test
+    public void testCaseInsensitiveContainmentDetectsTraversal() {
+        assertAttack(PathTraversalDetector.INSTANCE.run("/ETC/passwd", new String[]{"/etc/passwd"}));
+        assertAttack(PathTraversalDetector.INSTANCE.run("/ETC/PASSWD", new String[]{"/etc/passwd"}));
+        assertAttack(PathTraversalDetector.INSTANCE.run("/HOME/USER/file.txt", new String[]{"/home/user/file.txt"}));
+    }
 }
