@@ -29,7 +29,7 @@ public final class WebResponseCollector {
         }
 
         // Check for attack waves
-        if (AttackWaveDetectorStore.check(context)) {
+        if (AttackWaveDetectorStore.check(context, statusCode)) {
             AttackQueue.add(
                 DetectedAttackWave.createAPIEvent(context)
             );

@@ -9,14 +9,14 @@ import static dev.aikido.agent_api.vulnerabilities.attack_wave_detection.PathChe
 public final class WebScanDetector {
     private WebScanDetector() {}
 
-    public static boolean isWebScanner(ContextObject ctx) {
+    public static boolean isWebScanner(ContextObject ctx, int statusCode) {
         String method = ctx.getMethod();
         if (method != null && isWebScanMethod(method)) {
             return true;
         }
 
         String route = ctx.getRoute();
-        if (route != null && isWebScanPath(route)) {
+        if (route != null && isWebScanPath(route, statusCode)) {
             return true;
         }
 

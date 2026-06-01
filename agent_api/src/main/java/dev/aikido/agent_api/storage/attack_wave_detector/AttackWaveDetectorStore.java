@@ -15,10 +15,10 @@ public final class AttackWaveDetectorStore {
     private AttackWaveDetectorStore() {
     }
 
-    public static boolean check(ContextObject ctx) {
+    public static boolean check(ContextObject ctx, int statusCode) {
         mutex.lock();
         try {
-            return detector.check(ctx);
+            return detector.check(ctx, statusCode);
         } catch (Throwable e) {
             logger.debug("An error occurred checking for attack waves: %s", e.getMessage());
             return false;

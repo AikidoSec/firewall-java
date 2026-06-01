@@ -18,7 +18,7 @@ public class PathCheckerTest {
         };
         for (String path : dangerousPaths) {
             assertTrue(
-                isWebScanPath(path),
+                isWebScanPath(path, 404),
                 "Expected '" + path + "' to be detected as a web scan path"
             );
         }
@@ -32,9 +32,33 @@ public class PathCheckerTest {
         };
         for (String path : safePaths) {
             assertFalse(
-                isWebScanPath(path),
+                isWebScanPath(path, 404),
                 "Expected '" + path + "' to NOT be detected as a web scan path"
             );
         }
+    }
+
+    @Test
+    void testForeignExtensions_404_ReturnsTrue() {
+        assertTrue(isWebScanPath("/admin.php", 404),
+            "php extension with 404 should be a scan path");
+        assertTrue(isWebScanPath("/config.php5", 404),
+            "php5 extension with 404 should be a scan path");
+        assertTrue(isWebScanPath("/index.php3", 404),
+            "php3 extension with 404 should be a scan path");
+        assertTrue(isWebScanPath("/index.php4", 404),
+            "php4 extension with 404 should be a scan path");
+        assertTrue(isWebScanPath("/page.phtml", 404),
+            "phtml extension with 404 should be a scan path");
+    }
+
+    @Test
+    void testForeignExtensions_200_ReturnsFalse() {
+        assertFalse(isWebScanPath("/admin.php", 200),
+            "php extension with 200 should NOT be a scan path (app may proxy to PHP backend)");
+        assertFalse(isWebScanPath("/config.php5", 200),
+            "php5 extension with 200 should NOT be a scan path");
+        assertFalse(isWebScanPath("/page.phtml", 200),
+            "phtml extension with 200 should NOT be a scan path");
     }
 }

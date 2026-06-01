@@ -21,7 +21,7 @@ class AttackWaveDetectorTest {
             ctx = new EmptySampleContextObject("../etc/passwd", "/wp-config.php", "BADMETHOD");
         }
         ctx.setIp(ip);
-        return detector.check(ctx);
+        return detector.check(ctx, 404);
     }
 
     @Test
@@ -129,13 +129,13 @@ class AttackWaveDetectorTest {
     @Test
     void testItRespectsSamplesLimit() {
         AttackWaveDetector detector = newAttackWaveDetector();
-        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "GET"));
-        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "GET"));
-        detector.check(new EmptySampleContextObject("", "/test2", "GET"));
-        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "POST"));
-        detector.check(new EmptySampleContextObject("", "/test3", "PUT"));
-        detector.check(new EmptySampleContextObject("", "/.env", "GET"));
-        detector.check(new EmptySampleContextObject("", "/test4", "BADMETHOD"));
+        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "GET"), 404);
+        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "GET"), 404);
+        detector.check(new EmptySampleContextObject("", "/test2", "GET"), 404);
+        detector.check(new EmptySampleContextObject("", "/../etc/passwd", "POST"), 404);
+        detector.check(new EmptySampleContextObject("", "/test3", "PUT"), 404);
+        detector.check(new EmptySampleContextObject("", "/.env", "GET"), 404);
+        detector.check(new EmptySampleContextObject("", "/test4", "BADMETHOD"), 404);
         assertArrayEquals(
             List.of(
                 new AttackWaveDetector.Sample("GET", "https://example.com/../etc/passwd"),

@@ -44,10 +44,11 @@ public class AttackWaveDetector {
     /**
      * Checks if the request is part of an attack wave.
      *
-     * @param ctx the context object to check.
+     * @param ctx        the context object to check.
+     * @param statusCode the HTTP response status code.
      * @return true if an attack wave is detected and should be reported.
      */
-    public boolean check(ContextObject ctx) {
+    public boolean check(ContextObject ctx, int statusCode) {
         String ip = ctx.getRemoteAddress();
         if (ip == null) {
             return false;
@@ -59,7 +60,7 @@ public class AttackWaveDetector {
             return false;
         }
 
-        if (!isWebScanner(ctx)) {
+        if (!isWebScanner(ctx, statusCode)) {
             return false;
         }
 

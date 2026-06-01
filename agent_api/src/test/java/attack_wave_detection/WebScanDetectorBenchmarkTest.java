@@ -19,9 +19,9 @@ class WebScanDetectorBenchmarkTest {
         int iterations = 25_000;
         long start = System.nanoTime();
         for (int i = 0; i < iterations; i++) {
-            WebScanDetector.isWebScanner(getTestContext("/wp-config.php", "GET", "1"));
-            WebScanDetector.isWebScanner(getTestContext("/vulnerable", "GET", "1'; DROP TABLE users; --"));
-            WebScanDetector.isWebScanner(getTestContext("/", "GET", "1"));
+            WebScanDetector.isWebScanner(getTestContext("/wp-config.php", "GET", "1"), 404);
+            WebScanDetector.isWebScanner(getTestContext("/vulnerable", "GET", "1'; DROP TABLE users; --"), 200);
+            WebScanDetector.isWebScanner(getTestContext("/", "GET", "1"), 200);
         }
         long end = System.nanoTime();
         double timePerCheck = (double) (end - start) / iterations / 3 / 1_000_000; // Convert nanoseconds to milliseconds
