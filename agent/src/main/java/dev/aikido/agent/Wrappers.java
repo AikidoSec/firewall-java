@@ -1,6 +1,11 @@
 package dev.aikido.agent;
 
 import dev.aikido.agent.wrappers.*;
+import dev.aikido.agent.wrappers.executor.AbstractExecutorServiceWrapper;
+import dev.aikido.agent.wrappers.executor.DelegatedExecutorServiceWrapper;
+import dev.aikido.agent.wrappers.executor.ForkJoinPoolWrapper;
+import dev.aikido.agent.wrappers.executor.ScheduledThreadPoolExecutorWrapper;
+import dev.aikido.agent.wrappers.executor.ThreadPoolExecutorWrapper;
 import dev.aikido.agent.wrappers.file.FileConstructorMultiArgumentWrapper;
 import dev.aikido.agent.wrappers.file.FileConstructorSingleArgumentWrapper;
 import dev.aikido.agent.wrappers.javalin.*;
@@ -9,6 +14,8 @@ import dev.aikido.agent.wrappers.spring.SpringMVCJavaxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringWebfluxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringControllerWrapper;
 import dev.aikido.agent.wrappers.spring.SpringMVCJakartaWrapper;
+import dev.aikido.agent.wrappers.spring.SpringMVCJavaxWrapper;
+import dev.aikido.agent.wrappers.spring.SpringWebfluxWrapper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +24,13 @@ public final class Wrappers {
     private Wrappers() {}
     public static final List<Wrapper> WRAPPERS = Arrays.asList(
             new PostgresWrapper(),
+
+            new DelegatedExecutorServiceWrapper(),
+            new ThreadPoolExecutorWrapper(),
+            new AbstractExecutorServiceWrapper(),
+            new ForkJoinPoolWrapper(),
+            new ScheduledThreadPoolExecutorWrapper(),
+
             new SpringMVCJakartaWrapper(),
             new SpringMVCJavaxWrapper(),
             new SpringWebfluxWrapper(),

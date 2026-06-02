@@ -6,6 +6,27 @@ spring_boot_postgres_app.add_payload("sql",
     safe_request=Request("/api/pets/create", body={"name": "Bobby"}),
     unsafe_request=Request("/api/pets/create", body={"name": "Malicious Pet', 'Gru from the Minions') -- "})
 )
+
+for endpoint in [
+    "completable-future-single",
+    "submit-callable",
+    "thread-pool-execute",
+    "fork-join-submit",
+    "scheduled-callable",
+    "spring-task-executor",
+    "spring-async-annotation",
+]:
+    spring_boot_postgres_app.add_payload(
+        f"sql async context propagation {endpoint}",
+        safe_request=Request(
+            f"/api/pets/create/async/{endpoint}",
+            body={"name": "Bobby"}
+        ),
+        unsafe_request=Request(
+            f"/api/pets/create/async/{endpoint}",
+            body={"name": "Malicious Pet', 'Gru from the Minions') -- "}
+        )
+    )
 spring_boot_postgres_app.add_payload("command injection",
     safe_request=Request("/api/commands/execute/Johnny", method='GET'),
     unsafe_request=Request("/api/commands/execute/%27%3B%20sleep%202%3B%20%23%20", method='GET'),
