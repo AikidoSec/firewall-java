@@ -13,6 +13,10 @@ public final class TrustedHosts {
 
     /** Checks if this hostname is trusted */
     public static boolean isTrustedHostname(String hostname) {
-        return Arrays.asList(trustedHosts).contains(hostname);
+        String normalized = hostname.toLowerCase();
+        if (normalized.endsWith(".")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        return Arrays.asList(trustedHosts).contains(normalized);
     }
 }
