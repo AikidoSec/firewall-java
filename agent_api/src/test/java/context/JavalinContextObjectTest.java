@@ -103,4 +103,18 @@ class JavalinContextObjectTest {
         assertEquals("user456", contextObject.getCookies().get("userId").get(0));
         assertEquals(2, contextObject.getCookies().size());
     }
+
+    @Test
+    void testConstructorStripsPortFromRawIp() {
+        JavalinContextObject contextObject = new JavalinContextObject(
+            "GET",
+            "http://example.com",
+            "109.132.232.101:58780",
+            new HashMap<>(),
+            new HashMap<>(),
+            new HashMap<>()
+        );
+
+        assertEquals("109.132.232.101", contextObject.getRemoteAddress());
+    }
 }

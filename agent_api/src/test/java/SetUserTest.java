@@ -1,6 +1,7 @@
 import dev.aikido.agent_api.SetUser;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.context.JavalinContextObject;
 import dev.aikido.agent_api.storage.UsersStore;
 import org.junit.jupiter.api.*;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -133,5 +134,26 @@ public class SetUserTest {
         SetUser.setUser(new SetUser.UserObject("ID", "Name"));
         assertFalse(out.capturedString().contains("SetUser")); // Should not contain SetUser class
         assertEquals(1, UsersStore.getUsersAsList().size());
+    }
+
+    @Test
+    void testSetUserUsesNormalizedIpFromContext() {
+        ContextObject contextObject = new JavalinContextObject(
+            "GET",
+            "http://example.com",
+            "109.132.232.101:58780",
+            new HashMap<>(),
+            new HashMap<>(),
+            new HashMap<>()
+        );
+
+        Context.set(contextObject);
+
+        SetUser.setUser(new SetUser.UserObject("admin", "Admin"));
+
+        assertNotNull(Context.get().getUser());
+        assertEquals("109.132.232.101", Context.get().getUser().lastIpAddress());
+
+        Context.reset();
     }
 }
