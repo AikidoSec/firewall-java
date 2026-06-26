@@ -2,6 +2,8 @@ package dev.aikido.agent_api.helpers.net;
 
 import java.util.regex.Pattern;
 
+import static dev.aikido.agent_api.helpers.extraction.IPV6BracketsHelper.removeIfExistsIPv6Brackets;
+
 /**
  * Validates IP Addresses
  * Copied over from : https://github.com/validatorjs/validator.js/blob/master/src/lib/isIP.js
@@ -57,6 +59,7 @@ public class IPValidator {
         if (str == null || str.isEmpty()) {
             return false;
         }
+        str = removeIfExistsIPv6Brackets(str);
         if (version == null || version.isEmpty()) {
             return isIP(str, "4") || isIP(str, "6");
         }

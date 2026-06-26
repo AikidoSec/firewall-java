@@ -6,20 +6,25 @@ import java.util.HashMap;
 import java.util.List;
 
 import static dev.aikido.agent_api.context.ContextObject.getHeader;
+import static dev.aikido.agent_api.helpers.extraction.IPV6BracketsHelper.removeIfExistsIPv6Brackets;
 
 public class ProxyForwardedParser {
     public static String getIpFromRequest(String rawIp, HashMap<String, List<String>> headers) {
+        String ip = rawIp;
+
         String ipHeader = getHeader(headers, getIpHeaderName());
         if (ipHeader != null && !ipHeader.isEmpty() && trustProxy()) {
             // Parse ip header and return the correct IP :
             String ipHeaderValue = extractIpFromHeader(ipHeader);
             if (ipHeaderValue != null) {
-                return ipHeaderValue;
+                ip = ipHeaderValue;
             }
         }
 
-        // If no valid IP was found, or if X-Forwarded-For was not present, default to raw ip:
-        return rawIp;
+        // Aikido core cannot handle the [ ] in the request's IP, so we parse them away here :
+        ip = removeIfExistsIPv6Brackets(ip);
+
+        return ip;
     }
 
     /**
