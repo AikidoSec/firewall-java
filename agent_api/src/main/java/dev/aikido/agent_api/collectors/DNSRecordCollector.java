@@ -39,22 +39,25 @@ public final class DNSRecordCollector {
             // Removing them here ensures each (hostname, port) pair is counted exactly once.
             Set<Integer> ports = PendingHostnamesStore.getAndRemove(hostname);
 
-            // The outbound-domains list is meant for hostnames, not raw IP literals.
-            // A private/internal IP literal passed straight to getAllByName (DNS-resolver
-            // bootstrap, service discovery connecting by IP, libraries building a private-IP
-            // matcher, ...) is not an outbound domain and would otherwise flood the
-            // "new outbound connection" feature. Skip recording those; SSRF/stored-SSRF and
-            // outbound-domain blocking below are unaffected.
-            boolean isPrivateIpLiteral = IsPrivateIP.isPrivateIp(hostname);
-            if (!isPrivateIpLiteral) {
-                if (!ports.isEmpty()) {
-                    for (int port : ports) {
-                        HostnamesStore.incrementHits(hostname, port);
-                    }
-                } else {
-                    // We still need to report a hit to the hostname for outbound domain blocking
-                    HostnamesStore.incrementHits(hostname, 0);
+            // Don't report private/internal IP literals as outbound connections, consistent
+            // with the other Zen agents. A raw private IP reaching getAllByName is infrastructure,
+            // not a real outbound domain: the Reactor Netty resolver bootstrap resolving the
+            // any-address/nameservers, service discovery connecting by IP, a library building a
+            // private-IP matcher, etc. We fully return so we also skip outbound blocking below;
+            // otherwise lockdown mode (blockNewOutgoingRequests) would block these internal
+            // resolutions and break the application. Real domains that resolve to private IPs are
+            // not literals, so they fall through and are still tracked and SSRF-checked.
+            if (IsPrivateIP.isPrivateIp(hostname)) {
+                return;
+            }
+
+            if (!ports.isEmpty()) {
+                for (int port : ports) {
+                    HostnamesStore.incrementHits(hostname, port);
                 }
+            } else {
+                // We still need to report a hit to the hostname for outbound domain blocking
+                HostnamesStore.incrementHits(hostname, 0);
             }
 
             // Block if the hostname is in the blocked domains list

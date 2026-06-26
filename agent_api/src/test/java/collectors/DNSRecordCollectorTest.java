@@ -278,4 +278,34 @@ public class DNSRecordCollectorTest {
         assertEquals(1, entries.length);
         assertEquals("1.1.1.1", entries[0].getHostname());
     }
+
+    @Test
+    public void testPrivateIpLiteralNotBlockedInLockdownMode() throws UnknownHostException {
+        // Lockdown (blockNewOutgoingRequests=true) blocks any host not on the allow list.
+        // A private IP literal must be fully ignored via early return, so it is neither
+        // recorded nor blocked; otherwise lockdown would break internal resolutions.
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
+        ));
+        InetAddress[] resolved = new InetAddress[]{InetAddress.getByName("10.0.0.0")};
+
+        assertDoesNotThrow(() -> DNSRecordCollector.report("10.0.0.0", resolved));
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+    }
+
+    @Test
+    public void testPrivateIpLiteralViaUrlInLockdownNotBlockedNorRecorded() throws UnknownHostException {
+        // http://10.0.0.1:8080 -> URLCollector registers pending port 8080, then
+        // getAllByName("10.0.0.1"). The private IP is fully ignored: not recorded, not blocked
+        // in lockdown, and the pending port is still consumed.
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
+        ));
+        PendingHostnamesStore.add("10.0.0.1", 8080);
+        InetAddress[] resolved = new InetAddress[]{InetAddress.getByName("10.0.0.1")};
+
+        assertDoesNotThrow(() -> DNSRecordCollector.report("10.0.0.1", resolved));
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+        assertTrue(PendingHostnamesStore.getPorts("10.0.0.1").isEmpty());
+    }
 }
