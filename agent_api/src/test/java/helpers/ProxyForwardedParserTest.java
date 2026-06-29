@@ -145,4 +145,73 @@ class ProxyForwardedParserTest {
         String result = getIpFromRequest("1.2.3.4", headers);
         assertEquals("5.6.7.8", result);
     }
+
+    @Test
+    void testGetIpFromRequest_RawIpWithIPv4Port() {
+        String result = getIpFromRequest("109.132.232.101:58780", new HashMap<>());
+        assertEquals("109.132.232.101", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_RawIpWithBracketedIPv6Port() {
+        String result = getIpFromRequest("[2001:db8::1]:443", new HashMap<>());
+        assertEquals("2001:db8::1", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_RawIpWithBracketedIPv6WithoutPort() {
+        String result = getIpFromRequest("[2001:db8::1]", new HashMap<>());
+        assertEquals("2001:db8::1", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_XForwardedForWithBracketedIPv6Port() {
+        headers.put("X-Forwarded-For", List.of("[2001:db8::1]:443, 203.0.113.5"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("2001:db8::1", result);
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "0")
+    void testGetIpFromRequest_TrustProxyFalseStillNormalizesRawIp() {
+        headers.put("X-Forwarded-For", List.of("1.2.3.4"));
+        String result = getIpFromRequest("109.132.232.101:58780", headers);
+        assertEquals("109.132.232.101", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_RawIpWithPlainIPv4() {
+        String result = getIpFromRequest("109.132.232.101", new HashMap<>());
+        assertEquals("109.132.232.101", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_RawIpWithPlainIPv6() {
+        String result = getIpFromRequest("2001:db8::1", new HashMap<>());
+        assertEquals("2001:db8::1", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_RawIpWithInvalidBracketedIpFallsBackToRawIp() {
+        String result = getIpFromRequest("[not-an-ip]", new HashMap<>());
+        assertEquals("[not-an-ip]", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_RawIpWithInvalidBracketedIpAndPortFallsBackToRawIp() {
+        String result = getIpFromRequest("[not-an-ip]:443", new HashMap<>());
+        assertEquals("[not-an-ip]:443", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_RawIpWithInvalidIPv4PortFallsBackToRawIp() {
+        String result = getIpFromRequest("not-an-ip:58780", new HashMap<>());
+        assertEquals("not-an-ip:58780", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_RawIpWithEmptyStringFallsBackToRawIp() {
+        String result = getIpFromRequest("", new HashMap<>());
+        assertEquals("", result);
+    }
 }

@@ -19,6 +19,11 @@ public class ProxyForwardedParser {
         }
 
         // If no valid IP was found, or if X-Forwarded-For was not present, default to raw ip:
+        String normalizedRawIp = normalizeIp(rawIp);
+        if (normalizedRawIp != null) {
+            return normalizedRawIp;
+        }
+
         return rawIp;
     }
 
@@ -35,19 +40,50 @@ public class ProxyForwardedParser {
         for (String ip: ips) {
             ip = ip.trim();
 
-            // Some proxies pass along port numbers inside x-forwarded-for :
-            if (ip.contains(":")) {
-                String[] ipParts = ip.split(":");
-                if (ipParts.length == 2 && IPValidator.isIP(ipParts[0])) {
-                    return ipParts[0];
-                }
-            }
-
-            // Continue to check the IPs :
-            if (IPValidator.isIP(ip)) {
-                return ip;
+            String normalizedIp = normalizeIp(ip);
+            if (normalizedIp != null) {
+                return normalizedIp;
             }
         }
+        return null;
+    }
+
+    private static String normalizeIp(String ip) {
+        if (ip == null || ip.isEmpty()) {
+            return null;
+        }
+
+        ip = ip.trim();
+
+        if (IPValidator.isIP(ip)) {
+            return ip;
+        }
+
+        if (ip.startsWith("[") && ip.endsWith("]")) {
+            String unwrappedIp = ip.substring(1, ip.length() - 1);
+            if (IPValidator.isIP(unwrappedIp)) {
+                return unwrappedIp;
+            }
+        }
+
+        if (ip.startsWith("[")) {
+            int closingBracket = ip.indexOf("]:");
+            if (closingBracket > 0) {
+                String unwrappedIp = ip.substring(1, closingBracket);
+                if (IPValidator.isIP(unwrappedIp)) {
+                    return unwrappedIp;
+                }
+            }
+        }
+
+        // Some proxies pass along port numbers with IP addresses :
+        if (ip.contains(":")) {
+            String[] ipParts = ip.split(":");
+            if (ipParts.length == 2 && IPValidator.isIP(ipParts[0], "4")) {
+                return ipParts[0];
+            }
+        }
+
         return null;
     }
 
