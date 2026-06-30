@@ -12,7 +12,6 @@ import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundExc
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
-import dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFException;
 
@@ -38,23 +37,13 @@ public final class DNSRecordCollector {
             // Consume pending ports recorded by URLCollector for this hostname.
             // Removing them here ensures each (hostname, port) pair is counted exactly once.
             Set<Integer> ports = PendingHostnamesStore.getAndRemove(hostname);
-
-            // The outbound-domains list is meant for hostnames, not raw IP literals.
-            // A private/internal IP literal passed straight to getAllByName (DNS-resolver
-            // bootstrap, service discovery connecting by IP, libraries building a private-IP
-            // matcher, ...) is not an outbound domain and would otherwise flood the
-            // "new outbound connection" feature. Skip recording those; SSRF/stored-SSRF and
-            // outbound-domain blocking below are unaffected.
-            boolean isPrivateIpLiteral = IsPrivateIP.isPrivateIp(hostname);
-            if (!isPrivateIpLiteral) {
-                if (!ports.isEmpty()) {
-                    for (int port : ports) {
-                        HostnamesStore.incrementHits(hostname, port);
-                    }
-                } else {
-                    // We still need to report a hit to the hostname for outbound domain blocking
-                    HostnamesStore.incrementHits(hostname, 0);
+            if (!ports.isEmpty()) {
+                for (int port : ports) {
+                    HostnamesStore.incrementHits(hostname, port);
                 }
+            } else {
+                // We still need to report a hit to the hostname for outbound domain blocking
+                HostnamesStore.incrementHits(hostname, 0);
             }
 
             // Block if the hostname is in the blocked domains list
