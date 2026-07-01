@@ -9,6 +9,8 @@ import dev.aikido.agent.wrappers.spring.SpringMVCJavaxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringWebfluxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringControllerWrapper;
 import dev.aikido.agent.wrappers.spring.SpringMVCJakartaWrapper;
+import dev.aikido.agent.wrappers.spring.SpringWebClientWrapper;
+import dev.aikido.agent.wrappers.spring.SpringWebClientRedirectWrapper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,11 +32,14 @@ public final class Wrappers {
             // SSRF/HTTP wrappers
             new HttpURLConnectionWrapper(),
             new InetAddressWrapper(),
+            new SocketChannelWrapper(),
             new HttpClientWrapper(),
             new HttpConnectionRedirectWrapper(),
             new HttpClientSendWrapper(),
             new OkHttpWrapper(),
             new ApacheHttpClientWrapper(),
+            new SpringWebClientWrapper(),
+            new SpringWebClientRedirectWrapper(),
 
             new PathWrapper(),
             new PathsWrapper(),

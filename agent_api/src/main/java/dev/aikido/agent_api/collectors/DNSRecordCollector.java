@@ -12,6 +12,7 @@ import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundExc
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFException;
 
@@ -26,30 +27,46 @@ import static dev.aikido.agent_api.storage.AttackQueue.attackDetected;
 public final class DNSRecordCollector {
     private DNSRecordCollector() {}
     private static final Logger logger = LogManager.getLogger(DNSRecordCollector.class);
-    private static final String OPERATION_NAME = "java.net.InetAddress.getAllByName";
+    private static final String INET_ADDRESS_OPERATION_NAME = "java.net.InetAddress.getAllByName";
+    private static final String SOCKET_CHANNEL_OPERATION_NAME = "java.nio.channels.SocketChannel.connect";
+
     public static void report(String hostname, InetAddress[] inetAddresses) {
+        // InetAddress.getAllByName() resolves everything in one call, so it's safe to consume.
+        process(hostname, inetAddresses, PendingHostnamesStore.getAndRemove(hostname), INET_ADDRESS_OPERATION_NAME);
+    }
+
+    // For clients that resolve their own DNS (e.g. Reactor Netty, used by Spring's WebClient) or
+    // connect straight to an IP literal. A single request can trigger multiple connect() calls to
+    // the same hostname (IPv4 then IPv6), so unlike report(), this peeks the pending port instead
+    // of consuming it - consuming on the first attempt would let a later attempt bypass SSRF.
+    public static void reportConnect(String hostname, InetAddress resolvedAddress) {
+        process(hostname, new InetAddress[]{resolvedAddress}, PendingHostnamesStore.getPorts(hostname), SOCKET_CHANNEL_OPERATION_NAME);
+    }
+
+    private static void process(String hostname, InetAddress[] inetAddresses, Set<Integer> ports, String operationName) {
         try {
             logger.trace("DNSRecordCollector called with %s & inet addresses: %s", hostname, List.of(inetAddresses));
 
             // store stats
-            StatisticsStore.registerCall("java.net.InetAddress.getAllByName", OperationKind.OUTGOING_HTTP_OP);
+            StatisticsStore.registerCall(operationName, OperationKind.OUTGOING_HTTP_OP);
 
-            // Consume pending ports recorded by URLCollector for this hostname.
-            // Removing them here ensures each (hostname, port) pair is counted exactly once.
-            Set<Integer> ports = PendingHostnamesStore.getAndRemove(hostname);
-            if (!ports.isEmpty()) {
-                for (int port : ports) {
-                    HostnamesStore.incrementHits(hostname, port);
+            // No pending port + private IP literal = infrastructure noise (Netty resolver bootstrap
+            // etc), not a real request - skip recording/blocking. SSRF checks below still run regardless.
+            if (!ports.isEmpty() || !IsPrivateIP.isPrivateIp(hostname)) {
+                if (!ports.isEmpty()) {
+                    for (int port : ports) {
+                        HostnamesStore.incrementHits(hostname, port);
+                    }
+                } else {
+                    // We still need to report a hit to the hostname for outbound domain blocking
+                    HostnamesStore.incrementHits(hostname, 0);
                 }
-            } else {
-                // We still need to report a hit to the hostname for outbound domain blocking
-                HostnamesStore.incrementHits(hostname, 0);
-            }
 
-            // Block if the hostname is in the blocked domains list
-            if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
-                logger.debug("Blocking DNS lookup for domain: %s", hostname);
-                throw BlockedOutboundException.get();
+                // Block if the hostname is in the blocked domains list
+                if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
+                    logger.debug("Blocking DNS lookup for domain: %s", hostname);
+                    throw BlockedOutboundException.get();
+                }
             }
 
             // Convert inetAddresses array to a List of IP strings :
@@ -62,7 +79,7 @@ public final class DNSRecordCollector {
             for (int port : ports) {
                 logger.debug("Hostname: %s, Port: %s, IPs: %s", hostname, port, ipAddresses);
 
-                Attack attack = SSRFDetector.run(hostname, port, ipAddresses, OPERATION_NAME);
+                Attack attack = SSRFDetector.run(hostname, port, ipAddresses, operationName);
                 if (attack == null) {
                     continue;
                 }
@@ -81,7 +98,7 @@ public final class DNSRecordCollector {
 
             // We don't need the context object to check for stored ssrf, but we do want to run this after our other
             // SSRF checks, making sure if it's a normal ssrf attack it gets reported like that.
-            Attack storedSsrfAttack = new StoredSSRFDetector().run(hostname, ipAddresses, OPERATION_NAME);
+            Attack storedSsrfAttack = new StoredSSRFDetector().run(hostname, ipAddresses, operationName);
             if (storedSsrfAttack != null) {
                 attackDetected(storedSsrfAttack, Context.get());
 

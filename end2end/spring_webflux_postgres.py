@@ -30,6 +30,13 @@ spring_webflux_postgres_app.add_payload(
     unsafe_request=Request("/api/commands/executeFromCookie", method='GET', headers={'Cookie': 'command=|sleep;command=|sleep'}),
 )
 
+# WebClient SSRF: query params are the taint source tracked for Spring WebFlux (the request
+# body isn't, see agent_api's SpringWebfluxContextObject).
+spring_webflux_postgres_app.add_payload("ssrf",
+    safe_request=Request("/api/request?url=https://aikido.dev/", method='GET'),
+    unsafe_request=Request("/api/request?url=http://localhost:5000", method='GET')
+)
+
 spring_webflux_postgres_app.test_all_payloads()
 spring_webflux_postgres_app.test_blocking()
 spring_webflux_postgres_app.test_rate_limiting()

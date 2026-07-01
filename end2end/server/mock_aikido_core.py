@@ -1,6 +1,6 @@
 import gzip
 
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, redirect
 import sys
 import os
 import json
@@ -143,6 +143,11 @@ def mock_reset():
     global events
     events = [] # Reset events
     return jsonify({})
+
+@app.route('/mock/redirect-to-metadata', methods=['GET'])
+def mock_redirect_to_metadata():
+    # Used to test redirect-based SSRF: a safe-looking URL that redirects to a private IP.
+    return redirect('http://169.254.169.254/latest/meta-data/', code=302)
 
 @app.route('/mock/set_protection', methods=['POST'])
 def mock_set_protection():

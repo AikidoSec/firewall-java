@@ -39,6 +39,9 @@ dependencies {
     testImplementation 'org.springframework:spring-web:5.3.20'
     testImplementation 'org.springframework:spring-webmvc:5.3.20'
     testImplementation 'org.springframework:spring-test:5.3.20'
+    // Spring WebFlux for WebClient
+    testImplementation 'org.springframework:spring-webflux:5.3.20'
+    testImplementation 'io.projectreactor.netty:reactor-netty-http:1.2.1'
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
