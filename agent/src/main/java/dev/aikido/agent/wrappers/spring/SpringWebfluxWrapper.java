@@ -55,6 +55,12 @@ public class SpringWebfluxWrapper implements Wrapper {
     public record SkipOnWrapper(Mono<Void> newReturnValue) {
     }
 
+    // Non-skip path result: carries the ContextObject alongside the response so onExit() can
+    // write it into Reactor's own Context (see ReactorAikidoContext), letting it survive
+    // scheduler hops before any WebClient call made while handling this request.
+    public record EnterResult(ServerHttpResponse res, ContextObject context) {
+    }
+
     public static class SpringWebfluxAdvice {
         @Advice.OnMethodEnter(skipOn = SkipOnWrapper.class, suppress = Throwable.class)
         public static Object onEnter(
@@ -94,7 +100,7 @@ public class SpringWebfluxWrapper implements Wrapper {
                 return new SkipOnWrapper(res.writeWith(Mono.just(dataBuffer)));
             }
 
-            return res; // Return to analyze status code in OnMethodExit.
+            return new EnterResult(res, context); // Return to analyze status code in OnMethodExit.
         }
 
         /** onExit()
@@ -105,16 +111,19 @@ public class SpringWebfluxWrapper implements Wrapper {
                 @Advice.Enter Object enterResult,
                 @Advice.Return(readOnly = false) Mono<Void> returnValue
         ) {
-            // enterResult can be two things : Either the SkipOnWrapper or the ServerHttpResponse
-            // ServerHttpResponse -> Extract status code.
+            // enterResult can be two things : Either the SkipOnWrapper or the EnterResult
+            // EnterResult -> Extract status code, write the context into Reactor's Context.
             // SkipOnWrapper -> we blocked a request (e.g. IP Blocking), and are returning the value below
             if (enterResult instanceof SkipOnWrapper wrapper && wrapper.newReturnValue() != null) {
                 returnValue = wrapper.newReturnValue();
-            } else if (enterResult instanceof ServerHttpResponse res) {
+            } else if (enterResult instanceof EnterResult er) {
                 // Report status code of response :
-                Integer statusCode = res.getRawStatusCode();
+                Integer statusCode = er.res() != null ? er.res().getRawStatusCode() : null;
                 if (statusCode != null) {
                     WebResponseCollector.report(statusCode);
+                }
+                if (returnValue != null) {
+                    returnValue = (Mono<Void>) ReactorAikidoContext.write(returnValue, er.context());
                 }
             }
         }

@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.context.ContextObject;
 import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.storage.PendingHostnamesStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
@@ -32,7 +33,8 @@ public final class DNSRecordCollector {
 
     public static void report(String hostname, InetAddress[] inetAddresses) {
         // InetAddress.getAllByName() resolves everything in one call, so it's safe to consume.
-        process(hostname, inetAddresses, PendingHostnamesStore.getAndRemove(hostname), INET_ADDRESS_OPERATION_NAME);
+        withCapturedContext(hostname, () ->
+                process(hostname, inetAddresses, PendingHostnamesStore.getAndRemove(hostname), INET_ADDRESS_OPERATION_NAME));
     }
 
     // For clients that resolve their own DNS (e.g. Reactor Netty, used by Spring's WebClient) or
@@ -40,7 +42,31 @@ public final class DNSRecordCollector {
     // the same hostname (IPv4 then IPv6), so unlike report(), this peeks the pending port instead
     // of consuming it - consuming on the first attempt would let a later attempt bypass SSRF.
     public static void reportConnect(String hostname, InetAddress resolvedAddress) {
-        process(hostname, new InetAddress[]{resolvedAddress}, PendingHostnamesStore.getPorts(hostname), SOCKET_CHANNEL_OPERATION_NAME);
+        withCapturedContext(hostname, () ->
+                process(hostname, new InetAddress[]{resolvedAddress}, PendingHostnamesStore.getPorts(hostname), SOCKET_CHANNEL_OPERATION_NAME));
+    }
+
+    // Restores the ContextObject captured when this hostname's pending entry was registered
+    // (PendingHostnamesStore is global, not thread-local) so SSRFDetector's Context.get() sees
+    // the request that actually triggered the outbound call, even if we're running on a
+    // different thread than the one that registered it.
+    private static void withCapturedContext(String hostname, Runnable action) {
+        ContextObject capturedContext = PendingHostnamesStore.getContext(hostname);
+        if (capturedContext == null) {
+            action.run();
+            return;
+        }
+        ContextObject previous = Context.get();
+        Context.set(capturedContext);
+        try {
+            action.run();
+        } finally {
+            if (previous != null) {
+                Context.set(previous);
+            } else {
+                Context.reset();
+            }
+        }
     }
 
     private static void process(String hostname, InetAddress[] inetAddresses, Set<Integer> ports, String operationName) {
