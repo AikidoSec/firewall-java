@@ -149,6 +149,14 @@ def mock_redirect_to_metadata():
     # Used to test redirect-based SSRF: a safe-looking URL that redirects to a private IP.
     return redirect('http://169.254.169.254/latest/meta-data/', code=302)
 
+@app.route('/mock/redirect-to-self', methods=['GET'])
+def mock_redirect_to_self():
+    # Same idea as /mock/redirect-to-metadata, but redirects to this server's own address
+    # (a private IP - localhost) instead of the unreachable-in-CI AWS metadata IP, so the
+    # request actually completes with a real 200 when the agent is disabled (required by
+    # test_payloads_safe_vs_unsafe) instead of hanging until timeout.
+    return redirect('http://localhost:5000/mock/reset', code=302)
+
 @app.route('/mock/set_protection', methods=['POST'])
 def mock_set_protection():
     req = request.get_json()
