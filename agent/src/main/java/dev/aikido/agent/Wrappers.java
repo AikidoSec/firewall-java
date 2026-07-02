@@ -33,6 +33,7 @@ public final class Wrappers {
             new HttpURLConnectionWrapper(),
             new InetAddressWrapper(),
             new SocketChannelWrapper(),
+            new NettySocketChannelWrapper(),
             new HttpClientWrapper(),
             new HttpConnectionRedirectWrapper(),
             new HttpClientSendWrapper(),
