@@ -11,7 +11,18 @@ dependencies {
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1' // spring 2 -> javax
     compileOnly 'io.projectreactor.netty:reactor-netty-http:1.2.1' // For Spring Webflux
     compileOnly 'io.javalin:javalin:6.4.0'
-    compileOnly 'org.springframework:spring-web:5.3.20'
+    compileOnly 'org.springframework:spring-web:5.3.49'
+
+    constraints {
+        implementation('org.springframework:spring-core:5.3.49')
+        implementation('org.springframework:spring-webmvc:6.2.11')
+        implementation('org.springframework:spring-beans:6.2.11')
+        implementation('org.springframework:spring-expression:6.2.11')
+        implementation('org.springframework:spring-context:6.2.11')
+        implementation('org.eclipse.jetty:jetty-server:12.0.33')
+        implementation('org.eclipse.jetty:jetty-http:12.0.33')
+        implementation('org.jetbrains.kotlin:kotlin-stdlib:2.4.20')
+    }
 }
 
 shadowJar {
