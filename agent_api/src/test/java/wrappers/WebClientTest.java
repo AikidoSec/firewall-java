@@ -24,11 +24,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * SpringWebClientWrapper (URLCollector.report on ExchangeFunction.exchange) and
  * SocketChannelWrapper (DNSRecordCollector.reportConnect on SocketChannel.connect) run on
  * different threads for a real WebClient call: the former on the subscribing thread, the
- * latter on Reactor Netty's own event-loop thread. PendingHostnamesStore/Context are
- * ThreadLocal, so a plain "Context.set() then webClient.block()" test can't observe both
- * halves together the way HttpURLConnectionTest can for a same-thread blocking client - that
- * only works in production because a real WebFlux request stays on one reactor-http-nio
- * thread throughout. So this file tests each wrapper's own contribution separately.
+ * latter on Reactor Netty's own event-loop thread. This file can't be a single cohesive test
+ * the way HttpURLConnectionTest is for a same-thread blocking client, and this isn't just a
+ * ThreadLocal limitation fixed by PendingHostnamesStore going global: the taint-context capture
+ * (ReactorAikidoContext) only gets written into Reactor's own Context by SpringWebfluxWrapper,
+ * which only fires for a *real* incoming WebFlux request - a bare "webClient.get()...block()"
+ * call made directly from a test, with no request behind it, never populates it, so the SSRF
+ * check silently no-ops and a real network call goes out (confirmed empirically: it hangs until
+ * timeout instead of getting blocked). A true end-to-end "WebClient in a Spring app, request
+ * gets blocked" test needs an actual running app - see spring_webflux_postgres.py's `ssrf`
+ * payload for that. This file instead tests each wrapper's own contribution in isolation.
  */
 public class WebClientTest {
     private static final WebClient webClient = WebClient.create();
