@@ -151,10 +151,8 @@ def mock_redirect_to_metadata():
 
 @app.route('/mock/redirect-to-self', methods=['GET'])
 def mock_redirect_to_self():
-    # Same idea as /mock/redirect-to-metadata, but redirects to this server's own address
-    # (a private IP - localhost) instead of the unreachable-in-CI AWS metadata IP, so the
-    # request actually completes with a real 200 when the agent is disabled (required by
-    # test_payloads_safe_vs_unsafe) instead of hanging until timeout.
+    # Like /mock/redirect-to-metadata, but redirects to a reachable private IP (itself) so
+    # disabled-agent runs get a real 200 instead of hanging on the unreachable metadata IP.
     return redirect('http://localhost:5000/mock/reset', code=302)
 
 @app.route('/mock/set_protection', methods=['POST'])

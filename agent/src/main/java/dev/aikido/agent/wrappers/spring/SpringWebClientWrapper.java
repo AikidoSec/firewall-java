@@ -12,16 +12,14 @@ import org.springframework.web.reactive.function.client.ClientRequest;
 import java.net.MalformedURLException;
 
 public class SpringWebClientWrapper implements Wrapper {
-    // Referenced by name (not by .class) in the matchers below: ExchangeFunction is only on
-    // the target application's classloader (spring-webflux is compileOnly here), not on the
-    // agent's own classloader, so a .class literal would throw NoClassDefFoundError at premain.
+    // Referenced by name, not .class: spring-webflux is compileOnly, so a .class literal would
+    // throw NoClassDefFoundError on the agent's own classloader at premain.
     private static final String EXCHANGE_FUNCTION_CLASS_NAME =
             "org.springframework.web.reactive.function.client.ExchangeFunction";
 
     public String getName() {
-        // Wrap exchange(ClientRequest) on ExchangeFunction, the interface every WebClient
-        // request goes through before Reactor Netty resolves/connects.
-        // https://docs.spring.io/spring-framework/docs/5.3.20/javadoc-api/org/springframework/web/reactive/function/client/ExchangeFunction.html
+        // exchange(ClientRequest) is the interface every WebClient request goes through before
+        // Reactor Netty resolves/connects.
         return SpringWebClientAdvice.class.getName();
     }
     public ElementMatcher<? super MethodDescription> getMatcher() {
@@ -40,8 +38,7 @@ public class SpringWebClientWrapper implements Wrapper {
             if (request == null || request.url() == null) {
                 return;
             }
-            // Report the URL before the request is sent, so DNSRecordCollector can match the
-            // DNS lookup that follows to this outgoing request.
+            // Register before sending, so DNSRecordCollector can match the DNS lookup that follows.
             URLCollector.report(request.url().toURL());
         }
     }

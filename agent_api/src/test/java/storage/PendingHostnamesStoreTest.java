@@ -33,10 +33,8 @@ public class PendingHostnamesStoreTest {
 
     @Test
     public void testUnboundedHostnamesDoNotGrowThreadLocalMapForever() {
-        // Regression test: entries added outside any incoming-request context (e.g. a
-        // WebClient call from a @Scheduled task) never get cleared by WebRequestCollector's
-        // per-request clear(). Adding well over the internal cap of distinct hostnames must
-        // not let the store grow unboundedly - the oldest, untouched entries get evicted.
+        // Entries outside an incoming-request context (e.g. a @Scheduled task) never get
+        // cleared otherwise - the oldest, untouched ones must get evicted instead.
         for (int i = 0; i < 2000; i++) {
             PendingHostnamesStore.add("host-" + i + ".example.com", 443);
         }
@@ -51,10 +49,8 @@ public class PendingHostnamesStoreTest {
 
     @Test
     public void testReadingAnEntryProtectsItFromEvictionWhileStillInUse() {
-        // A dual-stack connect sequence peeks the same hostname's entry more than once (e.g.
-        // IPv4 then IPv6 attempt), realistically with only a handful of unrelated hostnames
-        // registered on the same thread in between (well under the eviction cap) - not
-        // thousands. Each read counts as "recently used", so the entry survives that window.
+        // A dual-stack connect sequence peeks the same entry twice; each read must count as
+        // "recently used" so it survives unrelated hostnames being added in between.
         PendingHostnamesStore.add("dual-stack.example.com", 443);
 
         for (int i = 0; i < 10; i++) {

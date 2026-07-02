@@ -4,17 +4,12 @@ import java.util.*;
 
 /**
  * Thread-local bridge between URLCollector and DNSRecordCollector.
- * URLCollector records hostname+port here; DNSRecordCollector.report() (fed by
- * InetAddress.getAllByName(), which resolves everything in one call) reads and removes the
- * entry so each (hostname, port) pair is processed exactly once per DNS lookup.
- * DNSRecordCollector.reportConnect() (fed by SocketChannel.connect(), which fires once per
- * connect attempt) instead peeks the entry, since a single outbound request can trigger
- * multiple connect attempts to the same hostname (e.g. IPv4 then IPv6 for a dual-stack host).
- *
- * Entries are normally cleared per incoming request by WebRequestCollector, but a peeked
- * entry added outside any incoming-request context (e.g. a WebClient call from a @Scheduled
- * task) would never be cleared that way. Capped at MAX_ENTRIES per thread, evicting the least
- * recently used entry once exceeded, same bounded-LRU pattern as Hostnames.
+ * report() consumes the entry (InetAddress.getAllByName() resolves everything in one call);
+ * reportConnect() peeks it instead, since one request can trigger multiple connect() attempts
+ * to the same hostname (e.g. IPv4 then IPv6) and consuming would skip SSRF on later attempts.
+ * Capped at MAX_ENTRIES per thread with LRU eviction, same pattern as Hostnames - a peeked
+ * entry outside any incoming-request context (e.g. a @Scheduled task) never gets cleared
+ * otherwise.
  */
 public final class PendingHostnamesStore {
     private PendingHostnamesStore() {}

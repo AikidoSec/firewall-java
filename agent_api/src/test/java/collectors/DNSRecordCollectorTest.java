@@ -228,9 +228,7 @@ public class DNSRecordCollectorTest {
 
     @Test
     public void testPrivateIpLiteralWithNoPendingPortNotRecorded() {
-        // No pending port and the hostname is a private IP literal: infrastructure noise
-        // (e.g. Reactor Netty's resolver bootstrap resolving nameserver/bind addresses).
-        // Must not be recorded as an outbound hostname.
+        // Looks like infra noise (e.g. Reactor Netty's resolver bootstrap).
         Context.set(null);
         DNSRecordCollector.report("10.20.11.143", new InetAddress[]{inetAddress2});
         assertEquals(0, HostnamesStore.getHostnamesAsList().length);
@@ -238,8 +236,7 @@ public class DNSRecordCollectorTest {
 
     @Test
     public void testPrivateIpLiteralWithNoPendingPortNotBlockedInLockdown() {
-        // Lockdown mode (blockNewOutgoingRequests=true) must not block a private IP literal
-        // that has no pending port, otherwise it would break internal/infra resolutions.
+        // Must not break internal/infra resolutions even in lockdown mode.
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
         ));
@@ -252,9 +249,7 @@ public class DNSRecordCollectorTest {
 
     @Test
     public void testPrivateIpLiteralWithPendingPortStillRecordedAndBlockedInLockdown() {
-        // A private IP literal that DOES have a pending port came from a real outgoing
-        // request made through an instrumented client, not from infrastructure noise. It
-        // must still be recorded and still be subject to outbound blocking in lockdown mode.
+        // A pending port means a real request, not infra noise - still blocked in lockdown.
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
         ));
@@ -268,10 +263,7 @@ public class DNSRecordCollectorTest {
 
     @Test
     public void testSsrfStillDetectedForPrivateIpLiteralWithPendingPort() {
-        // Regression test: an attacker-supplied private IP literal (e.g. a webhook URL field
-        // pointing straight at 169.254.169.254) reaching a real outgoing request through an
-        // instrumented client must still be caught as SSRF. Earlier attempts at filtering
-        // private IP literals used an early return that accidentally skipped this check.
+        // Regression test for #310: its early return for the infra-noise case also skipped SSRF.
         ServiceConfigStore.updateBlocking(true);
         PendingHostnamesStore.add("169.254.169.254", 80);
         Context.set(new EmptySampleContextObject("http://169.254.169.254:80/latest/meta-data/"));
@@ -282,9 +274,7 @@ public class DNSRecordCollectorTest {
         assertEquals("Aikido Zen has blocked a server-side request forgery", exception.getMessage());
     }
 
-    // reportConnect(): used by SocketChannelWrapper for clients that resolve their own DNS
-    // (e.g. Reactor Netty, used by Spring's WebClient) instead of InetAddress.getAllByName(),
-    // reporting one resolved address per connect() attempt.
+    // reportConnect(): used by SocketChannelWrapper, one resolved address per connect() attempt.
 
     @Test
     public void testReportConnectRecordsHostnameWithPendingPort() {
@@ -300,18 +290,13 @@ public class DNSRecordCollectorTest {
 
     @Test
     public void testReportConnectDoesNotConsumePendingPort() {
-        // Unlike report(), reportConnect() must peek instead of consume: a single outbound
-        // request can trigger multiple connect() calls to the same hostname (e.g. trying the
-        // IPv4 then the IPv6 address of a dual-stack host), and each one must still see the
-        // pending port to be checked correctly.
+        // Unlike report(), must peek not consume - a dual-stack host connects twice (IPv4 then IPv6).
         PendingHostnamesStore.add("example.com", 443);
         Context.set(mock(ContextObject.class));
 
         DNSRecordCollector.reportConnect("example.com", inetAddress1);
         assertFalse(PendingHostnamesStore.getPorts("example.com").isEmpty());
 
-        // A second connect attempt (e.g. the IPv6 address) still sees the same pending port
-        // and records another hit, instead of falling back to port 0 or being skipped.
         DNSRecordCollector.reportConnect("example.com", inetAddress2);
         Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
         assertEquals(1, entries.length);
@@ -322,11 +307,8 @@ public class DNSRecordCollectorTest {
 
     @Test
     public void testSsrfDetectedOnEveryConnectAttemptForDualStackHostname() throws UnknownHostException {
-        // Regression test for a real bug found via e2e testing: "localhost" resolves to both
-        // 127.0.0.1 and ::1, and Reactor Netty tries both addresses via separate connect()
-        // calls. With a naive getAndRemove() the first attempt would consume the pending port
-        // and the second attempt would silently skip the SSRF check, letting the request
-        // through despite the first attempt having been blocked.
+        // Regression test (found via e2e): a naive getAndRemove() let the second (IPv6) connect
+        // attempt for "localhost" bypass SSRF after the first (IPv4) attempt consumed the port.
         InetAddress loopbackIPv6 = InetAddress.getByName("::1");
         ServiceConfigStore.updateBlocking(true);
         PendingHostnamesStore.add("localhost", 5000);
@@ -342,9 +324,7 @@ public class DNSRecordCollectorTest {
 
     @Test
     public void testReportConnectPrivateIpLiteralWithNoPendingPortNotRecorded() {
-        // Same private-IP-literal infrastructure-noise filtering as report(), but for the
-        // reportConnect() path: a literal IP with no pending port (e.g. a raw socket connect
-        // Reactor Netty makes that we never asked for) must not be recorded.
+        // Same infra-noise filtering as report(), for the reportConnect() path.
         Context.set(null);
         DNSRecordCollector.reportConnect("10.20.11.143", inetAddress2);
         assertEquals(0, HostnamesStore.getHostnamesAsList().length);
@@ -362,14 +342,10 @@ public class DNSRecordCollectorTest {
 
     @Test
     public void testSsrfDetectedForRedirectToPrivateIp() throws Exception {
-        // Regression test: a WebClient call to a user-supplied, safe-looking URL that redirects
-        // to a private IP must still be caught, even though the redirect target itself never
-        // has a pending port (SpringWebClientWrapper only sees the original request).
-        // RedirectCollector.report() (called by SpringWebClientRedirectWrapper for each redirect
-        // hop) records the chain so SSRFDetector's PrivateIPRedirectFinder fallback can trace the
-        // private-IP target back to the tainted origin.
-        // Uses attacker-supplied.test rather than example.com since EmptySampleContextObject's
-        // own server URL defaults to example.com, which would collide with the origin hostname.
+        // Redirect targets never get a pending port directly; PrivateIPRedirectFinder traces
+        // back to the tainted origin via the chain RedirectCollector.report() records.
+        // attacker-supplied.test, not example.com: EmptySampleContextObject's own URL defaults
+        // to example.com, which would collide with the origin hostname here.
         ServiceConfigStore.updateBlocking(true);
         PendingHostnamesStore.add("attacker-supplied.test", 80);
         Context.set(new EmptySampleContextObject("http://attacker-supplied.test/redirect-me"));

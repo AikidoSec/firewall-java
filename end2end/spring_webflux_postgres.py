@@ -37,9 +37,7 @@ spring_webflux_postgres_app.add_payload("ssrf",
     unsafe_request=Request("/api/request?url=http://localhost:5000", method='GET')
 )
 
-# WebClient SSRF via redirect: a safe-looking URL that redirects to a private IP. Exercises
-# SpringWebClientRedirectWrapper specifically - without it, the redirect target is invisible to
-# the agent entirely (see PR description for details).
+# WebClient SSRF via redirect: exercises SpringWebClientRedirectWrapper specifically.
 spring_webflux_postgres_app.add_payload("ssrf via redirect",
     safe_request=Request("/api/request/follow-redirects?url=https://aikido.dev/", method='GET'),
     unsafe_request=Request("/api/request/follow-redirects?url=http://localhost:5000/mock/redirect-to-self", method='GET')

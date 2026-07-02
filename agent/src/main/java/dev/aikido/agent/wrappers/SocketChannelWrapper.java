@@ -17,12 +17,8 @@ import java.nio.channels.SocketChannel;
 
 public class SocketChannelWrapper implements Wrapper {
     public String getName() {
-        // Wrap connect(SocketAddress) on SocketChannel. Clients that resolve hostnames with
-        // their own DNS resolver instead of InetAddress.getAllByName() (e.g. Reactor Netty's
-        // async resolver, used by default by Spring's WebClient) never trigger
-        // InetAddressWrapper, so this is the only point where we see the resolved address
-        // before the connection is made. Also catches literal IP targets, which never go
-        // through any resolver at all.
+        // Catches clients with their own DNS resolver (e.g. Reactor Netty) that never trigger
+        // InetAddressWrapper, plus literal IP targets that skip resolution entirely.
         // https://docs.oracle.com/javase/8/docs/api/java/nio/channels/SocketChannel.html#connect-java.net.SocketAddress-
         return SocketChannelAdvice.class.getName();
     }

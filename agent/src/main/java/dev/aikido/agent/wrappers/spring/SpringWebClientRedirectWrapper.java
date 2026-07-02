@@ -13,13 +13,10 @@ import java.lang.reflect.Method;
 import java.net.URL;
 
 public class SpringWebClientRedirectWrapper implements Wrapper {
-    // Package-private in Reactor Netty, referenced by name only. This is the internal method
-    // that runs once per redirect hop, for both WebClient and the Netty-backed RestClient -
-    // Spring's own request-adaptation layer (ExchangeFunction/ReactorClientHttpRequest) is
-    // only invoked once per top-level call and never sees redirect targets for bodiless (e.g.
-    // GET) requests, since Reactor Netty resends internally without going back through it.
-    // Mirrors HttpConnectionRedirectWrapper, which hooks the JDK's equally-internal
-    // followRedirect0 for the same reason.
+    // Package-private in Reactor Netty, referenced by name only. Spring's own layer
+    // (ExchangeFunction) never sees redirect targets for bodiless requests - Reactor Netty
+    // resends internally without going back through it - so this internal method is the only
+    // place redirects are visible. Mirrors HttpConnectionRedirectWrapper's followRedirect0 hook.
     private static final String HTTP_CLIENT_HANDLER_CLASS_NAME =
             "reactor.netty.http.client.HttpClientConnect$HttpClientHandler";
 
@@ -38,9 +35,8 @@ public class SpringWebClientRedirectWrapper implements Wrapper {
     public static class RedirectAdvice {
         @Advice.OnMethodExit(suppress = Throwable.class)
         public static void after(@Advice.This Object handler) throws Exception {
-            // fromURI/toURI are UriEndpoint (also package-private), both reassigned by
-            // redirect() before this advice runs: fromURI is the hostname that redirected,
-            // toURI is where it redirected to.
+            // fromURI/toURI (package-private UriEndpoint fields) are reassigned by redirect()
+            // right before this runs: fromURI is the origin, toURI the redirect target.
             String origin = externalForm(handler, "fromURI");
             String dest = externalForm(handler, "toURI");
             if (origin == null || dest == null) {
