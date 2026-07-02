@@ -1,15 +1,17 @@
 package dev.aikido.agent.wrappers.spring;
 
 import dev.aikido.agent.wrappers.Wrapper;
-import dev.aikido.agent_api.collectors.URLCollector;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.springframework.web.reactive.function.client.ClientRequest;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import reactor.core.publisher.Mono;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 
 public class SpringWebClientWrapper implements Wrapper {
     // Referenced by name (not by .class) in the matchers below: ExchangeFunction is only on
@@ -33,16 +35,21 @@ public class SpringWebClientWrapper implements Wrapper {
         return ElementMatchers.hasSuperType(ElementMatchers.named(EXCHANGE_FUNCTION_CLASS_NAME));
     }
     public static class SpringWebClientAdvice {
-        @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static void before(
-                @Advice.Argument(0) ClientRequest request
+        // Registration happens in onExit, wrapped around the returned Mono via
+        // deferContextual(), rather than eagerly in onEnter. That way it runs at subscribe
+        // time, reading back whatever ContextObject SpringWebfluxWrapper wrote into Reactor's
+        // Context (see ReactorAikidoContext) - reliable regardless of scheduler hops between
+        // the incoming request and this WebClient call, unlike Context.get()'s ThreadLocal.
+        @Advice.OnMethodExit(suppress = Throwable.class)
+        public static void after(
+                @Advice.Argument(0) ClientRequest request,
+                @Advice.Return(readOnly = false) Mono<ClientResponse> returnValue
         ) throws MalformedURLException {
-            if (request == null || request.url() == null) {
+            if (request == null || request.url() == null || returnValue == null) {
                 return;
             }
-            // Report the URL before the request is sent, so DNSRecordCollector can match the
-            // DNS lookup that follows to this outgoing request.
-            URLCollector.report(request.url().toURL());
+            URL url = request.url().toURL();
+            returnValue = (Mono<ClientResponse>) ReactorAikidoContext.deferRegisterUrl(returnValue, url);
         }
     }
 }

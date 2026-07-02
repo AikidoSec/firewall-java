@@ -5,7 +5,6 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
-import java.lang.reflect.Method;
 import java.net.*;
 
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
@@ -50,13 +49,9 @@ public class HttpURLConnectionWrapper implements Wrapper {
             // Load the class from the JAR
             Class<?> clazz = classLoader.loadClass("dev.aikido.agent_api.collectors.URLCollector");
 
-            // Run report with "argument"
-            for (Method method2: clazz.getMethods()) {
-                if(method2.getName().equals("report")) {
-                    method2.invoke(null, url);
-                    break;
-                }
-            }
+            // report(URL) is overloaded (also has a report(URL, ContextObject) variant), so it
+            // must be looked up by exact signature - matching by name alone could pick either.
+            clazz.getMethod("report", URL.class).invoke(null, url);
             classLoader.close(); // Close the class loader
         }
     }

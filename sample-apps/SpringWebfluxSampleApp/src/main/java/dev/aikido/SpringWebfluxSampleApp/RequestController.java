@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
 
 @RestController
@@ -45,6 +46,17 @@ public class RequestController {
                 .onErrorResume(e -> isAikidoBlock(e)
                         ? Mono.error(e)
                         : Mono.just("Error: " + e.getMessage()));
+    }
+
+    // Exercises a scheduler hop (a common pattern for mixing blocking JDBC with reactive
+    // controllers) BEFORE the WebClient call, to test whether ThreadLocal-based taint/port
+    // correlation survives moving off the original reactor-http-nio thread. Unverified
+    // hypothesis, see PR #312 worklog item 2.
+    @GetMapping("/publish-on")
+    public Mono<String> makeRequestWithSchedulerHop(@RequestParam String url) {
+        return Mono.just(url)
+                .publishOn(Schedulers.boundedElastic())
+                .flatMap(this::makeRequestInternal);
     }
 
     private Mono<String> makeRequestInternal(String url) {
