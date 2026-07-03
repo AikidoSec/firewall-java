@@ -135,4 +135,42 @@ class TokenTest {
         Token token = new Token(mixedCaseToken);
         assertEquals(mixedCaseToken, token.get());
     }
+
+    @Test
+    void getRegion_shouldReturnRegion_forNewFormatToken() {
+        Token token = new Token("AIK_RUNTIME_1_2_US_random");
+        assertEquals("US", token.getRegion());
+    }
+
+    @Test
+    void getRegion_shouldReturnEU_forOldFormatToken() {
+        Token token = new Token("AIK_RUNTIME_1_2_random");
+        assertEquals("EU", token.getRegion());
+    }
+
+    @Test
+    void getRegion_shouldReturnEU_forNonRuntimeToken() {
+        Token token = new Token("some-other-token");
+        assertEquals("EU", token.getRegion());
+    }
+
+    @Test
+    void extractRegionFromToken_shouldReturnEU_whenTokenIsNull() {
+        assertEquals("EU", Token.extractRegionFromToken(null));
+    }
+
+    @Test
+    void extractRegionFromToken_shouldReturnEU_whenTokenIsEmpty() {
+        assertEquals("EU", Token.extractRegionFromToken(""));
+    }
+
+    @Test
+    void extractRegionFromToken_shouldReturnRegion_forME() {
+        assertEquals("ME", Token.extractRegionFromToken("AIK_RUNTIME_1_2_ME_random"));
+    }
+
+    @Test
+    void extractRegionFromToken_shouldReturnRegion_forAU() {
+        assertEquals("AU", Token.extractRegionFromToken("AIK_RUNTIME_1_2_AU_random"));
+    }
 }

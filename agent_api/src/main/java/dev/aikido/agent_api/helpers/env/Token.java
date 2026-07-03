@@ -26,6 +26,27 @@ public class Token {
     }
 
     /**
+     * Extracts the region from a runtime token.
+     * New format: AIK_RUNTIME_{sys_group_id}_{service_id}_{region}_{random}
+     * Old format: AIK_RUNTIME_{sys_group_id}_{service_id}_{random}
+     */
+    public static String extractRegionFromToken(String token) {
+        if (token == null || !token.startsWith("AIK_RUNTIME_")) {
+            return "EU";
+        }
+        String tokenWithoutPrefix = token.substring("AIK_RUNTIME_".length());
+        String[] parts = tokenWithoutPrefix.split("_");
+        if (parts.length == 4) {
+            return parts[2];
+        }
+        return "EU";
+    }
+
+    public String getRegion() {
+        return extractRegionFromToken(token);
+    }
+
+    /**
      * Hashes the token with SHA-256 and returns the hashed bytes in a hex representation (alphanum)
      */
     public String hash() {
