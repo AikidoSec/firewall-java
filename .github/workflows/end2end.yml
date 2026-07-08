@@ -51,6 +51,11 @@ jobs:
           - { name: SpringBootHyperSQL, test_file: end2end/spring_boot_hypersql.py, db: "" }
         java-version: [17, 18, 19, 20, 21, 24, 25]
         distribution: ['adopt', 'corretto', 'oracle']
+        exclude:
+          # Spring Boot 2.7 uses the legacy javax stack and does not support JDK 25;
+          # keep this app on Java 17-24 only (its javax coverage stays exercised there).
+          - app: { name: SpringBoot2.7Postgres, test_file: end2end/spring_boot_2.7_postgres.py, db: postgres_database }
+            java-version: 25
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
