@@ -31,8 +31,8 @@ public class Agent {
             logger.error("Zen by Aikido requires Java 17 or newer. Current version: %d. The agent will not be loaded.", javaVersion);
             return;
         }
-        if (javaVersion > 24) {
-            logger.error("Zen by Aikido does not support Java %d (max supported version: 24). The agent will not be loaded.", javaVersion);
+        if (javaVersion > 25) {
+            logger.error("Zen by Aikido does not support Java %d (max supported version: 25). The agent will not be loaded.", javaVersion);
             return;
         }
         logger.info("Zen by Aikido v%s starting.", Config.pkgVersion);
