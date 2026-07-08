@@ -8,6 +8,10 @@ plugins {
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
+// Spring Boot 3.4.1 manages an older Groovy 4.0.x whose ASM can't run on JDK 25;
+// Groovy 4.0.27+ adds Java 25 support.
+ext['groovy.version'] = '4.0.28'
+
 java {
 	sourceCompatibility = '17'
 	targetCompatibility = '17'

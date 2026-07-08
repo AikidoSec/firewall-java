@@ -1,11 +1,11 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id 'com.gradleup.shadow' version '9.5.1'
 }
 
 dependencies {
     implementation project(':agent_api')
-    implementation 'net.bytebuddy:byte-buddy:1.15.11'
+    implementation 'net.bytebuddy:byte-buddy:1.18.11'
     // Compile only for interface types :
     compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0' // spring 3 -> jakarta
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1' // spring 2 -> javax
