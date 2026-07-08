@@ -55,8 +55,12 @@ public class ProxyForwardedParser {
 
         ip = ip.trim();
 
-        if (IPValidator.isIP(ip)) {
-            return ip;
+        // Some proxies pass along port numbers with IPv4 addresses: ip:port
+        if (ip.contains(":")) {
+            String[] ipParts = ip.split(":");
+            if (ipParts.length == 2 && IPValidator.isIP(ipParts[0], "4")) {
+                return ipParts[0];
+            }
         }
 
         if (ip.startsWith("[") && ip.endsWith("]")) {
@@ -76,12 +80,8 @@ public class ProxyForwardedParser {
             }
         }
 
-        // Some proxies pass along port numbers with IP addresses :
-        if (ip.contains(":")) {
-            String[] ipParts = ip.split(":");
-            if (ipParts.length == 2 && IPValidator.isIP(ipParts[0], "4")) {
-                return ipParts[0];
-            }
+        if (IPValidator.isIP(ip)) {
+            return ip;
         }
 
         return null;
