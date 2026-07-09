@@ -73,7 +73,25 @@ To activate Zen you then just have to add the following `-javaagent` to your Jav
 ```
 java -javaagent:/opt/zen/agent.jar -jar build/myapp.jar
 ```
-Replace `/opt/zen` with your directory of choice.
+Replace `/opt/zen` with your directory of choice. Keep `agent.jar` together with the `binaries` folder from the
+release - if you copy `agent.jar` into a different location or a different Docker build stage, copy the whole
+directory, not just the jar. Without `binaries`, SQL injection detection is disabled.
+
+<details>
+<summary>Seeing <code>System::load has been called ... in an unnamed module</code> on Java 22+?</summary>
+
+This warning is safe to ignore for now - SQL injection detection still works, since `--illegal-native-access`
+still defaults to `warn`, not `deny`, on Java 25.
+
+To get rid of it, add `--enable-native-access=ALL-UNNAMED` to your Java command, or set it through the
+`JDK_JAVA_OPTIONS` environment variable so you don't have to touch your existing startup command:
+```
+java --enable-native-access=ALL-UNNAMED -javaagent:/opt/zen/agent.jar -jar build/myapp.jar
+```
+```
+JDK_JAVA_OPTIONS=--enable-native-access=ALL-UNNAMED
+```
+</details>
 
 To use user-blocking and/or rate-limiting features, you will have to include the following Jarfile into your repository
 ### Gradle
