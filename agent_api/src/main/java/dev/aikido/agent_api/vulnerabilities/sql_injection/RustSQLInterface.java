@@ -41,8 +41,18 @@ public final class RustSQLInterface {
     }
     public static SqlLib loadLibrary() {
         String path = getPathForBinary();
-        if (path == null || !Files.exists(Path.of(path))) {
-            logger.error("Could not load zen binaries used for SQL Injection algorithm. Path: %s", path);
+        if (path == null) {
+            logger.error("Could not load zen binaries: AIK_agent_dir is not set. SQL injection detection is disabled.");
+            return null;
+        }
+        Path binariesDir = Path.of(path).getParent();
+        if (binariesDir == null || !Files.isDirectory(binariesDir)) {
+            logger.error("Could not load zen binaries: the 'binaries' directory is missing (%s). Copy it next to " +
+                    "agent.jar - check if a build step (e.g. Docker COPY) left it out. SQL injection detection is disabled.", binariesDir);
+            return null;
+        }
+        if (!Files.exists(Path.of(path))) {
+            logger.error("Could not load zen binaries: file not found: %s. SQL injection detection is disabled.", path);
             return null;
         }
         Map<LibraryOption, Object> libraryOptions = new HashMap<>();
