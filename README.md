@@ -80,8 +80,8 @@ directory, not just the jar. Without `binaries`, SQL injection detection is disa
 <details>
 <summary>Seeing <code>System::load has been called ... in an unnamed module</code> on Java 22+?</summary>
 
-This warning (and similar ones about restricted/deprecated methods) is safe to ignore for now - Zen keeps working,
-since `--illegal-native-access` still defaults to `warn`, not `deny`, on Java 25.
+This warning is safe to ignore for now - SQL injection detection still works, since `--illegal-native-access`
+still defaults to `warn`, not `deny`, on Java 25.
 
 To get rid of it, add `--enable-native-access=ALL-UNNAMED` to your Java command, or set it through the
 `JDK_JAVA_OPTIONS` environment variable so you don't have to touch your existing startup command:
