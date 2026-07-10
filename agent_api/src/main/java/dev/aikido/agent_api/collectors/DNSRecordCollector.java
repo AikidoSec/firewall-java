@@ -12,6 +12,7 @@ import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundExc
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFException;
 
@@ -27,6 +28,7 @@ public final class DNSRecordCollector {
     private DNSRecordCollector() {}
     private static final Logger logger = LogManager.getLogger(DNSRecordCollector.class);
     private static final String OPERATION_NAME = "java.net.InetAddress.getAllByName";
+
     public static void report(String hostname, InetAddress[] inetAddresses) {
         try {
             logger.trace("DNSRecordCollector called with %s & inet addresses: %s", hostname, List.of(inetAddresses));
@@ -37,12 +39,9 @@ public final class DNSRecordCollector {
             // Consume pending ports recorded by URLCollector for this hostname.
             // Removing them here ensures each (hostname, port) pair is counted exactly once.
             Set<Integer> ports = PendingHostnamesStore.getAndRemove(hostname);
-            if (!ports.isEmpty()) {
-                for (int port : ports) {
-                    HostnamesStore.incrementHits(hostname, port);
-                }
-            } else {
-                // We still need to report a hit to the hostname for outbound domain blocking
+            // URLCollector already recorded known-port hits. This is the fallback for hostnames
+            // it never saw (JDBC, raw sockets, ...) - skip only private IP literals, infra noise.
+            if (ports.isEmpty() && !IsPrivateIP.isPrivateIp(hostname)) {
                 HostnamesStore.incrementHits(hostname, 0);
             }
 

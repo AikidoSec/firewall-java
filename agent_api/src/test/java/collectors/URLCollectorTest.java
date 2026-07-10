@@ -2,6 +2,7 @@ package collectors;
 
 import dev.aikido.agent_api.collectors.URLCollector;
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.Hostnames;
 import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.storage.PendingHostnamesStore;
 import org.junit.jupiter.api.AfterAll;
@@ -93,11 +94,13 @@ public class URLCollectorTest {
     }
 
     @Test
-    public void testOnlyPendingStore() throws IOException {
+    public void testRecordsHitAtTheCallSite() throws IOException {
         setContextAndLifecycle("");
         URLCollector.report(new URL("https://aikido.dev"));
-        // HostnamesStore is only written by DNSRecordCollector, not URLCollector
-        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(1, entries.length);
+        assertEquals("aikido.dev", entries[0].getHostname());
+        assertEquals(443, entries[0].getPort());
         Set<Integer> ports = PendingHostnamesStore.getPorts("aikido.dev");
         assertEquals(1, ports.size());
         assertTrue(ports.contains(443));
