@@ -44,9 +44,8 @@ jobs:
                   cp firewall-java/.github/workflows/Dockerfile.qa zen-demo-java/Dockerfile
 
             - name: Run Firewall QA Tests
-              uses: AikidoSec/firewall-tester-action@v1.0.0
+              uses: AikidoSec/firewall-tester-action@v1.0.12
               with:
                   dockerfile_path: ./zen-demo-java/Dockerfile
                   app_port: 8080
                   sleep_before_test: 30
-                  skip_tests: test_ssrf,test_demo_apps_generic_tests

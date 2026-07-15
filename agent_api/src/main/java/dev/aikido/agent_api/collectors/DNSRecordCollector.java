@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.collectors;
 
 import dev.aikido.agent_api.context.Context;
+import dev.aikido.agent_api.storage.BypassedContextStore;
 import dev.aikido.agent_api.storage.HostnamesStore;
 import dev.aikido.agent_api.storage.PendingHostnamesStore;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
@@ -34,20 +35,24 @@ public final class DNSRecordCollector {
             // store stats
             StatisticsStore.registerCall("java.net.InetAddress.getAllByName", OperationKind.OUTGOING_HTTP_OP);
 
+            boolean bypassed = BypassedContextStore.isBypassed();
+
             // Consume pending ports recorded by URLCollector for this hostname.
             // Removing them here ensures each (hostname, port) pair is counted exactly once.
             Set<Integer> ports = PendingHostnamesStore.getAndRemove(hostname);
-            if (!ports.isEmpty()) {
-                for (int port : ports) {
-                    HostnamesStore.incrementHits(hostname, port);
+            if (!bypassed) {
+                // Bypassed IPs are trusted — don't report their outbound hostnames in heartbeats.
+                if (!ports.isEmpty()) {
+                    for (int port : ports) {
+                        HostnamesStore.incrementHits(hostname, port);
+                    }
+                } else {
+                    HostnamesStore.incrementHits(hostname, 0);
                 }
-            } else {
-                // We still need to report a hit to the hostname for outbound domain blocking
-                HostnamesStore.incrementHits(hostname, 0);
             }
 
             // Block if the hostname is in the blocked domains list
-            if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
+            if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname) && !bypassed) {
                 logger.debug("Blocking DNS lookup for domain: %s", hostname);
                 throw BlockedOutboundException.get();
             }

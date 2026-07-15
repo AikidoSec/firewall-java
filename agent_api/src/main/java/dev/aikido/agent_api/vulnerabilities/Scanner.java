@@ -50,6 +50,8 @@ public final class Scanner {
                     break;
                 }
             }
+        } catch (AikidoException ae) {
+            exception = Optional.of(ae);
         } catch (Throwable e) {
             logger.debug(e);
         }
