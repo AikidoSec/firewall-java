@@ -2,15 +2,13 @@ package dev.aikido.agent_api.helpers.net;
 
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-
-import java.util.HashSet;
-import java.util.Set;
+import inet.ipaddr.format.util.DualIPv4v6Tries;
 
 public class IPList {
-    private Set<IPAddress> ipAddresses;
+    private final DualIPv4v6Tries ipAddresses;
 
     public IPList() {
-        this.ipAddresses = new HashSet<>();
+        this.ipAddresses = new DualIPv4v6Tries();
     }
 
     public void add(String ipOrCIDR) {
@@ -56,12 +54,7 @@ public class IPList {
     }
 
     private boolean containsAddress(IPAddress ipAddress) {
-        for (IPAddress subnet : ipAddresses) {
-            if (subnet.contains(ipAddress)) {
-                return true;
-            }
-        }
-        return false;
+        return ipAddresses.elementContains(ipAddress);
     }
     public int length() {
         return ipAddresses.size();
