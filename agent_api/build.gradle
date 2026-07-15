@@ -41,6 +41,13 @@ dependencies {
     testImplementation 'org.springframework:spring-test:5.3.20'
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+
+    // Version constraints for transitive dependencies
+    constraints {
+        implementation('org.eclipse.jetty:jetty-server:12.0.33')
+        implementation('org.eclipse.jetty:jetty-http:12.0.33')
+        implementation('org.jetbrains.kotlin:kotlin-stdlib:2.4.20')
+    }
 }
 
 test {
