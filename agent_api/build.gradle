@@ -46,7 +46,6 @@ dependencies {
 test {
     jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
     jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
-    jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
     jvmArgs '-Dnet.bytebuddy.experimental=true' // Mockito support.
 
     systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
@@ -63,6 +62,13 @@ test {
     }
     jacoco {
         enabled = true
+    }
+    doFirst {
+        // JaCoCo's javaagent must load before our own agent.jar. Our agent registers a
+        // retransformation-capable ByteBuddy transformer; if it loads first, JaCoCo silently
+        // stops recording coverage for almost every class, not just the ones we instrument.
+        jvmArgs jacoco.getAsJvmArg(), "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
+        jacoco.enabled = false
     }
 }
 
