@@ -214,4 +214,30 @@ class ProxyForwardedParserTest {
         String result = getIpFromRequest("", new HashMap<>());
         assertEquals("", result);
     }
+
+    @Test
+    void testGetIpFromRequest_IPv4WithMultiplePortColonsFallsBackToRawIp() {
+        headers.put("X-Forwarded-For", List.of("1.2.3.4:80:90"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("10.0.0.1", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_IPv4PortResolvesWithoutTouchingLaterEntries() {
+        headers.put("X-Forwarded-For", List.of("203.0.113.7:54321, 8.8.8.8"));
+        String result = getIpFromRequest("10.0.0.1", headers);
+        assertEquals("203.0.113.7", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_BracketedIPv4Resolves() {
+        String result = getIpFromRequest("[1.2.3.4]", new HashMap<>());
+        assertEquals("1.2.3.4", result);
+    }
+
+    @Test
+    void testGetIpFromRequest_BracketedIpWithTrailingGarbageFallsBackToRawIp() {
+        String result = getIpFromRequest("[::1]foo", new HashMap<>());
+        assertEquals("[::1]foo", result);
+    }
 }
