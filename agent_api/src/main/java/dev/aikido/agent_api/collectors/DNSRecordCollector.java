@@ -12,6 +12,7 @@ import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundExc
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFException;
 
@@ -41,12 +42,12 @@ public final class DNSRecordCollector {
                 for (int port : ports) {
                     HostnamesStore.incrementHits(hostname, port);
                 }
-            } else {
-                // We still need to report a hit to the hostname for outbound domain blocking
+            } else if (!IsPrivateIP.isPrivateIp(hostname)) {
+                // Literal IPs reach this sink without a real DNS call, so skip private ones as noise.
                 HostnamesStore.incrementHits(hostname, 0);
             }
 
-            // Block if the hostname is in the blocked domains list
+            // Checked here, not at the HTTP client, since not all clients are instrumented and port/context isn't always available.
             if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
                 logger.debug("Blocking DNS lookup for domain: %s", hostname);
                 throw BlockedOutboundException.get();
