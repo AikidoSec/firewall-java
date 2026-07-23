@@ -47,7 +47,7 @@ public final class DNSRecordCollector {
                 HostnamesStore.incrementHits(hostname, 0);
             }
 
-            // Block if the hostname is in the blocked domains list
+            // Checked here, not at the HTTP client, since not all clients are instrumented and port/context isn't always available.
             if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
                 logger.debug("Blocking DNS lookup for domain: %s", hostname);
                 throw BlockedOutboundException.get();
