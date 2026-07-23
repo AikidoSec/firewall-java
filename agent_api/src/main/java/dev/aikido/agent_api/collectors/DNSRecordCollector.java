@@ -43,7 +43,7 @@ public final class DNSRecordCollector {
                     HostnamesStore.incrementHits(hostname, port);
                 }
             } else if (!IsPrivateIP.isPrivateIp(hostname)) {
-                // We still need to report a hit to the hostname for outbound domain blocking
+                // Literal IPs reach this sink without a real DNS call, so skip private ones as noise.
                 HostnamesStore.incrementHits(hostname, 0);
             }
 
