@@ -12,6 +12,7 @@ import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundExc
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFException;
 
@@ -41,7 +42,7 @@ public final class DNSRecordCollector {
                 for (int port : ports) {
                     HostnamesStore.incrementHits(hostname, port);
                 }
-            } else {
+            } else if (!IsPrivateIP.isPrivateIp(hostname)) {
                 // We still need to report a hit to the hostname for outbound domain blocking
                 HostnamesStore.incrementHits(hostname, 0);
             }

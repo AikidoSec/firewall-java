@@ -204,6 +204,62 @@ public class DNSRecordCollectorTest {
     }
 
     @Test
+    public void testPrivateIpLiteralWithNoPendingPortNotRecorded() {
+        Context.set(null);
+        DNSRecordCollector.report("10.20.11.143", new InetAddress[]{inetAddress2});
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+    }
+
+    @Test
+    public void testPrivateIpLiteralWithNoPendingPortNotRecordedButBlockedInLockdown() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
+        ));
+        Context.set(null);
+        assertThrows(BlockedOutboundException.class, () ->
+            DNSRecordCollector.report("10.20.11.143", new InetAddress[]{inetAddress2})
+        );
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+    }
+
+    @Test
+    public void testPrivateIpLiteralWithPendingPortStillRecordedAndBlockedInLockdown() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
+        ));
+        PendingHostnamesStore.add("10.20.11.143", 443);
+        Context.set(mock(ContextObject.class));
+
+        assertThrows(BlockedOutboundException.class, () ->
+            DNSRecordCollector.report("10.20.11.143", new InetAddress[]{inetAddress2})
+        );
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(1, entries.length);
+        assertEquals(443, entries[0].getPort());
+    }
+
+    @Test
+    public void testSsrfStillDetectedForPrivateIpLiteralWithPendingPort() {
+        ServiceConfigStore.updateBlocking(true);
+        PendingHostnamesStore.add("169.254.169.254", 80);
+        Context.set(new EmptySampleContextObject("http://169.254.169.254:80/latest/meta-data/"));
+
+        Exception exception = assertThrows(SSRFException.class, () ->
+            DNSRecordCollector.report("169.254.169.254", new InetAddress[]{imdsAddress1})
+        );
+        assertEquals("Aikido Zen has blocked a server-side request forgery", exception.getMessage());
+    }
+
+    @Test
+    public void testNamedHostnameResolvingToPrivateIpWithNoPendingPortStillRecorded() {
+        Context.set(null);
+        DNSRecordCollector.report("internal-service.local", new InetAddress[]{inetAddress2});
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(1, entries.length);
+        assertEquals("internal-service.local", entries[0].getHostname());
+    }
+
+    @Test
     public void testStoredSSRFWithNoContext() throws InterruptedException {
         ServiceConfigStore.updateBlocking(true);
 
