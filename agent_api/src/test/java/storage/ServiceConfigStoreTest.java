@@ -58,4 +58,18 @@ public class ServiceConfigStoreTest {
         ));
         assertTrue(ServiceConfigStore.shouldBlockOutgoingRequest("unknown.com"));
     }
+
+    @Test
+    public void testIsRealtimeUpdatesEnabledFalseByDefault() {
+        assertFalse(ServiceConfigStore.isRealtimeUpdatesEnabled());
+    }
+
+    @Test
+    public void testIsRealtimeUpdatesEnabledTrueWhenEnabled() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+                true, null, 0L, null, null, null,
+                false, null, true, false, null, List.of("realtime_updates")
+        ));
+        assertTrue(ServiceConfigStore.isRealtimeUpdatesEnabled());
+    }
 }

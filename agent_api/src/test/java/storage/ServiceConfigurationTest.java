@@ -665,4 +665,58 @@ public class ServiceConfigurationTest {
         assertTrue(resultBlocked.blocked());
         assertFalse(resultNotAllowedLocal.blocked());
     }
+
+    @Test
+    public void testIsRealtimeUpdatesEnabledDefaultsFalse() {
+        assertFalse(serviceConfiguration.isRealtimeUpdatesEnabled());
+    }
+
+    @Test
+    public void testUpdateConfigWithNullEnabledFeaturesDoesNotThrow() {
+        APIResponse apiResponse = new APIResponse(
+                true, null, 0L, null, null, null,
+                false, null, true, false, null, null
+        );
+        assertDoesNotThrow(() -> serviceConfiguration.updateConfig(apiResponse));
+        assertFalse(serviceConfiguration.isRealtimeUpdatesEnabled());
+    }
+
+    @Test
+    public void testIsRealtimeUpdatesEnabledTrueWhenPresent() {
+        APIResponse apiResponse = new APIResponse(
+                true, null, 0L, null, null, null,
+                false, null, true, false, null, List.of("realtime_updates")
+        );
+        serviceConfiguration.updateConfig(apiResponse);
+
+        assertTrue(serviceConfiguration.isRealtimeUpdatesEnabled());
+    }
+
+    @Test
+    public void testIsRealtimeUpdatesEnabledFalseWhenRemoved() {
+        APIResponse enabled = new APIResponse(
+                true, null, 0L, null, null, null,
+                false, null, true, false, null, List.of("realtime_updates")
+        );
+        serviceConfiguration.updateConfig(enabled);
+        assertTrue(serviceConfiguration.isRealtimeUpdatesEnabled());
+
+        APIResponse disabled = new APIResponse(
+                true, null, 0L, null, null, null,
+                false, null, true, false, null, List.of()
+        );
+        serviceConfiguration.updateConfig(disabled);
+        assertFalse(serviceConfiguration.isRealtimeUpdatesEnabled());
+    }
+
+    @Test
+    public void testIsRealtimeUpdatesEnabledFalseForUnrelatedFeature() {
+        APIResponse apiResponse = new APIResponse(
+                true, null, 0L, null, null, null,
+                false, null, true, false, null, List.of("some_other_feature")
+        );
+        serviceConfiguration.updateConfig(apiResponse);
+
+        assertFalse(serviceConfiguration.isRealtimeUpdatesEnabled());
+    }
 }
