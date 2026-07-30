@@ -1,11 +1,13 @@
 package dev.aikido.agent_api.background;
 
 import dev.aikido.agent_api.background.cloud.RealtimeAPI;
+import dev.aikido.agent_api.background.cloud.RealtimeSSEAPI;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApi;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.background.cloud.api.events.Started;
 import dev.aikido.agent_api.helpers.env.BlockingEnv;
+import dev.aikido.agent_api.helpers.env.FeatureFlags;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
@@ -56,5 +58,9 @@ public class BackgroundProcess extends Thread {
 
         // one time check to report initial stats
         scheduler.schedule(new HeartbeatTask(api, true), 60, TimeUnit.SECONDS);
+
+        if (token != null && FeatureFlags.AIKIDO_FEATURE_SSE.isEnabled()) {
+            new RealtimeSSETask(new RealtimeSSEAPI(token), api).start();
+        }
     }
 }
