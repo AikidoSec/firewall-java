@@ -260,6 +260,42 @@ public class DNSRecordCollectorTest {
     }
 
     @Test
+    public void testPublicIpLiteralWithNoPendingPortNotRecorded() {
+        Context.set(null);
+        DNSRecordCollector.report("8.8.8.8", new InetAddress[]{inetAddress1});
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+    }
+
+    @Test
+    public void testPublicIpv6LiteralWithNoPendingPortNotRecorded() {
+        Context.set(null);
+        DNSRecordCollector.report("2606:4700:4700::1111", new InetAddress[]{inetAddress1});
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+    }
+
+    @Test
+    public void testPublicIpLiteralWithPendingPortStillRecorded() {
+        PendingHostnamesStore.add("8.8.8.8", 443);
+        Context.set(mock(ContextObject.class));
+        DNSRecordCollector.report("8.8.8.8", new InetAddress[]{inetAddress1});
+        Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
+        assertEquals(1, entries.length);
+        assertEquals(443, entries[0].getPort());
+    }
+
+    @Test
+    public void testPublicIpLiteralWithNoPendingPortNotRecordedButBlockedInLockdown() {
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+            true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
+        ));
+        Context.set(null);
+        assertThrows(BlockedOutboundException.class, () ->
+            DNSRecordCollector.report("8.8.8.8", new InetAddress[]{inetAddress1})
+        );
+        assertEquals(0, HostnamesStore.getHostnamesAsList().length);
+    }
+
+    @Test
     public void testStoredSSRFWithNoContext() throws InterruptedException {
         ServiceConfigStore.updateBlocking(true);
 
