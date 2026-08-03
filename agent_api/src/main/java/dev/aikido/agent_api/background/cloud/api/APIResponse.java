@@ -16,6 +16,23 @@ public record APIResponse(
         List<Domain> domains,
         boolean receivedAnyStats,
         boolean block,
-        List<String> excludedUserIdsFromRateLimiting
+        List<String> excludedUserIdsFromRateLimiting,
+        List<String> enabledFeatures
 ) {
+    public APIResponse(
+            boolean success,
+            String error,
+            long configUpdatedAt,
+            List<Endpoint> endpoints,
+            List<String> blockedUserIds,
+            List<String> allowedIPAddresses,
+            boolean blockNewOutgoingRequests,
+            List<Domain> domains,
+            boolean receivedAnyStats,
+            boolean block,
+            List<String> excludedUserIdsFromRateLimiting
+    ) {
+        this(success, error, configUpdatedAt, endpoints, blockedUserIds, allowedIPAddresses, blockNewOutgoingRequests,
+                domains, receivedAnyStats, block, excludedUserIdsFromRateLimiting, List.of());
+    }
 }

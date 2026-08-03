@@ -41,6 +41,15 @@ public final class ServiceConfigStore {
         }
     }
 
+    public static boolean isRealtimeUpdatesEnabled() {
+        mutex.readLock().lock();
+        try {
+            return config.isRealtimeUpdatesEnabled();
+        } finally {
+            mutex.readLock().unlock();
+        }
+    }
+
     public static void updateFromAPIResponse(APIResponse apiResponse) {
         mutex.writeLock().lock();
         try {

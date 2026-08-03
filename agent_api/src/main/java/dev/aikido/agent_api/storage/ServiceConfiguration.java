@@ -25,6 +25,7 @@ public class ServiceConfiguration {
     private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
     private HashSet<String> excludedUserIdsFromRateLimiting = new HashSet<>();
+    private HashSet<String> enabledFeatures = new HashSet<>();
     private List<Endpoint> endpoints = new ArrayList<>();
     private OutboundDomains outboundDomains = new OutboundDomains();
 
@@ -47,6 +48,9 @@ public class ServiceConfiguration {
         if (apiResponse.excludedUserIdsFromRateLimiting() != null) {
             this.excludedUserIdsFromRateLimiting = new HashSet<>(apiResponse.excludedUserIdsFromRateLimiting());
         }
+        if (apiResponse.enabledFeatures() != null) {
+            this.enabledFeatures = new HashSet<>(apiResponse.enabledFeatures());
+        }
         if (apiResponse.endpoints() != null) {
             this.endpoints = apiResponse.endpoints();
         }
@@ -56,6 +60,10 @@ public class ServiceConfiguration {
 
     public boolean isBlockingEnabled() {
         return blockingEnabled;
+    }
+
+    public boolean isRealtimeUpdatesEnabled() {
+        return enabledFeatures.contains("realtime_updates");
     }
 
     public void setBlocking(boolean block) {

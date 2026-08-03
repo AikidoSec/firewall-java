@@ -59,8 +59,10 @@ public class BackgroundProcess extends Thread {
         // one time check to report initial stats
         scheduler.schedule(new HeartbeatTask(api, true), 60, TimeUnit.SECONDS);
 
-        if (token != null && FeatureFlags.AIKIDO_FEATURE_SSE.isEnabled()) {
-            new RealtimeSSETask(new RealtimeSSEAPI(token), api).start();
+        if (token != null) {
+            if (FeatureFlags.AIKIDO_FEATURE_SSE.isEnabled() || ServiceConfigStore.isRealtimeUpdatesEnabled()) {
+                new RealtimeSSETask(new RealtimeSSEAPI(token), api).start();
+            }
         }
     }
 }
