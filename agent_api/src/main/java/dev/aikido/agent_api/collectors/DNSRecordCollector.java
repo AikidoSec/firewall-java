@@ -12,7 +12,7 @@ import dev.aikido.agent_api.vulnerabilities.outbound_blocking.BlockedOutboundExc
 import dev.aikido.agent_api.vulnerabilities.ssrf.SSRFException;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
-import dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP;
+import dev.aikido.agent_api.helpers.net.IPValidator;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFDetector;
 import dev.aikido.agent_api.vulnerabilities.ssrf.StoredSSRFException;
 
@@ -42,8 +42,9 @@ public final class DNSRecordCollector {
                 for (int port : ports) {
                     HostnamesStore.incrementHits(hostname, port);
                 }
-            } else if (!IsPrivateIP.isPrivateIp(hostname)) {
-                // Literal IPs reach this sink without a real DNS call, so skip private ones as noise.
+            } else if (!IPValidator.isIP(hostname)) {
+                // Skip literal IPs with no pending port: usually inbound IP parsing rather than an outbound request,
+                // and we can't tell them apart here. A real outbound one still hits the blocking/SSRF checks below.
                 HostnamesStore.incrementHits(hostname, 0);
             }
 
