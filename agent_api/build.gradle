@@ -41,6 +41,10 @@ dependencies {
     testImplementation 'org.springframework:spring-test:5.3.20'
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+
+    constraints {
+        implementation('org.jetbrains.kotlin:kotlin-stdlib:2.1.0')
+    }
 }
 
 test {
