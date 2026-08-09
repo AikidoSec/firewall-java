@@ -49,6 +49,7 @@ jobs:
           - { name: JavalinMySQLKotlin, test_file: end2end/javalin_mysql_kotlin.py, db: mysql_database }
           - { name: SpringBoot2.7Postgres, test_file: end2end/spring_boot_2.7_postgres.py, db: postgres_database }
           - { name: SpringBootHyperSQL, test_file: end2end/spring_boot_hypersql.py, db: "" }
+          - { name: RingClojurePostgres, test_file: end2end/ring_clojure_postgres.py, db: postgres_database }
         java-version: [17, 18, 19, 20, 21, 24, 25]
         distribution: ['adopt', 'corretto', 'oracle']
         exclude:
@@ -81,6 +82,12 @@ jobs:
           docker compose up --build -d ${{ matrix.app.db }}
       - name: Install Python dependencies
         run: python -m pip install -r end2end/requirements.txt
+
+      - name: Install Leiningen
+        if: matrix.app.name == 'RingClojurePostgres'
+        run: |
+          curl -sSL -o /usr/local/bin/lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+          chmod +x /usr/local/bin/lein
 
       - name: Build Application (ensures cache)
         working-directory: ./sample-apps/${{ matrix.app.name }}
