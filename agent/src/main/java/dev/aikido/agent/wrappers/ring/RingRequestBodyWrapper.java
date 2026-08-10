@@ -8,7 +8,6 @@ import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
-import jakarta.servlet.http.HttpServletRequest;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -41,7 +40,7 @@ public class RingRequestBodyWrapper implements Wrapper {
     @Override
     public ElementMatcher<? super TypeDescription> getTypeMatcher() {
         return nameContains("org.eclipse.jetty.ee9.nested")
-                .and(isSubTypeOf(HttpServletRequest.class));
+                .and(hasSuperType(named("jakarta.servlet.http.HttpServletRequest")));
     }
 
     // Must be public: Advice bytecode is inlined into the instrumented class itself, which
