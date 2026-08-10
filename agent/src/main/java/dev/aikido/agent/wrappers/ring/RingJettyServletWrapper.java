@@ -24,13 +24,6 @@ import java.util.List;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
-/**
- * Populates request context for Ring apps served through ring-jetty-adapter (Jetty 12/EE9),
- * which dispatches requests through a subclass of ServletHandler overriding doHandle(...).
- * Body capture lives in RingRequestBodyWrapper instead: Clojure's proxy-generated doHandle
- * boxes its arguments for delegation, so reassigning the request argument here never reaches
- * Ring's own handler.
- */
 public class RingJettyServletWrapper implements Wrapper {
     public static final Logger logger = LogManager.getLogger(RingJettyServletWrapper.class);
 

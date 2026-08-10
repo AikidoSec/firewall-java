@@ -19,11 +19,6 @@ import java.nio.charset.StandardCharsets;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
-/**
- * Captures the request body for Jetty EE9's HttpServletRequest and attaches it (best-effort
- * JSON parsed) to the ContextObject RingJettyServletWrapper already stored for this thread.
- * Ring calls getInputStream() once per request, so draining and replacing it here is safe.
- */
 public class RingRequestBodyWrapper implements Wrapper {
     public static final Logger logger = LogManager.getLogger(RingRequestBodyWrapper.class);
 
@@ -43,8 +38,6 @@ public class RingRequestBodyWrapper implements Wrapper {
                 .and(hasSuperType(named("jakarta.servlet.http.HttpServletRequest")));
     }
 
-    // Must be public: Advice bytecode is inlined into the instrumented class itself, which
-    // can't access a private nested class from a different top-level class (IllegalAccessError).
     public static class BufferedServletInputStream extends ServletInputStream {
         private final ByteArrayInputStream backing;
 
