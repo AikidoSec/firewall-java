@@ -5,6 +5,8 @@ import dev.aikido.agent.wrappers.file.FileConstructorMultiArgumentWrapper;
 import dev.aikido.agent.wrappers.file.FileConstructorSingleArgumentWrapper;
 import dev.aikido.agent.wrappers.javalin.*;
 import dev.aikido.agent.wrappers.jdbc.*;
+import dev.aikido.agent.wrappers.ring.RingJettyServletWrapper;
+import dev.aikido.agent.wrappers.ring.RingRequestBodyWrapper;
 import dev.aikido.agent.wrappers.spring.SpringMVCJavaxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringWebfluxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringControllerWrapper;
@@ -42,6 +44,8 @@ public final class Wrappers {
             new JavalinDataWrapper(),
             new JavalinContextClearWrapper(),
             new SQLiteWrapper(),
-            new HyperSQLWrapper()
+            new HyperSQLWrapper(),
+            new RingJettyServletWrapper(),
+            new RingRequestBodyWrapper()
     );
 }

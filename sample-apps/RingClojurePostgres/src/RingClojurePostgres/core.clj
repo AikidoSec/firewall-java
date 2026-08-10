@@ -91,4 +91,5 @@
 
 (defn -main
     [& args]
-    (run-jetty app {:port 8102 :join? false}))
+    (let [port (if-let [p (System/getenv "PORT")] (Integer/parseInt p) 8102)]
+        (run-jetty app {:port port :join? false})))
