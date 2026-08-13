@@ -10,9 +10,6 @@ java {
     targetCompatibility = '17'
 }
 
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     implementation 'org.restlet:org.restlet:2.6.0'

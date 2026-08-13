@@ -7,7 +7,6 @@ settings.pluginManagement {
 }
 
 settings.dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         maven { url = uri('https://maven-central.storage-download.googleapis.com/maven2/') }
         mavenCentral()

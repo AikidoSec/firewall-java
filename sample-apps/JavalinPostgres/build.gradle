@@ -11,9 +11,6 @@ java {
     targetCompatibility = '17'
 }
 
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     implementation files('../../dist/agent_api.jar')
