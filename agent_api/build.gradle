@@ -64,8 +64,8 @@ test {
         enabled = true
     }
     doFirst {
-        // Load JaCoCo before our agent so it can track classes from the start.
-        // Otherwise, some tested code may incorrectly appear uncovered.
+        // JaCoCo starts tracking a class when Java loads it.
+        // Our agent loads agent_api classes, so JaCoCo must start first.
         jvmArgs jacoco.getAsJvmArg(), "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
         jacoco.enabled = false
     }
