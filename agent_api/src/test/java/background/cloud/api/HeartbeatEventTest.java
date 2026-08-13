@@ -55,7 +55,7 @@ public class HeartbeatEventTest {
         ServiceConfigStore.setMiddlewareInstalled(false);
 
         // Act
-        Heartbeat.HeartbeatEvent event = Heartbeat.get(stats, hostnames.asArray(), routes, users);
+        Heartbeat.HeartbeatEvent event = Heartbeat.get(stats, hostnames.asArray(), routes, users, Collections.emptyList());
 
         // Assert
         assertEquals("heartbeat", event.type());
@@ -68,7 +68,7 @@ public class HeartbeatEventTest {
 
         // Test middleware installed as well :
         ServiceConfigStore.setMiddlewareInstalled(true);
-        Heartbeat.HeartbeatEvent event2 = Heartbeat.get(stats, hostnames.asArray(), routes, users);
+        Heartbeat.HeartbeatEvent event2 = Heartbeat.get(stats, hostnames.asArray(), routes, users, Collections.emptyList());
         assertTrue(event2.middlewareInstalled());
     }
 }
