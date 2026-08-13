@@ -1,5 +1,6 @@
 settings.pluginManagement {
     repositories {
+        // Avoid blocked Maven Central locally and 429 errors in CI.
         maven { url = uri('https://maven-central.storage-download.googleapis.com/maven2/') }
         gradlePluginPortal()
         mavenCentral()
@@ -8,6 +9,7 @@ settings.pluginManagement {
 
 settings.dependencyResolutionManagement {
     repositories {
+        // Avoid blocked Maven Central locally and 429 errors in CI.
         maven { url = uri('https://maven-central.storage-download.googleapis.com/maven2/') }
         mavenCentral()
     }
