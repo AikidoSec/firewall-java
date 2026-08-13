@@ -80,5 +80,32 @@ public class RealtimeSSETaskTest {
         task.onEvent(new SSEParser.Event("config-updated", "{\"configUpdatedAt\":200}"));
 
         verify(reportingApi, times(1)).fetchNewConfig();
+        verify(reportingApi, never()).fetchBlockedLists();
+    }
+
+    @Test
+    public void testRetriesSameEventAfterFetchFailure() {
+        when(reportingApi.fetchNewConfig())
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(sampleConfig(200)));
+        when(reportingApi.fetchBlockedLists()).thenReturn(Optional.empty());
+
+        SSEParser.Event event = new SSEParser.Event("config-updated", "{\"configUpdatedAt\":200}");
+        task.onEvent(event);
+        task.onEvent(event);
+
+        verify(reportingApi, times(2)).fetchNewConfig();
+        verify(reportingApi, times(1)).fetchBlockedLists();
+    }
+
+    @Test
+    public void testDeduplicatesUsingFetchedConfigTimestamp() {
+        when(reportingApi.fetchNewConfig()).thenReturn(Optional.of(sampleConfig(250)));
+        when(reportingApi.fetchBlockedLists()).thenReturn(Optional.empty());
+
+        task.onEvent(new SSEParser.Event("config-updated", "{\"configUpdatedAt\":200}"));
+        task.onEvent(new SSEParser.Event("config-updated", "{\"configUpdatedAt\":225}"));
+
+        verify(reportingApi, times(1)).fetchNewConfig();
     }
 }

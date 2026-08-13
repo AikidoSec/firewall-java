@@ -50,10 +50,16 @@ public class RealtimeSSETask extends Thread {
         if (configLastUpdatedAt.isPresent() && configUpdatedAt <= configLastUpdatedAt.get()) {
             return;
         }
-        configLastUpdatedAt = Optional.of(configUpdatedAt);
 
         Optional<APIResponse> newConfig = reportingApi.fetchNewConfig();
-        newConfig.ifPresent(ServiceConfigStore::updateFromAPIResponse);
+        if (newConfig.isEmpty()) {
+            logger.debug("Failed to fetch config after SSE event");
+            return;
+        }
+
+        APIResponse config = newConfig.get();
+        ServiceConfigStore.updateFromAPIResponse(config);
+        configLastUpdatedAt = Optional.of(config.configUpdatedAt());
 
         Optional<ReportingApi.APIListsResponse> blockedListsRes = reportingApi.fetchBlockedLists();
         blockedListsRes.ifPresent(ServiceConfigStore::updateFromAPIListsResponse);
