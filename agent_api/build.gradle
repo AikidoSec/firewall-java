@@ -5,7 +5,7 @@ plugins {
 }
 
 jacoco {
-    toolVersion "0.8.12"
+    toolVersion "0.8.15"
     reportsDirectory = layout.buildDirectory.dir('jacoco')
 }
 
@@ -64,9 +64,8 @@ test {
         enabled = true
     }
     doFirst {
-        // JaCoCo's javaagent must load before our own agent.jar. Our agent registers a
-        // retransformation-capable ByteBuddy transformer; if it loads first, JaCoCo silently
-        // stops recording coverage for almost every class, not just the ones we instrument.
+        // Load JaCoCo before our agent so it can track classes from the start.
+        // Otherwise, some tested code may incorrectly appear uncovered.
         jvmArgs jacoco.getAsJvmArg(), "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
         jacoco.enabled = false
     }
@@ -77,6 +76,18 @@ jacocoTestReport {
         xml.required = true
         csv.required = false
         html.required = false
+    }
+    dependsOn test
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                minimum = 0.80
+            }
+        }
     }
     dependsOn test
 }
