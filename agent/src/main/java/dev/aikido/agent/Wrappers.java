@@ -9,6 +9,7 @@ import dev.aikido.agent.wrappers.spring.SpringMVCJavaxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringWebfluxWrapper;
 import dev.aikido.agent.wrappers.spring.SpringControllerWrapper;
 import dev.aikido.agent.wrappers.spring.SpringMVCJakartaWrapper;
+import dev.aikido.agent.wrappers.spring.SpringMVCDispatcherWrapper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,7 @@ public final class Wrappers {
     public static final List<Wrapper> WRAPPERS = Arrays.asList(
             new PostgresWrapper(),
             new SpringMVCJakartaWrapper(),
+            new SpringMVCDispatcherWrapper(),
             new SpringMVCJavaxWrapper(),
             new SpringWebfluxWrapper(),
             new SpringControllerWrapper(),
