@@ -84,7 +84,7 @@ public class RealtimeSSETaskTest {
     }
 
     @Test
-    public void testRetriesSameEventAfterFetchFailure() {
+    public void testRepeatedEventAfterFetchFailure() {
         when(reportingApi.fetchNewConfig())
                 .thenReturn(Optional.empty())
                 .thenReturn(Optional.of(sampleConfig(200)));
@@ -99,7 +99,7 @@ public class RealtimeSSETaskTest {
     }
 
     @Test
-    public void testDeduplicatesUsingFetchedConfigTimestamp() {
+    public void testUsesFetchedConfigTimestamp() {
         when(reportingApi.fetchNewConfig()).thenReturn(Optional.of(sampleConfig(250)));
         when(reportingApi.fetchBlockedLists()).thenReturn(Optional.empty());
 
