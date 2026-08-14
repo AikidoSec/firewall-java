@@ -1,2 +1,4 @@
+apply from: 'gradle/maven-central-mirror.settings.gradle'
+
 rootProject.name = 'firewall-java'
 include 'agent', 'agent_api'

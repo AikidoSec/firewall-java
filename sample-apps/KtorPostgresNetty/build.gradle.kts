@@ -16,9 +16,6 @@ kotlin {
     jvmToolchain(17)
 }
 
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     implementation(libs.gson)
