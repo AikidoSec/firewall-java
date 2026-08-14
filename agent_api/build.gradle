@@ -5,7 +5,7 @@ plugins {
 }
 
 jacoco {
-    toolVersion "0.8.12"
+    toolVersion "0.8.15"
     reportsDirectory = layout.buildDirectory.dir('jacoco')
 }
 
@@ -46,7 +46,6 @@ dependencies {
 test {
     jvmArgs '--add-opens', 'java.base/java.util=ALL-UNNAMED'
     jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
-    jvmArgs "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
     jvmArgs '-Dnet.bytebuddy.experimental=true' // Mockito support.
 
     systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
@@ -64,6 +63,12 @@ test {
     jacoco {
         enabled = true
     }
+    doFirst {
+        // JaCoCo starts tracking a class when Java loads it.
+        // Our agent loads agent_api classes, so JaCoCo must start first.
+        jvmArgs jacoco.getAsJvmArg(), "-javaagent:${project.rootDir}/dist/agent.jar=mode=daemon-disabled"
+        jacoco.enabled = false
+    }
 }
 
 jacocoTestReport {
@@ -71,6 +76,18 @@ jacocoTestReport {
         xml.required = true
         csv.required = false
         html.required = false
+    }
+    dependsOn test
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                minimum = 0.80
+            }
+        }
     }
     dependsOn test
 }
