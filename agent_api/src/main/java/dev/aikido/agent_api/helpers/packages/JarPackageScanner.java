@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.jar.JarInputStream;
 
 public final class JarPackageScanner {
     private static final int MAX_METADATA_BYTES = 1024 * 1024;
+    private static final char[] HEX = "0123456789abcdef".toCharArray();
     private static final Pattern MAVEN_PACKAGE_NAME = Pattern.compile("[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+");
 
     private JarPackageScanner() {}
@@ -30,27 +33,80 @@ public final class JarPackageScanner {
             String classResourceUrl,
             long requiredAt
     ) {
+        return scan(classResourceUrl, requiredAt).packages();
+    }
+
+    public static JarScanResult scan(
+            String classResourceUrl,
+            long requiredAt
+    ) {
         try {
             JarLocation location = JarLocation.parse(classResourceUrl);
             if (location == null) {
-                return List.of();
+                return JarScanResult.empty();
             }
             if (location.nestedEntry() == null) {
+                List<RuntimePackage> packages;
                 try (InputStream input = new BufferedInputStream(Files.newInputStream(location.outerJar()))) {
-                    return findMavenPackages(input, requiredAt);
+                    packages = findMavenPackages(input, requiredAt);
                 }
+                return result(location.outerJar(), packages);
             }
             try (JarFile outerJar = new JarFile(location.outerJar().toFile())) {
                 JarEntry nestedJar = outerJar.getJarEntry(location.nestedEntry());
                 if (nestedJar == null) {
-                    return List.of();
+                    return JarScanResult.empty();
+                }
+                List<RuntimePackage> packages;
+                try (InputStream input = new BufferedInputStream(outerJar.getInputStream(nestedJar))) {
+                    packages = findMavenPackages(input, requiredAt);
+                }
+                if (!packages.isEmpty()) {
+                    return new JarScanResult(packages, null);
                 }
                 try (InputStream input = new BufferedInputStream(outerJar.getInputStream(nestedJar))) {
-                    return findMavenPackages(input, requiredAt);
+                    return new JarScanResult(packages, sha1(input));
                 }
             }
         } catch (IOException | RuntimeException ignored) {
-            return List.of();
+            return JarScanResult.empty();
+        }
+    }
+
+    private static JarScanResult result(Path jar, List<RuntimePackage> packages) throws IOException {
+        if (!packages.isEmpty()) {
+            return new JarScanResult(packages, null);
+        }
+        try (InputStream input = new BufferedInputStream(Files.newInputStream(jar))) {
+            return new JarScanResult(packages, sha1(input));
+        }
+    }
+
+    private static String sha1(InputStream input) throws IOException {
+        final MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException impossible) {
+            throw new IllegalStateException("SHA-1 is not available", impossible);
+        }
+        byte[] buffer = new byte[8192];
+        int read;
+        while ((read = input.read(buffer)) != -1) {
+            digest.update(buffer, 0, read);
+        }
+        byte[] hash = digest.digest();
+        char[] encoded = new char[hash.length * 2];
+        for (int i = 0; i < hash.length; i++) {
+            int value = hash[i] & 0xff;
+            encoded[i * 2] = HEX[value >>> 4];
+            encoded[i * 2 + 1] = HEX[value & 0x0f];
+        }
+        return new String(encoded);
+    }
+
+    public record JarScanResult(List<RuntimePackage> packages, String sha1) {
+        private static JarScanResult empty() {
+            return new JarScanResult(List.of(), null);
         }
     }
 

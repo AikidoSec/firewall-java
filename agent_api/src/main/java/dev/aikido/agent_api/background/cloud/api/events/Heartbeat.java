@@ -2,6 +2,7 @@ package dev.aikido.agent_api.background.cloud.api.events;
 
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.JavaArtifact;
 import dev.aikido.agent_api.storage.RuntimePackage;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.storage.statistics.Statistics;
@@ -24,16 +25,20 @@ public final class Heartbeat {
             RouteEntry[] routes,
             List<User> users,
             List<RuntimePackage> packages,
+            List<JavaArtifact> javaArtifacts,
             boolean middlewareInstalled
     ) implements APIEvent {}
     
     public static HeartbeatEvent get(
             Statistics.StatsRecord stats, Hostnames.HostnameEntry[] hostnames, RouteEntry[] routes,
-            List<User> users, List<RuntimePackage> packages
+            List<User> users, List<RuntimePackage> packages, List<JavaArtifact> javaArtifacts
     ) {
         long time = getUnixTimeMS(); // Get current time
         GetManagerInfo.ManagerInfo agent = getManagerInfo();
         boolean middlewareInstalled = ServiceConfigStore.getConfig().isMiddlewareInstalled();
-        return new HeartbeatEvent("heartbeat", agent, time, stats, hostnames, routes, users, packages, middlewareInstalled);
+        return new HeartbeatEvent(
+                "heartbeat", agent, time, stats, hostnames, routes, users,
+                packages, javaArtifacts, middlewareInstalled
+        );
     }
 }
