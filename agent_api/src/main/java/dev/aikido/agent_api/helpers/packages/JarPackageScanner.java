@@ -1,5 +1,6 @@
 package dev.aikido.agent_api.helpers.packages;
 
+import dev.aikido.agent_api.helpers.Hashing;
 import dev.aikido.agent_api.storage.RuntimePackage;
 
 import java.io.BufferedInputStream;
@@ -9,8 +10,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,7 +23,6 @@ import java.util.jar.JarInputStream;
 
 public final class JarPackageScanner {
     private static final int MAX_METADATA_BYTES = 1024 * 1024;
-    private static final char[] HEX = "0123456789abcdef".toCharArray();
     private static final Pattern MAVEN_PACKAGE_NAME = Pattern.compile("[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+");
 
     private JarPackageScanner() {}
@@ -65,7 +63,7 @@ public final class JarPackageScanner {
                     return new JarScanResult(packages, null);
                 }
                 try (InputStream input = new BufferedInputStream(outerJar.getInputStream(nestedJar))) {
-                    return new JarScanResult(packages, sha1(input));
+                    return new JarScanResult(packages, Hashing.sha1(input));
                 }
             }
         } catch (IOException | RuntimeException ignored) {
@@ -78,30 +76,8 @@ public final class JarPackageScanner {
             return new JarScanResult(packages, null);
         }
         try (InputStream input = new BufferedInputStream(Files.newInputStream(jar))) {
-            return new JarScanResult(packages, sha1(input));
+            return new JarScanResult(packages, Hashing.sha1(input));
         }
-    }
-
-    private static String sha1(InputStream input) throws IOException {
-        final MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException impossible) {
-            throw new IllegalStateException("SHA-1 is not available", impossible);
-        }
-        byte[] buffer = new byte[8192];
-        int read;
-        while ((read = input.read(buffer)) != -1) {
-            digest.update(buffer, 0, read);
-        }
-        byte[] hash = digest.digest();
-        char[] encoded = new char[hash.length * 2];
-        for (int i = 0; i < hash.length; i++) {
-            int value = hash[i] & 0xff;
-            encoded[i * 2] = HEX[value >>> 4];
-            encoded[i * 2 + 1] = HEX[value & 0x0f];
-        }
-        return new String(encoded);
     }
 
     public record JarScanResult(List<RuntimePackage> packages, String sha1) {
