@@ -49,7 +49,7 @@ public final class JarPackageScanner {
                     return findMavenPackages(input, requiredAt);
                 }
             }
-        } catch (IOException | IllegalArgumentException ignored) {
+        } catch (IOException | RuntimeException ignored) {
             return List.of();
         }
     }
@@ -61,7 +61,7 @@ public final class JarPackageScanner {
                 return null;
             }
             return location.getKey();
-        } catch (IllegalArgumentException ignored) {
+        } catch (RuntimeException ignored) {
             return null;
         }
     }
@@ -145,24 +145,42 @@ public final class JarPackageScanner {
             if (value.startsWith("jar:")) {
                 value = value.substring(4);
             }
-            int outerEnd = value.toLowerCase(Locale.ROOT).indexOf(".jar!/");
+            if (value.startsWith("nested:")) {
+                value = value.substring(7);
+            }
+            String lowerCaseValue = value.toLowerCase(Locale.ROOT);
+            int outerEnd = lowerCaseValue.indexOf(".jar!/");
+            int springBootOuterEnd = lowerCaseValue.indexOf(".jar/!");
+            if (outerEnd < 0 || springBootOuterEnd >= 0 && springBootOuterEnd < outerEnd) {
+                outerEnd = springBootOuterEnd;
+            }
             if (outerEnd < 0) {
-                int jarEnd = value.toLowerCase(Locale.ROOT).indexOf(".jar");
+                int jarEnd = lowerCaseValue.indexOf(".jar");
                 if (jarEnd < 0) {
                     return null;
                 }
-                Path jar = Path.of(URI.create(value.substring(0, jarEnd + 4)));
+                Path jar = toPath(value.substring(0, jarEnd + 4));
                 return new JarLocation(jar, null);
             }
 
-            Path outerJar = Path.of(URI.create(value.substring(0, outerEnd + 4)));
+            Path outerJar = toPath(value.substring(0, outerEnd + 4));
             int nestedStart = outerEnd + 6;
-            int nestedEnd = value.toLowerCase(Locale.ROOT).indexOf(".jar!/", nestedStart);
+            int nestedEnd = lowerCaseValue.indexOf(".jar!/", nestedStart);
+            if (nestedEnd < 0 && lowerCaseValue.endsWith(".jar")) {
+                nestedEnd = value.length() - 4;
+            }
             String nestedEntry = null;
             if (nestedEnd >= 0) {
                 nestedEntry = value.substring(nestedStart, nestedEnd + 4);
             }
             return new JarLocation(outerJar, nestedEntry);
+        }
+
+        private static Path toPath(String value) {
+            if (value.startsWith("file:")) {
+                return Path.of(URI.create(value));
+            }
+            return Path.of(value);
         }
 
         private String getKey() {

@@ -7,15 +7,12 @@ import dev.aikido.agent_api.helpers.env.BooleanEnv;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
-import dev.aikido.agent_api.storage.RuntimePackagesStore;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
-import java.lang.instrument.ClassFileTransformer;
-import java.security.ProtectionDomain;
 
 import static dev.aikido.agent.ByteBuddyInitializer.createAgentBuilder;
 import static dev.aikido.agent.DaemonStarter.startDaemon;
@@ -40,7 +37,7 @@ public class Agent {
         }
         logger.info("Zen by Aikido v%s starting.", Config.pkgVersion);
         setAikidoSysProperties();
-        installPackageObserver(inst);
+        PackageObserver.install(inst);
 
         // Test loading of zen binaries :
         loadLibrary();
@@ -62,44 +59,6 @@ public class Agent {
         ServiceConfigStore.updateBlocking(new BlockingEnv().getValue());
 
         startDaemon(agentArgs);
-    }
-
-    private static void installPackageObserver(Instrumentation inst) {
-        inst.addTransformer(new PackageObserver(), false);
-        for (Class<?> loadedClass : inst.getAllLoadedClasses()) {
-            observeLoadedClass(loadedClass);
-        }
-    }
-
-    private static void observeLoadedClass(Class<?> loadedClass) {
-        String className = loadedClass.getName().replace('.', '/');
-        if (isAikidoClass(className)) {
-            return;
-        }
-        try {
-            RuntimePackagesStore.observeClass(className, loadedClass.getClassLoader(), loadedClass.getProtectionDomain());
-        } catch (Throwable ignored) {
-        }
-    }
-
-    private static boolean isAikidoClass(String className) {
-        return className == null || className.startsWith("dev/aikido/");
-    }
-
-    private static final class PackageObserver implements ClassFileTransformer {
-        @Override
-        public byte[] transform(
-                ClassLoader loader,
-                String className,
-                Class<?> classBeingRedefined,
-                ProtectionDomain protectionDomain,
-                byte[] classfileBuffer
-        ) {
-            if (!isAikidoClass(className)) {
-                RuntimePackagesStore.observeClass(className, loader, protectionDomain);
-            }
-            return null;
-        }
     }
 
     private static class AikidoTransformer {

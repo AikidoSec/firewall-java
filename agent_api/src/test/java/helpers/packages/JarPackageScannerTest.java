@@ -33,6 +33,29 @@ class JarPackageScannerTest {
     }
 
     @Test
+    void readsMavenCoordinatesFromSpringBootNestedJar() throws IOException {
+        Path nestedJar = Files.createTempFile("aikido-nested-package", ".jar");
+        try (JarOutputStream output = new JarOutputStream(Files.newOutputStream(nestedJar))) {
+            output.putNextEntry(new JarEntry("META-INF/maven/org.example/demo/pom.properties"));
+            output.write("groupId=org.example\nartifactId=demo\nversion=1.2.3\n"
+                    .getBytes(StandardCharsets.UTF_8));
+        }
+
+        Path outerJar = Files.createTempFile("aikido-spring-boot", ".jar");
+        try (JarOutputStream output = new JarOutputStream(Files.newOutputStream(outerJar))) {
+            output.putNextEntry(new JarEntry("BOOT-INF/lib/demo.jar"));
+            output.write(Files.readAllBytes(nestedJar));
+        }
+
+        String codeSourceUrl = "nested:" + outerJar + "/!BOOT-INF/lib/demo.jar";
+        List<RuntimePackage> packages = JarPackageScanner.findMavenPackages(codeSourceUrl, 123L);
+
+        assertEquals(List.of(new RuntimePackage("org.example:demo", "1.2.3", 123L)), packages);
+        Files.deleteIfExists(nestedJar);
+        Files.deleteIfExists(outerJar);
+    }
+
+    @Test
     void ignoresManifestMetadataWithoutMavenCoordinates() throws IOException {
         Path jar = Files.createTempFile("aikido-package", ".jar");
         Manifest manifest = new Manifest();
