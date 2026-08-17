@@ -43,35 +43,56 @@ public class EndpointsTest {
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "https://realtime.aikido.dev")
     public void testGetAikidoRealtimeEndpoint_WithCustomEndpoint() {
-        String result = Endpoints.getAikidoRealtimeEndpoint();
+        String result = Endpoints.getAikidoRealtimeEndpoint(null);
         assertEquals("https://realtime.aikido.dev/", result);
     }
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "https://realtime.aikido.dev")
     public void testGetAikidoRealtimeEndpoint_WithCustomEndpointWithoutTrailingSlash() {
-        String result = Endpoints.getAikidoRealtimeEndpoint();
+        String result = Endpoints.getAikidoRealtimeEndpoint(null);
         assertEquals("https://realtime.aikido.dev/", result);
     }
 
     @Test
     public void testGetAikidoRealtimeEndpoint_WithNullEnvironmentVariable() {
-        // No environment variable set, should return default
-        String result = Endpoints.getAikidoRealtimeEndpoint();
-        assertEquals("https://runtime.aikido.dev/", result);
+        String result = Endpoints.getAikidoRealtimeEndpoint(null);
+        assertEquals("https://guard.aikido.dev/", result);
     }
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "https://realtime.aikido.dev/")
     public void testGetAikidoRealtimeEndpoint_WithCustomEndpointWithTrailingSlash() {
-        String result = Endpoints.getAikidoRealtimeEndpoint();
+        String result = Endpoints.getAikidoRealtimeEndpoint(null);
         assertEquals("https://realtime.aikido.dev/", result);
     }
 
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value = "")
     public void testGetAikidoRealtimeEndpoint_WithEmptyEnvironmentVariable() {
-        String result = Endpoints.getAikidoRealtimeEndpoint();
-        assertEquals("https://runtime.aikido.dev/", result);
+        String result = Endpoints.getAikidoRealtimeEndpoint(null);
+        assertEquals("https://guard.aikido.dev/", result);
+    }
+
+    @Test
+    public void testGetAikidoRealtimeEndpoint_WithUSRegionToken() {
+        Token token = new Token("AIK_RUNTIME_1_2_US_random");
+        String result = Endpoints.getAikidoRealtimeEndpoint(token);
+        assertEquals("https://guard.us.aikido.dev/", result);
+    }
+
+    @Test
+    public void testGetAikidoRealtimeEndpoint_WithMERegionToken() {
+        Token token = new Token("AIK_RUNTIME_1_2_ME_random");
+        String result = Endpoints.getAikidoRealtimeEndpoint(token);
+        assertEquals("https://guard.me.aikido.dev/", result);
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "AIKIDO_ENDPOINT", value = "https://custom.aikido.dev")
+    public void testGetAikidoRealtimeEndpoint_IgnoresAPIEndpointOverride() {
+        Token token = new Token("AIK_RUNTIME_1_2_US_random");
+        String result = Endpoints.getAikidoRealtimeEndpoint(token);
+        assertEquals("https://guard.us.aikido.dev/", result);
     }
 
     // Additional tests

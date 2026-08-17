@@ -25,7 +25,7 @@ public class RealtimeAPI {
     private final Token token;
 
     public RealtimeAPI(Token token) {
-        endpoint = getAikidoRealtimeEndpoint();
+        endpoint = getAikidoRealtimeEndpoint(token);
         this.token = token;
     }
     public record ConfigResponse(long configUpdatedAt) {}
