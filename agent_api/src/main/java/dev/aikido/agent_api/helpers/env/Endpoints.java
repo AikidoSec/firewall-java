@@ -11,6 +11,10 @@ public final class Endpoints {
             return endpoint;
         }
 
+        return getDefaultAikidoAPIEndpoint(token);
+    }
+
+    private static String getDefaultAikidoAPIEndpoint(Token token) {
         String region = token != null ? token.getRegion() : "EU";
         return switch (region) {
             case "US" -> "https://guard.us.aikido.dev/";
@@ -20,7 +24,7 @@ public final class Endpoints {
         };
     }
     
-    public static String getAikidoRealtimeEndpoint() {
+    public static String getAikidoRealtimeEndpoint(Token token) {
         String endpoint = System.getenv("AIKIDO_REALTIME_ENDPOINT");
         if (endpoint != null && !endpoint.isEmpty()) {
             if (!endpoint.endsWith("/")) {
@@ -29,7 +33,6 @@ public final class Endpoints {
             return endpoint;
         }
 
-        // Default option :
-        return "https://runtime.aikido.dev/";
+        return getDefaultAikidoAPIEndpoint(token);
     }
 }
