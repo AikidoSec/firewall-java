@@ -44,6 +44,7 @@ public class HeartbeatTask extends TimerTask {
         RouteEntry[] routes = RoutesStore.getRoutesAsList();
         List<User> users = UsersStore.getUsersAsList();
         List<RuntimePackage> packages = RuntimePackagesStore.getPackagesAsList();
+        List<JavaArtifact> javaArtifacts = JavaArtifactsStore.getArtifactsAsList();
 
         // Clear data :
         StatisticsStore.clear();
@@ -51,9 +52,10 @@ public class HeartbeatTask extends TimerTask {
         RoutesStore.clear();
         UsersStore.clear();
         RuntimePackagesStore.clear();
+        JavaArtifactsStore.clear();
 
         // Create and send event :
-        Heartbeat.HeartbeatEvent event = Heartbeat.get(stats, hostnames, routes, users, packages);
+        Heartbeat.HeartbeatEvent event = Heartbeat.get(stats, hostnames, routes, users, packages, javaArtifacts);
         Optional<APIResponse> res = api.report(event);
         res.ifPresent(ServiceConfigStore::updateFromAPIResponse);
     }
