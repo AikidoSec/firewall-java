@@ -101,7 +101,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/Aikido
 ### Your First Code Contribution
 
 - clone the repository to your local machine
-- run `$ make build` to build a `dist/` folder which includes binaries, agent.jar file and the agent_api.jar file
+- run `$ make build` to build a `dist/` folder which includes the agent.jar and agent_api.jar files
 - run `$ make mock_init` to build and start the mock aikido server (uses docker)
 - run `$ make test` to test the library with JUnit 5
 - run `$ make clean` to clean up the repository

@@ -28,13 +28,13 @@ jobs:
               working-directory: ./
               run: |
                   chmod +x gradlew
-                  make binaries
+                  make wasm
                   make build
 
-            - name: Run RustSQLInterfaceTest
+            - name: Run WasmSQLInterfaceTest
               working-directory: ./
               run: |
-                  ./gradlew test --tests "vulnerabilities.RustSQLInterfaceTest" --info
+                  ./gradlew test --tests "vulnerabilities.WasmSQLInterfaceTest" --info
 
     smoke-test-musl:
         name: Smoke Test (${{matrix.image}}, Java 21)
@@ -56,12 +56,12 @@ jobs:
               working-directory: ./
               run: |
                   chmod +x gradlew
-                  make binaries
+                  make wasm
                   make build
 
-            - name: Run RustSQLInterfaceTest on ${{matrix.image}}
+            - name: Run WasmSQLInterfaceTest on ${{matrix.image}}
               run: |
                   docker run --rm -v "$(pwd):/app" -w /app ${{matrix.image}} sh -c "
                     chmod +x gradlew && \
-                    AIKIDO_DEBUG=true ./gradlew test --tests 'vulnerabilities.RustSQLInterfaceTest' --info
+                    AIKIDO_DEBUG=true ./gradlew test --tests 'vulnerabilities.WasmSQLInterfaceTest' --info
                   "
