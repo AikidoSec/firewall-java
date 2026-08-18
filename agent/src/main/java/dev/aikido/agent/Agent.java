@@ -37,6 +37,7 @@ public class Agent {
         }
         logger.info("Zen by Aikido v%s starting.", Config.pkgVersion);
         setAikidoSysProperties();
+        PackageObserver.install(inst);
 
         // Test loading of zen binaries :
         loadLibrary();
@@ -59,6 +60,7 @@ public class Agent {
 
         startDaemon(agentArgs);
     }
+
     private static class AikidoTransformer {
         public static AgentBuilder.Transformer get() {
             var adviceAgentBuilder = new AgentBuilder.Transformer.ForAdvice()
