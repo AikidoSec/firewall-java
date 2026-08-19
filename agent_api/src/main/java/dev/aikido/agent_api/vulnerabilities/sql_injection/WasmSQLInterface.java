@@ -104,7 +104,7 @@ public final class WasmSQLInterface {
         String[] checksumFields = new String(readResource(CHECKSUM_RESOURCE), StandardCharsets.UTF_8)
                 .trim()
                 .split("\\s+", 2);
-        if (checksumFields.length == 0 || checksumFields[0].isEmpty()) {
+        if (checksumFields[0].isEmpty()) {
             throw new IllegalStateException("invalid zen-internals WASM checksum");
         }
         String expectedChecksum = checksumFields[0];
