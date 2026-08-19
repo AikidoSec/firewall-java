@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayDeque;
 import java.util.HexFormat;
+import java.util.Set;
 import java.util.function.Function;
 
 public final class WasmSQLInterface {
@@ -23,6 +24,8 @@ public final class WasmSQLInterface {
     private static final String WASM_RESOURCE = "zen_internals.wasm";
     private static final String CHECKSUM_RESOURCE = "zen_internals.wasm.sha256sum";
     private static final int MAX_IDLE_INSTANCES = 10;
+    // These functions exceed Java's 65,535-byte method limit, so run them in the interpreter and fail if any others cannot compile.
+    private static final Set<Integer> INTERPRETED_FUNCTIONS = Set.of(865, 3165);
 
     private static volatile RuntimeState runtime;
     private static volatile Throwable initializationFailure;
@@ -115,7 +118,8 @@ public final class WasmSQLInterface {
         WasmModule module = Parser.parse(wasm);
         Function<Instance, Machine> machineFactory =
                 MachineFactoryCompiler.builder(module)
-                        .withInterpreterFallback(InterpreterFallback.SILENT)
+                        .withInterpreterFallback(InterpreterFallback.FAIL)
+                        .withInterpretedFunctions(INTERPRETED_FUNCTIONS)
                         .compile();
         return new RuntimeState(module, machineFactory);
     }

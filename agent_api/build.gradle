@@ -12,8 +12,8 @@ jacoco {
 dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
     implementation 'com.google.code.gson:gson:2.11.0'
-    implementation 'com.dylibso.chicory:runtime:1.4.0'
-    implementation 'com.dylibso.chicory:compiler:1.4.0'
+    implementation 'com.dylibso.chicory:runtime:1.7.5'
+    implementation 'com.dylibso.chicory:compiler:1.7.5'
     // Junixsocket imports :
     implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
     implementation 'com.kohlschutter.junixsocket:junixsocket-server:2.10.1'
