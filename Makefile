@@ -11,10 +11,14 @@ wasm: download-wasm check-wasm
 
 download-wasm:
 	mkdir -p $(WASM_RESOURCE_DIR)
-	curl -fL -o $(WASM_RESOURCE_DIR)/zen_internals.wasm $(WASM_BASE_URL)/libzen_internals.wasm
-	curl -fL $(WASM_BASE_URL)/libzen_internals.wasm.sha256sum \
-		| sed 's/libzen_internals\.wasm/zen_internals.wasm/' \
-		> $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum
+	@set -e; \
+	tmp_dir=$$(mktemp -d); \
+	trap 'rm -rf "$$tmp_dir"' 0; \
+	curl -fL -o "$$tmp_dir/zen_internals.wasm" $(WASM_BASE_URL)/libzen_internals.wasm; \
+	curl -fL -o "$$tmp_dir/checksum" $(WASM_BASE_URL)/libzen_internals.wasm.sha256sum; \
+	sed 's/libzen_internals\.wasm/zen_internals.wasm/' "$$tmp_dir/checksum" > "$$tmp_dir/zen_internals.wasm.sha256sum"; \
+	mv "$$tmp_dir/zen_internals.wasm" $(WASM_RESOURCE_DIR)/zen_internals.wasm; \
+	mv "$$tmp_dir/zen_internals.wasm.sha256sum" $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum
 
 check-wasm:
 	@expected=$$(awk '{print $$1}' $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum); \
