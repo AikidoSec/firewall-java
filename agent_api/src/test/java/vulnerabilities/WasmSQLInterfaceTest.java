@@ -18,15 +18,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class WasmSQLInterfaceTest {
     @Test
     public void detectsSqlInjection() {
+        Dialect postgresql = new Dialect("postgresql");
         assertTrue(WasmSQLInterface.initialize());
-        assertTrue(WasmSQLInterface.detectSqlInjection(
-                "SELECT * FROM users WHERE id = '1' OR 1=1",
-                "1' OR 1=1",
-                new Dialect("postgresql")));
-        assertFalse(WasmSQLInterface.detectSqlInjection(
-                "SELECT * FROM users WHERE id = '1'",
-                "1",
-                new Dialect("postgresql")));
+
+        assertTrue(
+                WasmSQLInterface.detectSqlInjection(
+                        "SELECT * FROM users WHERE id = '1' OR 1=1",
+                        "1' OR 1=1",
+                        postgresql
+                )
+        );
+        assertFalse(
+                WasmSQLInterface.detectSqlInjection(
+                        "SELECT * FROM users WHERE id = '1'",
+                        "1",
+                        postgresql
+                )
+        );
     }
 
     @Test

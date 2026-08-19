@@ -147,9 +147,7 @@ public final class WasmSQLInterface {
         private final Function<Instance, Machine> machineFactory;
         private final InstancePool pool;
 
-        private RuntimeState(
-                WasmModule module,
-                Function<Instance, Machine> machineFactory) {
+        private RuntimeState(WasmModule module, Function<Instance, Machine> machineFactory) {
             this.module = module;
             this.machineFactory = machineFactory;
             this.pool = new InstancePool(this);
