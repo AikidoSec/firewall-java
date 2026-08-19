@@ -62,6 +62,7 @@ public final class WasmSQLInterface {
             return result == 1;
         } catch (Throwable e) {
             logger.trace(e);
+            // If zen-internals fails while checking the query, let the query proceed.
             return false;
         } finally {
             if (reusable) {
