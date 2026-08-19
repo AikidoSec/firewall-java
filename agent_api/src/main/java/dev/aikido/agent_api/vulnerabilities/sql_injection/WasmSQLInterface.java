@@ -51,7 +51,7 @@ public final class WasmSQLInterface {
             instance = current.pool.acquire();
         } catch (Throwable e) {
             logger.trace(e);
-            // If zen-internals is unavailable, let the database query proceed.
+            // If it cannot initialize or create an instance, let the query proceed.
             return false;
         }
 
