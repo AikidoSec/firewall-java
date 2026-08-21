@@ -74,7 +74,6 @@ public class Agent {
         String pathToAgentJar = Agent.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         String pathToAikidoDirectory = new File(pathToAgentJar).getParent();
         String jarPath = "file:" + pathToAikidoDirectory + "/agent_api.jar";
-        System.setProperty("AIK_agent_dir", pathToAikidoDirectory);
         System.setProperty("AIK_agent_api_jar", jarPath);
     }
 }
