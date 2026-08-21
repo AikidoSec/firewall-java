@@ -12,12 +12,14 @@ import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class RealtimeSSETask extends Thread {
     private static final Logger logger = LogManager.getLogger(RealtimeSSETask.class);
     private final RealtimeSSEAPI realtimeSSEApi;
     private final ReportingApiHTTP reportingApi;
     private Optional<Long> configLastUpdatedAt;
+    private Optional<Long> lastConfigRefreshStartedAt = Optional.empty();
 
     public RealtimeSSETask(RealtimeSSEAPI realtimeSSEApi, ReportingApiHTTP reportingApi) {
         super("RealtimeSSETask");
@@ -32,7 +34,7 @@ public class RealtimeSSETask extends Thread {
         realtimeSSEApi.listen(this::onEvent);
     }
 
-    public void onEvent(SSEParser.Event event) {
+    public synchronized void onEvent(SSEParser.Event event) {
         logger.trace("SSE event received: %s", event.event());
         if (!"config-updated".equals(event.event())) {
             return;
@@ -51,6 +53,11 @@ public class RealtimeSSETask extends Thread {
             return;
         }
 
+        if (configUpdateArrivedTooFast()) {
+            logger.debug("Ignoring SSE config-updated event during refresh throttle");
+            return;
+        }
+
         Optional<APIResponse> newConfig = reportingApi.fetchNewConfig();
         if (newConfig.isEmpty()) {
             logger.debug("Failed to fetch config after SSE event");
@@ -65,5 +72,17 @@ public class RealtimeSSETask extends Thread {
         blockedListsRes.ifPresent(ServiceConfigStore::updateFromAPIListsResponse);
 
         logger.debug("Config updated via SSE");
+    }
+
+    private boolean configUpdateArrivedTooFast() {
+        long now = System.nanoTime();
+        if (lastConfigRefreshStartedAt.isPresent()) {
+            if (now - lastConfigRefreshStartedAt.get() < TimeUnit.SECONDS.toNanos(9)) {
+                return true;
+            }
+        }
+
+        lastConfigRefreshStartedAt = Optional.of(now);
+        return false;
     }
 }
