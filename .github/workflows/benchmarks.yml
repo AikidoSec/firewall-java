@@ -23,7 +23,7 @@ jobs:
         working-directory: ./
         run: |
           chmod +x gradlew
-          make binaries
+          make wasm
           make build
 
       - name: Upload build artifacts

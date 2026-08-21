@@ -39,7 +39,7 @@ public class SqlDetector implements Detector {
         if (shouldReturnEarly(queryLower, userInputNormalized)) {
             return false;
         }
-        return RustSQLInterface.detectSqlInjection(queryLower, userInputNormalized, dialect);
+        return WasmSQLInterface.detectSqlInjection(queryLower, userInputNormalized, dialect);
     }
     /**
      *     Input : Lowercased query and user_input.
@@ -71,4 +71,3 @@ public class SqlDetector implements Detector {
         return pattern.matcher(cleanedInputForList).matches();
     }
 }
-

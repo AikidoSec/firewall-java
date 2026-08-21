@@ -12,7 +12,8 @@ jacoco {
 dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
     implementation 'com.google.code.gson:gson:2.11.0'
-    implementation 'com.github.jnr:jnr-ffi:2.2.17'
+    implementation 'com.dylibso.chicory:runtime:1.7.5'
+    implementation 'com.dylibso.chicory:compiler:1.7.5'
     // Junixsocket imports :
     implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
     implementation 'com.kohlschutter.junixsocket:junixsocket-server:2.10.1'
@@ -48,7 +49,6 @@ test {
     jvmArgs '--add-opens', 'java.base/java.lang=ALL-UNNAMED'
     jvmArgs '-Dnet.bytebuddy.experimental=true' // Mockito support.
 
-    systemProperty 'AIK_agent_dir', "${project.rootDir}/dist"
     if (project.hasProperty('coverageRun')) {
         systemProperty 'AIK_INTERNAL_coverage_run', '1'
     }

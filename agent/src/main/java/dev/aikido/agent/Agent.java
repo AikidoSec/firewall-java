@@ -17,7 +17,7 @@ import java.lang.instrument.Instrumentation;
 import static dev.aikido.agent.ByteBuddyInitializer.createAgentBuilder;
 import static dev.aikido.agent.DaemonStarter.startDaemon;
 import static dev.aikido.agent.Wrappers.WRAPPERS;
-import static dev.aikido.agent_api.vulnerabilities.sql_injection.RustSQLInterface.loadLibrary;
+import static dev.aikido.agent_api.vulnerabilities.sql_injection.WasmSQLInterface.initialize;
 
 public class Agent {
     private static final Logger logger = LogManager.getLogger(Agent.class);
@@ -38,8 +38,8 @@ public class Agent {
         logger.info("Zen by Aikido v%s starting.", Config.pkgVersion);
         setAikidoSysProperties();
 
-        // Test loading of zen binaries :
-        loadLibrary();
+        // Load the zen-internals WASM module.
+        initialize();
 
         ElementMatcher.Junction wrapperTypeDescriptors = ElementMatchers.none();
         for(Wrapper wrapper: WRAPPERS) {
@@ -74,7 +74,6 @@ public class Agent {
         String pathToAgentJar = Agent.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         String pathToAikidoDirectory = new File(pathToAgentJar).getParent();
         String jarPath = "file:" + pathToAikidoDirectory + "/agent_api.jar";
-        System.setProperty("AIK_agent_dir", pathToAikidoDirectory);
         System.setProperty("AIK_agent_api_jar", jarPath);
     }
 }
