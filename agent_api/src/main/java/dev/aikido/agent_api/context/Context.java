@@ -15,4 +15,11 @@ public final class Context {
     public static void reset() {
         threadLocalContext.remove();
     }
+    public static void restore(ContextObject previous) {
+        if (previous != null) {
+            set(previous);
+        } else {
+            reset();
+        }
+    }
 }
