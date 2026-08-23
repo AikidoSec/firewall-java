@@ -12,6 +12,9 @@ dependencies {
     compileOnly 'io.projectreactor.netty:reactor-netty-http:1.2.1' // For Spring Webflux
     compileOnly 'io.javalin:javalin:6.4.0'
     compileOnly 'org.springframework:spring-web:5.3.20'
+    constraints {
+        implementation('org.jetbrains.kotlin:kotlin-stdlib:2.1.0')
+    }
 }
 
 shadowJar {
