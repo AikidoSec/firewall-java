@@ -9,9 +9,20 @@ dependencies {
     // Compile only for interface types :
     compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0' // spring 3 -> jakarta
     compileOnly 'javax.servlet:javax.servlet-api:4.0.1' // spring 2 -> javax
-    compileOnly 'io.projectreactor.netty:reactor-netty-http:1.2.1' // For Spring Webflux
+    compileOnly 'io.projectreactor.netty:reactor-netty-http:1.3.7' // For Spring Webflux
     compileOnly 'io.javalin:javalin:6.4.0'
-    compileOnly 'org.springframework:spring-web:5.3.20'
+    compileOnly 'org.springframework:spring-web:7.0.9'
+    
+    constraints {
+        implementation('io.projectreactor.netty:reactor-netty-core:1.3.7')
+        implementation('io.projectreactor:reactor-core:3.8.7')
+        implementation('org.springframework:spring-beans:7.0.9')
+        implementation('org.springframework:spring-core:7.0.9')
+        implementation('org.springframework:spring-webmvc:7.0.9')
+        implementation('org.springframework:spring-expression:7.0.9')
+        implementation('org.springframework:spring-context:7.0.9')
+        implementation('org.jetbrains.kotlin:kotlin-stdlib:2.1.0')
+    }
 }
 
 shadowJar {
