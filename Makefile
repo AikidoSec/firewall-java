@@ -2,11 +2,34 @@ clean:
 	rm -rf dist/
 	./gradlew clean
 
-build: clean check_binaries
-	mkdir -p dist/
+ZEN_INTERNALS_VERSION = v0.1.60
+WASM_BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/$(ZEN_INTERNALS_VERSION)
+WASM_RESOURCE_DIR = agent_api/src/main/resources
 
-	@echo "Copying binaries from .cache folder"
-	cp -r .cache/binaries dist/binaries
+.PHONY: wasm download-wasm check-wasm
+wasm: download-wasm check-wasm
+
+download-wasm:
+	mkdir -p $(WASM_RESOURCE_DIR)
+	@set -e; \
+	tmp_dir=$$(mktemp -d); \
+	trap 'rm -rf "$$tmp_dir"' 0; \
+	curl -fL -o "$$tmp_dir/zen_internals.wasm" $(WASM_BASE_URL)/libzen_internals.wasm; \
+	curl -fL -o "$$tmp_dir/checksum" $(WASM_BASE_URL)/libzen_internals.wasm.sha256sum; \
+	sed 's/libzen_internals\.wasm/zen_internals.wasm/' "$$tmp_dir/checksum" > "$$tmp_dir/zen_internals.wasm.sha256sum"; \
+	mv "$$tmp_dir/zen_internals.wasm" $(WASM_RESOURCE_DIR)/zen_internals.wasm; \
+	mv "$$tmp_dir/zen_internals.wasm.sha256sum" $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum
+
+check-wasm:
+	@expected=$$(awk '{print $$1}' $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum); \
+	actual=$$(shasum -a 256 $(WASM_RESOURCE_DIR)/zen_internals.wasm | awk '{print $$1}'); \
+	if [ "$$expected" != "$$actual" ]; then \
+		echo "WASM checksum mismatch: expected $$expected, got $$actual"; \
+		exit 1; \
+	fi
+
+build: clean
+	mkdir -p dist/
 
 	./gradlew agent:shadowJar
 	cp agent/build/libs/agent*-all.jar dist/agent.jar
@@ -23,47 +46,11 @@ mock_restart:
 mock_stop:
 	docker kill mock_core && docker rm mock_core
 
-test: check_binaries
+test:
 	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test
 
-cov: check_binaries
+cov:
 	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test --rerun-tasks -PcoverageRun jacocoTestReport jacocoTestCoverageVerification
-
-
-# Binaries :
-
-BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/v0.1.60
-FILES = \
-    libzen_internals_aarch64-apple-darwin.dylib \
-    libzen_internals_aarch64-apple-darwin.dylib.sha256sum \
-    libzen_internals_aarch64-unknown-linux-gnu.so \
-    libzen_internals_aarch64-unknown-linux-gnu.so.sha256sum \
-    libzen_internals_aarch64-unknown-linux-musl.so \
-    libzen_internals_aarch64-unknown-linux-musl.so.sha256sum \
-    libzen_internals_x86_64-apple-darwin.dylib \
-    libzen_internals_x86_64-apple-darwin.dylib.sha256sum \
-    libzen_internals_x86_64-pc-windows-gnu.dll \
-    libzen_internals_x86_64-pc-windows-gnu.dll.sha256sum \
-    libzen_internals_x86_64-unknown-linux-gnu.so \
-    libzen_internals_x86_64-unknown-linux-gnu.so.sha256sum \
-    libzen_internals_x86_64-unknown-linux-musl.so \
-    libzen_internals_x86_64-unknown-linux-musl.so.sha256sum \
-
-binaries: binaries_make_dir $(addprefix .cache/binaries/, $(FILES))
-binaries_make_dir:
-	rm -rf .cache/binaries
-	mkdir -p .cache/binaries/
-.cache/binaries/%:
-	@echo "Downloading $*..."
-	curl -L -o $@ $(BASE_URL)/$*
-.PHONY: check_binaries
-check_binaries:
-	@if [ -d ".cache/binaries" ]; then \
-  		echo "Cache directory exists."; \
-	else \
-		echo "Cache directory is empty. Running 'make binaries'..."; \
-		$(MAKE) binaries; \
-	fi
 
 
 # Automatic versioning for releases :
@@ -80,4 +67,3 @@ replace_version:
 		sed -i.bak "s/1.0-REPLACE-VERSION/$$version/g" $$file; \
 		rm $$file.bak; \
 	done;
-

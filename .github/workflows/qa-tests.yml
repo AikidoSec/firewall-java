@@ -33,7 +33,7 @@ jobs:
               working-directory: ./firewall-java
               run: |
                   chmod +x gradlew
-                  make binaries
+                  make wasm
                   make build
 
                   # Move the build jars to demo app

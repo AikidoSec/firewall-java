@@ -31,8 +31,11 @@ jobs:
         with:
           java-version: '21'
           distribution: 'adopt'
-      - name: Download binaries & Build with Gradle
-        run: chmod +x gradlew && make binaries && make build
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          make wasm
+          make build
       - name: Create zip and tar.gz files of the build
         run: |
           mv dist/ zen/
