@@ -14,3 +14,10 @@ settings.dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
+gradle.beforeProject { project ->
+    project.buildscript.repositories {
+        maven { url = uri('https://maven-central.storage-download.googleapis.com/maven2/') }
+        mavenCentral()
+    }
+}

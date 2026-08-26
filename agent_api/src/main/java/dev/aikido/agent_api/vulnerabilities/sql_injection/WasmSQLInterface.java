@@ -1,31 +1,18 @@
 package dev.aikido.agent_api.vulnerabilities.sql_injection;
 
-import com.dylibso.chicory.compiler.InterpreterFallback;
-import com.dylibso.chicory.compiler.MachineFactoryCompiler;
 import com.dylibso.chicory.runtime.Instance;
 import com.dylibso.chicory.runtime.Machine;
-import com.dylibso.chicory.wasm.Parser;
 import com.dylibso.chicory.wasm.WasmModule;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
+import dev.aikido.agent_api.vulnerabilities.sql_injection.generated.ZenInternals;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayDeque;
-import java.util.HexFormat;
-import java.util.Set;
 import java.util.function.Function;
 
 public final class WasmSQLInterface {
     private static final Logger logger = LogManager.getLogger(WasmSQLInterface.class);
-    private static final String WASM_RESOURCE = "zen_internals.wasm";
-    private static final String CHECKSUM_RESOURCE = "zen_internals.wasm.sha256sum";
     private static final int MAX_IDLE_INSTANCES = 10;
-    // These functions exceed Java's 65,535-byte method limit, so run them in the interpreter and fail if any others cannot compile.
-    private static final Set<Integer> INTERPRETED_FUNCTIONS = Set.of(865, 3165);
 
     private static volatile RuntimeState runtime;
     private static volatile Throwable initializationFailure;
@@ -101,47 +88,9 @@ public final class WasmSQLInterface {
         }
     }
 
-    private static RuntimeState createRuntime() throws IOException {
-        byte[] wasm = readResource(WASM_RESOURCE);
-        String[] checksumFields = new String(readResource(CHECKSUM_RESOURCE), StandardCharsets.UTF_8)
-                .trim()
-                .split("\\s+", 2);
-        if (checksumFields[0].isEmpty()) {
-            throw new IllegalStateException("invalid zen-internals WASM checksum");
-        }
-        String expectedChecksum = checksumFields[0];
-        String actualChecksum = sha256(wasm);
-        if (!actualChecksum.equals(expectedChecksum)) {
-            throw new IllegalStateException(
-                    "zen-internals WASM checksum mismatch: expected " + expectedChecksum
-                            + ", got " + actualChecksum);
-        }
-
-        WasmModule module = Parser.parse(wasm);
-        Function<Instance, Machine> machineFactory =
-                MachineFactoryCompiler.builder(module)
-                        .withInterpreterFallback(InterpreterFallback.FAIL)
-                        .withInterpretedFunctions(INTERPRETED_FUNCTIONS)
-                        .compile();
-        return new RuntimeState(module, machineFactory);
-    }
-
-    private static byte[] readResource(String name) throws IOException {
-        ClassLoader classLoader = WasmSQLInterface.class.getClassLoader();
-        try (InputStream stream = classLoader.getResourceAsStream(name)) {
-            if (stream == null) {
-                throw new IOException("resource not found: " + name);
-            }
-            return stream.readAllBytes();
-        }
-    }
-
-    private static String sha256(byte[] bytes) {
-        try {
-            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
-        } catch (NoSuchAlgorithmException e) {
-            throw new AssertionError("SHA-256 is required by every supported JDK", e);
-        }
+    private static RuntimeState createRuntime() {
+        WasmModule module = ZenInternals.load();
+        return new RuntimeState(module, ZenInternals::create);
     }
 
     private static final class RuntimeState {

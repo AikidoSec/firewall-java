@@ -1,3 +1,9 @@
+buildscript {
+    dependencies {
+        classpath 'com.dylibso.chicory:build-time-compiler:1.7.5'
+    }
+}
+
 plugins {
     id 'java'
     id 'jacoco'
@@ -9,11 +15,60 @@ jacoco {
     reportsDirectory = layout.buildDirectory.dir('jacoco')
 }
 
+def zenInternalsWasm = layout.projectDirectory.file('src/main/resources/zen_internals.wasm')
+def zenInternalsGeneratedDirectory = layout.buildDirectory.dir('generated/chicory/zen-internals').get().asFile
+def zenInternalsGeneratedSourceDirectory = new File(zenInternalsGeneratedDirectory, 'sources')
+def zenInternalsGeneratedClassDirectory = new File(zenInternalsGeneratedDirectory, 'classes')
+def zenInternalsGeneratedResourceDirectory = new File(zenInternalsGeneratedDirectory, 'resources')
+def zenInternalsClassName = 'dev.aikido.agent_api.vulnerabilities.sql_injection.generated.ZenInternals'
+def zenInternalsInterpretedFunctions = [865, 3165] as Set
+
+def generateZenInternals = tasks.register('generateZenInternals') {
+    inputs.file(zenInternalsWasm)
+    inputs.property('chicoryVersion', '1.7.5')
+    inputs.property('className', zenInternalsClassName)
+    inputs.property('interpreterFallback', 'FAIL')
+    inputs.property('interpretedFunctions', zenInternalsInterpretedFunctions)
+    outputs.dir(zenInternalsGeneratedSourceDirectory)
+    outputs.dir(zenInternalsGeneratedClassDirectory)
+    outputs.dir(zenInternalsGeneratedResourceDirectory)
+
+    doLast {
+        project.delete(zenInternalsGeneratedDirectory)
+        def config = com.dylibso.chicory.build.time.compiler.Config.builder()
+                .withWasmFile(zenInternalsWasm.asFile.toPath())
+                .withName(zenInternalsClassName)
+                .withTargetSourceFolder(zenInternalsGeneratedSourceDirectory.toPath())
+                .withTargetClassFolder(zenInternalsGeneratedClassDirectory.toPath())
+                .withTargetWasmFolder(zenInternalsGeneratedResourceDirectory.toPath())
+                .withInterpreterFallback(com.dylibso.chicory.compiler.InterpreterFallback.FAIL)
+                .withInterpretedFunctions(zenInternalsInterpretedFunctions)
+                .build()
+        def generator = new com.dylibso.chicory.build.time.compiler.Generator(config)
+        def interpretedFunctions = generator.generateResources()
+        generator.generateMetaWasm(interpretedFunctions)
+        generator.generateSources()
+    }
+}
+
+sourceSets.main.java.srcDir(zenInternalsGeneratedSourceDirectory)
+sourceSets.main.resources.srcDir(zenInternalsGeneratedResourceDirectory)
+sourceSets.main.output.dir(zenInternalsGeneratedClassDirectory, builtBy: generateZenInternals)
+sourceSets.main.compileClasspath += files(zenInternalsGeneratedClassDirectory)
+
+tasks.named('compileJava') {
+    dependsOn(generateZenInternals)
+}
+
+tasks.named('processResources') {
+    dependsOn(generateZenInternals)
+    exclude 'zen_internals.wasm', 'zen_internals.wasm.sha256sum'
+}
+
 dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'com.dylibso.chicory:runtime:1.7.5'
-    implementation 'com.dylibso.chicory:compiler:1.7.5'
     // Junixsocket imports :
     implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.1'
     implementation 'com.kohlschutter.junixsocket:junixsocket-server:2.10.1'
