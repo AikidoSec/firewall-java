@@ -15,14 +15,30 @@ import net.bytebuddy.pool.TypePool;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 
-// Another agent (e.g. OpenTelemetry) can add synthetic supertypes with no .class resource to core types;
-// the default pool then throws while resolving the hierarchy. Unresolvable types degrade to an empty interface.
+/*
+ * OTel adds generated VirtualFieldAccessor interfaces to types it instruments. For example:
+ *
+ *   org.postgresql.jdbc.PgConnection
+ *     └─ java.sql.Connection
+ *          └─ io.opentelemetry.javaagent.bootstrap.field.VirtualFieldAccessor$...
+ *
+ * OTel provides the generated interface bytecode itself, so it has no .class resource for Zen's
+ * ClassFileLocator. Byte Buddy must resolve the hierarchy eagerly to replace this specific missing
+ * interface with an empty stub before Zen's matchers traverse it. Other missing types stay unresolved.
+ */
 public enum LenientPoolStrategy implements AgentBuilder.PoolStrategy {
     INSTANCE;
 
+    private static final String OTEL_VIRTUAL_FIELD_ACCESSOR_PREFIX =
+            "io.opentelemetry.javaagent.bootstrap.field.VirtualFieldAccessor$";
+
     @Override
     public TypePool typePool(ClassFileLocator classFileLocator, ClassLoader classLoader) {
-        return new LenientPool(new TypePool.CacheProvider.Simple(), classFileLocator, TypePool.Default.ReaderMode.FAST);
+        return new TypePool.LazyFacade(new LenientPool(
+                TypePool.CacheProvider.Simple.withObjectType(),
+                classFileLocator,
+                TypePool.Default.ReaderMode.FAST
+        ));
     }
 
     @Override
@@ -38,7 +54,10 @@ public enum LenientPoolStrategy implements AgentBuilder.PoolStrategy {
         @Override
         protected Resolution doDescribe(String name) {
             Resolution resolution = super.doDescribe(name);
-            return resolution.isResolved() ? resolution : new Resolution.Simple(new EmptyStubType(name));
+            if (resolution.isResolved() || !name.startsWith(OTEL_VIRTUAL_FIELD_ACCESSOR_PREFIX)) {
+                return resolution;
+            }
+            return new Resolution.Simple(new EmptyStubType(name));
         }
     }
 

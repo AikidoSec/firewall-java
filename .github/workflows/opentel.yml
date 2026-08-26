@@ -88,6 +88,7 @@ jobs:
     strategy:
       matrix:
         java-version: [17, 18, 19, 20, 21]
+        agent-order: [runWithOpentel, runWithZenFirstOpentel]
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -124,7 +125,7 @@ jobs:
         working-directory: ./sample-apps/SpringBootPostgres
         run: |
           nohup make runWithoutZen > output_without_zen.log & sleep 5
-          nohup make runWithOpentel > output.log & sleep 5
+          nohup make ${{ matrix.agent-order }} > output.log & sleep 5
 
       - name: Run End-to-End tests
         working-directory: ./
