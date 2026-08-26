@@ -65,6 +65,10 @@ tasks.named('processResources') {
     exclude 'zen_internals.wasm', 'zen_internals.wasm.sha256sum'
 }
 
+def jacocoClassDirectories = files(sourceSets.main.output.files.collect {
+    fileTree(dir: it, exclude: 'dev/aikido/agent_api/vulnerabilities/sql_injection/generated/**')
+})
+
 dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.5.1'
     implementation 'com.google.code.gson:gson:2.11.0'
@@ -127,6 +131,7 @@ test {
 }
 
 jacocoTestReport {
+    classDirectories.setFrom(jacocoClassDirectories)
     reports {
         xml.required = true
         csv.required = false
@@ -136,6 +141,7 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    classDirectories.setFrom(jacocoClassDirectories)
     violationRules {
         rule {
             limit {
