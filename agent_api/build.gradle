@@ -16,6 +16,7 @@ jacoco {
 }
 
 def zenInternalsWasm = layout.projectDirectory.file('src/main/resources/zen_internals.wasm')
+def zenInternalsChecksum = layout.projectDirectory.file('src/main/resources/zen_internals.wasm.sha256sum')
 def zenInternalsGeneratedDirectory = layout.buildDirectory.dir('generated/chicory/zen-internals').get().asFile
 def zenInternalsGeneratedSourceDirectory = new File(zenInternalsGeneratedDirectory, 'sources')
 def zenInternalsGeneratedClassDirectory = new File(zenInternalsGeneratedDirectory, 'classes')
@@ -25,6 +26,7 @@ def zenInternalsInterpretedFunctions = [865, 3165] as Set
 
 def generateZenInternals = tasks.register('generateZenInternals') {
     inputs.file(zenInternalsWasm)
+    inputs.file(zenInternalsChecksum)
     inputs.property('chicoryVersion', '1.7.5')
     inputs.property('className', zenInternalsClassName)
     inputs.property('interpreterFallback', 'FAIL')
@@ -32,6 +34,18 @@ def generateZenInternals = tasks.register('generateZenInternals') {
     outputs.dir(zenInternalsGeneratedSourceDirectory)
     outputs.dir(zenInternalsGeneratedClassDirectory)
     outputs.dir(zenInternalsGeneratedResourceDirectory)
+
+    doFirst {
+        def expectedChecksum = zenInternalsChecksum.asFile.text.trim().split(/\s+/, 2)[0]
+        if (!(expectedChecksum ==~ /[0-9a-fA-F]{64}/)) {
+            throw new GradleException('Invalid zen-internals WASM checksum')
+        }
+        def actualChecksum = java.util.HexFormat.of().formatHex(
+                java.security.MessageDigest.getInstance('SHA-256').digest(zenInternalsWasm.asFile.bytes))
+        if (!actualChecksum.equalsIgnoreCase(expectedChecksum)) {
+            throw new GradleException("zen-internals WASM checksum mismatch: expected ${expectedChecksum}, got ${actualChecksum}")
+        }
+    }
 
     doLast {
         project.delete(zenInternalsGeneratedDirectory)
