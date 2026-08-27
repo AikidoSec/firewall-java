@@ -34,7 +34,7 @@ jobs:
             - name: Run WasmSQLInterfaceTest
               working-directory: ./
               run: |
-                  ./gradlew test --tests "vulnerabilities.WasmSQLInterfaceTest" --info
+                  ./gradlew :agent_api:test --tests "vulnerabilities.WasmSQLInterfaceTest" --info
 
     smoke-test-musl:
         name: Smoke Test (${{matrix.image}}, Java 21)
@@ -63,5 +63,5 @@ jobs:
               run: |
                   docker run --rm -v "$(pwd):/app" -w /app ${{matrix.image}} sh -c "
                     chmod +x gradlew && \
-                    AIKIDO_DEBUG=true ./gradlew test --tests 'vulnerabilities.WasmSQLInterfaceTest' --info
+                    AIKIDO_DEBUG=true ./gradlew :agent_api:test --tests 'vulnerabilities.WasmSQLInterfaceTest' --info
                   "

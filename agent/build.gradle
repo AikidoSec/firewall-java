@@ -20,10 +20,6 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    // The root `test --tests <name>` smoke run targets a test in another module; don't fail here on no match.
-    filter {
-        setFailOnNoMatchingTests(false)
-    }
 }
 
 shadowJar {
