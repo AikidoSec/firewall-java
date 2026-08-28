@@ -4,7 +4,8 @@ spring_boot_postgres_app = App(8080)
 
 spring_boot_postgres_app.add_payload("sql",
     safe_request=Request("/api/pets/create", body={"name": "Bobby"}),
-    unsafe_request=Request("/api/pets/create", body={"name": "Malicious Pet', 'Gru from the Minions') -- "})
+    unsafe_request=Request("/api/pets/create", body={"name": "Malicious Pet', 'Gru from the Minions') -- "}),
+    test_request={"route": "/api/pets/create"}
 )
 spring_boot_postgres_app.add_payload("command injection",
     safe_request=Request("/api/commands/execute/Johnny", method='GET'),

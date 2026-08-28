@@ -28,6 +28,8 @@ public final class ByteBuddyInitializer {
                         .with(InstrumentedType.Factory.Default.FROZEN)
         );
 
+        agentBuilder = agentBuilder.with(LenientPoolStrategy.INSTANCE);
+
         //  Disables all implicit changes on a class file that Byte Buddy would apply for certain instrumentation's.
         agentBuilder = agentBuilder.disableClassFormatChanges();
 
@@ -39,10 +41,10 @@ public final class ByteBuddyInitializer {
                     .with(AgentBuilder.InstallationListener.StreamWriting.toSystemError());
         }
 
-        // Ignore Byte Buddy and Aikido's internal code:
         agentBuilder = agentBuilder.ignore(
                 ElementMatchers.nameContains("bytebuddy")
                 .or(ElementMatchers.nameContains("dev.aikido.agent"))
+                .or(ElementMatchers.nameStartsWith("io.opentelemetry.javaagent"))
         );
 
         agentBuilder = agentBuilder.with(AgentBuilder.TypeStrategy.Default.DECORATE);
