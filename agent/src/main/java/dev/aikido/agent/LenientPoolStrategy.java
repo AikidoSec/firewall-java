@@ -46,18 +46,21 @@ public enum LenientPoolStrategy implements AgentBuilder.PoolStrategy {
         return typePool(classFileLocator, classLoader);
     }
 
-    private static final class LenientPool extends TypePool.Default {
+    private static final class LenientPool extends TypePool.Default.WithLazyResolution {
         LenientPool(CacheProvider cacheProvider, ClassFileLocator classFileLocator, ReaderMode readerMode) {
             super(cacheProvider, classFileLocator, readerMode);
         }
 
         @Override
         protected Resolution doDescribe(String name) {
-            Resolution resolution = super.doDescribe(name);
-            if (resolution.isResolved() || !name.startsWith(OTEL_VIRTUAL_FIELD_ACCESSOR_PREFIX)) {
-                return resolution;
+            if (!name.startsWith(OTEL_VIRTUAL_FIELD_ACCESSOR_PREFIX)) {
+                return super.doDescribe(name);
             }
-            return new Resolution.Simple(new EmptyStubType(name));
+
+            Resolution resolution = super.doDescribe(name);
+            return resolution.isResolved()
+                    ? resolution
+                    : new Resolution.Simple(new EmptyStubType(name));
         }
     }
 
