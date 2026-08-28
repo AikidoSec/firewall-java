@@ -12,25 +12,37 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.pool.TypePool;
 
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 
 /*
- * OTel adds generated VirtualFieldAccessor interfaces to types it instruments. For example:
+ * OpenTelemetry adds helper interfaces to some classes it instruments. For example:
  *
  *   org.postgresql.jdbc.PgConnection
  *     └─ java.sql.Connection
  *          └─ io.opentelemetry.javaagent.bootstrap.field.VirtualFieldAccessor$...
  *
- * OTel provides the generated interface bytecode itself, so it has no .class resource for Zen's
- * ClassFileLocator. Byte Buddy must resolve the hierarchy eagerly to replace this specific missing
- * interface with an empty stub before Zen's matchers traverse it. Other missing types stay unresolved.
+ * OpenTelemetry loads these helpers itself, so Zen cannot read their class files through the
+ * application's class loader. Byte Buddy would remember the missing type and stop inspecting
+ * the hierarchy before Zen can apply its instrumentation.
+ *
+ * For these known OpenTelemetry helpers, check for the class file before Byte Buddy caches the
+ * miss. If it is unavailable, use an empty interface so Zen can keep inspecting the hierarchy.
+ * Leave all other missing types unresolved.
  */
 public enum LenientPoolStrategy implements AgentBuilder.PoolStrategy {
     INSTANCE;
 
     private static final String OTEL_VIRTUAL_FIELD_ACCESSOR_PREFIX =
             "io.opentelemetry.javaagent.bootstrap.field.VirtualFieldAccessor$";
+    private static final String OTEL_VIRTUAL_FIELD_INSTALLED_MARKER =
+            "io.opentelemetry.javaagent.bootstrap.field.VirtualFieldInstalledMarker";
+
+    private static boolean isOtelVirtualField(String name) {
+        return name.startsWith(OTEL_VIRTUAL_FIELD_ACCESSOR_PREFIX)
+                || name.equals(OTEL_VIRTUAL_FIELD_INSTALLED_MARKER);
+    }
 
     @Override
     public TypePool typePool(ClassFileLocator classFileLocator, ClassLoader classLoader) {
@@ -53,14 +65,19 @@ public enum LenientPoolStrategy implements AgentBuilder.PoolStrategy {
 
         @Override
         protected Resolution doDescribe(String name) {
-            if (!name.startsWith(OTEL_VIRTUAL_FIELD_ACCESSOR_PREFIX)) {
+            if (!isOtelVirtualField(name)) {
                 return super.doDescribe(name);
             }
 
-            Resolution resolution = super.doDescribe(name);
-            return resolution.isResolved()
-                    ? resolution
-                    : new Resolution.Simple(new EmptyStubType(name));
+            try {
+                if (!classFileLocator.locate(name).isResolved()) {
+                    return new Resolution.Simple(new EmptyStubType(name));
+                }
+            } catch (IOException exception) {
+                throw new IllegalStateException("Error while reading class file", exception);
+            }
+
+            return super.doDescribe(name);
         }
     }
 

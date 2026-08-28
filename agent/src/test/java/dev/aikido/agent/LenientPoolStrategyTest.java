@@ -11,6 +11,7 @@ import net.bytebuddy.pool.TypePool;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Map;
 
 import static net.bytebuddy.matcher.ElementMatchers.declaresMethod;
@@ -23,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LenientPoolStrategyTest {
     private static final String OTEL_VIRTUAL_FIELD_ACCESSOR =
             "io.opentelemetry.javaagent.bootstrap.field.VirtualFieldAccessor$java$lang$Runnable$context";
+    private static final String OTEL_VIRTUAL_FIELD_INSTALLED_MARKER =
+            "io.opentelemetry.javaagent.bootstrap.field.VirtualFieldInstalledMarker";
     private static final String CONTROLLER_BASE = "com.acme.ControllerBase";
     private static final String CONTROLLER = "com.acme.Controller";
 
@@ -32,15 +35,20 @@ class LenientPoolStrategyTest {
     }
 
     @Test
-    void virtualFieldAccessorDegradesToEmptyInterface() {
-        TypeDescription type = pool().describe(OTEL_VIRTUAL_FIELD_ACCESSOR).resolve();
+    void virtualFieldInterfacesDegradeToEmptyInterface() {
+        for (String virtualFieldInterface : List.of(
+                OTEL_VIRTUAL_FIELD_ACCESSOR,
+                OTEL_VIRTUAL_FIELD_INSTALLED_MARKER
+        )) {
+            TypeDescription type = pool().describe(virtualFieldInterface).resolve();
 
-        assertEquals(OTEL_VIRTUAL_FIELD_ACCESSOR, type.getName());
-        assertTrue(type.isInterface());
-        assertTrue(type.getDeclaredMethods().isEmpty());
-        assertTrue(type.getDeclaredFields().isEmpty());
-        assertTrue(type.getInterfaces().isEmpty());
-        assertEquals(Object.class.getName(), type.getSuperClass().asErasure().getName());
+            assertEquals(virtualFieldInterface, type.getName());
+            assertTrue(type.isInterface());
+            assertTrue(type.getDeclaredMethods().isEmpty());
+            assertTrue(type.getDeclaredFields().isEmpty());
+            assertTrue(type.getInterfaces().isEmpty());
+            assertEquals(Object.class.getName(), type.getSuperClass().asErasure().getName());
+        }
     }
 
     @Test
@@ -61,6 +69,7 @@ class LenientPoolStrategyTest {
         TypeDescription controller = pool.describe(CONTROLLER).resolve();
 
         assertTrue(hasSuperType(declaresMethod(named("handle"))).matches(controller));
+        assertFalse(hasSuperType(declaresMethod(named("missing"))).matches(controller));
     }
 
     private static byte[] controllerBaseBytes() {
