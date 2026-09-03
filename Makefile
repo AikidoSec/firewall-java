@@ -50,7 +50,7 @@ test:
 	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test
 
 cov:
-	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test --rerun-tasks -PcoverageRun jacocoTestReport jacocoTestCoverageVerification
+	AIKIDO_LOG_LEVEL="error" AIKIDO_TOKEN="token" ./gradlew test --rerun-tasks -PcoverageRun jacocoTestReport jacocoTestCoverageVerification coberturaToLcov
 
 
 # Automatic versioning for releases :
