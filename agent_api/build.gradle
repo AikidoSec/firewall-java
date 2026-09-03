@@ -8,6 +8,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'com.gradleup.shadow' version '9.5.1'
+    id 'name.remal.jacoco-to-cobertura' version '2.0.4'
 }
 
 jacoco {
@@ -152,6 +153,54 @@ jacocoTestReport {
         html.required = false
     }
     dependsOn test
+}
+
+// remal creates jacocoTestReportToCobertura (JaCoCo XML → Cobertura XML) via finalizedBy.
+def coberturaReportFile = layout.buildDirectory.file('jacoco/test/cobertura-jacocoTestReport.xml')
+def lcovReportFile = layout.buildDirectory.file('jacoco/test/lcov.info')
+
+tasks.register('coberturaToLcov') {
+    group = 'verification'
+    description = 'Converts Cobertura XML coverage report to LCOV format'
+    dependsOn 'jacocoTestReportToCobertura'
+    inputs.file(coberturaReportFile)
+    outputs.file(lcovReportFile)
+
+    doLast {
+        def coberturaFile = coberturaReportFile.get().asFile
+        if (!coberturaFile.exists()) {
+            throw new GradleException("Cobertura report not found: ${coberturaFile}")
+        }
+
+        def xml = new XmlSlurper().parse(coberturaFile)
+        def sourceRoots = xml.sources.source*.text().findAll { it }
+
+        def out = lcovReportFile.get().asFile
+        out.parentFile.mkdirs()
+        out.withWriter('UTF-8') { writer ->
+            writer.println('TN:')
+            xml.packages.package.classes.class.each { cls ->
+                def filename = cls.@filename.text()
+                def path = filename
+                for (root in sourceRoots) {
+                    def candidate = new File(root as String, filename)
+                    if (candidate.exists()) {
+                        path = candidate.path
+                        break
+                    }
+                }
+                writer.println("SF:${path}")
+                cls.lines.line.each { line ->
+                    writer.println("DA:${line.@number.text()},${line.@hits.text()}")
+                }
+                writer.println('end_of_record')
+            }
+        }
+    }
+}
+
+tasks.named('jacocoTestReportToCobertura').configure {
+    finalizedBy coberturaToLcov
 }
 
 jacocoTestCoverageVerification {
