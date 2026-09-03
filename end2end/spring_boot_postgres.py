@@ -20,4 +20,5 @@ spring_boot_postgres_app.add_payload("path traversal",
     unsafe_request=Request("/api/files/read", data_type='form', body={"fileName": "./../databases/docker-compose.yml"})
 )
 
+spring_boot_postgres_app.test_dependency_detection("com.fasterxml.jackson.core:jackson-databind")
 spring_boot_postgres_app.test_all_payloads()
