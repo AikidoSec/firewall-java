@@ -30,6 +30,10 @@ public class SqlInjectionTest {
             result = detectSqlInjection(sql, input, new Dialect("postgresql"));
             assertTrue(result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
         }
+        if ("hsql database engine".equals(dialect) || "all".equals(dialect)) {
+            result = detectSqlInjection(sql, input, new Dialect("hsql database engine"));
+            assertTrue(result, String.format("Expected SQL injection for SQL: %s and input: %s", sql, input));
+        }
     }
 
 
@@ -226,7 +230,7 @@ public class SqlInjectionTest {
         // Positive example of same query:
         isSqlInjection(
                 "SELECT * FROM comments WHERE comment = 'I'm writing you--'",
-                "I'm writing you--", "all"
+                "I'm writing you--", "postgresql"
         );
         isSqlInjection(
                 "SELECT * FROM comments WHERE comment = 'I'm writing you''",
@@ -360,11 +364,12 @@ public class SqlInjectionTest {
     public void testTrimmedUserInputBypass() {
         // Attacker pads payload with trailing spaces; app trims before DB execution.
         // The trimmed payload must still be detected (AIKIDO-OR0E0082).
-        isSqlInjection(
-                "INSERT INTO pets (name, owner) VALUES ('x', 'dummy'), ('injected', 'hacker'); --', 'owner')",
-                "x', 'dummy'), ('injected', 'hacker'); --    ",
-                "all"
-        );
+        String sql = "INSERT INTO pets (name, owner) VALUES ('x', 'dummy'), ('injected', 'hacker'); --', 'owner')";
+        String input = "x', 'dummy'), ('injected', 'hacker'); --    ";
+
+        isSqlInjection(sql, input, "postgresql");
+        // HyperSQL maps to zen-internals' generic SQL dialect.
+        isSqlInjection(sql, input, "hsql database engine");
     }
 
     @Test

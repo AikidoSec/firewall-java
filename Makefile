@@ -2,7 +2,7 @@ clean:
 	rm -rf dist/
 	./gradlew clean
 
-ZEN_INTERNALS_VERSION = v0.1.60
+ZEN_INTERNALS_VERSION = v0.1.70
 WASM_BASE_URL = https://github.com/AikidoSec/zen-internals/releases/download/$(ZEN_INTERNALS_VERSION)
 WASM_RESOURCE_DIR = agent_api/src/main/resources
 

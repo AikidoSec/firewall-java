@@ -22,7 +22,6 @@ def zenInternalsGeneratedSourceDirectory = new File(zenInternalsGeneratedDirecto
 def zenInternalsGeneratedClassDirectory = new File(zenInternalsGeneratedDirectory, 'classes')
 def zenInternalsGeneratedResourceDirectory = new File(zenInternalsGeneratedDirectory, 'resources')
 def zenInternalsClassName = 'dev.aikido.agent_api.vulnerabilities.sql_injection.generated.ZenInternals'
-def zenInternalsInterpretedFunctions = [865, 3165] as Set
 
 def generateZenInternals = tasks.register('generateZenInternals') {
     inputs.file(zenInternalsWasm)
@@ -30,7 +29,6 @@ def generateZenInternals = tasks.register('generateZenInternals') {
     inputs.property('chicoryVersion', '1.7.5')
     inputs.property('className', zenInternalsClassName)
     inputs.property('interpreterFallback', 'FAIL')
-    inputs.property('interpretedFunctions', zenInternalsInterpretedFunctions)
     outputs.dir(zenInternalsGeneratedSourceDirectory)
     outputs.dir(zenInternalsGeneratedClassDirectory)
     outputs.dir(zenInternalsGeneratedResourceDirectory)
@@ -56,7 +54,6 @@ def generateZenInternals = tasks.register('generateZenInternals') {
                 .withTargetClassFolder(zenInternalsGeneratedClassDirectory.toPath())
                 .withTargetWasmFolder(zenInternalsGeneratedResourceDirectory.toPath())
                 .withInterpreterFallback(com.dylibso.chicory.compiler.InterpreterFallback.FAIL)
-                .withInterpretedFunctions(zenInternalsInterpretedFunctions)
                 .build()
         def generator = new com.dylibso.chicory.build.time.compiler.Generator(config)
         def interpretedFunctions = generator.generateResources()
