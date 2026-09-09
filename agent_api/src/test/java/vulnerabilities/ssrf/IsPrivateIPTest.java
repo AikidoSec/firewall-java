@@ -140,6 +140,10 @@ public class IsPrivateIPTest {
         assertTrue(isPrivateIp("fe80::"));
         assertTrue(isPrivateIp("fe80::1"));
         assertTrue(isPrivateIp("fe80::abc:1"));
+        assertTrue(isPrivateIp("fe80::1%eth0"));
+        assertTrue(isPrivateIp("fe80::1%dummy0"));
+        assertTrue(isPrivateIp("fe80:0:0:0:0:0:0:1%3"));
+        assertTrue(isPrivateIp("::1%lo"));
         assertTrue(isPrivateIp("febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff"));
         assertTrue(isPrivateIp("fc00::"));
         assertTrue(isPrivateIp("fc00::1"));
@@ -182,6 +186,9 @@ public class IsPrivateIPTest {
         assertFalse(isPrivateIp("invalid-ip"));
         assertFalse(isPrivateIp("256.256.256.256")); // Invalid IPv4
         assertFalse(isPrivateIp("::g")); // Invalid IPv6
+        assertFalse(isPrivateIp("100::ffff::"));
+        assertFalse(isPrivateIp("::ffff:0.0.255.255.255"));
+        assertFalse(isPrivateIp("::ffff:0.255.255.255.255"));
     }
 
 }
