@@ -29,6 +29,7 @@ public class IsPrivateIPTest {
         assertTrue(isPrivateIp("10.255.255.255"));
         assertTrue(isPrivateIp("100.64.0.0"));
         assertTrue(isPrivateIp("100.64.0.1"));
+        assertTrue(isPrivateIp("100.100.100.200"));
         assertTrue(isPrivateIp("100.127.255.254"));
         assertTrue(isPrivateIp("100.127.255.255"));
         assertTrue(isPrivateIp("127.0.0.0"));
@@ -41,6 +42,7 @@ public class IsPrivateIPTest {
         assertTrue(isPrivateIp("127.255.255.255"));
         assertTrue(isPrivateIp("169.254.0.0"));
         assertTrue(isPrivateIp("169.254.0.1"));
+        assertTrue(isPrivateIp("169.254.169.254"));
         assertTrue(isPrivateIp("169.254.255.254"));
         assertTrue(isPrivateIp("169.254.255.255"));
         assertTrue(isPrivateIp("172.16.0.0"));

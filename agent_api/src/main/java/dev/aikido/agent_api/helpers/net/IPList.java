@@ -1,62 +1,32 @@
 package dev.aikido.agent_api.helpers.net;
 
-import inet.ipaddr.IPAddress;
-import inet.ipaddr.IPAddressString;
-import inet.ipaddr.format.util.DualIPv4v6Tries;
+import java.util.Collection;
+import java.util.List;
 
 public class IPList {
-    private final DualIPv4v6Tries ipAddresses;
+    private IPMatcher matcher;
 
     public IPList() {
-        this.ipAddresses = new DualIPv4v6Tries();
+        matcher = IPMatcher.from(List.of());
+    }
+
+    public IPList(Collection<String> ipAddresses) {
+        matcher = IPMatcher.from(ipAddresses);
     }
 
     public void add(String ipOrCIDR) {
-        if (ipOrCIDR == null) {
-            return; // Don't add if IP is null
-        }
-        IPAddress ip = new IPAddressString(ipOrCIDR).getAddress();
-        if (ip == null) {
-            return;
-        }
-        // Normalize IPv4-mapped IPv6 addresses to their IPv4 form so matching is symmetric.
-        if (ip.isIPv6() && ip.toIPv6().isIPv4Convertible()) {
-            IPAddress ipv4 = ip.toIPv6().toIPv4();
-            if (ipv4 != null) {
-                ip = ipv4;
-            }
-        }
-        if (ipOrCIDR.contains("/")) {
-            ip = ip.toPrefixBlock();
-        }
-        ipAddresses.add(ip);
+        matcher = matcher.add(ipOrCIDR);
     }
 
     public boolean matches(String ip) {
-        IPAddressString ipAddressString = new IPAddressString(ip);
-        if (!ipAddressString.isValid()) {
-            return false; // Invalid IP address
-        }
-        IPAddress ipAddress = ipAddressString.getAddress();
-
-        if (containsAddress(ipAddress)) {
-            return true;
-        }
-
-        // Also try the embedded IPv4 form for IPv4-mapped IPv6 addresses (e.g. ::ffff:23.45.67.89)
-        if (ipAddress.isIPv6() && ipAddress.toIPv6().isIPv4Convertible()) {
-            IPAddress ipv4 = ipAddress.toIPv6().toIPv4();
-            if (ipv4 != null && containsAddress(ipv4)) {
-                return true;
-            }
-        }
-        return false;
+        return matcher.matches(ip);
     }
 
-    private boolean containsAddress(IPAddress ipAddress) {
-        return ipAddresses.elementContains(ipAddress);
+    public boolean matchesWithMappedCheck(String ip) {
+        return matcher.matchesWithMappedCheck(ip);
     }
+
     public int length() {
-        return ipAddresses.size();
+        return matcher.size();
     }
 }

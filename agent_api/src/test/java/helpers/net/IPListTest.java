@@ -118,13 +118,13 @@ public class IPListTest {
     @Test
     public void testBlocklistMatchesIPv4MappedIPv6() {
         blocklist.add("192.168.1.1");
-        assertTrue(blocklist.matches("::ffff:192.168.1.1"));
-        assertFalse(blocklist.matches("::ffff:192.168.1.2"));
+        assertTrue(blocklist.matchesWithMappedCheck("::ffff:192.168.1.1"));
+        assertFalse(blocklist.matchesWithMappedCheck("::ffff:192.168.1.2"));
 
         blocklist.add("10.0.0.0/8");
-        assertTrue(blocklist.matches("::ffff:10.5.6.7"));
-        assertTrue(blocklist.matches("::ffff:10.0.0.1"));
-        assertFalse(blocklist.matches("::ffff:11.0.0.1"));
+        assertTrue(blocklist.matchesWithMappedCheck("::ffff:10.5.6.7"));
+        assertTrue(blocklist.matchesWithMappedCheck("::ffff:10.0.0.1"));
+        assertFalse(blocklist.matchesWithMappedCheck("::ffff:11.0.0.1"));
     }
 
     @Test
@@ -154,18 +154,18 @@ public class IPListTest {
     }
 
     @Test
-    public void testBlocklistStoredIPv4MappedMatchesPlainIPv4() {
+    public void testBlocklistStoredIPv4MappedDoesNotMatchPlainIPv4() {
         blocklist.add("::ffff:23.45.67.89");
-        assertTrue(blocklist.matches("23.45.67.89"));
-        assertTrue(blocklist.matches("::ffff:23.45.67.89"));
-        assertFalse(blocklist.matches("23.45.67.90"));
+        assertFalse(blocklist.matchesWithMappedCheck("23.45.67.89"));
+        assertTrue(blocklist.matchesWithMappedCheck("::ffff:23.45.67.89"));
+        assertFalse(blocklist.matchesWithMappedCheck("23.45.67.90"));
     }
 
     @Test
-    public void testBlocklistStoredIPv4MappedCidrMatchesPlainIPv4() {
+    public void testBlocklistStoredIPv4MappedCidrDoesNotMatchPlainIPv4() {
         blocklist.add("::ffff:10.0.0.0/104");
-        assertTrue(blocklist.matches("10.1.2.3"));
-        assertTrue(blocklist.matches("::ffff:10.1.2.3"));
-        assertFalse(blocklist.matches("11.1.2.3"));
+        assertFalse(blocklist.matchesWithMappedCheck("10.1.2.3"));
+        assertTrue(blocklist.matchesWithMappedCheck("::ffff:10.1.2.3"));
+        assertFalse(blocklist.matchesWithMappedCheck("11.1.2.3"));
     }
 }

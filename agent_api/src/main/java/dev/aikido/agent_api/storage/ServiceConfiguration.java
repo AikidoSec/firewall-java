@@ -10,7 +10,7 @@ import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 
 import java.util.*;
 
-import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
+import static dev.aikido.agent_api.helpers.IPListBuilder.createIPListWithMappedAddresses;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
 
 /**
@@ -40,7 +40,8 @@ public class ServiceConfiguration {
         }
         this.blockingEnabled = apiResponse.block();
         if (apiResponse.allowedIPAddresses() != null) {
-            this.bypassedIPs = createIPList(apiResponse.allowedIPAddresses());
+            // Small list, frequently accessed: add IPv4-mapped versions at creation time for fast lookups
+            this.bypassedIPs = createIPListWithMappedAddresses(apiResponse.allowedIPAddresses());
         }
         if (apiResponse.blockedUserIds() != null) {
             this.blockedUserIDs = new HashSet<>(apiResponse.blockedUserIds());

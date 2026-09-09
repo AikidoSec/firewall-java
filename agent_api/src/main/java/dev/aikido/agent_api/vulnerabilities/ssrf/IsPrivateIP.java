@@ -4,6 +4,8 @@ import dev.aikido.agent_api.helpers.net.IPList;
 
 import java.util.List;
 
+import static dev.aikido.agent_api.helpers.IPListBuilder.createIPListWithMappedAddresses;
+
 public final class IsPrivateIP {
     // Define private IP ranges
     private static final List<String> PRIVATE_IP_RANGES = List.of(
@@ -25,9 +27,7 @@ public final class IsPrivateIP {
             "203.0.113.0/24", // TEST-NET-3 (RFC 5737)
             "240.0.0.0/4", // Reserved for Future Use (RFC 1112)
             "224.0.0.0/4", // Multicast (RFC 3171)
-            "255.255.255.255/32" // Limited Broadcast (RFC 919)
-    );
-    private static final List<String> PRIVATE_IPV6_RANGES = List.of(
+            "255.255.255.255/32", // Limited Broadcast (RFC 919)
             "::/128", // Unspecified address (RFC 4291)
             "::1/128", // Loopback address (RFC 4291)
             "fc00::/7", // Unique local address (ULA) (RFC 4193)
@@ -36,12 +36,8 @@ public final class IsPrivateIP {
             "2001:db8::/32", // Documentation prefix (RFC 3849)
             "3fff::/20" // Documentation prefix (RFC 9637)
     );
-    private static final IPList privateIpNetworks = new IPList();
-
-    static {
-        PRIVATE_IP_RANGES.stream().forEach(privateIpNetworks::add);
-        PRIVATE_IPV6_RANGES.stream().forEach(privateIpNetworks::add);
-    }
+    // Small list, frequently accessed: add IPv4-mapped versions at creation time for fast lookups
+    private static final IPList privateIpNetworks = createIPListWithMappedAddresses(PRIVATE_IP_RANGES);
 
     private IsPrivateIP() {
     }
@@ -56,6 +52,52 @@ public final class IsPrivateIP {
     }
 
     public static boolean isPrivateIp(String ip) {
-        return privateIpNetworks.matches(ip);
+        return privateIpNetworks.matches(normalizeIPv4Address(ip));
+    }
+
+    private static String normalizeIPv4Address(String ip) {
+        if (ip == null) {
+            return null;
+        }
+
+        int partCount = 1;
+        for (int index = 0; index < ip.length(); index++) {
+            char character = ip.charAt(index);
+            if (character == '.') {
+                partCount++;
+            } else if (character < '0' || character > '9') {
+                return ip;
+            }
+        }
+        if (partCount > 3) {
+            return ip;
+        }
+
+        String[] parts = ip.split("\\.", -1);
+        int lastPartBits = (5 - partCount) * Byte.SIZE;
+        long address = 0;
+        try {
+            for (int index = 0; index < parts.length - 1; index++) {
+                long part = Long.parseLong(parts[index]);
+                if (part > 255) {
+                    return ip;
+                }
+                address = (address << Byte.SIZE) | part;
+            }
+            long lastPart = Long.parseLong(parts[parts.length - 1]);
+            if (lastPart >= (1L << lastPartBits)) {
+                return ip;
+            }
+            address = (address << lastPartBits) | lastPart;
+        } catch (NumberFormatException ignored) {
+            return ip;
+        }
+
+        return String.format(
+            "%d.%d.%d.%d",
+            address >>> 24,
+            (address >>> 16) & 0xff,
+            (address >>> 8) & 0xff,
+            address & 0xff);
     }
 }
