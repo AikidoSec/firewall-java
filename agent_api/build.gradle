@@ -10,6 +10,8 @@ plugins {
     id 'com.gradleup.shadow' version '9.5.1'
 }
 
+def apacheHttpClient5Version = findProperty('apacheHttpClient5Version') ?: '5.5.2'
+
 jacoco {
     toolVersion "0.8.15"
     reportsDirectory = layout.buildDirectory.dir('jacoco')
@@ -105,6 +107,7 @@ dependencies {
     testImplementation 'com.microsoft.sqlserver:mssql-jdbc:10.2.0.jre8'
     testImplementation 'com.squareup.okhttp3:okhttp:4.10.0'
     testImplementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    testImplementation "org.apache.httpcomponents.client5:httpclient5:${apacheHttpClient5Version}"
 
     // Spring Web for RestTemplate
     testImplementation 'org.springframework:spring-web:5.3.20'
