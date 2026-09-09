@@ -1,8 +1,10 @@
 package helpers;
+import com.google.gson.Gson;
 import dev.aikido.agent_api.background.Endpoint;
 import dev.aikido.agent_api.helpers.IPAccessController;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -72,6 +74,26 @@ public class IPAccessControllerTest {
     public void testBlocksRequestIfNotAllowedIpAddress() {
         List<Endpoint> endpoints = List.of(genEndpoint(List.of("1.2.3.4")));
         assertFalse(IPAccessController.ipAllowedToAccessRoute("3.4.5.6", endpoints));
+    }
+
+    @Test
+    public void testUsesCachedAllowedIpMatcher() {
+        List<String> allowedIPAddresses = new ArrayList<>(List.of("1.2.3.4"));
+        Endpoint endpoint = genEndpoint(allowedIPAddresses);
+        allowedIPAddresses.clear();
+
+        assertTrue(endpoint.isIpAllowed("1.2.3.4"));
+    }
+
+    @Test
+    public void testDeserializedEndpointBuildsAllowedIpMatcher() {
+        Endpoint endpoint = new Gson().fromJson(
+                "{\"method\":\"GET\",\"route\":\"/\",\"allowedIPAddresses\":[\"1.2.3.4\"]}",
+                Endpoint.class
+        );
+
+        assertTrue(endpoint.isIpAllowed("1.2.3.4"));
+        assertFalse(endpoint.isIpAllowed("3.4.5.6"));
     }
 
     @Test
