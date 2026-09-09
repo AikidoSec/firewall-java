@@ -35,6 +35,9 @@ public final class Wrappers {
             new HttpClientSendWrapper(),
             new OkHttpWrapper(),
             new ApacheHttpClientWrapper(),
+            new AsyncHttpClientWrapper(),
+            new AsyncHttpClientRedirectWrapper(),
+            new NingAsyncHttpClientWrapper(),
 
             new PathWrapper(),
             new PathsWrapper(),
