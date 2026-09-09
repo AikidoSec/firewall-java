@@ -3,7 +3,7 @@ package dev.aikido.agent_api.helpers.net;
 import java.util.Arrays;
 import java.util.Collection;
 
-// This parser and matcher preserve firewall-node's netparser-derived behavior.
+// This parser and matcher are based on firewall-node's netparser-derived implementation.
 // netparser is MIT licensed, Copyright (c) 2019 alex.
 final class IPMatcher {
   private static final int IPV4 = 4;
@@ -800,6 +800,13 @@ final class IPMatcher {
       }
       if (start == end) {
         return false;
+      }
+      int zoneSeparator = indexOf(value, '%', start, end);
+      if (zoneSeparator >= 0) {
+        if (zoneSeparator == end - 1) {
+          return false;
+        }
+        end = zoneSeparator;
       }
       if (end - start == 2 && value.charAt(start) == ':' && value.charAt(start + 1) == ':') {
         return true;

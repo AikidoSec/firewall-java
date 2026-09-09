@@ -284,6 +284,19 @@ class IPMatcherCompatibilityTest {
   }
 
   @Test
+  void ignoresIPv6ZoneIdentifiersDuringMatching() {
+    IPList matcher = new IPList(List.of("::1", "fe80::/10", "2001:db8::/32"));
+
+    assertTrue(matcher.matches("fe80::1%eth0"));
+    assertTrue(matcher.matches("fe80::1%3"));
+    assertTrue(matcher.matches("[fe80::1%eth0]"));
+    assertTrue(matcher.matches("::1%lo"));
+    assertTrue(matcher.matches("2001:db8::1%eth0"));
+    assertFalse(matcher.matches("2001:db9::1%eth0"));
+    assertFalse(matcher.matches("fe80::1%"));
+  }
+
+  @Test
   void mapsIPv4MappedIPv6RequestsToIPv4Networks() {
     IPList addressMatcher = new IPList(List.of("192.0.2.1"));
     assertTrue(addressMatcher.matches("192.0.2.1"));
