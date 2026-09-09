@@ -12,6 +12,7 @@ public class Endpoint {
     private final String route;
     private final RateLimitingConfig rateLimiting;
     private final List<String> allowedIPAddresses;
+    private transient volatile IPList allowedIPMatcher;
     private final boolean graphql;
     private final boolean forceProtectionOff;
     public Endpoint(
@@ -21,6 +22,7 @@ public class Endpoint {
         this.method = method;
         this.route = route;
         this.allowedIPAddresses = allowedIPAddresses;
+        this.allowedIPMatcher = createIPList(allowedIPAddresses);
         this.rateLimiting = new RateLimitingConfig(maxRequests, windowSizeMS, rateLimitingEnabled);
         this.graphql = graphql;
         this.forceProtectionOff = forceProtectionOff;
@@ -47,7 +49,14 @@ public class Endpoint {
         return allowedIPAddresses == null || allowedIPAddresses.size() == 0;
     }
 
+    private IPList getOrCreateAllowedIPMatcher() {
+        if (allowedIPMatcher == null) {
+            this.allowedIPMatcher = createIPList(allowedIPAddresses);
+        }
+        return allowedIPMatcher;
+    }
+
     public boolean isIpAllowed(String ip) {
-        return createIPList(allowedIPAddresses).matches(ip);
+        return getOrCreateAllowedIPMatcher().matches(ip);
     }
 }
