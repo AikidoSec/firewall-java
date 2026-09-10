@@ -4,7 +4,7 @@ import dev.aikido.agent_api.helpers.net.IPList;
 
 import java.util.List;
 
-import static dev.aikido.agent_api.helpers.IPListBuilder.createIPList;
+import static dev.aikido.agent_api.helpers.IPListBuilder.createIPListWithMappedAddresses;
 
 public class Endpoint {
     public record RateLimitingConfig(long maxRequests, long windowSizeInMS, boolean enabled) {}
@@ -12,6 +12,7 @@ public class Endpoint {
     private final String route;
     private final RateLimitingConfig rateLimiting;
     private final List<String> allowedIPAddresses;
+    private transient volatile IPList allowedIPMatcher;
     private final boolean graphql;
     private final boolean forceProtectionOff;
     public Endpoint(
@@ -21,6 +22,8 @@ public class Endpoint {
         this.method = method;
         this.route = route;
         this.allowedIPAddresses = allowedIPAddresses;
+        // Small list, frequently accessed: add IPv4-mapped versions at creation time for fast lookups
+        this.allowedIPMatcher = createIPListWithMappedAddresses(allowedIPAddresses);
         this.rateLimiting = new RateLimitingConfig(maxRequests, windowSizeMS, rateLimitingEnabled);
         this.graphql = graphql;
         this.forceProtectionOff = forceProtectionOff;
@@ -47,7 +50,15 @@ public class Endpoint {
         return allowedIPAddresses == null || allowedIPAddresses.size() == 0;
     }
 
+    // Gson can skip the constructor, so create the matcher on first use.
+    private IPList getOrCreateAllowedIPMatcher() {
+        if (allowedIPMatcher == null) {
+            allowedIPMatcher = createIPListWithMappedAddresses(allowedIPAddresses);
+        }
+        return allowedIPMatcher;
+    }
+
     public boolean isIpAllowed(String ip) {
-        return createIPList(allowedIPAddresses).matches(ip);
+        return getOrCreateAllowedIPMatcher().matches(ip);
     }
 }

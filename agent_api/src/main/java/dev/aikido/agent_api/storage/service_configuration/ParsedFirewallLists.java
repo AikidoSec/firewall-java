@@ -25,7 +25,7 @@ public class ParsedFirewallLists {
     public List<Match> matchBlockedIps(String ip) {
         List<Match> matches = new ArrayList<>();
         for (IPEntry entry : this.blockedIps) {
-            if (entry.ips().matches(ip)) {
+            if (entry.ips().matchesWithMappedCheck(ip)) {
                 matches.add(new Match(entry.key(), entry.description()));
             }
         }
@@ -35,7 +35,7 @@ public class ParsedFirewallLists {
     public List<Match> matchMonitoredIps(String ip) {
         List<Match> matches = new ArrayList<>();
         for (IPEntry entry : this.monitoredIps) {
-            if (entry.ips().matches(ip)) {
+            if (entry.ips().matchesWithMappedCheck(ip)) {
                 matches.add(new Match(entry.key(), entry.description()));
             }
         }
@@ -49,7 +49,7 @@ public class ParsedFirewallLists {
             return true; // Empty allowed is means all ips match
         }
         for (IPEntry entry : this.allowedIps) {
-            if (entry.ips().matches(ip)) {
+            if (entry.ips().matchesWithMappedCheck(ip)) {
                 return true;
             }
         }
@@ -91,6 +91,7 @@ public class ParsedFirewallLists {
         if (blockedIpLists == null)
             return;
         for (ReportingApi.ListsResponseEntry entry : blockedIpLists) {
+            // Large list: IPv4-mapped addresses are checked at lookup time to save memory
             IPList ipList = createIPList(entry.ips());
             this.blockedIps.add(new IPEntry(entry.key(), entry.source(), entry.description(), ipList));
         }
@@ -101,6 +102,7 @@ public class ParsedFirewallLists {
         if (monitoredIpsList == null)
             return;
         for (ReportingApi.ListsResponseEntry entry : monitoredIpsList) {
+            // Large list: IPv4-mapped addresses are checked at lookup time to save memory
             IPList ipList = createIPList(entry.ips());
             this.monitoredIps.add(new IPEntry(entry.key(), entry.source(), entry.description(), ipList));
         }
@@ -111,6 +113,7 @@ public class ParsedFirewallLists {
         if (allowedIpLists == null)
             return;
         for (ReportingApi.ListsResponseEntry entry : allowedIpLists) {
+            // Large list: IPv4-mapped addresses are checked at lookup time to save memory
             IPList ipList = createIPList(entry.ips());
             allowedIps.add(new IPEntry(entry.key(), entry.source(), entry.description(), ipList));
         }
