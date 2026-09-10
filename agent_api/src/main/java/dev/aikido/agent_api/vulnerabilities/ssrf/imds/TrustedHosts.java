@@ -1,8 +1,7 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf.imds;
 
+import dev.aikido.agent_api.helpers.net.NormalizeHostname;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 public final class TrustedHosts {
     private TrustedHosts() {}
@@ -13,6 +12,6 @@ public final class TrustedHosts {
 
     /** Checks if this hostname is trusted */
     public static boolean isTrustedHostname(String hostname) {
-        return Arrays.asList(trustedHosts).contains(hostname);
+        return Arrays.asList(trustedHosts).contains(NormalizeHostname.normalize(hostname));
     }
 }
