@@ -6,7 +6,7 @@ import dev.aikido.agent_api.storage.RedirectNode;
 
 import java.util.*;
 
-public class ContextObject {
+public class ContextObject implements Cloneable {
     protected String method;
     protected String source;
     protected String url;
@@ -24,6 +24,46 @@ public class ContextObject {
     protected transient ArrayList<RedirectNode> redirectStartNodes;
     protected transient Map<String, Map<String, String>> cache = new HashMap<>();
     protected transient Optional<Boolean> forcedProtectionOff = Optional.empty();
+
+    // Async tasks get their own copy so parallel workers sharing one request's
+    // context never race on its mutable working state (cache, redirect nodes).
+    public ContextObject copyForPropagation() {
+        try {
+            ContextObject copy = (ContextObject) super.clone();
+            copy.cache = copyCache(this.cache);
+            copy.redirectStartNodes = copyRedirectChains(this.redirectStartNodes);
+            copy.headers = copyStringListMap(this.headers);
+            copy.query = copyStringListMap(this.query);
+            copy.cookies = copyStringListMap(this.cookies);
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            return this;
+        }
+    }
+
+    private static Map<String, Map<String, String>> copyCache(Map<String, Map<String, String>> cache) {
+        Map<String, Map<String, String>> copy = new HashMap<>();
+        cache.forEach((key, strings) -> copy.put(key, new HashMap<>(strings)));
+        return copy;
+    }
+
+    private static ArrayList<RedirectNode> copyRedirectChains(ArrayList<RedirectNode> nodes) {
+        if (nodes == null) {
+            return null;
+        }
+        ArrayList<RedirectNode> copy = new ArrayList<>(nodes.size());
+        nodes.forEach(starter -> copy.add(starter.copyChain()));
+        return copy;
+    }
+
+    private static HashMap<String, List<String>> copyStringListMap(HashMap<String, List<String>> map) {
+        if (map == null) {
+            return null;
+        }
+        HashMap<String, List<String>> copy = new HashMap<>();
+        map.forEach((key, values) -> copy.put(key, new ArrayList<>(values)));
+        return copy;
+    }
 
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
