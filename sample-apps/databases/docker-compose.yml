@@ -14,6 +14,11 @@ services:
       POSTGRES_PASSWORD: 'password'
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=password psql -h 127.0.0.1 -U user -d db -c 'SELECT 1 FROM pets LIMIT 1' >/dev/null 2>&1"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
   mysql_database:
     image: mysql
     container_name: sample_mysql_db
@@ -29,6 +34,11 @@ services:
     ports:
       - "3306:3306"
     command: --init-file /data/application/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=password mysql -h 127.0.0.1 -u user db -e 'SELECT 1 FROM pets LIMIT 1' >/dev/null 2>&1"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
   mssql_database:
     build: ./mssql_database
     container_name: sample_mssql_db
@@ -40,6 +50,11 @@ services:
       - "1433:1433"
     volumes:
       - mssql_db_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${SA_PASSWORD}\" -d db -Q 'SELECT TOP 1 1 FROM pets' -N -C -b >/dev/null 2>&1"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
   mongo_database:
       image: mongo:latest
       container_name: sample_mongo_db_java

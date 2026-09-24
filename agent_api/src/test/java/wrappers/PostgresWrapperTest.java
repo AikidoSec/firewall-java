@@ -2,6 +2,8 @@ package wrappers;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
+import dev.aikido.agent_api.storage.statistics.OperationKind;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,6 +27,8 @@ public class PostgresWrapperTest {
     public void setUp() throws SQLException {
         // Connect to the PostgreSQL database
         connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/db", "user", "password");
+        StatisticsStore.clear();
+        ServiceConfigStore.updateBlocking(true);
     }
 
     @AfterEach
@@ -32,7 +36,9 @@ public class PostgresWrapperTest {
         if (connection != null) {
             connection.close();
         }
+        StatisticsStore.clear();
         Context.set(null);
+        ServiceConfigStore.updateBlocking(true);
     }
 
     @Test
@@ -79,6 +85,54 @@ public class PostgresWrapperTest {
             connection.prepareStatement("SELECT * FROM pets;");
         });
         assertEquals("Aikido Zen has blocked SQL Injection, Dialect: PostgreSQL",  exception.getMessage());
+    }
+
+    @Test
+    public void testPrepareStatementReportsOnceInDetectionOnlyMode() throws SQLException {
+        String payload = "Malicious Pet', 'Gru from the Minions') -- ";
+        String sql = "INSERT INTO pets (pet_name, owner) VALUES ('" + payload + "', 'Aikido Security')";
+        Context.set(new EmptySampleContextObject(payload));
+        ServiceConfigStore.updateBlocking(false);
+
+        assertDoesNotThrow(() -> connection.prepareStatement(sql));
+
+        var stats = StatisticsStore.getStatsRecord();
+        assertEquals(1, stats.requests().attacksDetected().total());
+        assertEquals(1, stats.operations().values().stream()
+                .filter(record -> record.getKind() == OperationKind.SQL_OP)
+                .count());
+        var operation = stats.operations()
+                .get("(PostgreSQL JDBC Driver) java.sql.Connection.prepareStatement");
+        assertNotNull(operation);
+        assertEquals(1, operation.total());
+        assertEquals(1, operation.getAttacksDetected().get("total"));
+        assertEquals(0, operation.getAttacksDetected().get("blocked"));
+
+        ServiceConfigStore.updateBlocking(true);
+        assertThrows(SQLInjectionException.class,
+                () -> connection.prepareStatement(sql));
+    }
+
+    @Test
+    public void testPrepareStatementReportsAfterBlocking() throws SQLException {
+        String payload = "Malicious Pet', 'Gru from the Minions') -- ";
+        String sql = "INSERT INTO pets (pet_name, owner) VALUES ('" + payload + "', 'Aikido Security')";
+        Context.set(new EmptySampleContextObject(payload));
+
+        assertThrows(SQLInjectionException.class,
+                () -> connection.prepareStatement(sql));
+
+        ServiceConfigStore.updateBlocking(false);
+        assertDoesNotThrow(() -> connection.prepareStatement(sql));
+
+        var stats = StatisticsStore.getStatsRecord();
+        assertEquals(2, stats.requests().attacksDetected().total());
+        var operation = stats.operations()
+                .get("(PostgreSQL JDBC Driver) java.sql.Connection.prepareStatement");
+        assertNotNull(operation);
+        assertEquals(2, operation.total());
+        assertEquals(2, operation.getAttacksDetected().get("total"));
+        assertEquals(1, operation.getAttacksDetected().get("blocked"));
     }
 
     @Test
