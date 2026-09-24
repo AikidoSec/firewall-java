@@ -15,6 +15,8 @@ class EventHandler:
         return json_events
     def fetch_attacks(self):
         return filter_on_event_type(self.fetch_events_from_mock(), "detected_attack")
+    def fetch_heartbeats(self):
+        return filter_on_event_type(self.fetch_events_from_mock(), "heartbeat")
     def set_protection(self, api_pets_create_protection, api_protection):
         print("Setting forceProtectionOff")
         res = requests.post(self.url + "/mock/set_protection", json={

@@ -43,15 +43,17 @@ public class HeartbeatTask extends TimerTask {
         Hostnames.HostnameEntry[] hostnames = HostnamesStore.getHostnamesAsList();
         RouteEntry[] routes = RoutesStore.getRoutesAsList();
         List<User> users = UsersStore.getUsersAsList();
+        List<RuntimePackage> packages = RuntimePackagesStore.getPackagesAsList();
 
         // Clear data :
         StatisticsStore.clear();
         HostnamesStore.clear();
         RoutesStore.clear();
         UsersStore.clear();
+        RuntimePackagesStore.clear();
 
         // Create and send event :
-        Heartbeat.HeartbeatEvent event = Heartbeat.get(stats, hostnames, routes, users);
+        Heartbeat.HeartbeatEvent event = Heartbeat.get(stats, hostnames, routes, users, packages);
         Optional<APIResponse> res = api.report(event);
         res.ifPresent(ServiceConfigStore::updateFromAPIResponse);
     }
