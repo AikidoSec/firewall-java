@@ -212,7 +212,7 @@ class WebRequestCollectorTest {
 
         List<String> bypassedIps = List.of("192.168.1.1");
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of()
+                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of(), 0
         ));
 
 
@@ -231,7 +231,7 @@ class WebRequestCollectorTest {
 
         List<String> bypassedIps = List.of("192.168.1.1");
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of()
+                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of(), 0
         ));
 
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
@@ -251,7 +251,7 @@ class WebRequestCollectorTest {
 
         List<String> bypassedIps = List.of("192.168.1.1");
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of()
+                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of(), 0
         ));
 
         WebRequestCollector.Res response = WebRequestCollector.report(contextObject);
@@ -271,7 +271,7 @@ class WebRequestCollectorTest {
 
         List<String> bypassedIps = List.of("192.168.1.1");
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of()
+                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of(), 0
         ));
 
 

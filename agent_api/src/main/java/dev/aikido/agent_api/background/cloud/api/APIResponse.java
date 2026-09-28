@@ -17,7 +17,8 @@ public record APIResponse(
         boolean receivedAnyStats,
         boolean block,
         List<String> excludedUserIdsFromRateLimiting,
-        List<String> enabledFeatures
+        List<String> enabledFeatures,
+        long heartbeatIntervalInMS
 ) {
     public APIResponse(
             boolean success,
@@ -30,9 +31,10 @@ public record APIResponse(
             List<Domain> domains,
             boolean receivedAnyStats,
             boolean block,
-            List<String> excludedUserIdsFromRateLimiting
+            List<String> excludedUserIdsFromRateLimiting,
+            long heartbeatIntervalInMS
     ) {
         this(success, error, configUpdatedAt, endpoints, blockedUserIds, allowedIPAddresses, blockNewOutgoingRequests,
-                domains, receivedAnyStats, block, excludedUserIdsFromRateLimiting, List.of());
+                domains, receivedAnyStats, block, excludedUserIdsFromRateLimiting, List.of(), heartbeatIntervalInMS);
     }
 }

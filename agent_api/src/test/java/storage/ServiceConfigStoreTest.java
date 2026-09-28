@@ -17,7 +17,7 @@ public class ServiceConfigStoreTest {
         // Reset to a known state: no domains, blockNewOutgoingRequests=false
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
                 true, null, 0L, null, null, null,
-                false, null, true, false, null
+                false, null, true, false, null, 0
         ));
     }
 
@@ -32,7 +32,7 @@ public class ServiceConfigStoreTest {
                 true, null, 0L, null, null, null,
                 false,
                 List.of(new Domain("blocked.com", "block")),
-                true, false, null
+                true, false, null, 0
         ));
         assertTrue(ServiceConfigStore.shouldBlockOutgoingRequest("blocked.com"));
     }
@@ -43,7 +43,7 @@ public class ServiceConfigStoreTest {
                 true, null, 0L, null, null, null,
                 true,
                 List.of(new Domain("allowed.com", "allow")),
-                true, false, null
+                true, false, null, 0
         ));
         assertFalse(ServiceConfigStore.shouldBlockOutgoingRequest("allowed.com"));
     }
@@ -54,7 +54,7 @@ public class ServiceConfigStoreTest {
                 true, null, 0L, null, null, null,
                 true,
                 List.of(new Domain("allowed.com", "allow")),
-                true, false, null
+                true, false, null, 0
         ));
         assertTrue(ServiceConfigStore.shouldBlockOutgoingRequest("unknown.com"));
     }
@@ -68,7 +68,7 @@ public class ServiceConfigStoreTest {
     public void testIsRealtimeUpdatesEnabledTrueWhenEnabled() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
                 true, null, 0L, null, null, null,
-                false, null, true, false, null, List.of("realtime_updates")
+                false, null, true, false, null, List.of("realtime_updates"), 0
         ));
         assertTrue(ServiceConfigStore.isRealtimeUpdatesEnabled());
     }

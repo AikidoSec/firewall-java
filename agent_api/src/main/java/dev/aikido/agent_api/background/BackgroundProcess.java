@@ -18,12 +18,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static dev.aikido.agent_api.Config.heartbeatEveryXSeconds;
-import static dev.aikido.agent_api.Config.pollingEveryXSeconds;
 import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoAPIEndpoint;
 
 public class BackgroundProcess extends Thread {
-    private final static int API_TIMEOUT = 10; // 10 seconds
+    private static final int API_TIMEOUT = 10; // 10 seconds
+    private static final int POLLING_INTERVAL_SECONDS = 60; // Check for realtime config changes every 1 minute
     private final Token token;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
     private static final Logger logger = LogManager.getLogger(BackgroundProcess.class);
@@ -52,8 +51,9 @@ public class BackgroundProcess extends Thread {
 
 
         // Schedule tasks using ScheduledExecutorService
-        scheduler.scheduleAtFixedRate(new HeartbeatTask(api), heartbeatEveryXSeconds, heartbeatEveryXSeconds, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(new RealtimeTask(realtimeApi, api), pollingEveryXSeconds, pollingEveryXSeconds, TimeUnit.SECONDS);
+        scheduler.schedule(createRecurringHeartbeat(new HeartbeatTask(api), scheduler),
+                ServiceConfigStore.getConfig().getHeartbeatIntervalInMS(), TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(new RealtimeTask(realtimeApi, api), POLLING_INTERVAL_SECONDS, POLLING_INTERVAL_SECONDS, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(new AttackQueueConsumerTask(api), 0, 2, TimeUnit.SECONDS);
 
         // one time check to report initial stats
@@ -64,5 +64,13 @@ public class BackgroundProcess extends Thread {
                 new RealtimeSSETask(new RealtimeSSEAPI(token), api).start();
             }
         }
+    }
+
+    static Runnable createRecurringHeartbeat(HeartbeatTask task, ScheduledExecutorService scheduler) {
+        return () -> {
+            task.run();
+            scheduler.schedule(createRecurringHeartbeat(task, scheduler),
+                    ServiceConfigStore.getConfig().getHeartbeatIntervalInMS(), TimeUnit.MILLISECONDS);
+        };
     }
 }

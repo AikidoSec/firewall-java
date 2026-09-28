@@ -39,7 +39,7 @@ public class ServiceConfigurationTest {
                 null,
                 true,
                 true,
-                null
+                null, 0
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -70,7 +70,7 @@ public class ServiceConfigurationTest {
                 null,
                 false,
                 false,
-                null
+                null, 0
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -312,7 +312,7 @@ public class ServiceConfigurationTest {
                 null,
                 false,
                 true,
-                null
+                null, 0
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -333,7 +333,7 @@ public class ServiceConfigurationTest {
                 null,
                 true,
                 true,
-                null
+                null, 0
         ));
 
         assertFalse(serviceConfiguration.isIpBypassed("192.168.1.1"));
@@ -352,7 +352,7 @@ public class ServiceConfigurationTest {
                 null,
                 true,
                 true,
-                null
+                null, 0
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -375,7 +375,7 @@ public class ServiceConfigurationTest {
                 null,
                 true,
                 true,
-                null
+                null, 0
         ));
 
         assertFalse(serviceConfiguration.isUserBlocked("user1"));
@@ -390,7 +390,7 @@ public class ServiceConfigurationTest {
         serviceConfiguration.updateConfig(new APIResponse(
                 true, null, 12345L, null, null, null,
                 false, null, true, true,
-                List.of("user1", "user2")
+                List.of("user1", "user2"), 0
         ));
         assertTrue(serviceConfiguration.isUserExcludedFromRateLimiting("user1"));
         assertTrue(serviceConfiguration.isUserExcludedFromRateLimiting("user2"));
@@ -400,7 +400,7 @@ public class ServiceConfigurationTest {
         serviceConfiguration.updateConfig(new APIResponse(
                 true, null, 12345L, null, null, null,
                 false, null, true, true,
-                List.of("user3")
+                List.of("user3"), 0
         ));
         assertFalse(serviceConfiguration.isUserExcludedFromRateLimiting("user1"));
         assertTrue(serviceConfiguration.isUserExcludedFromRateLimiting("user3"));
@@ -409,7 +409,7 @@ public class ServiceConfigurationTest {
         serviceConfiguration.updateConfig(new APIResponse(
                 true, null, 12345L, null, null, null,
                 false, null, true, true,
-                Collections.emptyList()
+                Collections.emptyList(), 0
         ));
         assertFalse(serviceConfiguration.isUserExcludedFromRateLimiting("user3"));
     }
@@ -427,7 +427,7 @@ public class ServiceConfigurationTest {
                 null,
                 true,
                 true,
-                null
+                null, 0
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -449,7 +449,7 @@ public class ServiceConfigurationTest {
                 null,
                 true,
                 true,
-                null
+                null, 0
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -470,7 +470,7 @@ public class ServiceConfigurationTest {
                 null,
                 true,
                 true,
-                null
+                null, 0
         );
 
         serviceConfiguration.updateConfig(apiResponse);
@@ -615,7 +615,7 @@ public class ServiceConfigurationTest {
                 true, null, 0L, null, null, null,
                 true,
                 List.of(new Domain("example.com", "block"), new Domain("allowed.com", "allow")),
-                true, true, null
+                true, true, null, 0
         );
         serviceConfiguration.updateConfig(apiResponse);
 
@@ -630,7 +630,7 @@ public class ServiceConfigurationTest {
                 true, null, 0L, null, null, null,
                 false,
                 List.of(new Domain("example.com", "block"), new Domain("allowed.com", "allow")),
-                true, true, null
+                true, true, null, 0
         );
         serviceConfiguration.updateConfig(apiResponse2);
 
@@ -675,7 +675,7 @@ public class ServiceConfigurationTest {
     public void testUpdateConfigWithNullEnabledFeaturesDoesNotThrow() {
         APIResponse apiResponse = new APIResponse(
                 true, null, 0L, null, null, null,
-                false, null, true, false, null, null
+                false, null, true, false, null, null, 0
         );
         assertDoesNotThrow(() -> serviceConfiguration.updateConfig(apiResponse));
         assertFalse(serviceConfiguration.isRealtimeUpdatesEnabled());
@@ -685,7 +685,7 @@ public class ServiceConfigurationTest {
     public void testIsRealtimeUpdatesEnabledTrueWhenPresent() {
         APIResponse apiResponse = new APIResponse(
                 true, null, 0L, null, null, null,
-                false, null, true, false, null, List.of("realtime_updates")
+                false, null, true, false, null, List.of("realtime_updates"), 0
         );
         serviceConfiguration.updateConfig(apiResponse);
 
@@ -696,14 +696,14 @@ public class ServiceConfigurationTest {
     public void testIsRealtimeUpdatesEnabledFalseWhenRemoved() {
         APIResponse enabled = new APIResponse(
                 true, null, 0L, null, null, null,
-                false, null, true, false, null, List.of("realtime_updates")
+                false, null, true, false, null, List.of("realtime_updates"), 0
         );
         serviceConfiguration.updateConfig(enabled);
         assertTrue(serviceConfiguration.isRealtimeUpdatesEnabled());
 
         APIResponse disabled = new APIResponse(
                 true, null, 0L, null, null, null,
-                false, null, true, false, null, List.of()
+                false, null, true, false, null, List.of(), 0
         );
         serviceConfiguration.updateConfig(disabled);
         assertFalse(serviceConfiguration.isRealtimeUpdatesEnabled());
@@ -713,7 +713,7 @@ public class ServiceConfigurationTest {
     public void testIsRealtimeUpdatesEnabledFalseForUnrelatedFeature() {
         APIResponse apiResponse = new APIResponse(
                 true, null, 0L, null, null, null,
-                false, null, true, false, null, List.of("some_other_feature")
+                false, null, true, false, null, List.of("some_other_feature"), 0
         );
         serviceConfiguration.updateConfig(apiResponse);
 

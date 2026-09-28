@@ -47,7 +47,7 @@ public class DNSRecordCollectorTest {
         AttackQueue.clear();
         // Reset domain config
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-            true, null, 0L, null, null, null, false, List.of(), true, false, List.of()
+            true, null, 0L, null, null, null, false, List.of(), true, false, List.of(), 0
         ));
     }
 
@@ -116,7 +116,7 @@ public class DNSRecordCollectorTest {
     public void testBlockedDomain() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null,
-            false, List.of(new Domain("blocked.example.com", "block")), true, true, List.of()
+            false, List.of(new Domain("blocked.example.com", "block")), true, true, List.of(), 0
         ));
         assertThrows(BlockedOutboundException.class, () ->
             DNSRecordCollector.report("blocked.example.com", new InetAddress[]{inetAddress1})
@@ -127,7 +127,7 @@ public class DNSRecordCollectorTest {
     public void testAllowedDomainNotBlocked() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null,
-            false, List.of(new Domain("allowed.example.com", "allow")), true, true, List.of()
+            false, List.of(new Domain("allowed.example.com", "allow")), true, true, List.of(), 0
         ));
         assertDoesNotThrow(() ->
             DNSRecordCollector.report("allowed.example.com", new InetAddress[]{inetAddress1})
@@ -138,7 +138,7 @@ public class DNSRecordCollectorTest {
     public void testUnknownDomainBlockedWhenBlockNewOutgoingRequests() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null,
-            true, List.of(), true, true, List.of()
+            true, List.of(), true, true, List.of(), 0
         ));
         assertThrows(BlockedOutboundException.class, () ->
             DNSRecordCollector.report("unknown.example.com", new InetAddress[]{inetAddress1})
@@ -213,7 +213,7 @@ public class DNSRecordCollectorTest {
     @Test
     public void testPrivateIpLiteralWithNoPendingPortNotRecordedButBlockedInLockdown() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-            true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
+            true, null, 0L, null, null, null, true, List.of(), true, true, List.of(), 0
         ));
         Context.set(null);
         assertThrows(BlockedOutboundException.class, () ->
@@ -225,7 +225,7 @@ public class DNSRecordCollectorTest {
     @Test
     public void testPrivateIpLiteralWithPendingPortStillRecordedAndBlockedInLockdown() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-            true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
+            true, null, 0L, null, null, null, true, List.of(), true, true, List.of(), 0
         ));
         PendingHostnamesStore.add("10.20.11.143", 443);
         Context.set(mock(ContextObject.class));
@@ -286,7 +286,7 @@ public class DNSRecordCollectorTest {
     @Test
     public void testPublicIpLiteralWithNoPendingPortNotRecordedButBlockedInLockdown() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-            true, null, 0L, null, null, null, true, List.of(), true, true, List.of()
+            true, null, 0L, null, null, null, true, List.of(), true, true, List.of(), 0
         ));
         Context.set(null);
         assertThrows(BlockedOutboundException.class, () ->
