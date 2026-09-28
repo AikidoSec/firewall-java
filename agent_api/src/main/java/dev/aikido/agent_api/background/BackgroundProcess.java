@@ -51,13 +51,11 @@ public class BackgroundProcess extends Thread {
 
 
         // Schedule tasks using ScheduledExecutorService
-        scheduler.schedule(createRecurringHeartbeat(new HeartbeatTask(api), scheduler),
-                ServiceConfigStore.getConfig().getHeartbeatIntervalInMS(), TimeUnit.MILLISECONDS);
         scheduler.scheduleAtFixedRate(new RealtimeTask(realtimeApi, api), POLLING_INTERVAL_SECONDS, POLLING_INTERVAL_SECONDS, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(new AttackQueueConsumerTask(api), 0, 2, TimeUnit.SECONDS);
 
-        // one time check to report initial stats
-        scheduler.schedule(new HeartbeatTask(api, true), 60, TimeUnit.SECONDS);
+        // Start heartbeats
+        scheduler.schedule(createHeartbeatTask(api, scheduler, true), 60, TimeUnit.SECONDS);
 
         if (token != null) {
             if (FeatureFlags.AIKIDO_FEATURE_SSE.isEnabled() || ServiceConfigStore.isRealtimeUpdatesEnabled()) {
@@ -66,10 +64,10 @@ public class BackgroundProcess extends Thread {
         }
     }
 
-    static Runnable createRecurringHeartbeat(HeartbeatTask task, ScheduledExecutorService scheduler) {
+    static Runnable createHeartbeatTask(ReportingApiHTTP api, ScheduledExecutorService scheduler, boolean initial) {
         return () -> {
-            task.run();
-            scheduler.schedule(createRecurringHeartbeat(task, scheduler),
+            new HeartbeatTask(api, initial).run();
+            scheduler.schedule(createHeartbeatTask(api, scheduler, false),
                     ServiceConfigStore.getConfig().getHeartbeatIntervalInMS(), TimeUnit.MILLISECONDS);
         };
     }

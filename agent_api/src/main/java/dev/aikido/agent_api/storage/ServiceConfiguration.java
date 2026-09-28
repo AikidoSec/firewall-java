@@ -41,7 +41,7 @@ public class ServiceConfiguration {
             return;
         }
         this.blockingEnabled = apiResponse.block();
-        if (apiResponse.heartbeatIntervalInMS() >= 120_000) {
+        if (apiResponse.heartbeatIntervalInMS() >= 60_000) {
             this.heartbeatIntervalInMS = apiResponse.heartbeatIntervalInMS();
         }
         if (apiResponse.allowedIPAddresses() != null) {
