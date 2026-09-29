@@ -18,9 +18,11 @@ import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
  * It is essential for e.g. rate limiting
  */
 public class ServiceConfiguration {
+    private static final long defaultHeartbeatIntervalInMS = 10 * 60 * 1000L; // 10 minutes
     private final ParsedFirewallLists firewallLists = new ParsedFirewallLists();
     private boolean blockingEnabled;
     private boolean receivedAnyStats;
+    private volatile long heartbeatIntervalInMS = defaultHeartbeatIntervalInMS;
     private boolean middlewareInstalled;
     private IPList bypassedIPs = new IPList();
     private HashSet<String> blockedUserIDs = new HashSet<>();
@@ -39,6 +41,9 @@ public class ServiceConfiguration {
             return;
         }
         this.blockingEnabled = apiResponse.block();
+        if (apiResponse.heartbeatIntervalInMS() >= 60_000) {
+            this.heartbeatIntervalInMS = apiResponse.heartbeatIntervalInMS();
+        }
         if (apiResponse.allowedIPAddresses() != null) {
             this.bypassedIPs = createIPList(apiResponse.allowedIPAddresses());
         }
@@ -72,6 +77,10 @@ public class ServiceConfiguration {
 
     public boolean hasReceivedAnyStats() {
         return receivedAnyStats;
+    }
+
+    public long getHeartbeatIntervalInMS() {
+        return heartbeatIntervalInMS;
     }
 
     public boolean isMiddlewareInstalled() {

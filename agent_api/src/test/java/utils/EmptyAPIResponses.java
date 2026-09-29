@@ -12,19 +12,19 @@ import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public class EmptyAPIResponses {
     public final static APIResponse emptyAPIResponse = new APIResponse(
-            true, "", UnixTimeMS.getUnixTimeMS(), List.of(), List.of(), List.of(), false, null,true, false, List.of()
+            true, "", UnixTimeMS.getUnixTimeMS(), List.of(), List.of(), List.of(), false, null,true, false, List.of(), 0
     );
     public final static ReportingApi.APIListsResponse emptyAPIListsResponse = new ReportingApi.APIListsResponse(
             List.of(), List.of(), List.of(), null, null, List.of()
     );
     public static void setEmptyConfigWithEndpointList(List<Endpoint> endpoints) {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-                true, "", getUnixTimeMS(), endpoints, List.of(), List.of(), false, null, true, false, List.of()
+                true, "", getUnixTimeMS(), endpoints, List.of(), List.of(), false, null, true, false, List.of(), 0
         ));
     }
     public static void setEmptyConfigWithEndpointListAndExcludedUsers(List<Endpoint> endpoints, List<String> excludedUserIds) {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
-                true, "", getUnixTimeMS(), endpoints, List.of(), List.of(), false, null, true, false, excludedUserIds
+                true, "", getUnixTimeMS(), endpoints, List.of(), List.of(), false, null, true, false, excludedUserIds, 0
         ));
     }
 }

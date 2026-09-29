@@ -18,12 +18,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static dev.aikido.agent_api.Config.heartbeatEveryXSeconds;
-import static dev.aikido.agent_api.Config.pollingEveryXSeconds;
 import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoAPIEndpoint;
 
 public class BackgroundProcess extends Thread {
-    private final static int API_TIMEOUT = 10; // 10 seconds
+    private static final int API_TIMEOUT = 10; // 10 seconds
+    private static final int POLLING_INTERVAL_SECONDS = 60; // Check for realtime config changes every 1 minute
+    private static final int FIRST_HEARTBEAT_INTERVAL_SECONDS = 30;
+    private static final int SECOND_HEARTBEAT_INTERVAL_SECONDS = 120;
     private final Token token;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
     private static final Logger logger = LogManager.getLogger(BackgroundProcess.class);
@@ -52,17 +53,30 @@ public class BackgroundProcess extends Thread {
 
 
         // Schedule tasks using ScheduledExecutorService
-        scheduler.scheduleAtFixedRate(new HeartbeatTask(api), heartbeatEveryXSeconds, heartbeatEveryXSeconds, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(new RealtimeTask(realtimeApi, api), pollingEveryXSeconds, pollingEveryXSeconds, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(new RealtimeTask(realtimeApi, api), POLLING_INTERVAL_SECONDS, POLLING_INTERVAL_SECONDS, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(new AttackQueueConsumerTask(api), 0, 2, TimeUnit.SECONDS);
 
-        // one time check to report initial stats
-        scheduler.schedule(new HeartbeatTask(api, true), 60, TimeUnit.SECONDS);
+        // Start heartbeats
+        scheduler.schedule(createHeartbeatTask(api, scheduler, true), FIRST_HEARTBEAT_INTERVAL_SECONDS, TimeUnit.SECONDS);
 
         if (token != null) {
             if (FeatureFlags.AIKIDO_FEATURE_SSE.isEnabled() || ServiceConfigStore.isRealtimeUpdatesEnabled()) {
                 new RealtimeSSETask(new RealtimeSSEAPI(token), api).start();
             }
         }
+    }
+
+    static Runnable createHeartbeatTask(ReportingApiHTTP api, ScheduledExecutorService scheduler, boolean initial) {
+        return () -> {
+            new HeartbeatTask(api).run();
+            long nextIntervalInMS;
+            if (initial) {
+                nextIntervalInMS = TimeUnit.SECONDS.toMillis(SECOND_HEARTBEAT_INTERVAL_SECONDS);
+            } else {
+                nextIntervalInMS = ServiceConfigStore.getConfig().getHeartbeatIntervalInMS();
+            }
+            scheduler.schedule(createHeartbeatTask(api, scheduler, false),
+                    nextIntervalInMS, TimeUnit.MILLISECONDS);
+        };
     }
 }

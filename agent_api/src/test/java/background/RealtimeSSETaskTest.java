@@ -26,7 +26,7 @@ public class RealtimeSSETaskTest {
     }
 
     private APIResponse sampleConfig(long configUpdatedAt) {
-        return new APIResponse(true, null, configUpdatedAt, List.of(), List.of(), List.of(), false, List.of(), true, true, List.of());
+        return new APIResponse(true, null, configUpdatedAt, List.of(), List.of(), List.of(), false, List.of(), true, true, List.of(), 0);
     }
 
     @Test

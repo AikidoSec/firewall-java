@@ -19,22 +19,13 @@ import java.util.TimerTask;
 public class HeartbeatTask extends TimerTask {
     private static final Logger logger = LogManager.getLogger(HeartbeatTask.class);
     private final ReportingApiHTTP api;
-    private final boolean shouldCheckForInitialStats;
 
     public HeartbeatTask(ReportingApiHTTP api) {
-        this(api, false);
-    }
-    public HeartbeatTask(ReportingApiHTTP api, boolean shouldCheckForInitialStats) {
         this.api = api;
-        this.shouldCheckForInitialStats = shouldCheckForInitialStats;
     }
 
     @Override
     public void run() {
-        if (shouldCheckForInitialStats && ServiceConfigStore.getConfig().hasReceivedAnyStats()) {
-            // Stats were already sent, so return :
-            return;
-        }
         // This gets executed as task (every x seconds)
         logger.debug("Sending out a heartbeat");
 
