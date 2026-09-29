@@ -69,11 +69,11 @@ public class BackgroundProcess extends Thread {
     static Runnable createHeartbeatTask(ReportingApiHTTP api, ScheduledExecutorService scheduler, boolean initial) {
         return () -> {
             new HeartbeatTask(api).run();
-            long intervalInMS = initial
+            long nextIntervalInMS = initial
                     ? TimeUnit.SECONDS.toMillis(SECOND_HEARTBEAT_INTERVAL_SECONDS)
                     : ServiceConfigStore.getConfig().getHeartbeatIntervalInMS();
             scheduler.schedule(createHeartbeatTask(api, scheduler, false),
-                    intervalInMS, TimeUnit.MILLISECONDS);
+                    nextIntervalInMS, TimeUnit.MILLISECONDS);
         };
     }
 }
