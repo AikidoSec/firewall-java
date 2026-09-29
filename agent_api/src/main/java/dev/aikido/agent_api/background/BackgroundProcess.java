@@ -23,6 +23,8 @@ import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoAPIEndpoint;
 public class BackgroundProcess extends Thread {
     private static final int API_TIMEOUT = 10; // 10 seconds
     private static final int POLLING_INTERVAL_SECONDS = 60; // Check for realtime config changes every 1 minute
+    private static final int FIRST_HEARTBEAT_INTERVAL_SECONDS = 30;
+    private static final int SECOND_HEARTBEAT_INTERVAL_SECONDS = 120;
     private final Token token;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
     private static final Logger logger = LogManager.getLogger(BackgroundProcess.class);
@@ -55,7 +57,7 @@ public class BackgroundProcess extends Thread {
         scheduler.scheduleAtFixedRate(new AttackQueueConsumerTask(api), 0, 2, TimeUnit.SECONDS);
 
         // Start heartbeats
-        scheduler.schedule(createHeartbeatTask(api, scheduler, true), 60, TimeUnit.SECONDS);
+        scheduler.schedule(createHeartbeatTask(api, scheduler, true), FIRST_HEARTBEAT_INTERVAL_SECONDS, TimeUnit.SECONDS);
 
         if (token != null) {
             if (FeatureFlags.AIKIDO_FEATURE_SSE.isEnabled() || ServiceConfigStore.isRealtimeUpdatesEnabled()) {
@@ -66,9 +68,12 @@ public class BackgroundProcess extends Thread {
 
     static Runnable createHeartbeatTask(ReportingApiHTTP api, ScheduledExecutorService scheduler, boolean initial) {
         return () -> {
-            new HeartbeatTask(api, initial).run();
+            new HeartbeatTask(api).run();
+            long intervalInMS = initial
+                    ? TimeUnit.SECONDS.toMillis(SECOND_HEARTBEAT_INTERVAL_SECONDS)
+                    : ServiceConfigStore.getConfig().getHeartbeatIntervalInMS();
             scheduler.schedule(createHeartbeatTask(api, scheduler, false),
-                    ServiceConfigStore.getConfig().getHeartbeatIntervalInMS(), TimeUnit.MILLISECONDS);
+                    intervalInMS, TimeUnit.MILLISECONDS);
         };
     }
 }

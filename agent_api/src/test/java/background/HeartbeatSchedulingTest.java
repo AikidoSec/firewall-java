@@ -53,8 +53,8 @@ class HeartbeatSchedulingTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"60000, false", "120000, false", "600000, false", "60000, true"})
-    void startsRecurringHeartbeatsAfterInitialCheck(long interval, boolean receivedAnyStats) {
+    @CsvSource({"60000, false", "120000, false", "600000, false", "60000, true", "120000, true", "600000, true"})
+    void sendsTwoEarlyHeartbeatsThenUsesConfiguredInterval(long interval, boolean receivedAnyStats) {
         try (var executors = mockStatic(Executors.class);
              var clients = mockConstruction(ReportingApiHTTP.class, (client, context) ->
                      when(client.report(any())).thenReturn(Optional.of(config(
@@ -64,7 +64,7 @@ class HeartbeatSchedulingTest {
             new BackgroundProcess("heartbeat-test", new Token("token")).run();
 
             ArgumentCaptor<Runnable> initial = ArgumentCaptor.forClass(Runnable.class);
-            verify(scheduler).schedule(initial.capture(), eq(60L), eq(TimeUnit.SECONDS));
+            verify(scheduler).schedule(initial.capture(), eq(30L), eq(TimeUnit.SECONDS));
             verify(scheduler).scheduleAtFixedRate(any(RealtimeTask.class), eq(60L), eq(60L), eq(TimeUnit.SECONDS));
             verify(scheduler).scheduleAtFixedRate(any(AttackQueueConsumerTask.class), eq(0L), eq(2L), eq(TimeUnit.SECONDS));
             verifyNoMoreInteractions(scheduler);
@@ -73,11 +73,30 @@ class HeartbeatSchedulingTest {
             ReportingApiHTTP client = clients.constructed().get(0);
             verify(client).report(any());
             initial.getValue().run();
-            verify(client, times(receivedAnyStats ? 1 : 2)).report(any());
+            verify(client, times(2)).report(any());
+            scheduledTask(120_000).run();
+            verify(client, times(3)).report(any());
             scheduledTask(interval).run();
-            verify(client, times(receivedAnyStats ? 2 : 3)).report(any());
+            verify(client, times(4)).report(any());
             scheduledTask(interval);
         }
+    }
+
+    @Test
+    void keepsSecondHeartbeatDelayWhenFirstResponseUpdatesInterval() {
+        when(api.report(any())).thenReturn(Optional.of(config("\"heartbeatIntervalInMS\":300000")));
+        BackgroundProcess.createHeartbeatTask(api, scheduler, true).run();
+        scheduledTask(120_000).run();
+        verify(api, times(2)).report(any());
+        scheduledTask(300_000);
+    }
+
+    @Test
+    void continuesStartupScheduleAfterFailedReport() {
+        BackgroundProcess.createHeartbeatTask(api, scheduler, true).run();
+        scheduledTask(120_000).run();
+        verify(api, times(2)).report(any());
+        scheduledTask(600_000);
     }
 
     @Test
