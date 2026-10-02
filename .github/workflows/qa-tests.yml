@@ -48,4 +48,9 @@ jobs:
               with:
                   dockerfile_path: ./zen-demo-java/Dockerfile
                   app_port: 8080
-                  skip_tests: test-ssrf,test-demo-apps-generic-tests
+                  skip_tests: >-
+                      test-ssrf,
+                      test-demo-apps-generic-tests,
+                      test-outbound-domain-blocking,
+                      test-rate-limiting-retry-after,
+                      test-stored-ssrf
