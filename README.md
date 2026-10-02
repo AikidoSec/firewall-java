@@ -73,7 +73,7 @@ To activate Zen you then just have to add the following `-javaagent` to your Jav
 ```
 java -javaagent:/opt/zen/agent.jar -jar build/myapp.jar
 ```
-To use user-blocking and/or rate-limiting features, you will have to include the following Jarfile into your repository
+To use user blocking, rate limiting, or custom event tracking, include `agent_api.jar` in your application.
 ### Gradle
 Add the following code to your `build.gradle` file.
 ```gradle
@@ -130,7 +130,8 @@ See [Reporting to Aikido](#reporting-to-your-aikido-security-dashboard) to learn
 
 ## Additional configuration
 
-[Configure Zen using environment variables for authentication, mode settings, debugging, and more.](https://help.aikido.dev/doc/configuration-via-env-vars/docrSItUkeR9)
+* [Track custom events](./docs/track.md): trigger events that Playbooks can act on
+* [Configure Zen using environment variables for authentication, mode settings, debugging, and more](https://help.aikido.dev/doc/configuration-via-env-vars/docrSItUkeR9)
 
 ## License
 

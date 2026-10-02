@@ -3,15 +3,18 @@ package dev.aikido.agent_api;
 import dev.aikido.agent_api.background.cloud.api.events.CustomEvent;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
 import dev.aikido.agent_api.storage.AttackQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class Track {
     private Track() {}
+
     private static final Logger logger = LogManager.getLogger(Track.class);
     private static final int MAX_EVENTS_PER_REQUEST = 25;
-    private static boolean loggedWarningTrackCalledWithoutContext = false;
+    private static final AtomicBoolean loggedWarningTrackCalledWithoutContext = new AtomicBoolean(false);
 
     /**
      * External function for applications to track a custom event, e.g. a
@@ -29,11 +32,19 @@ public final class Track {
             return;
         }
 
-        if (currentContext.incrementTrackedEventCount() > MAX_EVENTS_PER_REQUEST) {
-            logger.warn(
-                "track(...) was called more than %d times during this request. Dropping event: %s",
-                MAX_EVENTS_PER_REQUEST, eventName
-            );
+        // No reporting worker runs without a token, so queued events would remain in memory.
+        if (Token.fromEnv() == null) {
+            return;
+        }
+
+        int trackedEventCount = currentContext.incrementTrackedEventCount();
+        if (trackedEventCount > MAX_EVENTS_PER_REQUEST) {
+            if (trackedEventCount == MAX_EVENTS_PER_REQUEST + 1) {
+                logger.warn(
+                        "track(...) was called more than %d times during this request. "
+                                + "Only the first %d events were tracked.",
+                        MAX_EVENTS_PER_REQUEST, MAX_EVENTS_PER_REQUEST);
+            }
             return;
         }
 
@@ -41,20 +52,17 @@ public final class Track {
     }
 
     private static void logWarningTrackCalledWithoutContext() {
-        if (loggedWarningTrackCalledWithoutContext) {
+        if (!loggedWarningTrackCalledWithoutContext.compareAndSet(false, true)) {
             return;
         }
-        logger.warn(
-            "track(...) was called without a context. The event will not be tracked. " +
-            "Make sure to call track(...) within an HTTP request."
-        );
-        loggedWarningTrackCalledWithoutContext = true;
+        logger.warn("track(...) was called without a context. The event will not be tracked. "
+                + "Make sure to call track(...) within an HTTP request.");
     }
 
     /**
      * Resets internal warning state. Only intended for use in tests.
      */
     public static void reset() {
-        loggedWarningTrackCalledWithoutContext = false;
+        loggedWarningTrackCalledWithoutContext.set(false);
     }
 }
