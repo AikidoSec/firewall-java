@@ -9,10 +9,19 @@ import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
 
 public final class CustomEvent {
     private CustomEvent() {}
+    public record RequestData(
+        // note that URL is not included in the request metadata
+        String method,
+        String ipAddress,
+        String userAgent,
+        String source,
+        String route
+    ) {}
+
     public record CustomEventEvent(
         String type,
         String name,
-        DetectedAttack.RequestData request,
+        RequestData request,
         GetManagerInfo.ManagerInfo agent,
         User user,
         long time
@@ -29,15 +38,14 @@ public final class CustomEvent {
         );
     }
 
-    private static DetectedAttack.RequestData buildRequestData(ContextObject context) {
+    private static RequestData buildRequestData(ContextObject context) {
         if (context == null) {
             return null;
         }
-        return new DetectedAttack.RequestData(
+        return new RequestData(
             context.getMethod(),
             context.getRemoteAddress(),
             context.getHeader("user-agent"),
-            context.getUrl(),
             context.getSource(),
             context.getRoute()
         );

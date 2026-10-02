@@ -78,4 +78,30 @@ public class TrackTest {
         assertEquals("POST", customEvent.request().method());
         assertEquals("/track-me", customEvent.request().route());
     }
+
+    @Test
+    public void testTrackAllowsUpToLimitPerRequest() {
+        ContextObject context = new EmptySampleContextObject("test", "/track-me", "POST");
+        Context.set(context);
+
+        for (int i = 0; i < 25; i++) {
+            Track.track("event-" + i);
+        }
+
+        assertEquals(25, AttackQueue.getSize());
+    }
+
+    @Test
+    @StdIo
+    public void testTrackDropsEventsOverLimitPerRequest(StdOut out) {
+        ContextObject context = new EmptySampleContextObject("test", "/track-me", "POST");
+        Context.set(context);
+
+        for (int i = 0; i < 26; i++) {
+            Track.track("event-" + i);
+        }
+
+        assertEquals(25, AttackQueue.getSize());
+        assertTrue(out.capturedString().contains("Dropping event: event-25"));
+    }
 }
