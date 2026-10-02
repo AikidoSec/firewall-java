@@ -10,6 +10,7 @@ import dev.aikido.agent_api.storage.AttackQueue;
 public final class Track {
     private Track() {}
     private static final Logger logger = LogManager.getLogger(Track.class);
+    private static final int MAX_EVENTS_PER_REQUEST = 25;
     private static boolean loggedWarningTrackCalledWithoutContext = false;
 
     /**
@@ -25,6 +26,14 @@ public final class Track {
         ContextObject currentContext = Context.get();
         if (currentContext == null) {
             logWarningTrackCalledWithoutContext();
+            return;
+        }
+
+        if (currentContext.incrementTrackedEventCount() > MAX_EVENTS_PER_REQUEST) {
+            logger.warn(
+                "track(...) was called more than %d times during this request. Dropping event: %s",
+                MAX_EVENTS_PER_REQUEST, eventName
+            );
             return;
         }
 
