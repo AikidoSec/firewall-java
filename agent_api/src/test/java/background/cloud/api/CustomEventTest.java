@@ -12,14 +12,11 @@ class CustomEventTest {
 
     @Test
     void createAPIEvent_WithValidContext_ReturnsCustomEventEvent() {
-        // Arrange
         ContextObject context = new EmptySampleContextObject("test", "/api/resource", "POST");
         context.setUser(new User("user-1", "Jane Doe", "192.168.1.1", 1000L));
 
-        // Act
         CustomEvent.CustomEventEvent event = CustomEvent.createAPIEvent("my-custom-event", context);
 
-        // Assert
         assertNotNull(event);
         assertEquals("custom", event.type());
         assertEquals("my-custom-event", event.name());
@@ -36,11 +33,19 @@ class CustomEventTest {
     }
 
     @Test
+    void createAPIEvent_WithValidContext_UserOnlyContainsIdAndName() {
+        ContextObject context = new EmptySampleContextObject("test", "/api/resource", "POST");
+        context.setUser(new User("user-1", "Jane Doe", "192.168.1.1", 1000L));
+
+        CustomEvent.CustomEventEvent event = CustomEvent.createAPIEvent("my-custom-event", context);
+
+        assertEquals(2, CustomEvent.UserData.class.getRecordComponents().length);
+    }
+
+    @Test
     void createAPIEvent_WithNullContext_ReturnsCustomEventEventWithNullRequestAndUser() {
-        // Act
         CustomEvent.CustomEventEvent event = CustomEvent.createAPIEvent("my-custom-event", null);
 
-        // Assert
         assertNotNull(event);
         assertEquals("custom", event.type());
         assertEquals("my-custom-event", event.name());
@@ -52,13 +57,10 @@ class CustomEventTest {
 
     @Test
     void createAPIEvent_WithContextButNoUser_ReturnsCustomEventEventWithNullUser() {
-        // Arrange
         ContextObject context = new EmptySampleContextObject("test", "/api/resource", "GET");
 
-        // Act
         CustomEvent.CustomEventEvent event = CustomEvent.createAPIEvent("my-custom-event", context);
 
-        // Assert
         assertNull(event.user());
     }
 }

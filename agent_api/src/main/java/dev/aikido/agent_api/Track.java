@@ -29,11 +29,14 @@ public final class Track {
             return;
         }
 
-        if (currentContext.incrementTrackedEventCount() > MAX_EVENTS_PER_REQUEST) {
-            logger.warn(
-                "track(...) was called more than %d times during this request. Dropping event: %s",
-                MAX_EVENTS_PER_REQUEST, eventName
-            );
+        int trackedEventCount = currentContext.incrementTrackedEventCount();
+        if (trackedEventCount > MAX_EVENTS_PER_REQUEST) {
+            if (trackedEventCount == MAX_EVENTS_PER_REQUEST + 1) {
+                logger.warn(
+                    "track(...) was called more than %d times during this request. Dropping event: %s",
+                    MAX_EVENTS_PER_REQUEST, eventName
+                );
+            }
             return;
         }
 

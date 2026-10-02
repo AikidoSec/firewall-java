@@ -104,4 +104,21 @@ public class TrackTest {
         assertEquals(25, AttackQueue.getSize());
         assertTrue(out.capturedString().contains("Dropping event: event-25"));
     }
+
+    @Test
+    @StdIo
+    public void testTrackLogsOverLimitWarningOnlyOnce(StdOut out) {
+        ContextObject context = new EmptySampleContextObject("test", "/track-me", "POST");
+        Context.set(context);
+
+        for (int i = 0; i < 30; i++) {
+            Track.track("event-" + i);
+        }
+
+        assertEquals(25, AttackQueue.getSize());
+        long warningCount = out.capturedString().lines()
+            .filter(line -> line.contains("Dropping event"))
+            .count();
+        assertEquals(1, warningCount);
+    }
 }

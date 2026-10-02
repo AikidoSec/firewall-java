@@ -18,12 +18,14 @@ public final class CustomEvent {
         String route
     ) {}
 
+    public record UserData(String id, String name) {}
+
     public record CustomEventEvent(
         String type,
         String name,
         RequestData request,
         GetManagerInfo.ManagerInfo agent,
-        User user,
+        UserData user,
         long time
     ) implements APIEvent {}
 
@@ -33,9 +35,17 @@ public final class CustomEvent {
             eventName, // name
             buildRequestData(context), // request
             getManagerInfo(), // agent
-            context != null ? context.getUser() : null, // user
+            buildUserData(context), // user
             getUnixTimeMS() // time
         );
+    }
+
+    private static UserData buildUserData(ContextObject context) {
+        if (context == null || context.getUser() == null) {
+            return null;
+        }
+        User user = context.getUser();
+        return new UserData(user.id(), user.name());
     }
 
     private static RequestData buildRequestData(ContextObject context) {
