@@ -20,7 +20,7 @@ import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoRealtimeEndpoi
 
 public class RealtimeAPI {
     private static final Logger logger = LogManager.getLogger(RealtimeAPI.class);
-    private static final int timeoutInSec = 3; // 3 sec timeout for requests to the realtime endpoint
+    private static final int timeoutInSec = 30;
     private final String endpoint;
     private final Token token;
 
@@ -59,6 +59,7 @@ public class RealtimeAPI {
     private static HttpRequest createConfigRequest(String token, URI uri) {
         return HttpRequest.newBuilder()
                 .uri(uri) // Change to your target URL
+                .timeout(Duration.ofSeconds(timeoutInSec))
                 .header("Content-Type", "application/json") // Set Content-Type header
                 .header("Authorization", token) // Set Authorization header
                 .build();
