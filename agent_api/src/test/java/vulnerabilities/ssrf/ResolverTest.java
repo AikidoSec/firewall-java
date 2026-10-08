@@ -44,11 +44,12 @@ public class ResolverTest {
     }
 
     @Test
-    void testDoesntResolveToImdsIp_WithHostnameImdsIp() {
+    void testResolvesToImdsIp_WithHostnameImdsIp() {
         Set<String> resolvedIps = new HashSet<>();
         resolvedIps.add("169.254.169.254"); // IMDS IP
 
-        assertNull(Resolver.resolvesToImdsIp(resolvedIps, " 169.254.169.254 "));
+        // Literal IMDS IPs should be detected as IMDS addresses
+        assertEquals("169.254.169.254", Resolver.resolvesToImdsIp(resolvedIps, " 169.254.169.254 "));
     }
 
     @Test

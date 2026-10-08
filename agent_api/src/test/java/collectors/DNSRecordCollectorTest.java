@@ -315,4 +315,16 @@ public class DNSRecordCollectorTest {
             DNSRecordCollector.report("metadata.google.internal", new InetAddress[]{imdsAddress1, inetAddress2});
         });
     }
+
+    @Test
+    public void testLiteralImdsIpWithNoPendingPortDetectedAsStoredSSRF() {
+        ServiceConfigStore.updateBlocking(true);
+        Context.set(new EmptySampleContextObject());
+
+        // Literal IMDS IP without pending port should be detected as stored SSRF
+        Exception exception = assertThrows(StoredSSRFException.class, () -> {
+            DNSRecordCollector.report("169.254.169.254", new InetAddress[]{imdsAddress1});
+        });
+        assertEquals("Aikido Zen has blocked a stored server-side request forgery", exception.getMessage());
+    }
 }

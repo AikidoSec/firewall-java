@@ -14,11 +14,6 @@ public final class Resolver {
             return null;
         }
         for (String ip : resolvedIpAddresses) {
-            if (hostname.trim().equals(ip.trim())) {
-                // If the hostname is the IP, that means no resolving is happening
-                // so the request is safe.
-                continue;
-            }
             if (IMDSAddresses.isImdsIpAddress(ip)) {
                 return ip;
             }
