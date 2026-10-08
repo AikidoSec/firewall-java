@@ -13,6 +13,15 @@ public final class CommandEncapsulationChecker {
         // Split the command by the user input
         String[] segments = command.split(Pattern.quote(userInput), -1);
 
+        // If we have less than 2 segments, the user input was not found (shouldn't happen)
+        // or there's an edge case - fail closed for security
+        if (segments.length < 2) {
+            return false;
+        }
+
+        // Track if we actually validated at least one occurrence
+        boolean validatedAtLeastOnce = false;
+
         for (int i = 0; i < segments.length - 1; i++) {
             String currentSegment = segments[i];
             String nextSegment = segments[i + 1];
@@ -47,8 +56,12 @@ public final class CommandEncapsulationChecker {
                     }
                 }
             }
+
+            validatedAtLeastOnce = true;
         }
 
-        return true;
+        // If we never validated any occurrence, fail closed for security
+        // This handles edge cases where the loop might not run as expected
+        return validatedAtLeastOnce;
     }
 }
