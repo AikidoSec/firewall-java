@@ -118,4 +118,27 @@ public class IPAccessControllerTest {
         assertTrue(IPAccessController.ipAllowedToAccessRoute("1.2.3.4", endpoints));
         assertFalse(IPAccessController.ipAllowedToAccessRoute("3.4.5.6", endpoints));
     }
+
+    @Test
+    public void testIPv6Slash96DoesNotAllowAllIPv4() {
+        // Security test: ::/96 should NOT be converted to 0.0.0.0/0
+        // and should not allow arbitrary IPv4 addresses
+        List<Endpoint> endpoints = List.of(
+                genEndpoint(List.of("::/96"))
+        );
+        assertFalse(IPAccessController.ipAllowedToAccessRoute("1.2.3.4", endpoints));
+        assertFalse(IPAccessController.ipAllowedToAccessRoute("192.168.1.1", endpoints));
+        assertFalse(IPAccessController.ipAllowedToAccessRoute("10.0.0.1", endpoints));
+    }
+
+    @Test
+    public void testIPv4MappedIPv6WithHighPrefixStillWorks() {
+        // Test that IPv4-mapped IPv6 addresses with prefix > 96 still work correctly
+        List<Endpoint> endpoints = List.of(
+                genEndpoint(List.of("::ffff:10.0.0.0/104"))
+        );
+        assertTrue(IPAccessController.ipAllowedToAccessRoute("10.1.2.3", endpoints));
+        assertTrue(IPAccessController.ipAllowedToAccessRoute("10.0.0.1", endpoints));
+        assertFalse(IPAccessController.ipAllowedToAccessRoute("11.0.0.1", endpoints));
+    }
 }

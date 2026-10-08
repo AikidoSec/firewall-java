@@ -19,16 +19,25 @@ public class IPList {
         if (ip == null) {
             return;
         }
-        // Normalize IPv4-mapped IPv6 addresses to their IPv4 form so matching is symmetric.
-        if (ip.isIPv6() && ip.toIPv6().isIPv4Convertible()) {
-            IPAddress ipv4 = ip.toIPv6().toIPv4();
-            if (ipv4 != null) {
-                ip = ipv4;
-            }
-        }
+        
+        // Apply prefix block first if this is a CIDR notation
         if (ipOrCIDR.contains("/")) {
             ip = ip.toPrefixBlock();
         }
+        
+        // Normalize IPv4-mapped IPv6 addresses to their IPv4 form so matching is symmetric.
+        // Only convert if it's not a CIDR, or if it's a CIDR with prefix > 96
+        // (so the IPv4 portion has meaningful prefix bits and won't expand to 0.0.0.0/0 or worse)
+        if (ip.isIPv6() && ip.toIPv6().isIPv4Convertible()) {
+            boolean isCIDR = ipOrCIDR.contains("/");
+            if (!isCIDR || (ip.getPrefixLength() != null && ip.getPrefixLength() > 96)) {
+                IPAddress ipv4 = ip.toIPv6().toIPv4();
+                if (ipv4 != null) {
+                    ip = ipv4;
+                }
+            }
+        }
+        
         ipAddresses.add(ip);
     }
 

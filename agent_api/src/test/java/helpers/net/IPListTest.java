@@ -168,4 +168,28 @@ public class IPListTest {
         assertTrue(blocklist.matches("::ffff:10.1.2.3"));
         assertFalse(blocklist.matches("11.1.2.3"));
     }
+
+    @Test
+    public void testBlocklistIPv6Slash96DoesNotMatchAllIPv4() {
+        // Security test: ::/96 should NOT be converted to 0.0.0.0/0
+        // It should remain as an IPv6 range and not match arbitrary IPv4 addresses
+        blocklist.add("::/96");
+        assertFalse(blocklist.matches("1.2.3.4"));
+        assertFalse(blocklist.matches("192.168.1.1"));
+        assertFalse(blocklist.matches("10.0.0.1"));
+        // It should still match IPv6 addresses in that range
+        assertTrue(blocklist.matches("::"));
+        assertTrue(blocklist.matches("::1"));
+    }
+
+    @Test
+    public void testBlocklistIPv4ConvertibleIPv6CIDRsWithLowPrefix() {
+        // Test various IPv6 CIDRs with prefix < 96 to ensure they don't expand to match all IPv4
+        blocklist.add("::ffff:0:0/80");
+        assertFalse(blocklist.matches("1.2.3.4"));
+        assertFalse(blocklist.matches("192.168.1.1"));
+        
+        // But IPv6 addresses in that range should match
+        assertTrue(blocklist.matches("::ffff:0:0"));
+    }
 }
