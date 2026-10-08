@@ -9,7 +9,7 @@ public class Dialect {
         if (Objects.equals(dialect, "postgresql")) {
             rustDialectInt = 9;
             humanName = "PostgreSQL";
-        } else if (Objects.equals(dialect, "mysql")) {
+        } else if (Objects.equals(dialect, "mysql") || Objects.equals(dialect, "mariadb")) {
             rustDialectInt = 8;
             humanName = "MySQL";
         } else if (Objects.equals(dialect, "microsoft sql server")) {
