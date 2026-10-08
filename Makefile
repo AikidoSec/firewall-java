@@ -12,16 +12,41 @@ wasm: download-wasm check-wasm
 download-wasm:
 	mkdir -p $(WASM_RESOURCE_DIR)
 	@set -e; \
+	if [ ! -f "$(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum" ]; then \
+		echo "Error: Repository checksum file not found at $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum"; \
+		echo "This file serves as the trust anchor and must be committed to the repository."; \
+		exit 1; \
+	fi; \
 	tmp_dir=$$(mktemp -d); \
 	trap 'rm -rf "$$tmp_dir"' 0; \
 	curl -fL -o "$$tmp_dir/zen_internals.wasm" $(WASM_BASE_URL)/libzen_internals.wasm; \
-	curl -fL -o "$$tmp_dir/checksum" $(WASM_BASE_URL)/libzen_internals.wasm.sha256sum; \
-	sed 's/libzen_internals\.wasm/zen_internals.wasm/' "$$tmp_dir/checksum" > "$$tmp_dir/zen_internals.wasm.sha256sum"; \
-	mv "$$tmp_dir/zen_internals.wasm" $(WASM_RESOURCE_DIR)/zen_internals.wasm; \
-	mv "$$tmp_dir/zen_internals.wasm.sha256sum" $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum
+	expected=$$(awk '{print $$1}' $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum); \
+	actual=$$(shasum -a 256 "$$tmp_dir/zen_internals.wasm" | awk '{print $$1}'); \
+	if [ "$$expected" != "$$actual" ]; then \
+		echo "WASM checksum validation failed against repository trust anchor"; \
+		echo "Expected (from repository): $$expected"; \
+		echo "Actual (downloaded WASM):   $$actual"; \
+		echo ""; \
+		echo "The downloaded WASM does not match the trusted checksum committed to this repository."; \
+		echo "If you are updating to a new zen-internals version:"; \
+		echo "  1. Verify the authenticity of the new WASM through a secure channel"; \
+		echo "  2. Update ZEN_INTERNALS_VERSION in the Makefile"; \
+		echo "  3. Update the checksum in $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum"; \
+		echo "  4. Commit both changes together in a reviewed pull request"; \
+		exit 1; \
+	fi; \
+	mv "$$tmp_dir/zen_internals.wasm" $(WASM_RESOURCE_DIR)/zen_internals.wasm
 
 check-wasm:
-	@expected=$$(awk '{print $$1}' $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum); \
+	@if [ ! -f "$(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum" ]; then \
+		echo "Error: Repository checksum file not found"; \
+		exit 1; \
+	fi; \
+	if [ ! -f "$(WASM_RESOURCE_DIR)/zen_internals.wasm" ]; then \
+		echo "Error: WASM file not found. Run 'make wasm' first."; \
+		exit 1; \
+	fi; \
+	expected=$$(awk '{print $$1}' $(WASM_RESOURCE_DIR)/zen_internals.wasm.sha256sum); \
 	actual=$$(shasum -a 256 $(WASM_RESOURCE_DIR)/zen_internals.wasm | awk '{print $$1}'); \
 	if [ "$$expected" != "$$actual" ]; then \
 		echo "WASM checksum mismatch: expected $$expected, got $$actual"; \
