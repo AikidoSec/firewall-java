@@ -38,6 +38,7 @@ public final class Wrappers {
 
             new PathWrapper(),
             new PathsWrapper(),
+            new FileSystemWrapper(),
             new JavalinWrapper(),
             new JavalinDataWrapper(),
             new JavalinContextClearWrapper(),
