@@ -46,7 +46,13 @@ public final class WasmSQLInterface {
         try {
             int result = instance.detect(query, userInput, dialect.getDialectInteger());
             reusable = true;
-            return result == 1;
+            // Status codes from zen-internals WASM detector:
+            // 0 = Clean (no injection detected)
+            // 1 = Detected (injection found)
+            // 2 = Error during detection
+            // 3 = Tokenizer failure
+            // Fail closed: treat only status 0 as clean; all other statuses indicate potential attacks
+            return result != 0;
         } catch (Throwable e) {
             logger.trace(e);
             // If zen-internals fails while checking the query, let the query proceed.
