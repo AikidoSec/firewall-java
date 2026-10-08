@@ -73,9 +73,9 @@ public class FileConstructorMultiArgumentWrapper implements Wrapper {
                 // Run report with "argument"
                 Method reportMethod = clazz.getMethod("report", Object.class, String.class);
 
-                // Report both parent and child paths :
-                reportMethod.invoke(null, parent, "java.io.File(String, String)");
-                reportMethod.invoke(null, child, "java.io.File(String, String)");
+                // Compose the path as Java's File constructor does
+                String composedPath = composeFilePath(parent, child);
+                reportMethod.invoke(null, composedPath, "java.io.File(String, String)");
 
                 classLoader.close(); // Close the class loader
             } catch (InvocationTargetException invocationTargetException) {
@@ -86,6 +86,51 @@ public class FileConstructorMultiArgumentWrapper implements Wrapper {
             } catch (Throwable e) {
                 System.out.println("AIKIDO: " + e.getMessage());
             }
+        }
+
+        /**
+         * Composes a file path from parent and child components, mimicking Java's File(String, String) constructor.
+         * This ensures the detector sees the actual path that will be used by the File object.
+         * 
+         * Based on Java's UnixFileSystem.resolve() and WindowsFileSystem.resolve() behavior:
+         * - If parent is null or empty, return child
+         * - If child is empty, return parent
+         * - On Unix: if child starts with '/', concatenate parent + child (unless parent is "/")
+         * - On Windows: if child has a drive letter or UNC path, it's absolute and replaces parent
+         * - Otherwise, join parent and child with separator
+         */
+        private static String composeFilePath(String parent, String child) {
+            if (parent == null || parent.isEmpty()) {
+                return child != null ? child : "";
+            }
+            if (child == null || child.isEmpty()) {
+                return parent;
+            }
+            
+            String separator = System.getProperty("file.separator", "/");
+            boolean isWindows = separator.equals("\\");
+            
+            if (isWindows) {
+                // Windows: check if child is absolute (has drive letter or UNC path)
+                if ((child.length() >= 2 && child.charAt(1) == ':') ||
+                    child.startsWith("\\\\")) {
+                    return child; // Absolute path on Windows replaces parent
+                }
+            } else {
+                // Unix: if child starts with '/', concatenate (unless parent is "/")
+                if (child.startsWith("/")) {
+                    if (parent.equals("/")) {
+                        return child;
+                    }
+                    return parent + child;
+                }
+            }
+            
+            // Join parent and child with separator
+            if (parent.endsWith("/") || parent.endsWith("\\")) {
+                return parent + child;
+            }
+            return parent + separator + child;
         }
     }
 }

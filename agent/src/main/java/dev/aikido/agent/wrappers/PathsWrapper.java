@@ -60,12 +60,10 @@ public class PathsWrapper implements Wrapper {
 
                 // Run report with "argument"
                 Method reportMethod = clazz.getMethod("report", Object.class, String.class);
-                if (argument1 != null) {
-                    reportMethod.invoke(null, argument1, "java.nio.file.Paths.get");
-                }
-                if (argument2 != null) {
-                    reportMethod.invoke(null, argument2, "java.nio.file.Paths.get");
-                }
+                
+                // Compose the path as Java's Paths.get does
+                String composedPath = composePathsGet(argument1, argument2);
+                reportMethod.invoke(null, composedPath, "java.nio.file.Paths.get");
             } catch (InvocationTargetException invocationTargetException) {
                 if(invocationTargetException.getCause().toString().startsWith("dev.aikido.agent_api.vulnerabilities")) {
                     throw invocationTargetException.getCause();
@@ -75,6 +73,58 @@ public class PathsWrapper implements Wrapper {
                 System.out.println("AIKIDO: " + e.getMessage());
             }
             classLoader.close(); // Close the class loader
+        }
+
+        /**
+         * Composes a path from first and more components, mimicking Java's Paths.get(String, String...) method.
+         * This ensures the detector sees the actual path that will be created by Paths.get.
+         * 
+         * Based on Java's Path.of() / Paths.get() behavior:
+         * - Joins path segments with the file separator
+         * - If a segment is absolute (starts with separator or has drive letter), it replaces all previous segments
+         * - Empty segments are skipped
+         */
+        private static String composePathsGet(String first, String[] more) {
+            if (first == null) {
+                first = "";
+            }
+            if (more == null || more.length == 0) {
+                return first;
+            }
+            
+            StringBuilder result = new StringBuilder(first);
+            String separator = System.getProperty("file.separator", "/");
+            boolean isWindows = separator.equals("\\");
+            
+            for (String segment : more) {
+                if (segment == null || segment.isEmpty()) {
+                    continue;
+                }
+                
+                // Check if segment is absolute
+                boolean isAbsolute = false;
+                if (isWindows) {
+                    // Windows: absolute if has drive letter or UNC path
+                    isAbsolute = (segment.length() >= 2 && segment.charAt(1) == ':') ||
+                                 segment.startsWith("\\\\");
+                } else {
+                    // Unix: absolute if starts with '/'
+                    isAbsolute = segment.startsWith("/");
+                }
+                
+                if (isAbsolute) {
+                    // Absolute segment replaces everything before it
+                    result = new StringBuilder(segment);
+                } else {
+                    // Append segment to result
+                    if (result.length() > 0 && !result.toString().endsWith("/") && !result.toString().endsWith("\\")) {
+                        result.append(separator);
+                    }
+                    result.append(segment);
+                }
+            }
+            
+            return result.toString();
         }
     }
 }
