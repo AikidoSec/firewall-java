@@ -149,4 +149,44 @@ public class MatchEndpointsTest {
         );
         assertEquals(expected, matchEndpoints(routeMetadata, endpoints));
     }
+
+    @Test
+    void testWildcardRouteWithRegexMetacharacters() {
+        // Test that regex metacharacters in routes are treated as literals
+        // This prevents bypass of IP restrictions when routes contain +, ., (, ), etc.
+        List<Endpoint> endpoints = List.of(
+                new Endpoint("GET", "/admin+/*", 10, 1000, List.of("1.2.3.4"), false, false, true)
+        );
+        
+        RouteMetadata routeMetadata = sampleRouteMetadata(
+                "http://localhost:4000/admin+/secret", "GET", "/admin+/secret"
+        );
+        
+        assertEquals(endpoints, matchEndpoints(routeMetadata, endpoints));
+    }
+
+    @Test
+    void testWildcardRouteWithMultipleRegexMetacharacters() {
+        // Test various regex metacharacters: +, ., (, ), [, ], {, }, ^, $, |, \, ?
+        List<Endpoint> endpoints = List.of(
+                new Endpoint("POST", "/api.v2+/*", 10, 1000, List.of(), false, false, true),
+                new Endpoint("GET", "/path(test)/*", 10, 1000, List.of(), false, false, true),
+                new Endpoint("PUT", "/route[abc]/*", 10, 1000, List.of(), false, false, true)
+        );
+        
+        RouteMetadata routeMetadata1 = sampleRouteMetadata(
+                "http://localhost:4000/api.v2+/endpoint", "POST", "/api.v2+/endpoint"
+        );
+        assertEquals(List.of(endpoints.get(0)), matchEndpoints(routeMetadata1, endpoints));
+        
+        RouteMetadata routeMetadata2 = sampleRouteMetadata(
+                "http://localhost:4000/path(test)/data", "GET", "/path(test)/data"
+        );
+        assertEquals(List.of(endpoints.get(1)), matchEndpoints(routeMetadata2, endpoints));
+        
+        RouteMetadata routeMetadata3 = sampleRouteMetadata(
+                "http://localhost:4000/route[abc]/item", "PUT", "/route[abc]/item"
+        );
+        assertEquals(List.of(endpoints.get(2)), matchEndpoints(routeMetadata3, endpoints));
+    }
 }

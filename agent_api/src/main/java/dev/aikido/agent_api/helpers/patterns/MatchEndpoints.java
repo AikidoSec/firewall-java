@@ -58,8 +58,19 @@ public final class MatchEndpoints {
 
         for (Endpoint wildcard : wildcards) {
             String route = wildcard.getRoute();
-            String regexString = "^" + route.replace("*", "(.*)") + "/?$";
-            Pattern regex = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);
+            // Split by * to separate literal parts from wildcards
+            String[] parts = route.split("\\*", -1);
+            StringBuilder regexBuilder = new StringBuilder("^");
+            for (int i = 0; i < parts.length; i++) {
+                // Quote each literal part to escape regex metacharacters
+                regexBuilder.append(Pattern.quote(parts[i]));
+                // Add wildcard pattern between parts (but not after the last part)
+                if (i < parts.length - 1) {
+                    regexBuilder.append("(.*)");
+                }
+            }
+            regexBuilder.append("/?$");
+            Pattern regex = Pattern.compile(regexBuilder.toString(), Pattern.CASE_INSENSITIVE);
 
             if (regex.matcher(path).matches()) {
                 results.add(wildcard);
