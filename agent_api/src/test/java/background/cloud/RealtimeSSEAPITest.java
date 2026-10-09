@@ -1,6 +1,7 @@
 package background.cloud;
 
 import com.sun.net.httpserver.HttpServer;
+import dev.aikido.agent_api.background.cloud.AgentHeaders;
 import dev.aikido.agent_api.background.cloud.RealtimeSSEAPI;
 import dev.aikido.agent_api.background.cloud.SSEParser;
 import dev.aikido.agent_api.helpers.env.Token;
@@ -203,7 +204,8 @@ public class RealtimeSSEAPITest {
         assertEquals("text/event-stream", headers.getFirst("Accept"));
         assertEquals("no-cache", headers.getFirst("Cache-Control"));
         assertEquals("java", headers.getFirst("X-Agent-Platform"));
-        assertNotNull(headers.getFirst("X-Agent-Version"));
+        assertEquals("firewall-java", headers.getFirst("X-Agent-Library"));
+        AgentHeaders.get().forEach((name, value) -> assertEquals(value, headers.getFirst(name), name));
     }
 
     @Test

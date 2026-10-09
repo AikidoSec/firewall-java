@@ -1,6 +1,5 @@
 package dev.aikido.agent_api.background.cloud;
 
-import dev.aikido.agent_api.Config;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
@@ -87,8 +86,7 @@ public class RealtimeSSEAPI {
             connection.setRequestProperty("Authorization", token.get());
             connection.setRequestProperty("Accept", "text/event-stream");
             connection.setRequestProperty("Cache-Control", "no-cache");
-            connection.setRequestProperty("X-Agent-Platform", "java");
-            connection.setRequestProperty("X-Agent-Version", Config.pkgVersion);
+            AgentHeaders.get().forEach(connection::setRequestProperty);
             connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
             connection.setReadTimeout(readTimeoutMs);
         } catch (IOException e) {

@@ -57,10 +57,11 @@ public class RealtimeAPI {
         return Optional.of(gson.fromJson(res.body(), ConfigResponse.class));
     }
     private static HttpRequest createConfigRequest(String token, URI uri) {
-        return HttpRequest.newBuilder()
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .uri(uri) // Change to your target URL
                 .header("Content-Type", "application/json") // Set Content-Type header
-                .header("Authorization", token) // Set Authorization header
-                .build();
+                .header("Authorization", token); // Set Authorization header
+        AgentHeaders.get().forEach(requestBuilder::header);
+        return requestBuilder.build();
     }
 }
