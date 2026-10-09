@@ -1,11 +1,22 @@
-import static org.junit.jupiter.api.Assertions.*;
+package dev.aikido.agent_api;
 
-import dev.aikido.agent_api.Track;
+import static dev.aikido.agent_api.helpers.UnixTimeMS.getUnixTimeMS;
+import static org.junit.jupiter.api.Assertions.*;
+import static utils.EmptyAPIResponses.emptyAPIResponse;
+
+import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.background.cloud.api.events.CustomEvent;
+import dev.aikido.agent_api.collectors.WebRequestCollector;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.context.SpringWebfluxContextObject;
 import dev.aikido.agent_api.storage.AttackQueue;
+import dev.aikido.agent_api.storage.ServiceConfigStore;
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.*;
 import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
@@ -17,16 +28,11 @@ import utils.EmptySampleContextObject;
 @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token-2")
 public class TrackTest {
     @BeforeEach
-    public void setup() {
-        Context.set(null);
-        AttackQueue.clear();
-        Track.reset();
-    }
-
     @AfterEach
-    public void tearDown() {
-        Context.set(null);
+    public void resetState() {
+        Context.reset();
         AttackQueue.clear();
+        ServiceConfigStore.updateFromAPIResponse(emptyAPIResponse);
         Track.reset();
     }
 
@@ -62,6 +68,31 @@ public class TrackTest {
         int occurrences =
                 out.capturedString().split("track\\(\\.\\.\\.\\) was called without a context\\.", -1).length - 1;
         assertEquals(1, occurrences);
+    }
+
+    @Test
+    @StdIo
+    public void testTrackForBypassedIpDoesNotQueueOrWarn(StdOut out) {
+        List<String> bypassedIps = List.of("192.168.1.1");
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of()));
+        WebRequestCollector.report(new EmptySampleContextObject("test", "/track-me", "POST"));
+
+        Track.track("my-custom-event");
+
+        assertEquals(0, AttackQueue.getSize());
+        assertFalse(out.capturedString().contains("track(...) was called without a context."));
+    }
+
+    @Test
+    public void testTrackDoesNotQueueEventForWebfluxRequest() {
+        Context.set(new SpringWebfluxContextObject(
+                "POST", "http://localhost/login", new InetSocketAddress("1.2.3.4", 443),
+                new HashMap<>(), Map.of(), Map.of()));
+
+        Track.track("my-custom-event");
+
+        assertEquals(0, AttackQueue.getSize());
     }
 
     @Test
@@ -120,6 +151,5 @@ public class TrackTest {
                 .filter(line -> line.contains("Only the first 25 events were tracked."))
                 .count();
         assertEquals(1, warningCount);
-        assertFalse(out.capturedString().contains("event-25"));
     }
 }

@@ -31,7 +31,7 @@ public final class CustomEvent {
     }
 
     private static UserData buildUserData(ContextObject context) {
-        if (context == null || context.getUser() == null) {
+        if (context.getUser() == null) {
             return null;
         }
         User user = context.getUser();
@@ -39,9 +39,6 @@ public final class CustomEvent {
     }
 
     private static RequestData buildRequestData(ContextObject context) {
-        if (context == null) {
-            return null;
-        }
         return new RequestData(
                 context.getMethod(),
                 context.getRemoteAddress(),

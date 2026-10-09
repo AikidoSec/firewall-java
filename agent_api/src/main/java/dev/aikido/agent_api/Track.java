@@ -3,6 +3,7 @@ package dev.aikido.agent_api;
 import dev.aikido.agent_api.background.cloud.api.events.CustomEvent;
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.context.ContextObject;
+import dev.aikido.agent_api.context.SpringWebfluxContextObject;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
 import dev.aikido.agent_api.helpers.logging.Logger;
@@ -15,6 +16,7 @@ public final class Track {
     private static final Logger logger = LogManager.getLogger(Track.class);
     private static final int MAX_EVENTS_PER_REQUEST = 25;
     private static final AtomicBoolean loggedWarningTrackCalledWithoutContext = new AtomicBoolean(false);
+    private static final AtomicBoolean loggedWarningWebfluxNotSupported = new AtomicBoolean(false);
 
     /**
      * External function for applications to track a custom event, e.g. a
@@ -28,7 +30,15 @@ public final class Track {
 
         ContextObject currentContext = Context.get();
         if (currentContext == null) {
-            logWarningTrackCalledWithoutContext();
+            if (!Context.isBypassed()) {
+                logWarningTrackCalledWithoutContext();
+            }
+            return;
+        }
+
+        // WebFlux's shared threads can hold another request's context, so we'd send the wrong IP and user.
+        if (currentContext instanceof SpringWebfluxContextObject) {
+            logWarningWebfluxNotSupported();
             return;
         }
 
@@ -59,10 +69,18 @@ public final class Track {
                 + "Make sure to call track(...) within an HTTP request.");
     }
 
+    private static void logWarningWebfluxNotSupported() {
+        if (!loggedWarningWebfluxNotSupported.compareAndSet(false, true)) {
+            return;
+        }
+        logger.warn("track(...) is not supported for Spring WebFlux yet. The event will not be tracked.");
+    }
+
     /**
      * Resets internal warning state. Only intended for use in tests.
      */
-    public static void reset() {
+    static void reset() {
         loggedWarningTrackCalledWithoutContext.set(false);
+        loggedWarningWebfluxNotSupported.set(false);
     }
 }
