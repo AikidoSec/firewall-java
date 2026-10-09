@@ -1,5 +1,8 @@
 package background.cloud;
 
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpServer;
+import dev.aikido.agent_api.background.cloud.AgentHeaders;
 import dev.aikido.agent_api.background.cloud.api.APIResponse;
 import dev.aikido.agent_api.background.cloud.api.ReportingApiHTTP;
 import dev.aikido.agent_api.helpers.env.Token;
@@ -10,7 +13,10 @@ import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.junitpioneer.jupiter.StdIo;
 import org.junitpioneer.jupiter.StdOut;
 
+import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -95,6 +101,30 @@ public class ReportingAPITest {
 
         assertEquals("AI2Bot|Bytespider", res.get().blockedUserAgents());
         assertEquals("ClaudeUser", res.get().monitoredUserAgents());
+    }
+
+    @Test
+    public void testSendsAgentHeaders() throws Exception {
+        List<Headers> receivedHeaders = new CopyOnWriteArrayList<>();
+        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+        server.createContext("/", exchange -> {
+            receivedHeaders.add(exchange.getRequestHeaders());
+            exchange.sendResponseHeaders(500, -1);
+            exchange.close();
+        });
+        server.start();
+        try {
+            api = new ReportingApiHTTP("http://localhost:" + server.getAddress().getPort() + "/", 2, new Token("token"));
+            api.fetchNewConfig();
+            api.fetchBlockedLists();
+        } finally {
+            server.stop(0);
+        }
+
+        assertEquals(2, receivedHeaders.size());
+        for (Headers headers : receivedHeaders) {
+            AgentHeaders.get().forEach((name, value) -> assertEquals(value, headers.getFirst(name), name));
+        }
     }
 
     @Test

@@ -48,12 +48,20 @@ public final class GetManagerInfo {
     }
 
 
+    public static String getHostname() {
+        String instanceName = InstanceName.fromEnv();
+        if (instanceName != null) {
+            return instanceName;
+        }
+        String hostname = Hostname.get();
+        return hostname.isBlank() ? "unknown" : hostname;
+    }
+
     public static ManagerInfo getManagerInfo() {
         ServiceConfiguration serviceConfig = ServiceConfigStore.getConfig();
-        String instanceName = InstanceName.fromEnv();
         return new ManagerInfo(
             !serviceConfig.isBlockingEnabled(), // dryMode
-            instanceName != null ? instanceName : Hostname.get(), // hostname
+            getHostname(), // hostname
             Config.pkgVersion, // version
             "firewall-java", // library
             IPAddress.get(), // ipAddress

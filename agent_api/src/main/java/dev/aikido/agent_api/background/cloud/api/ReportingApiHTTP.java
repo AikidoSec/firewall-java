@@ -1,6 +1,7 @@
 package dev.aikido.agent_api.background.cloud.api;
 
 import com.google.gson.Gson;
+import dev.aikido.agent_api.background.cloud.AgentHeaders;
 import dev.aikido.agent_api.background.cloud.api.events.APIEvent;
 import dev.aikido.agent_api.helpers.env.Token;
 import dev.aikido.agent_api.helpers.logging.LogManager;
@@ -88,12 +89,13 @@ public class ReportingApiHTTP extends ReportingApi {
                     .build();
 
             URI uri = URI.create(reportingUrl + "api/runtime/firewall/lists");
-            HttpRequest request = HttpRequest.newBuilder()
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                     .uri(uri)
                     .timeout(Duration.ofSeconds(timeoutInSec))
                     .header("Accept-Encoding", "gzip")
-                    .header("Authorization", token.get())
-                    .build();
+                    .header("Authorization", token.get());
+            AgentHeaders.get().forEach(requestBuilder::header);
+            HttpRequest request = requestBuilder.build();
 
             // Send the request and get the response
             HttpResponse<InputStream> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
@@ -139,6 +141,7 @@ public class ReportingApiHTTP extends ReportingApi {
             .timeout(Duration.ofSeconds(timeoutInSec))
             .header("Content-Type", "application/json") // Set Content-Type header
             .header("Authorization", token.get()); // Set Authorization header
+        AgentHeaders.get().forEach(requestBuilder::header);
         if (event.isPresent()) {
             Gson gson = new Gson();
             String requestPayload = gson.toJson(event.get());
