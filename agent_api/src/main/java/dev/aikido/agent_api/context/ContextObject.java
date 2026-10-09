@@ -24,6 +24,7 @@ public class ContextObject {
     protected transient ArrayList<RedirectNode> redirectStartNodes;
     protected transient Map<String, Map<String, String>> cache = new HashMap<>();
     protected transient Optional<Boolean> forcedProtectionOff = Optional.empty();
+    protected transient int trackedEventCount = 0;
 
     public boolean middlewareExecuted() {return executedMiddleware; }
     public void setExecutedMiddleware(boolean value) { executedMiddleware = value; }
@@ -102,6 +103,14 @@ public class ContextObject {
 
     public RouteMetadata getRouteMetadata() {
         return new RouteMetadata(route, url, method);
+    }
+
+    /**
+     * Increments the number of custom events tracked during this request and
+     * returns the new count. Used to enforce a per-request limit on track(...) calls.
+     */
+    public int incrementTrackedEventCount() {
+        return ++trackedEventCount;
     }
 
     @Override
