@@ -23,4 +23,7 @@ After adding `Track.track(...)`, trigger the event at least once. It will then a
 
 Call `Track.track(...)` while handling an HTTP request. Zen associates the event with the request's IP address. Playbook counts are per IP, not across your whole app. If you call [`setUser`](./user.md) before `Track.track(...)`, Zen also includes the current user. Calling `setUser` is optional — events without a user are still tracked.
 
+> [!NOTE]
+> `Track.track(...)` doesn't support Spring WebFlux yet.
+
 Event names can use any format. We recommend lowercase, dot-separated names such as `user.login_failed`.

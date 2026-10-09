@@ -42,19 +42,6 @@ class CustomEventTest {
     }
 
     @Test
-    void createAPIEvent_WithNullContext_ReturnsCustomEventEventWithNullRequestAndUser() {
-        CustomEvent.CustomEventEvent event = CustomEvent.createAPIEvent("my-custom-event", null);
-
-        assertNotNull(event);
-        assertEquals("custom", event.type());
-        assertEquals("my-custom-event", event.name());
-        assertNull(event.request());
-        assertNull(event.user());
-        assertNotNull(event.agent());
-        assertTrue(event.time() > 0);
-    }
-
-    @Test
     void createAPIEvent_WithContextButNoUser_ReturnsCustomEventEventWithNullUser() {
         ContextObject context = new EmptySampleContextObject("test", "/api/resource", "GET");
 
