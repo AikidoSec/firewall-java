@@ -85,4 +85,13 @@ public class ResolverTest {
 
         assertNull(Resolver.resolvesToImdsIp(resolvedIps, "metadata.google.internal"));
     }
+
+    @Test
+    void testResolvesToImdsIp_TrustedHostnameWithTrailingDot() {
+        Set<String> resolvedIps = new HashSet<>();
+        resolvedIps.add("169.254.169.254"); // IMDS IP
+
+        assertNull(Resolver.resolvesToImdsIp(resolvedIps, "metadata.google.internal."));
+        assertNull(Resolver.resolvesToImdsIp(resolvedIps, "metadata.goog."));
+    }
 }
