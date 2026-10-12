@@ -14,7 +14,9 @@ import static dev.aikido.agent_api.background.cloud.api.events.DetectedAttack.cr
 
 public final class AttackQueue {
     private static final Logger logger = LogManager.getLogger(AttackQueue.class);
-    private static final BlockingQueue<APIEvent> queue = new LinkedBlockingQueue<>();
+    // Events pile up while Aikido's API is slow or down, so cap memory use. add() drops events when full.
+    private static final int MAX_QUEUE_SIZE = 100;
+    private static final BlockingQueue<APIEvent> queue = new LinkedBlockingQueue<>(MAX_QUEUE_SIZE);
 
     private AttackQueue() {
 

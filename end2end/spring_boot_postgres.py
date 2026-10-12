@@ -1,4 +1,5 @@
 from utils import App, Request
+from utils.test_custom_events import test_custom_events
 
 spring_boot_postgres_app = App(8080)
 
@@ -21,3 +22,6 @@ spring_boot_postgres_app.add_payload("path traversal",
 )
 
 spring_boot_postgres_app.test_all_payloads()
+
+test_custom_events(spring_boot_postgres_app.urls["enabled"], spring_boot_postgres_app.event_handler)
+print("✅ Tested custom events")
