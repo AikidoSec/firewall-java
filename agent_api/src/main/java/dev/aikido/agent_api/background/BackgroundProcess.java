@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoAPIEndpoint;
 
 public class BackgroundProcess extends Thread {
-    private static final int API_TIMEOUT = 10; // 10 seconds
+    private static final int API_TIMEOUT = 30; // 30 seconds
     private static final int POLLING_INTERVAL_SECONDS = 60; // Check for realtime config changes every 1 minute
     private static final int FIRST_HEARTBEAT_INTERVAL_SECONDS = 30;
     private static final int SECOND_HEARTBEAT_INTERVAL_SECONDS = 120;
