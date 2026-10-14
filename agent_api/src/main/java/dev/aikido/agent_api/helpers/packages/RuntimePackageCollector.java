@@ -1,5 +1,7 @@
 package dev.aikido.agent_api.helpers.packages;
 
+import dev.aikido.agent_api.storage.JavaArtifact;
+import dev.aikido.agent_api.storage.JavaArtifactsStore;
 import dev.aikido.agent_api.storage.RuntimePackagesStore;
 
 import java.security.ProtectionDomain;
@@ -45,7 +47,11 @@ public final class RuntimePackageCollector {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 ObservedLocation location = PENDING_LOCATIONS.take();
-                RuntimePackagesStore.addAll(JarPackageScanner.findMavenPackages(location.url(), location.requiredAt()));
+                JarPackageScanner.JarScanResult result = JarPackageScanner.scan(location.url(), location.requiredAt());
+                RuntimePackagesStore.addAll(result.packages());
+                if (result.sha1() != null) {
+                    JavaArtifactsStore.add(new JavaArtifact(result.sha1(), location.requiredAt()));
+                }
             } catch (InterruptedException interrupted) {
                 Thread.currentThread().interrupt();
             } catch (Throwable ignored) {
