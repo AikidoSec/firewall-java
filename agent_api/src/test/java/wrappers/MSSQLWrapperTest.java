@@ -35,6 +35,7 @@ public class MSSQLWrapperTest {
         String password = "Strong!Passw0rd"; // Change to your password
         connection = DriverManager.getConnection(url, user, password);
         StatisticsStore.clear();
+        ServiceConfigStore.updateBlocking(true);
     }
 
     @AfterEach
@@ -44,6 +45,7 @@ public class MSSQLWrapperTest {
         }
         Context.set(null);
         StatisticsStore.clear();
+        ServiceConfigStore.updateBlocking(true);
     }
 
     @Test
@@ -61,10 +63,32 @@ public class MSSQLWrapperTest {
         });
         assertEquals("Aikido Zen has blocked SQL Injection, Dialect: Microsoft SQL", exception.getMessage());
         var operation = StatisticsStore.getStatsRecord().operations().get("(Microsoft JDBC Driver 10.2 for SQL Server) java.sql.Connection.prepareStatement");
-        assertEquals(5, operation.total());
+        assertEquals(3, operation.total());
         assertEquals(1, operation.getAttacksDetected().get("blocked"));
         assertEquals(1, operation.getAttacksDetected().get("total"));
         assertEquals(OperationKind.SQL_OP, operation.getKind());
+    }
+
+    @Test
+    public void testPrepareStatementReportsOnceInDetectionOnlyMode() throws SQLException {
+        String payload = "Malicious Pet', 'Gru from the Minions') -- ";
+        String sql = "INSERT INTO pets (pet_name, owner) VALUES ('" + payload + "', 'Aikido Security')";
+        Context.set(new EmptySampleContextObject(payload));
+        ServiceConfigStore.updateBlocking(false);
+
+        assertDoesNotThrow(() -> connection.prepareStatement(sql));
+
+        var stats = StatisticsStore.getStatsRecord();
+        assertEquals(1, stats.requests().attacksDetected().total());
+        assertEquals(1, stats.operations().values().stream()
+                .filter(record -> record.getKind() == OperationKind.SQL_OP)
+                .count());
+        var operation = stats.operations()
+                .get("(Microsoft JDBC Driver 10.2 for SQL Server) java.sql.Connection.prepareStatement");
+        assertNotNull(operation);
+        assertEquals(1, operation.total());
+        assertEquals(1, operation.getAttacksDetected().get("total"));
+        assertEquals(0, operation.getAttacksDetected().get("blocked"));
     }
 
     @Test
