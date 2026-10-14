@@ -90,6 +90,9 @@ public class SpringMVCJakartaWrapper implements Wrapper {
                     request.getParameterMap(), cookiesMap, headersMap, request.getQueryString()
             );
 
+            // Marker read by SpringMVCDispatcherWrapper so the fallback does not re-create this context.
+            request.setAttribute("dev.aikido.zen.springContextCreated", Boolean.TRUE);
+
             // Write a new response:
             WebRequestCollector.Res res = WebRequestCollector.report(contextObject);
             if (res != null) {
