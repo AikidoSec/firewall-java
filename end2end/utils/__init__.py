@@ -62,6 +62,17 @@ class App:
         for key in self.payloads.keys():
             self.test_payload(key)
 
+    def test_dependency_detection(self, dependency_name, timeout=75):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            for heartbeat in self.event_handler.fetch_heartbeats():
+                packages = heartbeat.get("packages", [])
+                if any(package.get("name") == dependency_name for package in packages):
+                    print("✅ Detected loaded dependency: " + dependency_name)
+                    return
+            time.sleep(1)
+        raise AssertionError("Loaded dependency was not reported: " + dependency_name)
+
     def test_blocking(self):
         test_bot_blocking(self.urls["enabled"])
         print("✅ Tested bot blocking")
