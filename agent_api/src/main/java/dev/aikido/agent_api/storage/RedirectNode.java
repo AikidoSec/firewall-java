@@ -36,6 +36,17 @@ public class RedirectNode {
         this.child = child;
     }
 
+    public RedirectNode copyChain() {
+        RedirectNode copy = new RedirectNode(this.url);
+        RedirectNode source = this.child;
+        RedirectNode tail = copy;
+        while (source != null) {
+            tail = new RedirectNode(tail, source.url);
+            source = source.child;
+        }
+        return copy;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null || getClass() != obj.getClass()) {
