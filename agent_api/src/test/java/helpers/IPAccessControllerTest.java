@@ -75,6 +75,13 @@ public class IPAccessControllerTest {
     }
 
     @Test
+    public void testAllowsPlainIPv4RequestForIPv4MappedAllowedIpAddress() {
+        List<Endpoint> endpoints = List.of(genEndpoint(List.of("::ffff:1.2.3.4")));
+        assertTrue(IPAccessController.ipAllowedToAccessRoute("1.2.3.4", endpoints));
+        assertFalse(IPAccessController.ipAllowedToAccessRoute("1.2.3.5", endpoints));
+    }
+
+    @Test
     public void testChecksEveryMatchingEndpoint() {
         List<Endpoint> endpoints = List.of(
                 genEndpoint(List.of("3.4.5.6")),

@@ -2,6 +2,11 @@ package vulnerabilities.ssrf;
 
 import org.junit.jupiter.api.Test;
 
+import java.net.Inet6Address;
+import java.net.UnknownHostException;
+import java.util.List;
+
+import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.containsPrivateIP;
 import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -180,6 +185,55 @@ public class IsPrivateIPTest {
         assertFalse(isPrivateIp("invalid-ip"));
         assertFalse(isPrivateIp("256.256.256.256")); // Invalid IPv4
         assertFalse(isPrivateIp("::g")); // Invalid IPv6
+    }
+
+    @Test
+    void testNonCanonicalPrivateAddresses() {
+        assertTrue(isPrivateIp("127.1"));
+        assertTrue(isPrivateIp("10.1"));
+        assertTrue(isPrivateIp("2130706433"));
+        assertTrue(isPrivateIp("0x7f000001"));
+        assertTrue(isPrivateIp("0177.0.0.1"));
+        assertTrue(isPrivateIp("::ffff:0177.0.0.1"));
+        assertTrue(isPrivateIp("::ffff:127.0.0.1"));
+        assertTrue(isPrivateIp("::ffff:7f00:1"));
+        assertTrue(isPrivateIp("0:0:0:0:0:FFFF:7F00:1"));
+        assertTrue(isPrivateIp("FE80:0:0:0:0:0:0:1"));
+        assertTrue(isPrivateIp("fe80::1%eth0"));
+        assertTrue(isPrivateIp("fe80:0:0:0:0:0:0:1%2"));
+        assertTrue(isPrivateIp("::1%lo"));
+        assertFalse(isPrivateIp("8.8.8.8"));
+        assertFalse(isPrivateIp("2001:4860:4860::8888"));
+    }
+
+    @Test
+    void testInvalidAddressesNeverThrow() {
+        assertFalse(isPrivateIp(null));
+        assertFalse(isPrivateIp(""));
+        assertFalse(isPrivateIp("abc"));
+        assertFalse(isPrivateIp("1.2.3.4.5"));
+        assertFalse(isPrivateIp("999.1.1.1"));
+        assertFalse(isPrivateIp("1.2.3.401-"));
+    }
+
+    @Test
+    void testScopedInet6AddressHostAddresses() throws UnknownHostException {
+        byte[] linkLocal = new byte[16];
+        linkLocal[0] = (byte) 0xfe;
+        linkLocal[1] = (byte) 0x80;
+        linkLocal[15] = 1;
+        String scopedLinkLocal = Inet6Address.getByAddress(null, linkLocal, 2).getHostAddress();
+        assertEquals("fe80:0:0:0:0:0:0:1%2", scopedLinkLocal);
+        assertTrue(isPrivateIp(scopedLinkLocal));
+
+        byte[] loopback = new byte[16];
+        loopback[15] = 1;
+        assertTrue(isPrivateIp(Inet6Address.getByAddress(null, loopback, 1).getHostAddress()));
+
+        byte[] google = {0x20, 0x01, 0x48, 0x60, 0x48, 0x60, 0, 0, 0, 0, 0, 0, 0, 0, (byte) 0x88, (byte) 0x88};
+        String scopedPublic = Inet6Address.getByAddress(null, google, 3).getHostAddress();
+        assertFalse(isPrivateIp(scopedPublic));
+        assertTrue(containsPrivateIP(List.of(scopedPublic, scopedLinkLocal)));
     }
 
 }

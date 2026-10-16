@@ -1,6 +1,9 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
 import dev.aikido.agent_api.helpers.net.IPList;
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
+import inet.ipaddr.IPAddressStringParameters;
 
 import java.util.List;
 
@@ -37,6 +40,9 @@ public final class IsPrivateIP {
             "3fff::/20" // Documentation prefix (RFC 9637)
     );
     private static final IPList privateIpNetworks = new IPList();
+    // The library would otherwise parse "" as the loopback address.
+    private static final IPAddressStringParameters DISALLOW_EMPTY =
+            new IPAddressStringParameters.Builder().allowEmpty(false).toParams();
 
     static {
         PRIVATE_IP_RANGES.stream().forEach(privateIpNetworks::add);
@@ -56,6 +62,20 @@ public final class IsPrivateIP {
     }
 
     public static boolean isPrivateIp(String ip) {
-        return privateIpNetworks.matches(ip);
+        String normalizedIp = normalize(ip);
+        return normalizedIp != null && privateIpNetworks.matches(normalizedIp);
+    }
+
+    // Rewrites shorthand IPs like "127.1" or "2130706433" (both 127.0.0.1) to the full form the matcher understands.
+    private static String normalize(String ip) {
+        try {
+            IPAddress address = new IPAddressString(ip, DISALLOW_EMPTY).getAddress();
+            if (address == null || address.isMultiple()) {
+                return null;
+            }
+            return address.withoutPrefixLength().toNormalizedString();
+        } catch (RuntimeException e) {
+            return null; // The library throws on some malformed input, e.g. 1.2.3.401-
+        }
     }
 }
