@@ -1,6 +1,9 @@
 package dev.aikido.agent_api.vulnerabilities.ssrf;
 
 import dev.aikido.agent_api.helpers.net.IPList;
+import inet.ipaddr.IPAddress;
+import inet.ipaddr.IPAddressString;
+import inet.ipaddr.IPAddressStringParameters;
 
 import java.util.List;
 
@@ -37,6 +40,9 @@ public final class IsPrivateIP {
             "3fff::/20" // Documentation prefix (RFC 9637)
     );
     private static final IPList privateIpNetworks = new IPList();
+    // By default the library reads "" as loopback.
+    private static final IPAddressStringParameters NORMALIZE_PARAMETERS =
+            new IPAddressStringParameters.Builder().allowEmpty(false).toParams();
 
     static {
         PRIVATE_IP_RANGES.stream().forEach(privateIpNetworks::add);
@@ -56,6 +62,19 @@ public final class IsPrivateIP {
     }
 
     public static boolean isPrivateIp(String ip) {
-        return privateIpNetworks.matches(ip);
+        return privateIpNetworks.matches(normalize(ip));
+    }
+
+    // The matcher doesn't read inet_aton forms like 127.1, 2130706433 or 0177.0.0.1.
+    private static String normalize(String ip) {
+        try {
+            IPAddress address = new IPAddressString(ip, NORMALIZE_PARAMETERS).getAddress();
+            if (address == null || address.isMultiple()) {
+                return null;
+            }
+            return address.withoutPrefixLength().toNormalizedString();
+        } catch (RuntimeException e) {
+            return null; // e.g. 1.2.3.401-
+        }
     }
 }

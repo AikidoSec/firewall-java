@@ -96,7 +96,7 @@ public class ServiceConfigurationTest {
     @Test
     public void testIsIpBlockedOrMonitored() {
         var blockedEntry = new ReportingApi.ListsResponseEntry("blocked-key", "source", "blocked", List.of("192.168.1.1"));
-        var monitoredEntry = new ReportingApi.ListsResponseEntry("monitored-key", "source", "blocked", List.of("192.168.2.*"));
+        var monitoredEntry = new ReportingApi.ListsResponseEntry("monitored-key", "source", "blocked", List.of("192.168.2.0/24"));
 
         ReportingApi.APIListsResponse listsResponse = new ReportingApi.APIListsResponse(
             List.of(blockedEntry), List.of(monitoredEntry),

@@ -4,6 +4,10 @@ import dev.aikido.agent_api.helpers.net.IPList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class IPListTest {
@@ -167,5 +171,117 @@ public class IPListTest {
         assertTrue(blocklist.matches("10.1.2.3"));
         assertTrue(blocklist.matches("::ffff:10.1.2.3"));
         assertFalse(blocklist.matches("11.1.2.3"));
+    }
+
+    @Test
+    public void testBulkConstructorMatchesLikeAdd() {
+        List<String> networks = new ArrayList<>();
+        for (int i = 0; i < 256; i++) {
+            networks.add("192.0.2." + i);
+        }
+        networks.add("2001:db8::/32");
+        networks.add("notanip");
+        networks.add(null);
+        IPList bulk = new IPList(networks);
+
+        assertTrue(bulk.matches("192.0.2.77"));
+        assertTrue(bulk.matches("2001:db8::1"));
+        assertFalse(bulk.matches("192.0.3.1"));
+        // 256 adjacent addresses are summarised into 192.0.2.0/24
+        assertEquals(2, bulk.length());
+
+        bulk.add("10.0.0.0/8");
+        assertTrue(bulk.matches("10.1.2.3"));
+        assertTrue(bulk.matches("192.0.2.77"));
+        assertEquals(3, bulk.length());
+    }
+
+    @Test
+    public void testBulkConstructorWithNullOrEmptyCollection() {
+        assertEquals(0, new IPList(null).length());
+        assertFalse(new IPList(null).matches("1.2.3.4"));
+        assertFalse(new IPList(List.of()).matches("1.2.3.4"));
+    }
+
+    @Test
+    public void testMatchesNeverThrows() {
+        blocklist.add("0.0.0.0/0");
+        blocklist.add("::/0");
+        for (String ip : Arrays.asList(null, "", " ", "abc", "1.2.3.4.5", "999.1.1.1", "1.2.3.401-", "::ffff:186.3.320-.183",
+                "-", "*", "/8", "[", "[]", "%", "::%", "1::2::3", "\u0661.0.0.1")) {
+            assertDoesNotThrow(() -> blocklist.matches(ip), String.valueOf(ip));
+        }
+        assertFalse(blocklist.matches(null));
+        assertFalse(blocklist.matches(""));
+        assertFalse(blocklist.matches("1.2.3.401-"));
+    }
+
+    @Test
+    public void testIPv4MappedLookupsMatchIPv4Networks() {
+        Object[][] cases = {
+                {"192.0.2.0/24", "::ffff:192.0.2.1", true},
+                {"192.0.2.0/24", "::FFFF:192.0.2.1", true},
+                {"192.0.2.0/24", "::ffff:c000:201", true},
+                {"192.0.2.0/24", "::FFFF:C000:201", true},
+                {"192.0.2.0/24", "0:0:0:0:0:ffff:c000:201", true},
+                {"192.0.2.0/24", "0000:0000:0000:0000:0000:ffff:c000:0201", true},
+                {"192.0.2.0/24", "[::ffff:192.0.2.1]", true},
+                {"192.0.2.0/24", "[::ffff:c000:201]", true},
+                {"192.0.2.0/24", "::ffff:192.0.2.1%eth0", true},
+                {"192.0.2.0/24", "::ffff:c000:201%2", true},
+                {"192.0.2.0/24", "::ffff:192.0.3.1", false},
+                {"192.0.2.0/24", "::ffff:c000:301", false},
+                {"192.0.2.0/24", "::192.0.2.1", false},
+                {"192.0.2.0/24", "::ffff:0:c000:201", false},
+                {"192.0.2.0/24", "64:ff9b::192.0.2.1", false},
+                {"192.0.2.1", "::ffff:192.0.2.1", true},
+                {"192.0.2.1", "::ffff:192.0.2.2", false},
+                {"0.0.0.0/0", "::ffff:8.8.8.8", true},
+                {"192.0.2.0/24", "abc", false},
+                {"192.0.2.0/24", "", false},
+                {"192.0.2.0/24", null, false},
+        };
+        for (Object[] c : cases) {
+            IPList added = new IPList();
+            added.add((String) c[0]);
+            IPList bulk = new IPList(List.of((String) c[0]));
+            String message = c[0] + " / " + c[1];
+            assertEquals(c[2], added.matches((String) c[1]), message);
+            assertEquals(c[2], bulk.matches((String) c[1]), message);
+        }
+    }
+
+    @Test
+    public void testIPv4MappedEntriesMatchIPv4Lookups() {
+        Object[][] cases = {
+                {"::ffff:192.0.2.1", "192.0.2.1", true},
+                {"::ffff:c000:201", "192.0.2.1", true},
+                {"::FFFF:C000:201", "192.0.2.1", true},
+                {"0:0:0:0:0:ffff:c000:201", "192.0.2.1", true},
+                {"::ffff:192.0.2.1", "192.0.2.2", false},
+                {"::ffff:192.0.2.1", "::ffff:c000:201", true},
+                {"::ffff:192.0.2.0/120", "192.0.2.255", true},
+                {"::ffff:192.0.2.0/120", "192.0.3.0", false},
+                {"::ffff:192.0.2.0/97", "128.0.0.0", true},
+                {"::ffff:192.0.2.0/97", "127.255.255.255", false},
+                {"::ffff:0:0/96", "8.8.8.8", true},
+                {"::ffff:0:0/80", "8.8.8.8", true},
+                {"::ffff:0:0/80", "::ffff:8.8.8.8", true},
+                {"::192.0.2.1", "192.0.2.1", false},
+                {"64:ff9b::192.0.2.1", "192.0.2.1", false},
+                {"::ffff:192.0.2.1/129", "192.0.2.1", false},
+                {"::ffff:999.0.2.1", "192.0.2.1", false},
+        };
+        for (Object[] c : cases) {
+            IPList added = new IPList();
+            added.add((String) c[0]);
+            IPList bulk = new IPList(List.of((String) c[0]));
+            String message = c[0] + " / " + c[1];
+            assertEquals(c[2], added.matches((String) c[1]), message);
+            assertEquals(c[2], bulk.matches((String) c[1]), message);
+        }
+
+        IPList list = new IPList(List.of("::ffff:192.0.2.1", "::ffff:c000:200/127", "::ffff:999.0.2.1"));
+        assertEquals(1, list.length());
     }
 }
