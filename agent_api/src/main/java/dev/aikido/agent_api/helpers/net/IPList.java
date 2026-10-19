@@ -2,61 +2,66 @@ package dev.aikido.agent_api.helpers.net;
 
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-import inet.ipaddr.format.util.DualIPv4v6Tries;
+import inet.ipaddr.ipv4.IPv4Address;
 
+import java.util.Collection;
+import java.util.List;
+
+// The networks come from Aikido, not from users, so the matcher doesn't validate them strictly:
+// "1.2.3.4abc" is stored as 1.2.3.4.
 public class IPList {
-    private final DualIPv4v6Tries ipAddresses;
+    private volatile IPMatcher matcher;
 
     public IPList() {
-        this.ipAddresses = new DualIPv4v6Tries();
+        this(List.of());
+    }
+
+    public IPList(Collection<String> ipsOrCIDRs) {
+        this.matcher = new IPMatcher(normalizeNetworks(ipsOrCIDRs));
     }
 
     public void add(String ipOrCIDR) {
         if (ipOrCIDR == null) {
             return; // Don't add if IP is null
         }
-        IPAddress ip = new IPAddressString(ipOrCIDR).getAddress();
-        if (ip == null) {
-            return;
-        }
-        // Normalize IPv4-mapped IPv6 addresses to their IPv4 form so matching is symmetric.
-        if (ip.isIPv6() && ip.toIPv6().isIPv4Convertible()) {
-            IPAddress ipv4 = ip.toIPv6().toIPv4();
-            if (ipv4 != null) {
-                ip = ipv4;
-            }
-        }
-        if (ipOrCIDR.contains("/")) {
-            ip = ip.toPrefixBlock();
-        }
-        ipAddresses.add(ip);
+        matcher = matcher.withNetworks(List.of(ipv4IfMapped(ipOrCIDR)));
     }
 
     public boolean matches(String ip) {
-        IPAddressString ipAddressString = new IPAddressString(ip);
-        if (!ipAddressString.isValid()) {
-            return false; // Invalid IP address
-        }
-        IPAddress ipAddress = ipAddressString.getAddress();
-
-        if (containsAddress(ipAddress)) {
-            return true;
-        }
-
-        // Also try the embedded IPv4 form for IPv4-mapped IPv6 addresses (e.g. ::ffff:23.45.67.89)
-        if (ipAddress.isIPv6() && ipAddress.toIPv6().isIPv4Convertible()) {
-            IPAddress ipv4 = ipAddress.toIPv6().toIPv4();
-            if (ipv4 != null && containsAddress(ipv4)) {
-                return true;
-            }
-        }
-        return false;
+        return matcher.has(ip);
     }
 
-    private boolean containsAddress(IPAddress ipAddress) {
-        return ipAddresses.elementContains(ipAddress);
-    }
     public int length() {
-        return ipAddresses.size();
+        return matcher.size();
+    }
+
+    private static List<String> normalizeNetworks(Collection<String> ipsOrCIDRs) {
+        if (ipsOrCIDRs == null) {
+            return List.of();
+        }
+        return ipsOrCIDRs.stream().map(IPList::ipv4IfMapped).toList();
+    }
+
+    // The matcher matches IPv4-mapped lookups against IPv4 networks, not IPv4 lookups against mapped networks.
+    // So we store "::ffff:1.2.3.4" as "1.2.3.4".
+    private static String ipv4IfMapped(String network) {
+        if (!mayBeIpv4Mapped(network)) {
+            return network;
+        }
+        try {
+            IPAddress address = new IPAddressString(network).getAddress();
+            if (address == null || !address.isIPv6()) {
+                return network;
+            }
+            IPv4Address ipv4 = address.toIPv6().toIPv4();
+            return ipv4 == null ? network : ipv4.toNormalizedString();
+        } catch (RuntimeException e) {
+            return network;
+        }
+    }
+
+    // Avoids running the IP parser on every entry, lists can be big.
+    private static boolean mayBeIpv4Mapped(String network) {
+        return network != null && network.contains(":") && network.toLowerCase().contains("ffff");
     }
 }
