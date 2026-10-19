@@ -11,16 +11,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-import java.security.KeyStore;
 
 import static dev.aikido.agent_api.background.cloud.SSLContextHelper.createDefaultSSLContext;
 
@@ -29,6 +25,7 @@ public class ReportingApiHTTP extends ReportingApi {
     private final String reportingUrl;
     private final Token token;
     private final Gson gson = new Gson();
+    private HttpClient httpClient;
     public ReportingApiHTTP(String reportingUrl, int timeoutInSec, Token token) {
         // Reporting URL should end with trailing slash for now.
         super(timeoutInSec);
@@ -36,18 +33,23 @@ public class ReportingApiHTTP extends ReportingApi {
         this.token = token;
     }
 
-    public Optional<APIResponse> fetchNewConfig() {
-        try {
-            HttpClient httpClient = HttpClient.newBuilder()
+    private synchronized HttpClient getHttpClient() throws Exception {
+        if (httpClient == null) {
+            httpClient = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
                     .sslContext(createDefaultSSLContext())
                     .build();
+        }
+        return httpClient;
+    }
 
+    public Optional<APIResponse> fetchNewConfig() {
+        try {
             URI uri = URI.create(reportingUrl + "api/runtime/config");
             HttpRequest request = createHttpRequest(Optional.empty(), uri);
 
             // Send the request and get the response
-            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> httpResponse = getHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             logger.trace("Got response for %s: %s", uri.toString(), httpResponse.body());
             return Optional.of(toApiResponse(httpResponse));
         } catch (Exception e) {
@@ -59,16 +61,11 @@ public class ReportingApiHTTP extends ReportingApi {
     @Override
     public Optional<APIResponse> report(APIEvent event) {
         try {
-            HttpClient httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(timeoutInSec))
-                .sslContext(createDefaultSSLContext())
-                .build();
-
             URI uri = URI.create(reportingUrl + "api/runtime/events");
             HttpRequest request = createHttpRequest(Optional.of(event), uri);
 
             // Send the request and get the response
-            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> httpResponse = getHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             logger.trace("Got response for %s: %s", uri.toString(), httpResponse.body());
             return Optional.of(toApiResponse(httpResponse));
         } catch (Exception e) {
@@ -83,11 +80,6 @@ public class ReportingApiHTTP extends ReportingApi {
             return Optional.empty();
         }
         try {
-            HttpClient httpClient = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(timeoutInSec))
-                    .sslContext(createDefaultSSLContext())
-                    .build();
-
             URI uri = URI.create(reportingUrl + "api/runtime/firewall/lists");
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                     .uri(uri)
@@ -98,20 +90,17 @@ public class ReportingApiHTTP extends ReportingApi {
             HttpRequest request = requestBuilder.build();
 
             // Send the request and get the response
-            HttpResponse<InputStream> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            if (httpResponse.statusCode() != HttpURLConnection.HTTP_OK) {
-                return Optional.empty();
-            }
+            HttpResponse<InputStream> httpResponse = getHttpClient().send(request, HttpResponse.BodyHandlers.ofInputStream());
+            try (InputStream body = httpResponse.body()) {
+                if (httpResponse.statusCode() != HttpURLConnection.HTTP_OK) {
+                    return Optional.empty();
+                }
 
-            InputStream inputStream = httpResponse.body();
-            // Check if the response is gzipped
-            if ("gzip".equalsIgnoreCase(httpResponse.headers().firstValue("Content-Encoding").orElse(""))) {
-                inputStream = new GZIPInputStream(inputStream);
+                boolean gzipped = "gzip".equalsIgnoreCase(httpResponse.headers().firstValue("Content-Encoding").orElse(""));
+                try (InputStream inputStream = gzipped ? new GZIPInputStream(body) : body) {
+                    return Optional.of(gson.fromJson(new InputStreamReader(inputStream), APIListsResponse.class));
+                }
             }
-
-            // Read the response
-            APIListsResponse res = gson.fromJson(new InputStreamReader(inputStream), APIListsResponse.class);
-            return Optional.of(res);
         } catch (Exception e) {
             logger.debug("Failed to fetch blocked lists: %s", e.getMessage());
         }

@@ -27,6 +27,7 @@ public class RealtimeAPITest {
 
         assertTrue(response.isPresent());
         assertEquals(0, response.get().configUpdatedAt());
+        assertEquals(response, realtimeAPI.getConfig());
     }
 
     @SetEnvironmentVariable(key = "AIKIDO_REALTIME_ENDPOINT", value="http://localnothost:2500")
