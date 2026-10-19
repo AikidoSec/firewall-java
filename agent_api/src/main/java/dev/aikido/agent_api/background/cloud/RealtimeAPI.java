@@ -11,9 +11,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Optional;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-import java.security.KeyStore;
 
 import static dev.aikido.agent_api.background.cloud.SSLContextHelper.createDefaultSSLContext;
 import static dev.aikido.agent_api.helpers.env.Endpoints.getAikidoRealtimeEndpoint;
@@ -23,6 +20,7 @@ public class RealtimeAPI {
     private static final int timeoutInSec = 3; // 3 sec timeout for requests to the realtime endpoint
     private final String endpoint;
     private final Token token;
+    private HttpClient httpClient;
 
     public RealtimeAPI(Token token) {
         endpoint = getAikidoRealtimeEndpoint(token);
@@ -30,16 +28,22 @@ public class RealtimeAPI {
     }
     public record ConfigResponse(long configUpdatedAt) {}
 
-    public Optional<ConfigResponse> getConfig() {
-        try {
-            HttpClient httpClient = HttpClient.newBuilder()
+    private synchronized HttpClient getHttpClient() throws Exception {
+        if (httpClient == null) {
+            httpClient = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(timeoutInSec))
                     .sslContext(createDefaultSSLContext())
                     .build();
+        }
+        return httpClient;
+    }
+
+    public Optional<ConfigResponse> getConfig() {
+        try {
             URI uri = URI.create(endpoint + "config");
             HttpRequest request = createConfigRequest(token.get(), uri);
             // Send the request and get the response
-            HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> httpResponse = getHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             return toConfigResponse(httpResponse);
         } catch (Exception e) {
             logger.debug("Error while communicating with cloud: %s", e.getMessage());
