@@ -50,6 +50,23 @@ class WebRequestCollectorTest {
     }
 
     @Test
+    void testReport_bypassedIpIsMarkedUntilNextRequest() {
+        List<String> bypassedIps = List.of("192.168.1.1");
+        ServiceConfigStore.updateFromAPIResponse(new APIResponse(
+                true, "", getUnixTimeMS(), List.of(), List.of(), bypassedIps, false, null, true, false, List.of(), 0
+        ));
+
+        WebRequestCollector.report(contextObject);
+        assertNull(Context.get());
+        assertTrue(Context.isBypassed());
+
+        contextObject.setIp("10.0.0.1");
+        WebRequestCollector.report(contextObject);
+        assertNotNull(Context.get());
+        assertFalse(Context.isBypassed());
+    }
+
+    @Test
     void testReport_ipNotAllowed() {
         setEmptyConfigWithEndpointList(List.of(new Endpoint(
                 "GET", "/api/resource", 100, 100,
