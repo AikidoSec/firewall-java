@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+      contents: read
+
 jobs:
   extract-version:
     runs-on: ubuntu-latest
@@ -23,14 +26,19 @@ jobs:
     runs-on: open-source-releaser
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       - name: Set the version for this release
-        run: make replace_version version=${{ needs.extract-version.outputs.version }}
+        env:
+          RELEASE_VERSION: ${{ needs.extract-version.outputs.version }}
+        run: make replace_version version="$RELEASE_VERSION"
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '21'
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Build with Gradle
         run: |
           chmod +x gradlew
@@ -46,7 +54,7 @@ jobs:
           shasum -a 256 zen.zip > zen.zip.sha256sum
           shasum -a 256 zen.tar.gz > zen.tar.gz.sha256sum
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-artifacts
           path: |
@@ -62,13 +70,16 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: release-artifacts
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           draft: true
           files: |

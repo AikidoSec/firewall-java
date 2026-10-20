@@ -1,0 +1,25 @@
+name: Gradle Wrapper Validation
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+permissions:
+    contents: read
+
+# Dependency checksums and lockfiles are enforced by Gradle
+# Only the wrapper jar itself cannot be verified by Gradle, so it is checked here.
+jobs:
+    wrapper-validation:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+
+            # Verifies gradle/wrapper/gradle-wrapper.jar against checksums of official Gradle releases
+            - name: Validate Gradle wrapper
+              uses: gradle/actions/wrapper-validation@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
