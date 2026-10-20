@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '21'
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Build with Gradle
         working-directory: ./
@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         java-version: [17, 18, 19, 20, 21, 24, 25]
-        distribution: ['adopt', 'corretto', 'oracle']
+        distribution: ['temurin', 'corretto', 'oracle']
 
     steps:
       - name: Download build artifacts
