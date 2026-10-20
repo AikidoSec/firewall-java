@@ -2,6 +2,9 @@ allprojects {
     group = 'dev.aikido'
     version = '1.0-REPLACE-VERSION'
 
+    dependencyLocking {
+        lockAllConfigurations()
+    }
 }
 
 subprojects {
