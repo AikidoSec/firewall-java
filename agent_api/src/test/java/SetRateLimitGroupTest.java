@@ -39,7 +39,7 @@ public class SetRateLimitGroupTest {
 
     @AfterEach
     public void tearDown() throws SQLException {
-        Context.set(null);
+        Context.reset();
     }
 
     @Test
@@ -56,6 +56,16 @@ public class SetRateLimitGroupTest {
         SetRateLimitGroup.setRateLimitGroup("id");
         assertFalse(out.capturedString().contains("setRateLimitGroup(...) must be called before the Zen middleware is executed."));
         assertTrue(out.capturedString().contains("setRateLimitGroup(...) was called without a context. Make sure to call setRateLimitGroup(...) within an HTTP request."));
+    }
+
+    @Test
+    @StdIo
+    public void testWithBypassedRequestDoesNotWarn(StdOut out) {
+        Context.markBypassed();
+
+        SetRateLimitGroup.setRateLimitGroup("id");
+
+        assertFalse(out.capturedString().contains("was called without a context"));
     }
 
     @Test
