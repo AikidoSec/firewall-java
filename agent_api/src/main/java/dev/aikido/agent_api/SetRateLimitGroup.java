@@ -17,6 +17,9 @@ public class SetRateLimitGroup {
 
         ContextObject currentContext = Context.get();
         if (currentContext == null) {
+            if (Context.isBypassed()) {
+                return;
+            }
             logger.warn("setRateLimitGroup(...) was called without a context. Make sure to call setRateLimitGroup(...) within an HTTP request.");
             return;
         }

@@ -46,6 +46,7 @@ public final class WebRequestCollector {
         PendingHostnamesStore.clear();
 
         if (config.isIpBypassed(newContext.getRemoteAddress())) {
+            Context.markBypassed();
             return null; // do not set context when the IP address is bypassed (zen = off)
         }
 
