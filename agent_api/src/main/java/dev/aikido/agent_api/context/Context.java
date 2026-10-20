@@ -7,7 +7,7 @@ public final class Context {
 
     static final ThreadLocal<ContextObject> threadLocalContext = new ThreadLocal<>();
     // Bypassed requests have no context, so this flag tells them apart from code running outside a request.
-    static final ThreadLocal<Boolean> threadLocalBypassed = new ThreadLocal<>();
+    static final ThreadLocal<Boolean> threadLocalBypassed = ThreadLocal.withInitial(() -> false);
     public static ContextObject get() {
         return threadLocalContext.get();
     }
@@ -22,6 +22,6 @@ public final class Context {
         threadLocalBypassed.set(true);
     }
     public static boolean isBypassed() {
-        return threadLocalBypassed.get() != null;
+        return threadLocalBypassed.get();
     }
 }
