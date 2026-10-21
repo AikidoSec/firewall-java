@@ -37,11 +37,13 @@ Zen operates autonomously on the same server as your Java app to:
 #### Java
 * ✅ [`Spring MVC`](docs/spring.md) 3.x
 * ✅ [`Javalin`](docs/javalin.md) 6.x
+* 🚧 [`Micronaut`](docs/micronaut.md) 4.x, 5.x (blocking controllers; reactive is a work in progress)
 * 🚧 [`Spring Webflux`](docs/spring_webflux.md) 3.x
 
 #### Kotlin
 * ✅ [`Spring MVC`](docs/spring.md) 3.x
 * ✅ [`Javalin`](docs/javalin.md) 6.x
+* 🚧 [`Micronaut`](docs/micronaut.md) 4.x, 5.x (blocking controllers; reactive is a work in progress)
 * 🚧 [`Spring Webflux`](docs/spring_webflux.md) 3.x
 * 🚧 `Ktor`
 
