@@ -211,26 +211,26 @@ public class DNSRecordCollectorTest {
     }
 
     @Test
-    public void testPrivateIpLiteralWithNoPendingPortNotRecordedButBlockedInLockdown() {
+    public void testPrivateIpLiteralWithNoPendingPortNotRecordedOrBlockedInLockdown() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null, true, List.of(), true, true, List.of(), 0
         ));
         Context.set(null);
-        assertThrows(BlockedOutboundException.class, () ->
+        assertDoesNotThrow(() ->
             DNSRecordCollector.report("10.20.11.143", new InetAddress[]{inetAddress2})
         );
         assertEquals(0, HostnamesStore.getHostnamesAsList().length);
     }
 
     @Test
-    public void testPrivateIpLiteralWithPendingPortStillRecordedAndBlockedInLockdown() {
+    public void testPrivateIpLiteralWithPendingPortStillRecordedButNotBlockedInLockdown() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null, true, List.of(), true, true, List.of(), 0
         ));
         PendingHostnamesStore.add("10.20.11.143", 443);
         Context.set(mock(ContextObject.class));
 
-        assertThrows(BlockedOutboundException.class, () ->
+        assertDoesNotThrow(() ->
             DNSRecordCollector.report("10.20.11.143", new InetAddress[]{inetAddress2})
         );
         Hostnames.HostnameEntry[] entries = HostnamesStore.getHostnamesAsList();
@@ -284,12 +284,12 @@ public class DNSRecordCollectorTest {
     }
 
     @Test
-    public void testPublicIpLiteralWithNoPendingPortNotRecordedButBlockedInLockdown() {
+    public void testPublicIpLiteralWithNoPendingPortNotRecordedOrBlockedInLockdown() {
         ServiceConfigStore.updateFromAPIResponse(new APIResponse(
             true, null, 0L, null, null, null, true, List.of(), true, true, List.of(), 0
         ));
         Context.set(null);
-        assertThrows(BlockedOutboundException.class, () ->
+        assertDoesNotThrow(() ->
             DNSRecordCollector.report("8.8.8.8", new InetAddress[]{inetAddress1})
         );
         assertEquals(0, HostnamesStore.getHostnamesAsList().length);

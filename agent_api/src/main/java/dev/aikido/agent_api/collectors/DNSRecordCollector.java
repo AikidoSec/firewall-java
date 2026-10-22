@@ -44,12 +44,12 @@ public final class DNSRecordCollector {
                 }
             } else if (!IPValidator.isIP(hostname)) {
                 // Skip literal IPs with no pending port: usually inbound IP parsing rather than an outbound request,
-                // and we can't tell them apart here. A real outbound one still hits the blocking/SSRF checks below.
+                // and we can't tell them apart here. A real outbound one still hits the SSRF checks below.
                 HostnamesStore.incrementHits(hostname, 0);
             }
 
             // Checked here, not at the HTTP client, since not all clients are instrumented and port/context isn't always available.
-            if (ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
+            if (!IPValidator.isIP(hostname) && ServiceConfigStore.shouldBlockOutgoingRequest(hostname)) {
                 logger.debug("Blocking DNS lookup for domain: %s", hostname);
                 throw BlockedOutboundException.get();
             }
