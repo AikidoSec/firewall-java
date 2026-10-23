@@ -26,9 +26,11 @@ public class ReportingApiHTTP extends ReportingApi {
     private final Token token;
     private final Gson gson = new Gson();
     private HttpClient httpClient;
-    public ReportingApiHTTP(String reportingUrl, int timeoutInSec, Token token) {
+    private final int eventsTimeoutInSec;
+    public ReportingApiHTTP(String reportingUrl, int timeoutInSec, int eventsTimeoutInSec, Token token) {
         // Reporting URL should end with trailing slash for now.
         super(timeoutInSec);
+        this.eventsTimeoutInSec = eventsTimeoutInSec;
         this.reportingUrl = reportingUrl;
         this.token = token;
     }
@@ -125,9 +127,10 @@ public class ReportingApiHTTP extends ReportingApi {
         return getUnsuccessfulAPIResponse("unknown_error");
     }
     private HttpRequest createHttpRequest(Optional<APIEvent> event, URI uri) {
+        int requestTimeoutInSec = event.isPresent() ? eventsTimeoutInSec : timeoutInSec;
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(uri) // Change to your target URL
-            .timeout(Duration.ofSeconds(timeoutInSec))
+            .timeout(Duration.ofSeconds(requestTimeoutInSec))
             .header("Content-Type", "application/json") // Set Content-Type header
             .header("Authorization", token.get()); // Set Authorization header
         AgentHeaders.get().forEach(requestBuilder::header);
