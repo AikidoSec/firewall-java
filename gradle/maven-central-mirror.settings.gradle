@@ -12,6 +12,9 @@ settings.dependencyResolutionManagement {
         // Avoid blocked Maven Central locally and 429 errors in CI.
         maven { url = uri('https://maven-central.storage-download.googleapis.com/maven2/') }
         mavenCentral()
+        // Needed for AutoFix PRs to resolve Shadow's optional R8 dependency when regenerating lockfiles.
+        // We don't use R8 to build or run the agent.
+        google()
     }
 }
 
