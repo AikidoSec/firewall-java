@@ -73,13 +73,23 @@ To activate Zen you then just have to add the following `-javaagent` to your Jav
 ```
 java -javaagent:/opt/zen/agent.jar -jar build/myapp.jar
 ```
-To use user blocking, rate limiting, or custom event tracking, include `agent_api.jar` in your application.
+To call `SetUser.setUser()` or other Zen APIs, add `agent_api.jar` only for building your app. Do not bundle it inside your app. `agent.jar` provides these APIs when loaded with `-javaagent`.
+
+<details>
+<summary>Note about bundling Zen in your application</summary>
+
+Keep `agent.jar` and `agent_api.jar` out of your application's runtime dependencies. Use `compileOnly` in Gradle for `SetUser.setUser()` and other methods that the agent exposes. `agent.jar` provides these classes at runtime through `-javaagent`.
+
+Bundling these JARs can load duplicate Zen classes in certain setups and cause conflicts.
+
+</details>
+
 ### Gradle
 Add the following code to your `build.gradle` file.
 ```gradle
 dependencies {
     # ...
-    implementation files('/opt/zen/agent_api.jar')
+    compileOnly files('/opt/zen/agent_api.jar')
     # ...
 }
 ```
