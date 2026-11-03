@@ -151,6 +151,56 @@ jacocoTestReport {
     dependsOn test
 }
 
+def jacocoReportFile = layout.buildDirectory.file('jacoco/test/jacocoTestReport.xml')
+def lcovReportFile = layout.buildDirectory.file('jacoco/test/lcov.info')
+
+tasks.register('jacocoToLcov') {
+    group = 'verification'
+    description = 'Converts JaCoCo XML coverage report to LCOV format'
+    dependsOn jacocoTestReport
+    inputs.file(jacocoReportFile)
+    outputs.file(lcovReportFile)
+
+    doLast {
+        def reportFile = jacocoReportFile.get().asFile
+        if (!reportFile.exists()) {
+            throw new GradleException("JaCoCo report not found: ${reportFile}")
+        }
+
+        def parser = new groovy.xml.XmlSlurper(false, false, true)
+        parser.setFeature('http://xml.org/sax/features/external-general-entities', false)
+        parser.setFeature('http://xml.org/sax/features/external-parameter-entities', false)
+        parser.setFeature('http://apache.org/xml/features/nonvalidating/load-external-dtd', false)
+        def xml = parser.parse(reportFile)
+        def sourceRoots = sourceSets.main.java.srcDirs
+
+        def out = lcovReportFile.get().asFile
+        out.parentFile.mkdirs()
+        out.withWriter('UTF-8') { writer ->
+            writer.println('TN:')
+            xml.package.each { packageNode ->
+                packageNode.sourcefile.each { sourceFile ->
+                    def relativePath = "${packageNode.@name.text()}/${sourceFile.@name.text()}"
+                    def path = relativePath
+                    for (root in sourceRoots) {
+                        def candidate = new File(root, relativePath)
+                        if (candidate.exists()) {
+                            path = candidate.path
+                            break
+                        }
+                    }
+                    writer.println("SF:${path}")
+                    sourceFile.line.each { line ->
+                        def hits = line.@ci.text().toInteger() > 0 ? 1 : 0
+                        writer.println("DA:${line.@nr.text()},${hits}")
+                    }
+                    writer.println('end_of_record')
+                }
+            }
+        }
+    }
+}
+
 jacocoTestCoverageVerification {
     classDirectories.setFrom(jacocoClassDirectories)
     violationRules {
