@@ -25,12 +25,12 @@ public class ReportingAPITest {
     ReportingApiHTTP api;
     @BeforeEach
     public void setup() {
-        api = new ReportingApiHTTP("http://localhost:5000/", 2, new Token("token"));
+        api = new ReportingApiHTTP("http://localhost:5000/", 2, 2, new Token("token"));
     }
 
     @Test
     public void testTimeoutValid() {
-        api = new ReportingApiHTTP("http://localhost:5000/delayed/2/", 3, new Token("token")); // Allowed delay
+        api = new ReportingApiHTTP("http://localhost:5000/delayed/2/", 3, 3, new Token("token")); // Allowed delay
         Optional<APIResponse> res = api.fetchNewConfig();
         assertTrue(res.isPresent());
         assertTrue(res.get().block());
@@ -38,7 +38,7 @@ public class ReportingAPITest {
     }
     @Test
     public void testTimeoutInvalid() {
-        api = new ReportingApiHTTP("http://localhost:5000/delayed/4/", 3, new Token("token")); // Allowed delay
+        api = new ReportingApiHTTP("http://localhost:5000/delayed/4/", 3, 3, new Token("token")); // Allowed delay
         Optional<APIResponse> res = api.fetchNewConfig();
         assertFalse(res.isPresent());
     }
@@ -53,7 +53,7 @@ public class ReportingAPITest {
     @Test
     @StdIo
     public void testFetchNewConfigInvalidEndpoint(StdOut out) {
-        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2, new Token("token"));
+        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2, 2, new Token("token"));
         Optional<APIResponse> res = api.fetchNewConfig();
         assertEquals(Optional.empty(), res);
         assertTrue(
@@ -65,7 +65,7 @@ public class ReportingAPITest {
     @Test
     @StdIo
     public void testListsResponseWithWrongEndpoint(StdOut out) {
-        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2, new Token("token"));
+        this.api = new ReportingApiHTTP("http://unknown.app.here:1234/", 2, 2, new Token("token"));
         Optional<ReportingApiHTTP.APIListsResponse> res = api.fetchBlockedLists();
         assertEquals(Optional.empty(), res);
         assertTrue(
@@ -114,7 +114,7 @@ public class ReportingAPITest {
         });
         server.start();
         try {
-            api = new ReportingApiHTTP("http://localhost:" + server.getAddress().getPort() + "/", 2, new Token("token"));
+            api = new ReportingApiHTTP("http://localhost:" + server.getAddress().getPort() + "/", 2, 2, new Token("token"));
             api.fetchNewConfig();
             api.fetchBlockedLists();
         } finally {

@@ -36,7 +36,7 @@ public class ReportingAPIResourceTest {
         });
         server.start();
         try {
-            ReportingApiHTTP api = new ReportingApiHTTP("http://127.0.0.1:" + server.getAddress().getPort() + "/", 2, new Token("token"));
+            ReportingApiHTTP api = new ReportingApiHTTP("http://127.0.0.1:" + server.getAddress().getPort() + "/", 2, 2, new Token("token"));
             record Event(String type) implements APIEvent {}
             for (int i = 0; i < 10; i++) {
                 assertTrue(api.fetchNewConfig().isPresent());
@@ -80,7 +80,7 @@ public class ReportingAPIResourceTest {
                         return socket.getInputStream().read();
                     }
                 });
-                ReportingApiHTTP api = new ReportingApiHTTP("http://localhost:" + server.getLocalPort() + "/", 1, new Token("token"));
+                ReportingApiHTTP api = new ReportingApiHTTP("http://localhost:" + server.getLocalPort() + "/", 1, 1, new Token("token"));
                 assertTrue(api.fetchBlockedLists().isEmpty());
                 assertEquals(-1, disconnected.get(4, TimeUnit.SECONDS));
             } finally {
@@ -106,7 +106,7 @@ public class ReportingAPIResourceTest {
         });
         server.start();
         try {
-            ReportingApiHTTP api = new ReportingApiHTTP("http://127.0.0.1:" + server.getAddress().getPort() + "/", 2, new Token("token"));
+            ReportingApiHTTP api = new ReportingApiHTTP("http://127.0.0.1:" + server.getAddress().getPort() + "/", 2, 2, new Token("token"));
             assertEquals("bot", api.fetchBlockedLists().orElseThrow().blockedUserAgents());
         } finally {
             server.stop(0);
