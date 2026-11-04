@@ -45,20 +45,19 @@ public class BackgroundProcess extends Thread {
         ReportingApiHTTP api = new ReportingApiHTTP(getAikidoAPIEndpoint(token), API_TIMEOUT, EVENTS_API_TIMEOUT, token);
         RealtimeAPI realtimeApi = new RealtimeAPI(token);
 
-        // make api calls on start
-        Optional<APIResponse> res = api.report(Started.get());
-        res.ifPresent(ServiceConfigStore::updateFromAPIResponse);
-        // Fetch blocked lists using separate API call
-        Optional<ReportingApi.APIListsResponse> listsRes = api.fetchBlockedLists();
-        listsRes.ifPresent(ServiceConfigStore::updateFromAPIListsResponse);
-
-
         // Schedule tasks using ScheduledExecutorService
         scheduler.scheduleAtFixedRate(new RealtimeTask(realtimeApi, api), POLLING_INTERVAL_SECONDS, POLLING_INTERVAL_SECONDS, TimeUnit.SECONDS);
         scheduler.scheduleAtFixedRate(new AttackQueueConsumerTask(api), 0, 2, TimeUnit.SECONDS);
 
         // Start heartbeats
         scheduler.schedule(createHeartbeatTask(api, scheduler, true), FIRST_HEARTBEAT_INTERVAL_SECONDS, TimeUnit.SECONDS);
+
+        // make api calls on start, slow responses should not delay the tasks above
+        Optional<APIResponse> res = api.report(Started.get());
+        res.ifPresent(ServiceConfigStore::updateFromAPIResponse);
+        // Fetch blocked lists using separate API call
+        Optional<ReportingApi.APIListsResponse> listsRes = api.fetchBlockedLists();
+        listsRes.ifPresent(ServiceConfigStore::updateFromAPIListsResponse);
 
         if (token != null) {
             if (FeatureFlags.AIKIDO_FEATURE_SSE.isEnabled() || ServiceConfigStore.isRealtimeUpdatesEnabled()) {

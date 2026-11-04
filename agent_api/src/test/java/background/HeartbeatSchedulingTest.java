@@ -83,6 +83,24 @@ class HeartbeatSchedulingTest {
     }
 
     @Test
+    void schedulesTasksBeforeSendingStartEvent() {
+        try (var executors = mockStatic(Executors.class);
+             var clients = mockConstruction(ReportingApiHTTP.class, (client, context) ->
+                     when(client.report(any())).thenAnswer(invocation -> {
+                         verify(scheduler).scheduleAtFixedRate(any(RealtimeTask.class), eq(60L), eq(60L), eq(TimeUnit.SECONDS));
+                         verify(scheduler).scheduleAtFixedRate(any(AttackQueueConsumerTask.class), eq(0L), eq(2L), eq(TimeUnit.SECONDS));
+                         verify(scheduler).schedule(any(Runnable.class), eq(30L), eq(TimeUnit.SECONDS));
+                         return Optional.empty();
+                     }))) {
+            executors.when(() -> Executors.newScheduledThreadPool(3)).thenReturn(scheduler);
+
+            new BackgroundProcess("startup-order-test", new Token("token")).run();
+
+            verify(clients.constructed().get(0)).report(any());
+        }
+    }
+
+    @Test
     void keepsSecondHeartbeatDelayWhenFirstResponseUpdatesInterval() {
         when(api.report(any())).thenReturn(Optional.of(config("\"heartbeatIntervalInMS\":300000")));
         BackgroundProcess.createHeartbeatTask(api, scheduler, true).run();
