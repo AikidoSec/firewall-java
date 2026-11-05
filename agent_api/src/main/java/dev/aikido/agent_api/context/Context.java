@@ -24,4 +24,11 @@ public final class Context {
     public static boolean isBypassed() {
         return threadLocalBypassed.get();
     }
+    public static void restore(ContextObject previous) {
+        if (previous != null) {
+            set(previous);
+        } else {
+            reset();
+        }
+    }
 }
