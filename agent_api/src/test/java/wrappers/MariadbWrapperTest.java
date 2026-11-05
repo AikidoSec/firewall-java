@@ -2,6 +2,8 @@ package wrappers;
 
 import dev.aikido.agent_api.context.Context;
 import dev.aikido.agent_api.storage.ServiceConfigStore;
+import dev.aikido.agent_api.storage.statistics.OperationKind;
+import dev.aikido.agent_api.storage.statistics.StatisticsStore;
 import dev.aikido.agent_api.vulnerabilities.sql_injection.SQLInjectionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,6 +13,7 @@ import utils.EmptySampleContextObject;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -29,6 +32,8 @@ public class MariadbWrapperTest {
     public void setUp() throws SQLException {
         // Connect to the MySQL database
         connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/db?allowPublicKeyRetrieval=true&useSSL=false", "user", "password");
+        StatisticsStore.clear();
+        ServiceConfigStore.updateBlocking(true);
     }
 
     @AfterEach
@@ -37,6 +42,8 @@ public class MariadbWrapperTest {
             connection.close();
         }
         Context.set(null);
+        StatisticsStore.clear();
+        ServiceConfigStore.updateBlocking(true);
     }
 
     @Test
@@ -53,6 +60,31 @@ public class MariadbWrapperTest {
             connection.prepareStatement("SELECT * FROM pets;").executeQuery();
         });
         assertEquals("Aikido Zen has blocked SQL Injection, Dialect: MySQL", exception.getMessage());
+    }
+
+    @Test
+    public void testPrepareStatementReportsOnceInDetectionOnlyMode() throws SQLException {
+        String payload = "Malicious Pet', 'Gru from the Minions') -- ";
+        String sql = "INSERT INTO pets (pet_name, owner) VALUES ('" + payload + "', 'Aikido Security')";
+        Context.set(new EmptySampleContextObject(payload));
+        ServiceConfigStore.updateBlocking(false);
+
+        assertDoesNotThrow(() -> connection.prepareStatement(sql,
+                ResultSet.TYPE_FORWARD_ONLY,
+                ResultSet.CONCUR_READ_ONLY,
+                ResultSet.CLOSE_CURSORS_AT_COMMIT));
+
+        var stats = StatisticsStore.getStatsRecord();
+        assertEquals(1, stats.requests().attacksDetected().total());
+        assertEquals(1, stats.operations().values().stream()
+                .filter(record -> record.getKind() == OperationKind.SQL_OP)
+                .count());
+        var operation = stats.operations()
+                .get("(MariaDB Connector/J) java.sql.Connection.prepareStatement");
+        assertNotNull(operation);
+        assertEquals(1, operation.total());
+        assertEquals(1, operation.getAttacksDetected().get("total"));
+        assertEquals(0, operation.getAttacksDetected().get("blocked"));
     }
 
     @Test
