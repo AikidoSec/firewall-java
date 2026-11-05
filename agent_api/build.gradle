@@ -91,7 +91,7 @@ dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.3.3'
 
     // For middleware :
-    compileOnly 'io.javalin:javalin:6.3.0'
+    compileOnly 'io.javalin:javalin:6.4.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
@@ -167,5 +167,22 @@ jacocoTestCoverageVerification {
 shadowJar {
     mergeServiceFiles()
     manifest {
+    }
+}
+
+// Force Jetty 11.x transitive dependencies to the highest available 11.x release (11.0.26)
+// to mitigate CVE-2024-8184 and partially mitigate CVE-2026-10050.
+// CVE-2026-10050 requires org.eclipse.jetty:jetty-security >= 11.0.31, but that version
+// has not been published to Maven Central yet (11.0.26 is the highest available 11.x release).
+// The fix for CVE-2026-10050 cannot be applied until the upstream Jetty project publishes 11.0.31.
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'org.eclipse.jetty' ||
+            details.requested.group == 'org.eclipse.jetty.websocket') {
+            if (details.requested.version?.startsWith('11.')) {
+                details.useVersion '11.0.26'
+                details.because 'CVE-2024-8184 / CVE-2026-10050: force to highest available Jetty 11.x'
+            }
+        }
     }
 }
