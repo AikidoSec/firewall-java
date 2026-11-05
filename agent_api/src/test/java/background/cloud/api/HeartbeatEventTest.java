@@ -4,6 +4,7 @@ import dev.aikido.agent_api.storage.ServiceConfigStore;
 import dev.aikido.agent_api.background.cloud.GetManagerInfo;
 import dev.aikido.agent_api.background.cloud.api.events.Heartbeat;
 import dev.aikido.agent_api.storage.Hostnames;
+import dev.aikido.agent_api.storage.JavaArtifact;
 import dev.aikido.agent_api.storage.statistics.Statistics;
 import dev.aikido.agent_api.storage.routes.RouteEntry;
 import dev.aikido.agent_api.context.User;
@@ -50,12 +51,15 @@ public class HeartbeatEventTest {
         hostnames.add("aikido.dev", 8080);
         RouteEntry[] routes = new RouteEntry[0]; // Replace with actual RouteEntry array if needed
         List<User> users = Collections.emptyList(); // Replace with actual User list if needed
+        List<JavaArtifact> javaArtifacts = List.of(new JavaArtifact("0123456789012345678901234567890123456789", 123L));
 
         mockedGetManagerInfo.when(GetManagerInfo::getManagerInfo).thenReturn(managerInfo);
         ServiceConfigStore.setMiddlewareInstalled(false);
 
         // Act
-        Heartbeat.HeartbeatEvent event = Heartbeat.get(stats, hostnames.asArray(), routes, users, Collections.emptyList());
+        Heartbeat.HeartbeatEvent event = Heartbeat.get(
+                stats, hostnames.asArray(), routes, users, Collections.emptyList(), javaArtifacts
+        );
 
         // Assert
         assertEquals("heartbeat", event.type());
@@ -64,11 +68,14 @@ public class HeartbeatEventTest {
         assertArrayEquals(hostnames.asArray(), event.hostnames());
         assertEquals(routes, event.routes());
         assertEquals(users, event.users());
+        assertEquals(javaArtifacts, event.javaArtifacts());
         assertFalse(event.middlewareInstalled());
 
         // Test middleware installed as well :
         ServiceConfigStore.setMiddlewareInstalled(true);
-        Heartbeat.HeartbeatEvent event2 = Heartbeat.get(stats, hostnames.asArray(), routes, users, Collections.emptyList());
+        Heartbeat.HeartbeatEvent event2 = Heartbeat.get(
+                stats, hostnames.asArray(), routes, users, Collections.emptyList(), javaArtifacts
+        );
         assertTrue(event2.middlewareInstalled());
     }
 }

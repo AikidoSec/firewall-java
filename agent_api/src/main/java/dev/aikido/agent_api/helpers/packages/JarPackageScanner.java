@@ -1,5 +1,6 @@
 package dev.aikido.agent_api.helpers.packages;
 
+import dev.aikido.agent_api.helpers.Hashing;
 import dev.aikido.agent_api.storage.RuntimePackage;
 
 import java.io.BufferedInputStream;
@@ -30,27 +31,58 @@ public final class JarPackageScanner {
             String classResourceUrl,
             long requiredAt
     ) {
+        return scan(classResourceUrl, requiredAt).packages();
+    }
+
+    public static JarScanResult scan(
+            String classResourceUrl,
+            long requiredAt
+    ) {
         try {
             JarLocation location = JarLocation.parse(classResourceUrl);
             if (location == null) {
-                return List.of();
+                return JarScanResult.empty();
             }
             if (location.nestedEntry() == null) {
+                List<RuntimePackage> packages;
                 try (InputStream input = new BufferedInputStream(Files.newInputStream(location.outerJar()))) {
-                    return findMavenPackages(input, requiredAt);
+                    packages = findMavenPackages(input, requiredAt);
                 }
+                return result(location.outerJar(), packages);
             }
             try (JarFile outerJar = new JarFile(location.outerJar().toFile())) {
                 JarEntry nestedJar = outerJar.getJarEntry(location.nestedEntry());
                 if (nestedJar == null) {
-                    return List.of();
+                    return JarScanResult.empty();
+                }
+                List<RuntimePackage> packages;
+                try (InputStream input = new BufferedInputStream(outerJar.getInputStream(nestedJar))) {
+                    packages = findMavenPackages(input, requiredAt);
+                }
+                if (!packages.isEmpty()) {
+                    return new JarScanResult(packages, null);
                 }
                 try (InputStream input = new BufferedInputStream(outerJar.getInputStream(nestedJar))) {
-                    return findMavenPackages(input, requiredAt);
+                    return new JarScanResult(packages, Hashing.sha1(input));
                 }
             }
         } catch (IOException | RuntimeException ignored) {
-            return List.of();
+            return JarScanResult.empty();
+        }
+    }
+
+    private static JarScanResult result(Path jar, List<RuntimePackage> packages) throws IOException {
+        if (!packages.isEmpty()) {
+            return new JarScanResult(packages, null);
+        }
+        try (InputStream input = new BufferedInputStream(Files.newInputStream(jar))) {
+            return new JarScanResult(packages, Hashing.sha1(input));
+        }
+    }
+
+    public record JarScanResult(List<RuntimePackage> packages, String sha1) {
+        private static JarScanResult empty() {
+            return new JarScanResult(List.of(), null);
         }
     }
 
