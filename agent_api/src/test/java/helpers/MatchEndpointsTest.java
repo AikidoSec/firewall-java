@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static dev.aikido.agent_api.helpers.patterns.MatchEndpoints.matchEndpoints;
+import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -148,5 +149,61 @@ public class MatchEndpointsTest {
                 endpoints.get(1)
         );
         assertEquals(expected, matchEndpoints(routeMetadata, endpoints));
+    }
+
+    private List<Endpoint> matchUrl(String url, List<Endpoint> endpoints) {
+        // Same as the context objects: the route is derived from the request URL.
+        return matchEndpoints(new RouteMetadata(buildRouteFromUrl(url), url, "GET"), endpoints);
+    }
+
+    @Test
+    void testAlternativeSpellingsMatchTheSameEndpoints() {
+        Endpoint adminWildcard = new Endpoint("GET", "/admin/*", 3, 60000, List.of(), false, false, true);
+        Endpoint adminDelete = new Endpoint("GET", "/admin/delete", 3, 60000, List.of(), false, false, true);
+        Endpoint publicWildcard = new Endpoint("GET", "/public/*", 100, 60000, List.of(), false, false, true);
+        List<Endpoint> endpoints = List.of(publicWildcard, adminWildcard, adminDelete);
+
+        List<String> urls = List.of(
+                "http://127.0.0.1:8099/admin/delete",
+                "http://127.0.0.1:8099/admin;x=y/delete",
+                "http://127.0.0.1:8099/admin/delete;x=y",
+                "http://127.0.0.1:8099//admin//delete",
+                "http://127.0.0.1:8099/%61dmin/delete",
+                "http://127.0.0.1:8099/admin/delete?q=%zz",
+                "http://127.0.0.1:8099/admin/delete?q=a|b"
+        );
+        for (String url : urls) {
+            assertEquals(List.of(adminDelete, adminWildcard), matchUrl(url, endpoints), url);
+        }
+    }
+
+    @Test
+    void testDotSegmentsMatchBothTheLiteralAndTheResolvedPath() {
+        Endpoint adminWildcard = new Endpoint("GET", "/admin/*", 3, 60000, List.of(), false, false, true);
+        Endpoint adminDelete = new Endpoint("GET", "/admin/delete", 3, 60000, List.of(), false, false, true);
+        Endpoint publicWildcard = new Endpoint("GET", "/public/*", 100, 60000, List.of(), false, false, true);
+        List<Endpoint> endpoints = List.of(publicWildcard, adminWildcard, adminDelete);
+
+        List<String> urls = List.of(
+                "http://127.0.0.1:8099/public/../admin/delete",
+                "http://127.0.0.1:8099/public/%2e%2e/admin/delete",
+                "http://127.0.0.1:8099/public/..;/admin/delete",
+                "http://127.0.0.1:8099/public/x/../../admin/delete"
+        );
+        for (String url : urls) {
+            // Literal reading first (served by /public/**), then the resolved one (served by /admin/delete).
+            assertEquals(List.of(publicWildcard, adminDelete, adminWildcard), matchUrl(url, endpoints), url);
+        }
+
+        // Outside of both readings:
+        assertEquals(List.of(adminDelete, adminWildcard), matchUrl("http://127.0.0.1:8099/a/b/../../admin/delete", endpoints));
+        assertEquals(List.of(publicWildcard), matchUrl("http://127.0.0.1:8099/public/../other", endpoints));
+        assertNull(matchUrl("http://127.0.0.1:8099/a/../other", endpoints));
+    }
+
+    @Test
+    void testDotSegmentsDoNotDuplicateEndpoints() {
+        Endpoint adminWildcard = new Endpoint("GET", "/admin/*", 3, 60000, List.of(), false, false, true);
+        assertEquals(List.of(adminWildcard), matchUrl("http://127.0.0.1:8099/admin/x/../delete", List.of(adminWildcard)));
     }
 }

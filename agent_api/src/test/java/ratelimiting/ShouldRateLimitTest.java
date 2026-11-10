@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
+import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.EmptyAPIResponses.emptyAPIResponse;
 import static utils.EmptyAPIResponses.setEmptyConfigWithEndpointList;
@@ -339,5 +340,67 @@ public class ShouldRateLimitTest {
             assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
                     ShouldRateLimit.shouldRateLimit(routeMetadata, excludedUser, "group1", "1.2.3.4"));
         }
+    }
+
+    // Builds the metadata the way the context objects do: the route is derived from the request URL.
+    private void assertBlockedAfterThreeRequests(String url) {
+        RateLimiterStore.clear();
+        RouteMetadata routeMetadata = new RouteMetadata(buildRouteFromUrl(url), url, "GET");
+        for (int i = 0; i < 3; i++) {
+            assertEquals(new ShouldRateLimit.RateLimitDecision(false, null),
+                    ShouldRateLimit.shouldRateLimit(routeMetadata, null, null, "1.2.3.4"), url);
+        }
+        assertEquals(new ShouldRateLimit.RateLimitDecision(true, "ip"),
+                ShouldRateLimit.shouldRateLimit(routeMetadata, null, null, "1.2.3.4"), url);
+    }
+
+    @Test
+    public void testDotSegmentsDoNotEscapeTheRouteTheyAreServedUnder() {
+        // Spring MVC, Spring WebFlux and Javalin match dot segments literally: these reach the /files/** handler.
+        setEmptyConfigWithEndpointList(List.of(
+                new Endpoint("GET", "/files/*", 3, 60000, List.of(), false, false, true)));
+
+        assertBlockedAfterThreeRequests("http://localhost:8080/files/../admin/delete");
+        assertBlockedAfterThreeRequests("http://localhost:8080/files/x/../../admin/delete");
+        assertBlockedAfterThreeRequests("http://localhost:8080/files/%2e%2e/admin/delete");
+        assertBlockedAfterThreeRequests("http://localhost:8080/files/..;/admin/delete");
+    }
+
+    @Test
+    public void testDotSegmentsDoNotEscapeTheRouteTheyResolveTo() {
+        // Servlet containers resolve dot segments before picking a servlet: these reach a servlet mapped on /admin/*.
+        setEmptyConfigWithEndpointList(List.of(
+                new Endpoint("GET", "/public/*", 100, 60000, List.of(), false, false, true),
+                new Endpoint("GET", "/admin/*", 3, 60000, List.of(), false, false, true)));
+
+        assertBlockedAfterThreeRequests("http://localhost:8080/admin/delete");
+        assertBlockedAfterThreeRequests("http://localhost:8080/public/../admin/delete");
+        assertBlockedAfterThreeRequests("http://localhost:8080/public/%2e%2e/admin/delete");
+        assertBlockedAfterThreeRequests("http://localhost:8080/a/b/../../admin/delete");
+        assertBlockedAfterThreeRequests("http://localhost:8080/public/..;/admin/delete");
+    }
+
+    @Test
+    public void testAlternativeSpellingsOfARouteAreRateLimited() {
+        setEmptyConfigWithEndpointList(List.of(
+                new Endpoint("GET", "/admin/delete", 3, 60000, List.of(), false, false, true)));
+
+        assertBlockedAfterThreeRequests("http://localhost:8080/admin;x=y/delete");
+        assertBlockedAfterThreeRequests("http://localhost:8080/admin/delete;x=y");
+        assertBlockedAfterThreeRequests("http://localhost:8080//admin//delete");
+        assertBlockedAfterThreeRequests("http://localhost:8080/%61dmin/delete");
+    }
+
+    @Test
+    public void testUrlsRejectedByJavaNetUriAreStillRateLimited() {
+        // Tomcat and Jetty serve these, although java.net.URI refuses to parse them.
+        setEmptyConfigWithEndpointList(List.of(
+                new Endpoint("GET", "/admin/delete", 3, 60000, List.of(), false, false, true),
+                new Endpoint("GET", "/files/*", 3, 60000, List.of(), false, false, true)));
+
+        assertBlockedAfterThreeRequests("http://localhost:8080/admin/delete?q=%zz");
+        assertBlockedAfterThreeRequests("http://localhost:8080/admin/delete?q=a|b");
+        assertBlockedAfterThreeRequests("http://localhost:8080/files/a|b");
+        assertBlockedAfterThreeRequests("http://localhost:8080/files/{x}");
     }
 }
