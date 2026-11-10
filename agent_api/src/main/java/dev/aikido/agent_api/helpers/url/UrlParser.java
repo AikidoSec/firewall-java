@@ -85,26 +85,18 @@ public final class UrlParser {
         if (url == null) {
             return null;
         }
-        int authorityStart = 0;
-        if (!url.startsWith("/")) {
-            int schemeEnd = url.indexOf("://");
-            if (schemeEnd <= 0) {
-                return null;
-            }
-            authorityStart = schemeEnd + 3;
+        // Cut the query and fragment first: they may contain slashes that are not part of the path.
+        String withoutQuery = url.split("[?#]", 2)[0];
+        if (withoutQuery.startsWith("/")) {
+            return withoutQuery;
         }
-        int pathEnd = url.length();
-        for (int i = authorityStart; i < url.length(); i++) {
-            if (url.charAt(i) == '?' || url.charAt(i) == '#') {
-                pathEnd = i;
-                break;
-            }
+        String[] schemeAndRest = withoutQuery.split("://", 2);
+        if (schemeAndRest.length < 2 || schemeAndRest[0].isEmpty()) {
+            return null;
         }
-        int pathStart = url.indexOf('/', authorityStart);
-        if (pathStart < 0 || pathStart >= pathEnd) {
-            return "/";
-        }
-        return url.substring(pathStart, pathEnd);
+        String hostAndPath = schemeAndRest[1];
+        int pathStart = hostAndPath.indexOf('/');
+        return pathStart < 0 ? "/" : hostAndPath.substring(pathStart);
     }
 
     private static String percentDecode(String segment) {

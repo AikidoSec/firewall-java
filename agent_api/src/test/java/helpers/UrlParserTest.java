@@ -135,6 +135,15 @@ public class UrlParserTest {
     }
 
     @Test
+    public void testTryParseUrlPathIgnoresSlashesInQueryAndFragment() {
+        assertEquals("/admin/delete", UrlParser.tryParseUrlPath("http://localhost:8080/admin/delete?next=/public/x"));
+        assertEquals("/admin/delete", UrlParser.tryParseUrlPath("/admin/delete?next=http://evil.com/public/x"));
+        assertEquals("/admin/delete", UrlParser.tryParseUrlPath("http://localhost:8080/admin/delete#/public/x"));
+        assertEquals("/", UrlParser.tryParseUrlPath("http://localhost:8080?next=/public/x"));
+        assertNull(UrlParser.tryParseUrlPath("abc?next=http://localhost/public/x"));
+    }
+
+    @Test
     public void testResolveDotSegments() {
         assertEquals("/admin/delete", UrlParser.resolveDotSegments("/public/../admin/delete"));
         assertEquals("/admin/delete", UrlParser.resolveDotSegments("/a/b/../../admin/delete"));
