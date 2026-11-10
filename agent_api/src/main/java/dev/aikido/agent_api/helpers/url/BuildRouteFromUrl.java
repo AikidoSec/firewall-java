@@ -30,6 +30,10 @@ public final class BuildRouteFromUrl {
             return null;
         }
 
+        return buildRouteFromPath(path);
+    }
+
+    public static String buildRouteFromPath(String path) {
         String[] segments = path.split("/");
         StringBuilder route = new StringBuilder();
 
