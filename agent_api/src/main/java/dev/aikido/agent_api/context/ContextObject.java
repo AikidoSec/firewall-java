@@ -12,6 +12,7 @@ public class ContextObject {
     protected String url;
     protected String route;
     protected String remoteAddress;
+    protected boolean isBehindTrustedProxy;
     protected HashMap<String, List<String>> headers;
     protected HashMap<String, List<String>> query;
     protected HashMap<String, List<String>> cookies;
@@ -65,6 +66,9 @@ public class ContextObject {
     }
     public String getRemoteAddress() {
         return remoteAddress;
+    }
+    public boolean isBehindTrustedProxy() {
+        return isBehindTrustedProxy;
     }
     public HashMap<String, List<String>> getHeaders() {
         return headers;

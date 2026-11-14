@@ -20,7 +20,7 @@ public final class FindHostnameInContext {
     public static Res findHostnameInContext(String hostname, ContextObject context, int port) {
         // We don't want to block outgoing requests to the same host as the server
         // (often happens that we have a match on headers like `Host`, `Origin`, `Referer`, etc.)
-        if (isRequestToItself(context.getUrl(), hostname, port)) {
+        if (isRequestToItself(context.getUrl(), hostname, port, context.isBehindTrustedProxy())) {
             return null;
         }
 

@@ -1,8 +1,13 @@
 package helpers;
 
+import dev.aikido.agent_api.helpers.net.TrustProxy;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
+import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,47 +15,55 @@ import java.util.List;
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ClearEnvironmentVariable(key = "AIKIDO_TRUST_PROXY")
+@ClearEnvironmentVariable(key = "AIKIDO_CLIENT_IP_HEADER")
 class ProxyForwardedParserTest {
     private HashMap<String, List<String>> headers;
 
     @BeforeEach
     void setUp() {
+        TrustProxy.clearCache();
         headers = new HashMap<>();
+    }
+
+    @AfterEach
+    void clearProxyCache() {
+        TrustProxy.clearCache();
     }
 
     @Test
     void testGetIpFromRequest_ValidXForwardedFor() {
-        headers.put("X-Forwarded-For", List.of("192.168.1.1, 203.0.113.5"));
+        headers.put("X-Forwarded-For", List.of("192.168.1.1, 9.9.9.9"));
         String result = getIpFromRequest("10.0.0.1", headers);
-        assertEquals("192.168.1.1", result);
+        assertEquals("9.9.9.9", result);
     }
 
     @Test
     void testGetIpFromRequest_ValidXForwardedForWithPort() {
-        headers.put("X-Forwarded-For", List.of("192.168.1.1:8080, 203.0.113.5:443"));
+        headers.put("X-Forwarded-For", List.of("192.168.1.1:8080, 9.9.9.9:443"));
         String result = getIpFromRequest("10.0.0.1", headers);
-        assertEquals("192.168.1.1", result);
+        assertEquals("9.9.9.9", result);
     }
 
     @Test
     void testGetIpFromRequest_ValidXForwardedForWithIPv6() {
-        headers.put("X-Forwarded-For", List.of("2001:db8::1, 203.0.113.5"));
+        headers.put("X-Forwarded-For", List.of("2606:4700::1111, 192.168.1.1"));
         String result = getIpFromRequest("10.0.0.1", headers);
-        assertEquals("2001:db8::1", result);
+        assertEquals("2606:4700::1111", result);
     }
 
     @Test
     void testGetIpFromRequest_InvalidXForwardedFor() {
-        headers.put("X-Forwarded-For", List.of("invalid.ip.address, 203.0.113.5"));
+        headers.put("X-Forwarded-For", List.of("invalid.ip.address, 9.9.9.9"));
         String result = getIpFromRequest("10.0.0.1", headers);
-        assertEquals("203.0.113.5", result);
+        assertEquals("9.9.9.9", result);
     }
 
     @Test
     void testGetIpFromRequest_InvalidXForwardedFor_with_port() {
-        headers.put("X-Forwarded-For", List.of("invalid.ip.address:443, 203.0.113.5:8080192"));
+        headers.put("X-Forwarded-For", List.of("invalid.ip.address:443, 9.9.9.9:8080192"));
         String result = getIpFromRequest("10.0.0.1", headers);
-        assertEquals("203.0.113.5", result);
+        assertEquals("9.9.9.9", result);
     }
 
     @Test
@@ -85,9 +98,9 @@ class ProxyForwardedParserTest {
     @Test
     @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "1")
     void testGetIpFromRequest_MultipleValidIPs() {
-        headers.put("X-Forwarded-For", List.of("203.0.113.5, 192.168.1.1"));
+        headers.put("X-Forwarded-For", List.of("8.8.8.8, 9.9.9.9"));
         String result = getIpFromRequest("10.0.0.1", headers);
-        assertEquals("203.0.113.5", result);
+        assertEquals("9.9.9.9", result);
     }
 
     @Test
@@ -166,9 +179,9 @@ class ProxyForwardedParserTest {
 
     @Test
     void testGetIpFromRequest_XForwardedForWithBracketedIPv6Port() {
-        headers.put("X-Forwarded-For", List.of("[2001:db8::1]:443, 203.0.113.5"));
+        headers.put("X-Forwarded-For", List.of("[2606:4700::1111]:443, 192.168.1.1"));
         String result = getIpFromRequest("10.0.0.1", headers);
-        assertEquals("2001:db8::1", result);
+        assertEquals("2606:4700::1111", result);
     }
 
     @Test
@@ -223,10 +236,10 @@ class ProxyForwardedParserTest {
     }
 
     @Test
-    void testGetIpFromRequest_IPv4PortResolvesWithoutTouchingLaterEntries() {
+    void testGetIpFromRequest_IPv4PortDoesNotOverrideRightmostPublicIp() {
         headers.put("X-Forwarded-For", List.of("203.0.113.7:54321, 8.8.8.8"));
         String result = getIpFromRequest("10.0.0.1", headers);
-        assertEquals("203.0.113.7", result);
+        assertEquals("8.8.8.8", result);
     }
 
     @Test
@@ -239,5 +252,56 @@ class ProxyForwardedParserTest {
     void testGetIpFromRequest_BracketedIpWithTrailingGarbageFallsBackToRawIp() {
         String result = getIpFromRequest("[::1]foo", new HashMap<>());
         assertEquals("[::1]foo", result);
+    }
+    @ParameterizedTest
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "2")
+    @CsvSource({
+        "'9.9.9.9, 1.2.3.4, 8.8.8.8', 1.2.3.4",
+        "'9.9.9.9, 10.0.0.1, 8.8.8.8', 9.9.9.9",
+        "'9.9.9.9, invalid, 8.8.8.8', 9.9.9.9",
+        "'9.9.9.9', 10.0.0.2",
+        "'9.9.9.9, 1.2.3.4,', 1.2.3.4"
+    })
+    void countsHeaderEntriesBeforeSkippingPrivateOrInvalidIps(String header, String expected) {
+        assertEquals(expected, getIpFromRequest("10.0.0.2", headers(header)));
+    }
+
+    @ParameterizedTest
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "127.0.0.1/32, 8.8.8.0/24, 2606:4700::/32")
+    @CsvSource({
+        "127.0.0.1, '9.9.9.9, 1.2.3.4, 8.8.8.8', 1.2.3.4",
+        "127.0.0.1:1234, '1.2.3.4, 9.9.9.9, 8.8.8.8', 9.9.9.9",
+        "::ffff:127.0.0.1, '9.9.9.9, ::ffff:8.8.8.8', 9.9.9.9",
+        "2606:4700::1111, '9.9.9.9, [2606:4700::1001]:443', 9.9.9.9",
+        "1.2.3.4, '9.9.9.9, 8.8.8.8', 1.2.3.4",
+        ", 9.9.9.9,",
+        "127.0.0.1, '8.8.8.8, 10.0.0.1', 127.0.0.1"
+    })
+    void trustsOnlyConfiguredPeersAndSkipsProxyIps(String rawIp, String header, String expected) {
+        assertEquals(expected, getIpFromRequest(rawIp, headers(header)));
+    }
+
+    @ParameterizedTest
+    @SetEnvironmentVariable(key = "AIKIDO_TRUST_PROXY", value = "invalid.ip, 1.2.3.4junk, 8.8.8.0/24junk, 8.8.*.*, 1.2.3.1-255")
+    @CsvSource({"1.2.3.4", "8.8.8.8"})
+    void malformedRangesDoNotTrustPeers(String rawIp) {
+        assertEquals(rawIp, getIpFromRequest(rawIp, headers("9.9.9.9")));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "'9.9.9.9, 1.2.3.4, 10.0.0.1, ::1', 1.2.3.4",
+        "'10.0.0.1, 192.168.1.1, 2001:db8::1', 10.0.0.2",
+        "'9.9.9.9, ::ffff:192.168.1.1', 9.9.9.9",
+        "'9.9.9.9, ::ffff:1.2.3.4', ::ffff:1.2.3.4"
+    })
+    void skipsPrivateIpsIncludingMappedAddresses(String header, String expected) {
+        assertEquals(expected, getIpFromRequest("10.0.0.2", headers(header)));
+    }
+
+    private static HashMap<String, List<String>> headers(String value) {
+        HashMap<String, List<String>> headers = new HashMap<>();
+        headers.put("X-Forwarded-For", List.of(value));
+        return headers;
     }
 }

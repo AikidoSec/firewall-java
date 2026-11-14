@@ -125,9 +125,11 @@ public class SSRFDetectorTest {
     @SetEnvironmentVariable(key = "AIKIDO_TOKEN", value = "invalid-token")
     public void testSsrfDetectorWithRedirectToLocalhostButIsRequestToItself() throws MalformedURLException {
         // Setup context :
-        Context.set(new EmptySampleContextObject(
+        EmptySampleContextObject context = new EmptySampleContextObject(
                 "http://ssrf-redirects.testssandbox.com/ssrf", // argument
-                "http://ssrf-redirects.testssandbox.com/examplesite")); // url
+                "http://ssrf-redirects.testssandbox.com/examplesite"); // url
+        context.setBehindTrustedProxy(true);
+        Context.set(context);
 
 
         URLCollector.report(new URL("http://ssrf-redirects.testssandbox.com/ssrf-test"));
