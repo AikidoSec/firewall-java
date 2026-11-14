@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.*;
 
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
+import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.isTrustedProxyRequest;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
 public class SpringWebfluxContextObject extends SpringContextObject {
@@ -21,7 +22,9 @@ public class SpringWebfluxContextObject extends SpringContextObject {
         this.headers = extractHeaders(headers);
 
         this.route = buildRouteFromUrl(this.url);
-        this.remoteAddress = getIpFromRequest(rawIp.getAddress().getHostAddress(), this.headers);
+        String remoteIp = rawIp.getAddress().getHostAddress();
+        this.remoteAddress = getIpFromRequest(remoteIp, this.headers);
+        this.isBehindTrustedProxy = isTrustedProxyRequest(remoteIp);
         this.source = "SpringWebflux";
         this.redirectStartNodes = new ArrayList<>();
     }

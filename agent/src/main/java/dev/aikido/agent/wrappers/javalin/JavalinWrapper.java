@@ -13,6 +13,7 @@ import net.bytebuddy.matcher.*;
 
 import java.util.*;
 
+import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpHeaderName;
 import static net.bytebuddy.implementation.bytecode.assign.Assigner.Typing.DYNAMIC;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
@@ -52,9 +53,18 @@ public class JavalinWrapper implements Wrapper {
                 cookies.put(cookie.getKey(), cookieValues); // Store
             }
 
-            // headerMap() returns the value for the last sent header if the key is the same, this is also how
-            // ctx.header(str key) operates so we don't have to change anything.
             Map<String, String> headers = ctx.headerMap();
+            String ipHeaderName = getIpHeaderName();
+            Enumeration<String> ipHeaders = ctx.req().getHeaders(ipHeaderName);
+            if (ipHeaders != null && ipHeaders.hasMoreElements()) {
+                StringJoiner chain = new StringJoiner(",");
+                while (ipHeaders.hasMoreElements()) {
+                    chain.add(ipHeaders.nextElement());
+                }
+                headers = new HashMap<>(headers);
+                headers.keySet().removeIf(ipHeaderName::equalsIgnoreCase);
+                headers.put(ipHeaderName, chain.toString());
+            }
 
             // Create a context object for Javalin
             ContextObject context = new JavalinContextObject(

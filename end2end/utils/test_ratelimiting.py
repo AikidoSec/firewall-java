@@ -5,63 +5,63 @@ from utils.assert_equals import assert_eq
 def test_ratelimiting(url):
     # Test route (First req & 2nd Req) :
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.1"
+        'X-Forwarded-For': "8.8.8.8"
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.1"
+        'X-Forwarded-For': "8.8.8.8"
     })
     assert_eq(res.status_code, equals=200)
 
     # 3rd & 4th (blocked) requests :
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.1"
+        'X-Forwarded-For': "8.8.8.8"
     })
     assert_eq(res.status_code, equals=429)
-    assert_eq(res.text, equals="You are rate limited by Zen. (Your IP: 192.168.1.1)")
+    assert_eq(res.text, equals="You are rate limited by Zen. (Your IP: 8.8.8.8)")
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.1"
+        'X-Forwarded-For': "8.8.8.8"
     })
     assert_eq(res.status_code, equals=429)
-    assert_eq(res.text, equals="You are rate limited by Zen. (Your IP: 192.168.1.1)")
+    assert_eq(res.text, equals="You are rate limited by Zen. (Your IP: 8.8.8.8)")
 
     # Now do the same but with a different IP in the same time block :
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2"
+        'X-Forwarded-For': "9.9.9.9"
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2"
+        'X-Forwarded-For': "9.9.9.9"
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2"
+        'X-Forwarded-For': "9.9.9.9"
     })
     assert_eq(res.status_code, equals=429)
-    assert_eq(res.text, equals="You are rate limited by Zen. (Your IP: 192.168.1.2)")
+    assert_eq(res.text, equals="You are rate limited by Zen. (Your IP: 9.9.9.9)")
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2"
+        'X-Forwarded-For': "9.9.9.9"
     })
     assert_eq(res.status_code, equals=429)
-    assert_eq(res.text, equals="You are rate limited by Zen. (Your IP: 192.168.1.2)")
+    assert_eq(res.text, equals="You are rate limited by Zen. (Your IP: 9.9.9.9)")
 
     # Now wait 5 seconds so your window is over and re-request :
     time.sleep(5)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2"
+        'X-Forwarded-For': "9.9.9.9"
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.1"
+        'X-Forwarded-For': "8.8.8.8"
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2"
+        'X-Forwarded-For': "9.9.9.9"
     })
     assert_eq(res.status_code, equals=200)
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.1"
+        'X-Forwarded-For': "8.8.8.8"
     })
     assert_eq(res.status_code, equals=200)
 
@@ -131,30 +131,30 @@ def test_ratelimiting_per_user(url):
 
     # Test it prefers user over IP :
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2"
+        'X-Forwarded-For': "9.9.9.9"
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2"
+        'X-Forwarded-For': "9.9.9.9"
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2",
+        'X-Forwarded-For': "9.9.9.9",
         'user': 'id3'
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2",
+        'X-Forwarded-For': "9.9.9.9",
         'user': 'id4'
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2",
+        'X-Forwarded-For': "9.9.9.9",
         'user': 'id5'
     })
     assert_eq(res.status_code, equals=200)
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.2",
+        'X-Forwarded-For': "9.9.9.9",
         'user': 'id6'
     })
     assert_eq(res.status_code, equals=200)
