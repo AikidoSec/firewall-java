@@ -3,6 +3,7 @@ package dev.aikido.agent_api.context;
 import java.util.*;
 
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
+import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.isTrustedProxyRequest;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
 public class SpringMVCContextObject extends SpringContextObject {
@@ -22,6 +23,7 @@ public class SpringMVCContextObject extends SpringContextObject {
         this.headers = extractHeaders(headers);
         this.route = buildRouteFromUrl(this.url);
         this.remoteAddress = getIpFromRequest(rawIp, this.headers);
+        this.isBehindTrustedProxy = isTrustedProxyRequest(rawIp);
         this.source = "SpringFramework";
         this.redirectStartNodes = new ArrayList<>();
     }

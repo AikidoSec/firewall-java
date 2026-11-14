@@ -45,6 +45,9 @@ public class EmptySampleContextObject extends ContextObject {
         this.method = method;
         this.query = new HashMap<>(queryParams);
     }
+    public void setBehindTrustedProxy(boolean trusted) {
+        this.isBehindTrustedProxy = trusted;
+    }
     public void setIp(String ip) {
         this.remoteAddress = ip;
     }

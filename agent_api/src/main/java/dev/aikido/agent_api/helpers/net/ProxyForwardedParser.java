@@ -1,6 +1,6 @@
 package dev.aikido.agent_api.helpers.net;
 
-import dev.aikido.agent_api.helpers.env.BooleanEnv;
+import static dev.aikido.agent_api.vulnerabilities.ssrf.IsPrivateIP.isPrivateIp;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,9 +10,10 @@ import static dev.aikido.agent_api.context.ContextObject.getHeader;
 public class ProxyForwardedParser {
     public static String getIpFromRequest(String rawIp, HashMap<String, List<String>> headers) {
         String ipHeader = getHeader(headers, getIpHeaderName());
-        if (ipHeader != null && !ipHeader.isEmpty() && trustProxy()) {
+        TrustProxy.Config config = TrustProxy.getConfig();
+        if (ipHeader != null && !ipHeader.isEmpty() && isTrustedProxyRequest(rawIp)) {
             // Parse ip header and return the correct IP :
-            String ipHeaderValue = extractIpFromHeader(ipHeader);
+            String ipHeaderValue = extractIpFromHeader(ipHeader, config);
             if (ipHeaderValue != null) {
                 return ipHeaderValue;
             }
@@ -27,23 +28,24 @@ public class ProxyForwardedParser {
         return rawIp;
     }
 
-    /**
-     * Checks the boolean environment variable `AIKIDO_TRUST_PROXY`, default is true.
-     */
-    public static boolean trustProxy() {
-        BooleanEnv trustProxy = new BooleanEnv("AIKIDO_TRUST_PROXY", /* default : */ true);
-        return trustProxy.getValue();
+    public static boolean isTrustedProxyRequest(String rawIp) {
+        return TrustProxy.isTrustedProxyRequest(normalizeIp(rawIp));
     }
 
-    private static String extractIpFromHeader(String xForwardedForHeader) {
-        String[] ips = xForwardedForHeader.split(",");
-        for (String ip: ips) {
-            ip = ip.trim();
-
-            String normalizedIp = normalizeIp(ip);
-            if (normalizedIp != null) {
-                return normalizedIp;
+    private static String extractIpFromHeader(String xForwardedForHeader, TrustProxy.Config config) {
+        String[] ips = xForwardedForHeader.split(",", -1);
+        int startIndex = config instanceof TrustProxy.CountConfig countConfig
+                ? ips.length - countConfig.count()
+                : ips.length - 1;
+        for (int index = startIndex; index >= 0; index--) {
+            String normalizedIp = normalizeIp(ips[index].trim());
+            if (normalizedIp == null || isPrivateIp(normalizedIp)) {
+                continue;
             }
+            if (config instanceof TrustProxy.CIDRConfig cidrConfig && cidrConfig.ranges().matches(normalizedIp)) {
+                continue;
+            }
+            return normalizedIp;
         }
         return null;
     }
