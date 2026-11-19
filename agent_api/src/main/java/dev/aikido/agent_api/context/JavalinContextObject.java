@@ -3,6 +3,7 @@ package dev.aikido.agent_api.context;
 import java.util.*;
 
 import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.getIpFromRequest;
+import static dev.aikido.agent_api.helpers.net.ProxyForwardedParser.isTrustedProxyRequest;
 import static dev.aikido.agent_api.helpers.url.BuildRouteFromUrl.buildRouteFromUrl;
 
 public class JavalinContextObject extends ContextObject {
@@ -21,6 +22,7 @@ public class JavalinContextObject extends ContextObject {
         this.headers = extractHeaders(headers);
         this.route = buildRouteFromUrl(this.url);
         this.remoteAddress = getIpFromRequest(rawIp, this.headers);
+        this.isBehindTrustedProxy = isTrustedProxyRequest(rawIp);
         this.source = "Javalin";
         this.redirectStartNodes = new ArrayList<>();
 

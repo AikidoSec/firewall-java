@@ -16,7 +16,7 @@ def test_custom_events(url, event_handler):
     event_handler.reset()
 
     res = requests.post(url + "/api/track", headers={
-        "X-Forwarded-For": "203.0.113.7",
+        "X-Forwarded-For": "8.8.8.8",
         "User-Agent": "zen-e2e",
     })
     assert_eq(res.status_code, equals=200)
@@ -25,7 +25,7 @@ def test_custom_events(url, event_handler):
     assert_eq(len(custom_events), equals=1)
     event = custom_events[0]
     assert_eq(event["name"], equals="user.login_failed")
-    assert_eq(event["request"]["ipAddress"], equals="203.0.113.7")
+    assert_eq(event["request"]["ipAddress"], equals="8.8.8.8")
     assert_eq(event["request"]["userAgent"], equals="zen-e2e")
     assert_eq(event["request"]["method"], equals="POST")
     assert_eq(event["request"]["route"], equals="/api/track")

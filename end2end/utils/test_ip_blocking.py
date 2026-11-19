@@ -28,9 +28,14 @@ def test_ip_blocking(url):
     })
     assert_eq(res.status_code, equals=200)
 
-    # It should only use the first valid ip
     res = requests.get(url, headers={
-        'X-Forwarded-For': "192.168.1.1, 1.2.3.4"
+        'X-Forwarded-For': "9.9.9.9, 1.2.3.4"
+    })
+    assert_eq(res.status_code, equals=403)
+    assert_eq(res.text, equals="Your IP address is blocked. Reason: geo restrictions (Your IP: 1.2.3.4)")
+
+    res = requests.get(url, headers={
+        'X-Forwarded-For': "1.2.3.4, 9.9.9.9"
     })
     assert_eq(res.status_code, equals=200)
 
